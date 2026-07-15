@@ -1,7 +1,7 @@
 import axios from '../api/axios';
 import { getProductImage } from '../utils/productImage';
 
-export const PRODUCT_API_BASE_URL = 'http://shyamagrotools.com';
+export const PRODUCT_API_BASE_URL = 'https://shyamagrotools.com';
 const PRODUCT_ENDPOINT = `${PRODUCT_API_BASE_URL}/api/products`;
 
 const requestConfig = {

@@ -1,6 +1,6 @@
 import axios from '../api/axios';
 
-export const CATEGORY_API_BASE_URL = 'http://shyamagrotools.com';
+export const CATEGORY_API_BASE_URL = 'https://shyamagrotools.com';
 export const DEFAULT_CATEGORY_IMAGE = '/category-banners/fallback.png';
 const CATEGORY_ENDPOINT = `${CATEGORY_API_BASE_URL}/api/Category`;
 const requestConfig = {

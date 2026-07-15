@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ─── Base URL ────────────────────────────────────────────────────────────────
-export const BASE_URL = 'http://shyamagrotools.com';
+export const BASE_URL = 'https://shyamagrotools.com';
 
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 const api = axios.create({

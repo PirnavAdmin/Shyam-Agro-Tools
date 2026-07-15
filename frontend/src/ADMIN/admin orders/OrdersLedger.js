@@ -139,7 +139,7 @@ const OrdersLedger = () => {
         
         let customerMap = {};
         try {
-          const custResponse = await fetch('http://shyamagrotools.com/api/Customers', {
+          const custResponse = await fetch('https://shyamagrotools.com/api/Customers', {
             headers: {
               'ngrok-skip-browser-warning': 'true',
               'Accept': 'application/json'

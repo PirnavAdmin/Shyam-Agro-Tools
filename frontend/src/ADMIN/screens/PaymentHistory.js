@@ -9,7 +9,7 @@ import { getOrders, updateOrderStatus } from '../api/orders';
 import { Toast } from '../components/Toast';
 import './PaymentHistory.css';
 
-const BASE_PAYMENT_URL = 'http://shyamagrotools.com/api/Payment';
+const BASE_PAYMENT_URL = 'https://shyamagrotools.com/api/Payment';
 const HEADERS = {
   'ngrok-skip-browser-warning': 'true',
   'Accept': 'application/json',
@@ -172,7 +172,7 @@ const PaymentHistory = () => {
         const serverQr = await fetchQrConfig();
         if (serverQr && serverQr.qrImageUrl) {
           const fullQrUrl = serverQr.qrImageUrl.startsWith('/') 
-            ? `http://shyamagrotools.com${serverQr.qrImageUrl}` 
+            ? `https://shyamagrotools.com${serverQr.qrImageUrl}` 
             : serverQr.qrImageUrl;
           setQrPreview(fullQrUrl);
         }
@@ -833,7 +833,7 @@ const PaymentHistory = () => {
                               </span>
                               {payment.screenshotUrl && (
                                 <a 
-                                  href={`http://shyamagrotools.com${payment.screenshotUrl}`} 
+                                  href={`https://shyamagrotools.com${payment.screenshotUrl}`} 
                                   target="_blank" 
                                   rel="noopener noreferrer" 
                                   className="screenshot-link"

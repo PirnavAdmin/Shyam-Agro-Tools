@@ -7,9 +7,9 @@ import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../componen
 import { Toast } from '../components/Toast';
 
 // Inline API utilities
-const API_BASE = 'http://shyamagrotools.com/api/Brand';
-const API_DOMAIN = 'http://shyamagrotools.com';
-const API_ITEM = (id) => `http://shyamagrotools.com/api/Brand/${encodeURIComponent(id)}`;
+const API_BASE = 'https://shyamagrotools.com/api/Brand';
+const API_DOMAIN = 'https://shyamagrotools.com';
+const API_ITEM = (id) => `https://shyamagrotools.com/api/Brand/${encodeURIComponent(id)}`;
 
 // Normalize brand object: map any possible image field name to `logo`
 const normalizeBrand = (b) => {

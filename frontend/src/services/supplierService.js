@@ -2,7 +2,7 @@ import apiClient from '../api/axios';
 
 export const SUPPLIER_API_BASE_URL = (
   process.env.REACT_APP_SUPPLIER_API_BASE_URL ||
-  'http://shyamagrotools.com'
+  'https://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const requestConfig = {

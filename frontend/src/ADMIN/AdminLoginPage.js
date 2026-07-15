@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AdminLoginPage.css';
 
-const ADMIN_AUTH_API = "http://shyamagrotools.com/api/Auth";
+const ADMIN_AUTH_API = "https://shyamagrotools.com/api/Auth";
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' };
 const REQUEST_TIMEOUT = 8000;
 
@@ -77,14 +77,14 @@ const AdminLoginPage = () => {
 
       let profile = null;
       try {
-        const res = await axios.get('http://shyamagrotools.com/api/Auth/profile', { headers, timeout: 5000 });
+        const res = await axios.get('https://shyamagrotools.com/api/Auth/profile', { headers, timeout: 5000 });
         if (res.data) {
           profile = res.data.data || res.data.value || res.data;
         }
       } catch (e) {
         console.warn('Auth profile fetch failed, trying Staff profile:', e.message);
         try {
-          const res = await axios.get('http://shyamagrotools.com/api/Staff/profile', { headers, timeout: 5000 });
+          const res = await axios.get('https://shyamagrotools.com/api/Staff/profile', { headers, timeout: 5000 });
           if (res.data) {
             profile = res.data.data || res.data.value || res.data;
           }
@@ -95,7 +95,7 @@ const AdminLoginPage = () => {
 
       let permissions = [];
       try {
-        const res = await axios.get('http://shyamagrotools.com/api/Permission/my-permissions', { headers, timeout: 5000 });
+        const res = await axios.get('https://shyamagrotools.com/api/Permission/my-permissions', { headers, timeout: 5000 });
         const permsData = res.data?.data || res.data?.value || res.data;
         if (Array.isArray(permsData)) {
           permsData.forEach(p => {
@@ -136,7 +136,7 @@ const AdminLoginPage = () => {
       try {
         console.log("Attempting login via new API...");
         const newResponse = await axios.post(
-          "http://shyamagrotools.com/api/Auth/login",
+          "https://shyamagrotools.com/api/Auth/login",
           buildLoginPayload(email, password),
           { headers: HEADERS, timeout: REQUEST_TIMEOUT }
         );

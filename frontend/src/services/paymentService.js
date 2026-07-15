@@ -3,7 +3,7 @@ import axios from '../api/axios';
 export const PAYMENT_API_BASE_URL = (
   process.env.REACT_APP_PAYMENT_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'http://shyamagrotools.com'
+  'https://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const paymentRequestConfig = {

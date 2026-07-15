@@ -4,7 +4,7 @@ import { clearSession, getRefreshToken, getToken, setAuthSession } from '../util
 const apiClient = axios.create();
 let refreshRequest = null;
 
-const authBaseUrl = () => (process.env.REACT_APP_AUTH_API_BASE_URL || 'http://shyamagrotools.com').replace(/\/$/, '');
+const authBaseUrl = () => (process.env.REACT_APP_AUTH_API_BASE_URL || 'https://shyamagrotools.com').replace(/\/$/, '');
 
 apiClient.interceptors.request.use((config) => {
   const token = getToken();
