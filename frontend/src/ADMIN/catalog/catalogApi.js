@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ─── Base URL ────────────────────────────────────────────────────────────────
-const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+const BASE_URL = 'http://shyamagrotools.com';
 
 // Axios instance — always skip the ngrok browser-warning page
 const api = axios.create({
@@ -151,10 +151,10 @@ export const mapProductFromApi = (raw = {}, categories = [], subcategories = [])
 };
 
 // ─── Category API ─────────────────────────────────────────────────────────────
-// GET  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Category
-// POST https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Category
-// PUT  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Category/{id}
-// DEL  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Category/{id}
+// GET  http://shyamagrotools.com/api/Category
+// POST http://shyamagrotools.com/api/Category
+// PUT  http://shyamagrotools.com/api/Category/{id}
+// DEL  http://shyamagrotools.com/api/Category/{id}
 
 export const fetchCategories = async () => {
   const response = await api.get('/api/Category');
@@ -208,10 +208,10 @@ export const deleteCategory = async (id) => {
 };
 
 // ─── Subcategory API ──────────────────────────────────────────────────────────
-// GET  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Subcategory
-// POST https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Subcategory
-// PUT  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Subcategories/{id}
-// DEL  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Subcategories/{id}
+// GET  http://shyamagrotools.com/api/Subcategory
+// POST http://shyamagrotools.com/api/Subcategory
+// PUT  http://shyamagrotools.com/api/Subcategories/{id}
+// DEL  http://shyamagrotools.com/api/Subcategories/{id}
 
 export const fetchSubcategories = async () => {
   const response = await api.get('/api/Subcategory');
@@ -264,10 +264,10 @@ export const deleteSubcategory = async (id) => {
 };
 
 // ─── Products API ─────────────────────────────────────────────────────────────
-// GET  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Catalog/products
-// POST https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Catalog/products
-// PUT  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Catalog/products/{id}
-// DEL  https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Catalog/products/{id}
+// GET  http://shyamagrotools.com/api/Catalog/products
+// POST http://shyamagrotools.com/api/Catalog/products
+// PUT  http://shyamagrotools.com/api/Catalog/products/{id}
+// DEL  http://shyamagrotools.com/api/Catalog/products/{id}
 
 export const fetchProducts = async (categories = [], subcategories = []) => {
   const response = await api.get('/api/Catalog/products');

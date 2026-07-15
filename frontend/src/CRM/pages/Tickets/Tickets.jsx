@@ -3,7 +3,7 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 import "./Tickets.css";
 
-const API_URL = "https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Tickets";
+const API_URL = "http://shyamagrotools.com/api/Tickets";
 
 function Tickets() {
   const [showModal, setShowModal] = useState(false);

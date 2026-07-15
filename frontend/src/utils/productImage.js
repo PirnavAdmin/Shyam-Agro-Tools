@@ -1,4 +1,4 @@
-export const PRODUCT_ASSET_BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+export const PRODUCT_ASSET_BASE_URL = 'http://shyamagrotools.com';
 export const PRODUCT_IMAGE_FALLBACK = '/assets/no-image.png';
 
 const getPath = (value) => {

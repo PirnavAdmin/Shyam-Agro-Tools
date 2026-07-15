@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import headerLogo from '../../asset/header logo.png';
 import './LoginPopup.css';
 
-const DIRECT_API_BASE_URL = "https://wildlife-unwieldy-devotee.ngrok-free.dev";
+const DIRECT_API_BASE_URL = "http://shyamagrotools.com";
 const API_HEADERS = {
   'Content-Type': 'application/json',
   'ngrok-skip-browser-warning': 'true',

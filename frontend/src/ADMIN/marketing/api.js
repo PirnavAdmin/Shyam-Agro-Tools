@@ -1,4 +1,4 @@
-const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Coupons';
+const BASE_URL = 'http://shyamagrotools.com/api/Coupons';
 
 function mapBackendToFrontend(apiCoupon) {
   return {

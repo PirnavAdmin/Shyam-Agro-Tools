@@ -106,7 +106,7 @@ const AdminDashboard = () => {
 
       // Fetch brands count
       try {
-        const brandRes = await fetch('https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Brand', {
+        const brandRes = await fetch('http://shyamagrotools.com/api/Brand', {
           headers: { 'ngrok-skip-browser-warning': 'true' }
         });
         if (brandRes.ok) {
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
 
       // Fetch staff count
       try {
-        const staffRes = await fetch('https://satin-eastcoast-musky.ngrok-free.dev/api/Staff', {
+        const staffRes = await fetch('http://shyamagrotools.com/api/Staff', {
           headers: { 'ngrok-skip-browser-warning': 'true' }
         });
         if (staffRes.ok) {

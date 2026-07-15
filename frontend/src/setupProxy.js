@@ -1,7 +1,7 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-const API_TARGET = 'https://snowplow-mummy-diligent.ngrok-free.dev';
-const COUPONS_API_TARGET = 'https://satin-eastcoast-musky.ngrok-free.dev';
+const API_TARGET = 'http://shyamagrotools.com';
+const COUPONS_API_TARGET = 'http://shyamagrotools.com';
 
 module.exports = function setupProxy(app) {
   // Route coupons API requests to the specific target to avoid CORS

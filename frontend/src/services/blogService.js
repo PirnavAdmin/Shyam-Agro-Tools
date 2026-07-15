@@ -2,7 +2,7 @@ import axios from '../api/axios';
 
 export const BLOG_API_BASE_URL = (
   process.env.REACT_APP_BLOG_API_BASE_URL ||
-  'https://wildlife-unwieldy-devotee.ngrok-free.dev'
+  'http://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const BLOG_ENDPOINT = `${BLOG_API_BASE_URL}/api/Blog`;

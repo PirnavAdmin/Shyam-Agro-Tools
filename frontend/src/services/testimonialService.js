@@ -3,7 +3,7 @@ import axios from '../api/axios';
 export const TESTIMONIAL_API_BASE_URL = (
   process.env.REACT_APP_TESTIMONIAL_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://wildlife-unwieldy-devotee.ngrok-free.dev'
+  'http://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const TESTIMONIAL_ENDPOINT = `${TESTIMONIAL_API_BASE_URL}/api/Testimonials`;

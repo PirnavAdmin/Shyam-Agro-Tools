@@ -1,6 +1,6 @@
 import axios from '../api/axios';
 
-export const SUBCATEGORY_API_BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+export const SUBCATEGORY_API_BASE_URL = 'http://shyamagrotools.com';
 export const DEFAULT_SUBCATEGORY_IMAGE = '/category-banners/fallback.png';
 const SUBCATEGORY_ENDPOINT = `${SUBCATEGORY_API_BASE_URL}/api/Subcategory`;
 const requestConfig = {

@@ -2,7 +2,7 @@ import apiClient from '../api/axios';
 
 export const COUPON_API_BASE_URL = (
   process.env.REACT_APP_COUPON_API_BASE_URL ||
-  'https://wildlife-unwieldy-devotee.ngrok-free.dev'
+  'http://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const requestConfig = {

@@ -188,7 +188,7 @@ const ProductsForm = () => {
     Promise.all([
       fetchCategories(),
       fetchSubcategories(),
-      fetch('https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Brand', {
+      fetch('http://shyamagrotools.com/api/Brand', {
         headers: { 'ngrok-skip-browser-warning': 'true' }
       }).then(res => res.json()).catch(() => []),
       fetchSuppliers().catch(() => [])

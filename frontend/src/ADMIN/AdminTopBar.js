@@ -50,7 +50,7 @@ const AdminTopBar = () => {
     if (apiVersion === 'new' && token) {
       try {
         console.log("Calling new API logout...");
-        await fetch('https://satin-eastcoast-musky.ngrok-free.dev/api/Auth/logout', {
+        await fetch('http://shyamagrotools.com/api/Auth/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

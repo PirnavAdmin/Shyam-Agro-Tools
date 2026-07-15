@@ -4,8 +4,8 @@ import { Search, Plus, FileText, Calendar, User, Eye, RefreshCw, AlertCircle } f
 import '../catalog/adminModule.css';
 import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../components/ActionButtons';
 
-const API_BASE = 'https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Blog';
-const IMG_BASE = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+const API_BASE = 'http://shyamagrotools.com/api/Blog';
+const IMG_BASE = 'http://shyamagrotools.com';
 
 const HEADERS = {
   'ngrok-skip-browser-warning': 'true',

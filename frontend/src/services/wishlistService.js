@@ -1,6 +1,6 @@
 import axios from '../api/axios';
 
-export const WISHLIST_API_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Wishlist';
+export const WISHLIST_API_URL = 'http://shyamagrotools.com/api/Wishlist';
 
 const requestConfig = {
   headers: {

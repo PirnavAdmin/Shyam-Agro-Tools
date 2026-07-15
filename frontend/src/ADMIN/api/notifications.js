@@ -1,4 +1,4 @@
-const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Notifications';
+const BASE_URL = 'http://shyamagrotools.com/api/Notifications';
 
 const DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',
