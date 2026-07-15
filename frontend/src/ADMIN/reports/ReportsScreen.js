@@ -438,9 +438,6 @@ const ReportsScreen = () => {
       
       if (data && data.exportUrl) {
         let downloadUrl = data.exportUrl;
-        if (downloadUrl.includes('localhost:7072')) {
-          downloadUrl = downloadUrl.replace('https://localhost:7072', 'https://wildlife-unwieldy-devotee.ngrok-free.dev');
-        }
 
         const checkResponse = await fetch(downloadUrl, {
           method: 'GET',

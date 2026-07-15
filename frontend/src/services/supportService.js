@@ -3,7 +3,7 @@ import apiClient from '../api/axios';
 export const SUPPORT_API_BASE_URL = (
   process.env.REACT_APP_SUPPORT_API_BASE_URL ||
   process.env.REACT_APP_AUTH_API_BASE_URL ||
-  'https://wildlife-unwieldy-devotee.ngrok-free.dev'
+  'http://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const supportRequestConfig = {

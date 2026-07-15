@@ -4,7 +4,7 @@ import { ArrowLeft, Save, Upload } from 'lucide-react';
 import '../catalog/adminModule.css';
 import { Toast } from '../components/Toast';
 
-const API_BASE = 'https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Testimonials';
+const API_BASE = 'http://shyamagrotools.com/api/Testimonials';
 
 const getHeaders = () => {
   const headers = {

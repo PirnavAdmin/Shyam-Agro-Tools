@@ -38,7 +38,7 @@ const CustomersList = () => {
 
   const fetchCustomers = () => {
     setLoading(true);
-    fetch('https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Customers', {
+    fetch('http://shyamagrotools.com/api/Customers', {
       headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
     })
       .then(res => {
@@ -58,7 +58,7 @@ const CustomersList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this customer?')) return;
     try {
-      const res = await fetch(`https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Customers/${id}`, {
+      const res = await fetch(`http://shyamagrotools.com/api/Customers/${id}`, {
         method: 'DELETE',
         headers: { 'ngrok-skip-browser-warning': 'true' }
       });
@@ -95,7 +95,7 @@ const CustomersList = () => {
         }
       };
 
-      const res = await fetch('https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Customers', {
+      const res = await fetch('http://shyamagrotools.com/api/Customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

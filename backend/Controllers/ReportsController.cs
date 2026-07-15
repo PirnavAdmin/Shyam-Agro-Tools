@@ -204,7 +204,7 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             // Mock CSV/Excel export payload
-            var exportUrl = $"https://localhost:7072/exports/{request.ReportType.ToLower()}_{DateTime.UtcNow:yyyyMMdd}.csv";
+            var exportUrl = $"http://shyamagrotools.com/exports/{request.ReportType.ToLower()}_{DateTime.UtcNow:yyyyMMdd}.csv";
 
             return Ok(new
             {

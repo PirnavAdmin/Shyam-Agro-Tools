@@ -4,7 +4,7 @@ import { ArrowLeft, Save, Shield, User, Key, Plus, Trash2 } from "lucide-react";
 import { Toast } from "../components/Toast";
 import './AddStaff.css';
 
-const BASE_URL = 'https://satin-eastcoast-musky.ngrok-free.dev/api';
+const BASE_URL = 'http://shyamagrotools.com/api';
 
 const getHeaders = () => {
   const headers = {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ─── Base URL ────────────────────────────────────────────────────────────────
-export const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+export const BASE_URL = 'http://shyamagrotools.com';
 
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 const api = axios.create({

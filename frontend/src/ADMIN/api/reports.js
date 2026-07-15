@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+export const BASE_URL = 'http://shyamagrotools.com';
 
 const api = axios.create({
   baseURL: BASE_URL,

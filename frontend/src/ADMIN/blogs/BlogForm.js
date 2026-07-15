@@ -4,8 +4,8 @@ import { ArrowLeft, Save, Upload, RefreshCw } from 'lucide-react';
 import '../catalog/adminModule.css';
 import { Toast } from '../components/Toast';
 
-const API_BASE   = 'https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Blog';
-const IMG_BASE   = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
+const API_BASE   = 'http://shyamagrotools.com/api/Blog';
+const IMG_BASE   = 'http://shyamagrotools.com';
 const GET_HEADERS = {
   'ngrok-skip-browser-warning': 'true',
   'Accept': 'application/json',

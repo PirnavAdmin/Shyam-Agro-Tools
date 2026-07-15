@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import './AdminVerifyOTP.css';
 
-const ADMIN_AUTH_API = "https://wildlife-unwieldy-devotee.ngrok-free.dev/api/Auth";
+const ADMIN_AUTH_API = "http://shyamagrotools.com/api/Auth";
 
 const HEADERS      = { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' };
 const REQUEST_TIMEOUT = 20000;

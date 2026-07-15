@@ -4,7 +4,7 @@ import { Users, Plus, Mail, Phone } from 'lucide-react';
 import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../components/ActionButtons';
 import { Toast } from '../components/Toast';
 
-const BASE_URL = 'https://satin-eastcoast-musky.ngrok-free.dev/api';
+const BASE_URL = 'http://shyamagrotools.com/api';
 
 const getHeaders = () => {
   const headers = {

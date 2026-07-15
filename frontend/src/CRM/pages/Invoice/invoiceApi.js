@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://wildlife-unwieldy-devotee.ngrok-free.dev/api";
+const API_BASE_URL = "http://shyamagrotools.com/api";
 
 export const INVOICES_API_URL = `${API_BASE_URL}/Invoices`;
 export const INVOICE_ACTIONS_API_URL = `${API_BASE_URL}/invoice-actions`;
