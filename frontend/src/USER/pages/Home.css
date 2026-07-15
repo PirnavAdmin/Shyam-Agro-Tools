@@ -1,0 +1,82 @@
+.home-container {
+  /* Global padding-left: 280px handled in App.css */
+}
+
+.main-content-area {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero Section Refinement - Shorter and cleaner */
+.hero-section {
+  width: 100%;
+  height: 320px; /* Reduced further for professional look */
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Darker overlay for better text contrast */
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #ffc107;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+  padding: 0.8rem 2rem;
+  background-color: #ffc107;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #e0a800;
+}
+
+/* Categories Section Spacing */
+.home-categories-wrapper {
+  background-color: #ffffff;
+  padding-top: 1rem;
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    height: 250px;
+  }
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+}

@@ -1,0 +1,88 @@
+:root {
+  --primary-color: #0b2e13;
+  --accent-color: #ffc107;
+  --bg-light: #f8f9fa;
+  --sidebar-width: 280px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+body {
+  background-color: #fff;
+  color: #333;
+}
+
+/* Global Page Wrapper - Robust CSS Grid Layout */
+.home-container, .home-wrapper {
+  min-height: 100vh;
+  background-color: #fff;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* 1. Header (TopBar + UtilityBar) spans full width */
+.home-container > .header-container, 
+.home-wrapper > .header-container {
+  grid-column: 1 / -1;
+  grid-row: 1 / 2;
+}
+
+/* 2. MenuBar stays in the left column */
+.home-container > .side-menu-container,
+.home-wrapper > .side-menu-container {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+/* 3. Main Content takes the remaining right side */
+.home-container > main, 
+.home-wrapper > main {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+/* 4. Footer spans full width */
+.home-container > footer,
+.home-wrapper > footer {
+  grid-column: 1 / -1;
+  grid-row: 3 / 4;
+}
+
+/* Responsive adjustment for Sidebar */
+@media (max-width: 992px) {
+  .home-container, .home-wrapper {
+    grid-template-columns: 1fr; /* Sidebar collapses or becomes hidden */
+  }
+  
+  .home-container > .side-menu-container,
+  .home-wrapper > .side-menu-container {
+    display: none; /* Hide sidebar on mobile/tablet for now */
+  }
+
+  .home-container > main, 
+  .home-wrapper > main {
+    grid-column: 1 / -1;
+  }
+}
+
+.main-container {
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

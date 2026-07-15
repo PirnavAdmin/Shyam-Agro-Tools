@@ -1,0 +1,342 @@
+.add-staff-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1e293b;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.add-staff-header {
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.staff-kicker {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #10b981;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.staff-cancel-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.staff-cancel-btn:hover {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.staff-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #10b981;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
+}
+
+.staff-save-btn:hover {
+  background: #059669;
+}
+
+/* Two-column layout grid */
+.staff-content-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .staff-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.staff-form-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+}
+
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+@media (max-width: 600px) {
+  .fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.staff-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.staff-field label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.staff-field input, .staff-field select {
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #1e293b;
+  font-family: inherit;
+  background-color: white;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.staff-field input:focus, .staff-field select:focus {
+  border-color: #10b981;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.phone-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.phone-prefix {
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  font-size: 13px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.phone-input-container input {
+  flex: 1;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+
+.field-error-msg {
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Permissions toggle section */
+.permission-intro {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.permissions-grid-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+  .permissions-grid-wrap {
+    grid-template-columns: 1fr;
+  }
+}
+
+.permission-switch-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s;
+}
+
+.permission-switch-item:hover {
+  border-color: #cbd5e1;
+}
+
+.switch-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.switch-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete-custom-mod-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.delete-custom-mod-btn:hover {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+/* Switch styling */
+.switch-bg {
+  position: relative;
+  display: inline-flex;
+  height: 20px;
+  width: 36px;
+  align-items: center;
+  border-radius: 9999px;
+  border: none;
+  background-color: #cbd5e1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.switch-bg.active {
+  background-color: #10b981;
+}
+
+.switch-toggle-knob {
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+  transform: translateX(3px);
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 0.2s;
+}
+
+.switch-toggle-knob.active {
+  transform: translateX(19px);
+}
+
+/* Dynamic module registration box */
+.add-custom-module-box {
+  margin-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+}
+
+.add-custom-module-box h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  margin-top: 0;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.inline-add-form {
+  display: flex;
+  gap: 8px;
+}
+
+.inline-add-form input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.inline-add-form input:focus {
+  border-color: #10b981;
+  outline: none;
+}
+
+.inline-add-form button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.inline-add-form button:hover {
+  background: #2563eb;
+}

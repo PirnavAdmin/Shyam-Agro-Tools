@@ -1,0 +1,86 @@
+{
+  "blog": {
+    "latestNews": "Dernieres nouvelles",
+    "fromOurBlog": "Depuis notre blog",
+    "by": "Par",
+    "categoryAgriculture": "Agriculture",
+    "readMore": "Lire plus",
+    "closeBlogDetails": "Fermer les details du blog",
+    "posts": {
+      "soilPreparation": {
+        "title": "Conseils essentiels pour preparer le sol",
+        "excerpt": "Decouvrez les methodes professionnelles pour preparer votre sol avant la saison agricole et maximiser le rendement...",
+        "date": "12 mai 2026",
+        "author": "Admin",
+        "points": [
+          "Conseil: Choose the right tiller for your soil type.",
+          "Conseil: Remove weeds and leftover crop residue before planting.",
+          "Conseil: Maintain proper soil moisture before tilling.",
+          "Conseil: Use cultivators for better aeration and root growth.",
+          "Conseil: Break large soil clods before seed placement.",
+          "Conseil: Level the field to avoid waterlogging in low spots.",
+          "Conseil: Add compost or organic manure before final cultivation.",
+          "Conseil: Avoid working soil when it is too wet or sticky.",
+          "Conseil: Check soil pH and correct nutrient imbalance early.",
+          "Conseil: Prepare raised beds for vegetables and delicate crops.",
+          "Conseil: Keep tiller blades clean and sharp for uniform soil mixing.",
+          "Conseil: Use shallow cultivation around existing roots.",
+          "Conseil: Plan drainage channels before the rainy season.",
+          "Conseil: Rotate crops to maintain soil health.",
+          "Conseil: Do a final light pass before sowing for smooth seed beds."
+        ]
+      },
+      "powerTools": {
+        "title": "Entretenir vos outils motorises",
+        "excerpt": "Un guide complet pour nettoyer et entretenir vos outils industriels afin de prolonger leur duree de vie et leur securite...",
+        "date": "10 mai 2026",
+        "author": "Expert agricole",
+        "points": [
+          "Conseil: Clean tools after every use.",
+          "Conseil: Remove soil, dust, and crop residue from blades.",
+          "Conseil: Check engine oil before starting.",
+          "Conseil: Clean or replace air filters regularly.",
+          "Conseil: Tighten loose nuts, bolts, and screws.",
+          "Conseil: Sharpen blades when cutting performance decreases.",
+          "Conseil: Check fuel lines for leakage.",
+          "Conseil: Store tools in a dry and shaded place.",
+          "Conseil: Lubricate moving parts regularly.",
+          "Conseil: Inspect power cables and switches.",
+          "Conseil: Replace damaged blades immediately.",
+          "Conseil: Use only recommended fuel or power source.",
+          "Conseil: Avoid overloading the machine.",
+          "Conseil: Follow manufacturer safety instructions.",
+          "Conseil: Service the tool at regular intervals."
+        ]
+      },
+      "irrigation": {
+        "title": "Techniques modernes d irrigation",
+        "excerpt": "Explorez les systemes d irrigation economes en eau qui transforment l agriculture moderne en Inde...",
+        "date": "08 mai 2026",
+        "author": "Editeur",
+        "points": [
+          "Conseil: Use drip irrigation to save water in row crops.",
+          "Conseil: Maintain pumps and filters regularly.",
+          "Conseil: Choose quality hoses, pipes, and connectors.",
+          "Conseil: Monitor water pressure during irrigation.",
+          "Conseil: Install filters before drip lines to reduce clogging.",
+          "Conseil: Flush drip pipes at regular intervals.",
+          "Conseil: Use sprinklers for even coverage in open fields.",
+          "Conseil: Select pump capacity based on field size and head height.",
+          "Conseil: Repair leaks quickly to prevent water loss.",
+          "Conseil: Schedule irrigation early morning or evening.",
+          "Conseil: Group crops with similar water needs together.",
+          "Conseil: Use rain guns for larger field coverage.",
+          "Conseil: Check nozzles for blockage before every cycle.",
+          "Conseil: Protect pipes from direct damage during field operations.",
+          "Conseil: Track soil moisture before increasing watering time."
+        ]
+      }
+    }
+  },
+  "supportChat": {
+    "reset": "Reinitialiser",
+    "message": "Message",
+    "title": "Shyam Agro Support"
+  }
+}

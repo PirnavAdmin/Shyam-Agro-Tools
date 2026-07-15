@@ -1,0 +1,165 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\models\\paymentconfigs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:models\\paymentconfigs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\models\\wallettransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:models\\wallettransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\models\\wishlistitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:models\\wishlistitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\models\\testuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:models\\testuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\controllers\\testauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:controllers\\testauthcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|c:\\users\\admin\\source\\repos\\shyamagrosuite.api\\shyamagrosuite.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{34489462-A8F1-B097-75AB-0EB7BDC9EDFC}|ShyamAgroSuite.Api.csproj|solutionrelative:shyamagrosuite.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{ca8cc5c7-0231-406a-95cd-aa5ed6ac0190}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Order.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\Order.cs",
+              "RelativeDocumentMoniker": "Models\\Order.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\Order.cs",
+              "RelativeToolTip": "Models\\Order.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAuwBwAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-12T09:57:21.474Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WalletTransaction.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\WalletTransaction.cs",
+              "RelativeDocumentMoniker": "Models\\WalletTransaction.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\WalletTransaction.cs",
+              "RelativeToolTip": "Models\\WalletTransaction.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAiwB0AAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-07T11:48:55.251Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "WishlistItem.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\WishlistItem.cs",
+              "RelativeDocumentMoniker": "Models\\WishlistItem.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\WishlistItem.cs",
+              "RelativeToolTip": "Models\\WishlistItem.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAAA0AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-06T03:57:49.299Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TestUser.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\TestUser.cs",
+              "RelativeDocumentMoniker": "Models\\TestUser.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\TestUser.cs",
+              "RelativeToolTip": "Models\\TestUser.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAiwBIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-23T12:17:29.672Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Properties\\launchSettings.json",
+              "RelativeToolTip": "Properties\\launchSettings.json",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAA0AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-06-23T10:36:22.543Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TestAuthController.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Controllers\\TestAuthController.cs",
+              "RelativeDocumentMoniker": "Controllers\\TestAuthController.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Controllers\\TestAuthController.cs",
+              "RelativeToolTip": "Controllers\\TestAuthController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAIkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-23T09:24:07.682Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PaymentConfigs.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\PaymentConfigs.cs",
+              "RelativeDocumentMoniker": "Models\\PaymentConfigs.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\Models\\PaymentConfigs.cs",
+              "RelativeToolTip": "Models\\PaymentConfigs.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAcwBoAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-10T09:11:15.825Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ShyamAgroSuite.Api.csproj",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\ShyamAgroSuite.Api.csproj",
+              "RelativeDocumentMoniker": "ShyamAgroSuite.Api.csproj",
+              "ToolTip": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\ShyamAgroSuite.Api.csproj",
+              "RelativeToolTip": "ShyamAgroSuite.Api.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-23T09:11:29.757Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

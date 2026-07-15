@@ -1,0 +1,67 @@
+/* ═══════════════════════════════════════════════
+   AdminSubNav – Horizontal Quick-Nav Pills
+   Professional Light Theme | Royal Blue Gradient
+   ═══════════════════════════════════════════════ */
+
+.admin-subnav {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 1.8rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(38, 54, 182, 0.06);
+}
+
+.subnav-scroll-container {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 9px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.subnav-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.subnav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #f8fafc;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  border: 1px solid #e2e8f0;
+  letter-spacing: 0.2px;
+}
+
+.subnav-link i {
+  font-size: 0.74rem;
+  transition: color 0.18s ease;
+}
+
+.subnav-link:hover {
+  background: #f0f4ff;
+  border-color: #c7d0f4;
+  color: #2636b6;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(38, 54, 182, 0.1);
+}
+
+.subnav-link.active {
+  background: linear-gradient(135deg, #2636b6 0%, #151f86 100%);
+  color: #ffffff;
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(38, 54, 182, 0.25);
+}
+
+.subnav-link.active i {
+  color: #ffffff;
+}

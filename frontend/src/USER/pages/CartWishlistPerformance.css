@@ -1,0 +1,64 @@
+.cart-wishlist-page {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: visible;
+  scroll-behavior: auto;
+}
+
+.cart-wishlist-main {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.cart-wishlist-bottom-section {
+  flex: 0 0 auto;
+  padding-bottom: clamp(4rem, 10vh, 7rem);
+}
+
+.cart-wishlist-bottom-section .marketplace-banner-panel {
+  overflow: visible;
+}
+
+.cart-wishlist-list {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  contain: layout paint;
+}
+
+.cart-wishlist-row {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 96px;
+}
+
+.cart-product-details,
+.cart-product-details > div:last-child {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cart-product-title {
+  max-width: 100%;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+.cart-summary-sticky {
+  will-change: auto;
+}
+
+@media (max-width: 1023px) {
+  .cart-summary-sticky {
+    position: static !important;
+  }
+}

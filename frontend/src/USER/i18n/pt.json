@@ -1,0 +1,86 @@
+{
+  "blog": {
+    "latestNews": "Ultimas noticias",
+    "fromOurBlog": "Do nosso blog",
+    "by": "Por",
+    "categoryAgriculture": "Agricultura",
+    "readMore": "Ler mais",
+    "closeBlogDetails": "Fechar detalhes do blog",
+    "posts": {
+      "soilPreparation": {
+        "title": "Dicas essenciais para preparar o solo",
+        "excerpt": "Aprenda segredos profissionais para preparar o solo antes da proxima safra e aumentar a produtividade...",
+        "date": "12 de maio de 2026",
+        "author": "Admin",
+        "points": [
+          "Dica: Choose the right tiller for your soil type.",
+          "Dica: Remove weeds and leftover crop residue before planting.",
+          "Dica: Maintain proper soil moisture before tilling.",
+          "Dica: Use cultivators for better aeration and root growth.",
+          "Dica: Break large soil clods before seed placement.",
+          "Dica: Level the field to avoid waterlogging in low spots.",
+          "Dica: Add compost or organic manure before final cultivation.",
+          "Dica: Avoid working soil when it is too wet or sticky.",
+          "Dica: Check soil pH and correct nutrient imbalance early.",
+          "Dica: Prepare raised beds for vegetables and delicate crops.",
+          "Dica: Keep tiller blades clean and sharp for uniform soil mixing.",
+          "Dica: Use shallow cultivation around existing roots.",
+          "Dica: Plan drainage channels before the rainy season.",
+          "Dica: Rotate crops to maintain soil health.",
+          "Dica: Do a final light pass before sowing for smooth seed beds."
+        ]
+      },
+      "powerTools": {
+        "title": "Manutencao das suas ferramentas eletricas",
+        "excerpt": "Um guia completo para limpar e manter ferramentas industriais com mais durabilidade e seguranca...",
+        "date": "10 de maio de 2026",
+        "author": "Especialista agricola",
+        "points": [
+          "Dica: Clean tools after every use.",
+          "Dica: Remove soil, dust, and crop residue from blades.",
+          "Dica: Check engine oil before starting.",
+          "Dica: Clean or replace air filters regularly.",
+          "Dica: Tighten loose nuts, bolts, and screws.",
+          "Dica: Sharpen blades when cutting performance decreases.",
+          "Dica: Check fuel lines for leakage.",
+          "Dica: Store tools in a dry and shaded place.",
+          "Dica: Lubricate moving parts regularly.",
+          "Dica: Inspect power cables and switches.",
+          "Dica: Replace damaged blades immediately.",
+          "Dica: Use only recommended fuel or power source.",
+          "Dica: Avoid overloading the machine.",
+          "Dica: Follow manufacturer safety instructions.",
+          "Dica: Service the tool at regular intervals."
+        ]
+      },
+      "irrigation": {
+        "title": "Tecnicas modernas de irrigacao",
+        "excerpt": "Conheca sistemas modernos de irrigacao que economizam agua e transformam a agricultura na India...",
+        "date": "08 de maio de 2026",
+        "author": "Editor",
+        "points": [
+          "Dica: Use drip irrigation to save water in row crops.",
+          "Dica: Maintain pumps and filters regularly.",
+          "Dica: Choose quality hoses, pipes, and connectors.",
+          "Dica: Monitor water pressure during irrigation.",
+          "Dica: Install filters before drip lines to reduce clogging.",
+          "Dica: Flush drip pipes at regular intervals.",
+          "Dica: Use sprinklers for even coverage in open fields.",
+          "Dica: Select pump capacity based on field size and head height.",
+          "Dica: Repair leaks quickly to prevent water loss.",
+          "Dica: Schedule irrigation early morning or evening.",
+          "Dica: Group crops with similar water needs together.",
+          "Dica: Use rain guns for larger field coverage.",
+          "Dica: Check nozzles for blockage before every cycle.",
+          "Dica: Protect pipes from direct damage during field operations.",
+          "Dica: Track soil moisture before increasing watering time."
+        ]
+      }
+    }
+  },
+  "supportChat": {
+    "reset": "Redefinir",
+    "message": "Mensagem",
+    "title": "Shyam Agro Support"
+  }
+}
