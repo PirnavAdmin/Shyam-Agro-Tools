@@ -1,0 +1,179 @@
+/* ═══════════════════════════════════════════════
+   SHYAM AGRO TOOLS – Admin Layout
+   Hover-expand sidebar: 64px collapsed → 260px expanded
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --sidebar-collapsed: 64px;
+  --sidebar-expanded:  260px;
+  --sidebar-duration:  0.28s;
+  --topbar-height:     64px;
+}
+
+/* ── Grid Layout ── */
+.admin-layout {
+  display: grid;
+  grid-template-rows: var(--topbar-height) 1fr;
+  grid-template-areas:
+    "topbar"
+    "main";
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: #f8f9fc;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  /* Sidebar handled via position:fixed */
+}
+
+/* ── Fixed Sidebar ── */
+.admin-sidebar-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: var(--sidebar-collapsed);
+  z-index: 200;
+  transition: width var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* Expanded state */
+.admin-layout.sidebar-open .admin-sidebar-area {
+  width: var(--sidebar-expanded);
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Topbar – shifts with sidebar ── */
+.admin-topbar-area {
+  grid-area: topbar;
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-collapsed);
+  right: 0;
+  height: var(--topbar-height);
+  z-index: 190;
+  transition: left var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-layout.sidebar-open .admin-topbar-area {
+  left: var(--sidebar-expanded);
+}
+
+/* ── Main Content – shifts with sidebar ── */
+.admin-main-content {
+  grid-area: main;
+  position: fixed;
+  top: var(--topbar-height);
+  left: var(--sidebar-collapsed);
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem 2.2rem;
+  scroll-behavior: smooth;
+  background: #f8f9fc;
+  transition: left var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  /* Hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.admin-main-content::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-layout.sidebar-open .admin-main-content {
+  left: var(--sidebar-expanded);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-collapsed: 0px;
+  }
+  .admin-main-content {
+    padding: 1.2rem;
+  }
+}
+
+/* ── Manager Read-Only Warning Banner ── */
+.manager-read-only-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Access Denied Panel ── */
+.access-denied-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 48px 32px;
+  max-width: 520px;
+  margin: 40px auto 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.access-denied-view svg {
+  margin-bottom: 20px;
+}
+
+.access-denied-view h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px;
+}
+
+.access-denied-view p {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+.access-denied-view code {
+  background: #f1f5f9;
+  color: #ef4444;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.access-denied-view button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.25);
+}
+
+.access-denied-view button:hover {
+  background: #2563eb;
+}

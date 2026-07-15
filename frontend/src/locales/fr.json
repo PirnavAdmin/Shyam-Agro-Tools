@@ -1,0 +1,281 @@
+{
+  "blog": {
+    "latestNews": "Dernières nouvelles",
+    "fromOurBlog": "Depuis notre blog",
+    "by": "Par",
+    "categoryAgriculture": "Agriculture",
+    "readMore": "Lire la suite",
+    "closeBlogDetails": "Fermer les détails du blog",
+    "posts": {
+      "soilPreparation": {
+        "title": "Conseils essentiels pour preparer le sol",
+        "excerpt": "Decouvrez les methodes professionnelles pour preparer votre sol avant la saison agricole et maximiser le rendement...",
+        "date": "12 mai 2026",
+        "author": "Admin",
+        "points": [
+          "Conseil: Choose the right tiller for your soil type.",
+          "Conseil: Remove weeds and leftover crop residue before planting.",
+          "Conseil: Maintain proper soil moisture before tilling.",
+          "Conseil: Use cultivators for better aeration and root growth.",
+          "Conseil: Break large soil clods before seed placement.",
+          "Conseil: Level the field to avoid waterlogging in low spots.",
+          "Conseil: Add compost or organic manure before final cultivation.",
+          "Conseil: Avoid working soil when it is too wet or sticky.",
+          "Conseil: Check soil pH and correct nutrient imbalance early.",
+          "Conseil: Prepare raised beds for vegetables and delicate crops.",
+          "Conseil: Keep tiller blades clean and sharp for uniform soil mixing.",
+          "Conseil: Use shallow cultivation around existing roots.",
+          "Conseil: Plan drainage channels before the rainy season.",
+          "Conseil: Rotate crops to maintain soil health.",
+          "Conseil: Do a final light pass before sowing for smooth seed beds."
+        ]
+      },
+      "powerTools": {
+        "title": "Entretenir vos outils motorises",
+        "excerpt": "Un guide complet pour nettoyer et entretenir vos outils industriels afin de prolonger leur duree de vie et leur securite...",
+        "date": "10 mai 2026",
+        "author": "Expert agricole",
+        "points": [
+          "Conseil: Clean tools after every use.",
+          "Conseil: Remove soil, dust, and crop residue from blades.",
+          "Conseil: Check engine oil before starting.",
+          "Conseil: Clean or replace air filters regularly.",
+          "Conseil: Tighten loose nuts, bolts, and screws.",
+          "Conseil: Sharpen blades when cutting performance decreases.",
+          "Conseil: Check fuel lines for leakage.",
+          "Conseil: Store tools in a dry and shaded place.",
+          "Conseil: Lubricate moving parts regularly.",
+          "Conseil: Inspect power cables and switches.",
+          "Conseil: Replace damaged blades immediately.",
+          "Conseil: Use only recommended fuel or power source.",
+          "Conseil: Avoid overloading the machine.",
+          "Conseil: Follow manufacturer safety instructions.",
+          "Conseil: Service the tool at regular intervals."
+        ]
+      },
+      "irrigation": {
+        "title": "Techniques modernes d irrigation",
+        "excerpt": "Explorez les systemes d irrigation economes en eau qui transforment l agriculture moderne en Inde...",
+        "date": "08 mai 2026",
+        "author": "Editeur",
+        "points": [
+          "Conseil: Use drip irrigation to save water in row crops.",
+          "Conseil: Maintain pumps and filters regularly.",
+          "Conseil: Choose quality hoses, pipes, and connectors.",
+          "Conseil: Monitor water pressure during irrigation.",
+          "Conseil: Install filters before drip lines to reduce clogging.",
+          "Conseil: Flush drip pipes at regular intervals.",
+          "Conseil: Use sprinklers for even coverage in open fields.",
+          "Conseil: Select pump capacity based on field size and head height.",
+          "Conseil: Repair leaks quickly to prevent water loss.",
+          "Conseil: Schedule irrigation early morning or evening.",
+          "Conseil: Group crops with similar water needs together.",
+          "Conseil: Use rain guns for larger field coverage.",
+          "Conseil: Check nozzles for blockage before every cycle.",
+          "Conseil: Protect pipes from direct damage during field operations.",
+          "Conseil: Track soil moisture before increasing watering time."
+        ]
+      }
+    },
+    "relatedProducts": "Produits associés",
+    "viewProduct": "Voir le produit",
+    "authors": {
+      "admin": "Administrateur",
+      "editor": "Éditeur",
+      "agriExpert": "Expert agricole"
+    },
+    "categories": {
+      "agriculture": "Agriculture"
+    },
+    "dates": {
+      "may12": "12 mai 2026",
+      "may10": "10 mai 2026",
+      "may08": "08 mai 2026"
+    },
+    "soilPreparation": {
+      "title": "Conseils essentiels pour la préparation du sol",
+      "description": "Découvrez les méthodes professionnelles pour préparer votre sol avant la prochaine saison agricole et maximiser le rendement...",
+      "points": [
+        "Conseil de préparation du sol 1",
+        "Conseil de préparation du sol 2",
+        "Conseil de préparation du sol 3",
+        "Conseil de préparation du sol 4",
+        "Conseil de préparation du sol 5",
+        "Conseil de préparation du sol 6",
+        "Conseil de préparation du sol 7",
+        "Conseil de préparation du sol 8",
+        "Conseil de préparation du sol 9",
+        "Conseil de préparation du sol 10",
+        "Conseil de préparation du sol 11",
+        "Conseil de préparation du sol 12",
+        "Conseil de préparation du sol 13",
+        "Conseil de préparation du sol 14",
+        "Conseil de préparation du sol 15"
+      ]
+    },
+    "powerTools": {
+      "title": "Entretenir vos outils motorisés",
+      "description": "Un guide complet pour nettoyer et entretenir vos outils agricoles motorisés afin de prolonger leur durée de vie et leur sécurité...",
+      "points": [
+        "Conseil d’entretien des outils 1",
+        "Conseil d’entretien des outils 2",
+        "Conseil d’entretien des outils 3",
+        "Conseil d’entretien des outils 4",
+        "Conseil d’entretien des outils 5",
+        "Conseil d’entretien des outils 6",
+        "Conseil d’entretien des outils 7",
+        "Conseil d’entretien des outils 8",
+        "Conseil d’entretien des outils 9",
+        "Conseil d’entretien des outils 10",
+        "Conseil d’entretien des outils 11",
+        "Conseil d’entretien des outils 12",
+        "Conseil d’entretien des outils 13",
+        "Conseil d’entretien des outils 14",
+        "Conseil d’entretien des outils 15"
+      ]
+    },
+    "irrigation": {
+      "title": "Techniques modernes d’irrigation",
+      "description": "Explorez les systèmes d’irrigation économes en eau qui transforment l’agriculture moderne en Inde...",
+      "points": [
+        "Conseil d’irrigation 1",
+        "Conseil d’irrigation 2",
+        "Conseil d’irrigation 3",
+        "Conseil d’irrigation 4",
+        "Conseil d’irrigation 5",
+        "Conseil d’irrigation 6",
+        "Conseil d’irrigation 7",
+        "Conseil d’irrigation 8",
+        "Conseil d’irrigation 9",
+        "Conseil d’irrigation 10",
+        "Conseil d’irrigation 11",
+        "Conseil d’irrigation 12",
+        "Conseil d’irrigation 13",
+        "Conseil d’irrigation 14",
+        "Conseil d’irrigation 15"
+      ]
+    }
+  },
+  "supportChat": {
+    "reset": "R?initialiser",
+    "message": "Message",
+    "title": "Assistance Shyam Agro",
+    "needHelp": "Besoin d?aide ?",
+    "subtitle": "Nous aidons pour les commandes, produits, paiements, livraisons et probl?mes techniques.",
+    "relatedQuestions": "Questions li?es",
+    "raiseTicket": "Cr?er un ticket",
+    "send": "Envoyer",
+    "typeMessage": "Tapez votre message",
+    "ticketSuccess": "Votre ticket a ?t? cr?? avec succ?s.",
+    "fallback": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+    "ticketIntro": "Expliquez le probl?me et notre ?quipe vous aidera.",
+    "name": "Nom",
+    "email": "E-mail",
+    "mobile": "Num?ro mobile",
+    "orderIdOptional": "ID de commande (facultatif)",
+    "issueType": "Type de probl?me",
+    "subject": "Sujet",
+    "description": "Description",
+    "cancel": "Annuler",
+    "submitTicket": "Envoyer le ticket",
+    "welcome": "Bonjour ! Bienvenue dans l?assistance Shyam Agro. Comment puis-je vous aider ?",
+    "solved": "Tr?s bien. Votre probl?me est r?solu.",
+    "closeChat": "Fermer le chat",
+    "openChat": "Besoin d?aide ? Ouvrir le chat",
+    "ticketSuccessWithId": "Votre ticket a ?t? cr??. ID du ticket : {{ticketId}}.",
+    "genericAnswer": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+    "nextStep": "?tape suivante",
+    "ticketFormPrompt": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+    "mainMenu": "Menu principal",
+    "issueSolved": "Probl?me r?solu",
+    "latestTracking": "Voici les d?tails de suivi de votre derni?re commande.",
+    "enterOrderIdPrompt": "Entrez votre ID de commande pour voir le suivi ici.",
+    "trackingFound": "Voici les d?tails de suivi de votre commande.",
+    "trackingFallback": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+    "tracking": {
+      "orderId": "ID de commande",
+      "orderStatus": "Statut de commande",
+      "estimatedDelivery": "Livraison estim?e",
+      "paymentMethod": "M?thode de paiement",
+      "currentStep": "?tape actuelle",
+      "timeline": "Chronologie de suivi",
+      "estimatedDeliveryValue": "3-7 jours ouvr?s",
+      "inTransit": "En transit",
+      "notAvailable": "Non disponible",
+      "steps": {
+        "ordered": "Command?",
+        "packed": "Emball?",
+        "shipped": "Exp?di?",
+        "outForDelivery": "En livraison",
+        "delivered": "Livr?"
+      }
+    },
+    "optionText": {
+      "Track Order": "Suivre la commande",
+      "Payment Issue": "Probl?me de paiement",
+      "Product Help": "Aide produit",
+      "Delivery Issue": "Probl?me de livraison",
+      "Return/Refund": "Retour/Remboursement",
+      "Technical Issue": "Probl?me technique",
+      "Raise Ticket": "Cr?er un ticket",
+      "Issue Solved": "Probl?me r?solu",
+      "Main Menu": "Menu principal"
+    },
+    "answers": {
+      "greeting": "Bonjour ! Bienvenue dans l?assistance Shyam Agro. Comment puis-je vous aider ?",
+      "track-order": "Entrez votre ID de commande pour voir le suivi ici.",
+      "product-help": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "payment-issue": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "delivery-issue": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "return-refund": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "technical-issue": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "language": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "cart": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "wishlist": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "images-videos": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "out-of-stock": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket.",
+      "ticket": "J?ai trouv? une ?tape d?aide li?e. Choisissez une option ou cr?ez un ticket."
+    }
+  },
+  "featuredMachinery": "Machines agricoles puissantes",
+  "modernAgriculture": "Pour les producteurs modernes",
+  "trendingNow": "Pulv?risateurs agricoles intelligents",
+  "mostPopular": "Prot?gez vos cultures avec des pulv?risateurs efficaces.",
+  "backToTop": "Retour en haut",
+  "previousProducts": "Produits pr?c?dents",
+  "nextProducts": "Produits suivants",
+  "previousMedia": "M?dia pr?c?dent",
+  "nextMedia": "M?dia suivant",
+  "gridView": "Vue grille",
+  "listView": "Vue liste",
+  "off": "DE R?DUCTION",
+  "hero": {
+    "sprayer": {
+      "title": "Pulv?risateurs agricoles intelligents",
+      "subtitle": "Soin pr?cis des cultures",
+      "description": "Prot?gez vos cultures avec des pulv?risateurs efficaces."
+    },
+    "tractor": {
+      "title": "Machines agricoles puissantes",
+      "subtitle": "Pour les producteurs modernes",
+      "description": "Am?liorez le travail avec des machines fiables."
+    }
+  },
+  "specLabels": {
+    "weight": "Poids",
+    "dimensions": "Dimensions",
+    "powerSource": "Source d??nergie",
+    "material": "Mat?riau",
+    "tankCapacity": "Capacit? du r?servoir",
+    "pressure": "Pression",
+    "usage": "Utilisation"
+  },
+  "productGeneric": {
+    "feature": "La fonction {{index}} de {{productName}} aide le travail agricole fiable.",
+    "detail": "{{productName}} est con?u pour une utilisation agricole fiable.",
+    "usageInstruction": "{{productName}} est con?u pour une utilisation agricole fiable.",
+    "suitableFor": "{{productName}} est con?u pour une utilisation agricole fiable.",
+    "specificationValue": "{{label}}: {{value}}",
+    "reviewComment": "Les acheteurs v?rifi?s ont not? {{productName}} {{rating}} ?toiles."
+  }
+}

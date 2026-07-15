@@ -1,0 +1,204 @@
+.brand-slider-section {
+  background: #fff;
+  border-top: 1px solid #efefef;
+  border-bottom: 1px solid #efefef;
+  padding: 16px 0 18px;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.brand-slider-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto 14px;
+  padding: 0 24px;
+}
+
+.brand-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #aaa;
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+}
+
+.brand-divider {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, #e0e0e0, transparent);
+}
+
+/* ── Scrolling Track ── */
+.brand-slider-body {
+  position: relative;
+}
+
+.brand-track-wrapper {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  /* Fade edges */
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.brand-track-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.brand-track-wrapper:focus-visible {
+  outline: 2px solid #58B82E;
+  outline-offset: -2px;
+}
+
+.brand-track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: max-content;
+}
+
+.brand-slider-control {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7ead2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f3d2e;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-slider-control:hover,
+.brand-slider-control:focus-visible {
+  background: #58B82E;
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(88, 184, 46, 0.22);
+  outline: none;
+}
+
+.brand-slider-control-prev {
+  left: 16px;
+}
+
+.brand-slider-control-next {
+  right: 16px;
+}
+
+.brand-slider-control-toggle {
+  right: 58px;
+}
+
+/* ── Individual Card ── */
+.brand-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 28px;
+  cursor: default;
+}
+
+/* ── Logo Wrapper ── */
+.brand-logo-wrap {
+  width: 116px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.brand-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: none;
+  opacity: 1;
+}
+
+/* Fallback text if img fails */
+.brand-fallback {
+  display: none;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+/* ── Brand Name ── */
+.brand-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #bbb;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .brand-logo-wrap { width: 100px; height: 48px; }
+  .brand-card { padding: 12px 24px; }
+  .brand-slider-header { padding: 0 20px; }
+  .brand-slider-control { width: 30px; height: 30px; }
+  .brand-slider-control-prev { left: 8px; }
+  .brand-slider-control-next { right: 8px; }
+  .brand-slider-control-toggle { right: 44px; }
+}
+
+[data-theme="dark"] .brand-slider-section {
+  background: #111111;
+  border-top-color: #333333;
+  border-bottom-color: #333333;
+}
+
+[data-theme="dark"] .brand-label {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .brand-divider {
+  background: linear-gradient(to right, #333333, transparent);
+}
+
+[data-theme="dark"] .brand-logo-img {
+  filter: none;
+  opacity: 1;
+}
+
+[data-theme="dark"] .brand-name {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .brand-fallback {
+  opacity: 1;
+}
+
+[data-theme="dark"] .brand-slider-control {
+  border-color: #244D32;
+  background: #111111;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .brand-slider-control:hover,
+[data-theme="dark"] .brand-slider-control:focus-visible {
+  background: #58B82E;
+  color: #ffffff;
+}

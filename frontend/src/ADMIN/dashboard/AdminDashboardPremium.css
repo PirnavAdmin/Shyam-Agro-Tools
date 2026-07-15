@@ -1,0 +1,208 @@
+/* Premium Dashboard CSS – Glassmorphism and Gradient Theme */
+
+/* Font imports */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --color-primary-start: #10b981; /* teal */
+  --color-primary-end: #059669;   /* darker teal */
+  --color-bg: rgba(255, 255, 255, 0.75);
+  --color-card-bg: rgba(255, 255, 255, 0.75);
+  --color-card-border: rgba(241, 245, 249, 0.9);
+  --color-text-primary: #1e293b;
+  --color-text-muted: #64748b;
+  --radius: 16px;
+  --spacing: 16px;
+  --transition-fast: 0.25s ease;
+}
+
+/* Dark‑mode fallback (optional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: rgba(24, 24, 27, 0.85);
+    --color-card-bg: rgba(24, 24, 27, 0.85);
+    --color-card-border: rgba(55, 65, 81, 0.9);
+    --color-text-primary: #f9fafb;
+    --color-text-muted: #d1d5db;
+  }
+}
+
+/* Global layout */
+.premium-dashboard {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  padding: var(--spacing);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Header */
+.premium-dashboard .dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing);
+}
+
+.premium-dashboard .dash-header h1 {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Buttons & selects */
+.premium-select {
+  padding: 10px 16px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  transition: var(--transition-fast);
+}
+
+.premium-select:hover {
+  border-color: #cbd5e1;
+  background: #ffffff;
+}
+
+.premium-btn {
+  background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transition: var(--transition-fast);
+}
+
+.premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* Premium glass‑morphism card */
+.premium-card {
+  background: var(--color-card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.01);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.06), 0 1px 5px rgba(0,0,0,0.02);
+}
+
+/* Card titles */
+.premium-card .card-title {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.8px;
+}
+
+/* Card values */
+.premium-card .card-value {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0 0 10px 0;
+  letter-spacing: -1px;
+}
+
+/* Grid layouts – maintain original breakpoints */
+.top-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.middle-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+}
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1200px) {
+  .top-cards { grid-template-columns: 1fr; }
+  .middle-grid { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+}
+
+/* Table styling – adopt glass look */
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  border-radius: var(--radius);
+}
+
+.premium-table th, .premium-table td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.premium-table th {
+  background: rgba(248, 250, 252, 0.6);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.premium-table td {
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.premium-table tr:hover td {
+  background: rgba(255,255,255,0.4);
+}
+
+/* Status tags – preserve colors, add subtle bg */
+.status-tag {
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Icons & avatars keep existing styles – can be tweaked later */
+.avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(16,185,129,0.15);
+}
