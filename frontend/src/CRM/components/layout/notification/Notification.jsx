@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Notification.css";
 
-const API_BASE_URL = "http://shyamagrotools.com/api";
+const API_BASE_URL = "https://shyamagrotools.com/api";
 
 function Notification() {
   const navigate = useNavigate();

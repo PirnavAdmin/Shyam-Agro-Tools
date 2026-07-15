@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ─── Base URL ────────────────────────────────────────────────────────────────
-const BASE_URL = 'http://shyamagrotools.com';
+const BASE_URL = 'https://shyamagrotools.com';
 
 // Axios instance — always skip the ngrok browser-warning page
 const api = axios.create({
@@ -151,10 +151,10 @@ export const mapProductFromApi = (raw = {}, categories = [], subcategories = [])
 };
 
 // ─── Category API ─────────────────────────────────────────────────────────────
-// GET  http://shyamagrotools.com/api/Category
-// POST http://shyamagrotools.com/api/Category
-// PUT  http://shyamagrotools.com/api/Category/{id}
-// DEL  http://shyamagrotools.com/api/Category/{id}
+// GET  https://shyamagrotools.com/api/Category
+// POST https://shyamagrotools.com/api/Category
+// PUT  https://shyamagrotools.com/api/Category/{id}
+// DEL  https://shyamagrotools.com/api/Category/{id}
 
 export const fetchCategories = async () => {
   const response = await api.get('/api/Category');
@@ -208,10 +208,10 @@ export const deleteCategory = async (id) => {
 };
 
 // ─── Subcategory API ──────────────────────────────────────────────────────────
-// GET  http://shyamagrotools.com/api/Subcategory
-// POST http://shyamagrotools.com/api/Subcategory
-// PUT  http://shyamagrotools.com/api/Subcategories/{id}
-// DEL  http://shyamagrotools.com/api/Subcategories/{id}
+// GET  https://shyamagrotools.com/api/Subcategory
+// POST https://shyamagrotools.com/api/Subcategory
+// PUT  https://shyamagrotools.com/api/Subcategories/{id}
+// DEL  https://shyamagrotools.com/api/Subcategories/{id}
 
 export const fetchSubcategories = async () => {
   const response = await api.get('/api/Subcategory');
@@ -264,10 +264,10 @@ export const deleteSubcategory = async (id) => {
 };
 
 // ─── Products API ─────────────────────────────────────────────────────────────
-// GET  http://shyamagrotools.com/api/Catalog/products
-// POST http://shyamagrotools.com/api/Catalog/products
-// PUT  http://shyamagrotools.com/api/Catalog/products/{id}
-// DEL  http://shyamagrotools.com/api/Catalog/products/{id}
+// GET  https://shyamagrotools.com/api/Catalog/products
+// POST https://shyamagrotools.com/api/Catalog/products
+// PUT  https://shyamagrotools.com/api/Catalog/products/{id}
+// DEL  https://shyamagrotools.com/api/Catalog/products/{id}
 
 export const fetchProducts = async (categories = [], subcategories = []) => {
   const response = await api.get('/api/Catalog/products');

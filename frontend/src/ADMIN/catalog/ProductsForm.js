@@ -188,7 +188,7 @@ const ProductsForm = () => {
     Promise.all([
       fetchCategories(),
       fetchSubcategories(),
-      fetch('http://shyamagrotools.com/api/Brand', {
+      fetch('https://shyamagrotools.com/api/Brand', {
         headers: { 'ngrok-skip-browser-warning': 'true' }
       }).then(res => res.json()).catch(() => []),
       fetchSuppliers().catch(() => [])

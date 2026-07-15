@@ -1,5 +1,5 @@
 // API/Local storage helper for Shyam Agro Support Tickets
-const BASE_URL = 'http://shyamagrotools.com/api/Tickets';
+const BASE_URL = 'https://shyamagrotools.com/api/Tickets';
 
 const DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',

@@ -13,7 +13,7 @@ import {
 
 import "./Customers.css";
 
-const API_BASE_URL = "http://shyamagrotools.com/api";
+const API_BASE_URL = "https://shyamagrotools.com/api";
 const CUSTOMER_API = {
   list: `${API_BASE_URL}/Customers`,
   byId: (id) => `${API_BASE_URL}/Customers/${id}`,

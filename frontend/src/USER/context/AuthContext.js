@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
     const current = getAuthSession();
     if (!current?.refreshToken) return null;
     try {
-      const baseUrl = (process.env.REACT_APP_AUTH_API_BASE_URL || 'http://shyamagrotools.com').replace(/\/$/, '');
+      const baseUrl = (process.env.REACT_APP_AUTH_API_BASE_URL || 'https://shyamagrotools.com').replace(/\/$/, '');
       const response = await apiClient.post(`${baseUrl}/test-auth/refresh-token`, {
         refreshToken: current.refreshToken,
       }, { skipAuth: true });

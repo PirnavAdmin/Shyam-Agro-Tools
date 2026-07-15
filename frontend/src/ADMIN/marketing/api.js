@@ -1,4 +1,4 @@
-const BASE_URL = 'http://shyamagrotools.com/api/Coupons';
+const BASE_URL = 'https://shyamagrotools.com/api/Coupons';
 
 function mapBackendToFrontend(apiCoupon) {
   return {

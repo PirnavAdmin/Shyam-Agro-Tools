@@ -1,5 +1,5 @@
-const BASE_URL = 'http://shyamagrotools.com/api/Returns';
-const ADMIN_BASE_URL = 'http://shyamagrotools.com/api/ReturnsAdmin';
+const BASE_URL = 'https://shyamagrotools.com/api/Returns';
+const ADMIN_BASE_URL = 'https://shyamagrotools.com/api/ReturnsAdmin';
 
 const DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',

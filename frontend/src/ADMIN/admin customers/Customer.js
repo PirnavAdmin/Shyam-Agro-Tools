@@ -38,7 +38,7 @@ const Customer = () => {
 
   // Fetch all customers for the search/select capability
   useEffect(() => {
-    fetch('http://shyamagrotools.com/api/Customers', {
+    fetch('https://shyamagrotools.com/api/Customers', {
       headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
     })
       .then(res => {
@@ -63,7 +63,7 @@ const Customer = () => {
 
     setLoading(true);
     setError(null);
-    fetch(`http://shyamagrotools.com/api/Customers/${id}`, {
+    fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
       headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
     })
       .then(res => {
@@ -114,7 +114,7 @@ const Customer = () => {
         }
       };
 
-      const res = await fetch(`http://shyamagrotools.com/api/Customers/${id}`, {
+      const res = await fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ const Customer = () => {
       });
       if (!res.ok) throw new Error('Update failed');
       // PUT returns 204 NoContent — refetch the profile to get updated data
-      const refreshed = await fetch(`http://shyamagrotools.com/api/Customers/${id}`, {
+      const refreshed = await fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
         headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
       });
       if (refreshed.ok) {
@@ -146,7 +146,7 @@ const Customer = () => {
       return;
     }
     try {
-      const res = await fetch(`http://shyamagrotools.com/api/Customers/${id}/advisory`, {
+      const res = await fetch(`https://shyamagrotools.com/api/Customers/${id}/advisory`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -46,7 +46,7 @@ const StatCard = ({ icon: Icon, label, value, detail }) => (
   </div>
 );
 
-const API_URL = 'http://shyamagrotools.com/api/Coins';
+const API_URL = 'https://shyamagrotools.com/api/Coins';
 
 const CoinsConverterScreen = () => {
   const [settings, setSettings] = useState(initialSettings);

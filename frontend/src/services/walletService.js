@@ -3,7 +3,7 @@ import apiClient from '../api/axios';
 export const WALLET_API_BASE_URL = (
   process.env.REACT_APP_WALLET_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'http://shyamagrotools.com'
+  'https://shyamagrotools.com'
 ).replace(/\/$/, '');
 
 const requestConfig = {
