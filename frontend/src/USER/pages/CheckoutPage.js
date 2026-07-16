@@ -29,6 +29,7 @@ import {
   verifyNetBankingOtp,
   watchPaymentStatus,
 } from '../../services/paymentService';
+import { updateLocalWalletAfterOrder } from '../../services/walletService';
 import {
   createAddress,
   deleteAddress,
@@ -276,8 +277,8 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
   const coinsDiscount = Number(checkoutSummary?.coinsDiscount ?? 0);
   const discountTotal = couponDiscount + coinsDiscount;
   const availableCoins = Number(checkoutSummary?.availableCoins ?? 0);
-  const maxConfiguredCoins = Number(coinsConfig?.maxRedeemableCoins ?? availableCoins);
-  const maxInputCoins = Math.max(0, Math.min(availableCoins, maxConfiguredCoins || availableCoins));
+  const maxConfiguredCoins = Math.min(500, Number(coinsConfig?.maxRedeemableCoins ?? 500));
+  const maxInputCoins = Math.max(0, Math.min(availableCoins, maxConfiguredCoins));
   const earnedCoins = useMemo(
     () => calculateEarnedCoins(cartSubtotal, coinsConfig),
     [cartSubtotal, coinsConfig]
@@ -858,6 +859,9 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
       createdAt: new Date().toISOString(),
     };
 
+    const coinsRedeemedVal = Number(checkoutSummary?.coinsToRedeem ?? coinsRedeem);
+    const coinsEarnedVal = Number(earnedCoins);
+    updateLocalWalletAfterOrder(coinsRedeemedVal, coinsEarnedVal);
     saveOrder(order);
     setPlacedOrder(order);
     clearCart();
@@ -1834,16 +1838,20 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                     Apply Coupon
                   </button>
                 </div>
-                <div className="total-row">
-                  <label htmlFor="checkout-coins">Available Coins: {checkoutSummary?.availableCoins ?? 0}</label>
+                <div className="total-row flex-col items-start gap-1">
+                  <div className="flex justify-between w-full">
+                    <label htmlFor="checkout-coins">Available Coins: {checkoutSummary?.availableCoins ?? 0}</label>
+                    <span className="text-[10px] text-gray-500 font-semibold">(Max 500 per order)</span>
+                  </div>
                   <input
                     id="checkout-coins"
                     type="number"
                     min="0"
-                    max={checkoutSummary?.availableCoins ?? 0}
+                    max={Math.min(checkoutSummary?.availableCoins ?? 0, 500)}
                     value={coinsRedeem}
-                    onChange={(event) => setCoinsRedeem(Math.max(0, Number(event.target.value) || 0))}
+                    onChange={(event) => setCoinsRedeem(Math.min(500, Math.max(0, Number(event.target.value) || 0)))}
                     aria-label="Coins to redeem"
+                    className="w-full"
                   />
                 </div>
                 </>

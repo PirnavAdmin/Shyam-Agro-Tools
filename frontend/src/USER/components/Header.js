@@ -10,6 +10,7 @@ import { getCategoryImage } from '../../services/categoryService';
 import { getSubcategoryImage } from '../../services/subcategoryService';
 import { getProducts, searchProducts } from '../../services/productService';
 import { getUserProfile, updateUserProfile, uploadUserProfileImage } from '../../services/userProfileService';
+import { getWallet } from '../../services/walletService';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
 import { getAuthSession, setAuthSession } from '../../utils/auth';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,7 +42,7 @@ const Header = ({ onLoginClick }) => {
   const { cartCount, cartItems, cartSubtotal, removeFromCart } = useCart();
   const { wishlistCount } = useWishlist();
   const { showToast } = useToast();
-  const { t, productText } = useLanguage();
+  const { t, productText, categoryText, subcategoryText } = useLanguage();
   const { mappedCategories, activeSubcategories } = useCategories();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,6 +51,45 @@ const Header = ({ onLoginClick }) => {
   const [isSearchingProducts, setIsSearchingProducts] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [accountInfoOpen, setAccountInfoOpen] = useState(false);
+  const [walletDetails, setWalletDetails] = useState(null);
+
+  useEffect(() => {
+    if (!user) {
+      setWalletDetails(null);
+      return;
+    }
+    let isMounted = true;
+    const fetchWallet = async () => {
+      try {
+        const data = await getWallet();
+        if (isMounted) {
+          setWalletDetails(data);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch wallet for header:', err);
+      }
+    };
+    fetchWallet();
+
+    const handleWalletUpdate = () => {
+      try {
+        const userId = user?.id || user?.phone || 'guest';
+        const rawLocal = localStorage.getItem(`Agro_wallet_${userId}`);
+        if (rawLocal && isMounted) {
+          setWalletDetails(JSON.parse(rawLocal));
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+    window.addEventListener('storage', handleWalletUpdate);
+    window.addEventListener('auth:user-updated', fetchWallet);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('storage', handleWalletUpdate);
+      window.removeEventListener('auth:user-updated', fetchWallet);
+    };
+  }, [user]);
   const [savingAccountField, setSavingAccountField] = useState('');
   const [loadingAccountProfile, setLoadingAccountProfile] = useState(false);
   const [accountForm, setAccountForm] = useState({
@@ -66,6 +106,10 @@ const Header = ({ onLoginClick }) => {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const profileMenuRef = useRef(null);
   const profilePhotoInputRef = useRef(null);
+
+  const headerWalletCoins = walletDetails ? walletDetails.balance : (user?.wallet || 0);
+  const headerWalletRate = walletDetails?.raw?.conversionRate || 1;
+  const headerWalletRupees = Math.round(headerWalletCoins * headerWalletRate);
 
   const searchResults = useMemo(
     () => buildSearchResults({
@@ -87,14 +131,14 @@ const Header = ({ onLoginClick }) => {
     }));
   const categorySuggestions = searchResults.categories.map((category) => ({
     id: `category-${category.id}`,
-    title: category.name,
+    title: categoryText(category),
     type: t('matchingCategories'),
     image: getCategoryImage(category.imageUrl),
     path: `/category/${category.id}`,
   }));
   const subcategorySuggestions = searchResults.subcategories.map((subcategory) => ({
     id: `subcategory-${subcategory.id}`,
-    title: subcategory.name,
+    title: subcategoryText(subcategory),
     type: t('matchingSubcategories'),
     image: getSubcategoryImage(subcategory.imageUrl),
     path: `/category/${subcategory.categoryId}`,
@@ -613,7 +657,7 @@ const Header = ({ onLoginClick }) => {
                       setProfileOpen(false);
                       navigate('/wallet');
                     }}>
-                      <Wallet size={16} /> {t('wallet')} (₹{user.wallet})
+                       <Wallet size={16} /> {t('wallet')} (₹{headerWalletRupees})
                     </button>
                     <div className="account-dropdown-divider"></div>
                     <button type="button" onClick={handleSignOut} className="account-dropdown-item account-dropdown-signout">

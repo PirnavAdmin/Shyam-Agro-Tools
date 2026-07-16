@@ -22,6 +22,8 @@ import {
   submitManualPaymentVerification,
   watchPaymentStatus,
 } from '../../services/paymentService';
+import { updateLocalWalletAfterOrder } from '../../services/walletService';
+import { loadCoins, calculateEarnedCoins } from '../../services/CoinsService';
 import './PaymentPage.css';
 
 const upiRegex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
@@ -531,6 +533,23 @@ const PaymentPage = () => {
   const { clearCart, waitForCartSync } = useCart();
   const { t, productText } = useLanguage();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [coinsConfig, setCoinsConfig] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchConfig = async () => {
+      try {
+        const response = await loadCoins();
+        if (isMounted) setCoinsConfig(response);
+      } catch (err) {
+        console.warn('Failed to load coins config in PaymentPage:', err);
+      }
+    };
+    fetchConfig();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -1039,6 +1058,9 @@ const PaymentPage = () => {
       createdAt: new Date().toISOString(),
     };
 
+    const coinsRedeemedVal = Number(checkoutSummary?.coinsToRedeem ?? coinsRedeem);
+    const coinsEarnedVal = coinsConfig ? calculateEarnedCoins(cartSubtotal, coinsConfig) : Math.floor(cartSubtotal * 0.05);
+    updateLocalWalletAfterOrder(coinsRedeemedVal, coinsEarnedVal);
     saveOrder(order);
     setPlacedOrder(order);
     clearCart();

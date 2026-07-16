@@ -1,4 +1,9 @@
-export const PRODUCT_ASSET_BASE_URL = 'https://shyamagrotools.com';
+export const PRODUCT_ASSET_BASE_URL = (
+  process.env.REACT_APP_PRODUCT_ASSET_BASE_URL ||
+  process.env.REACT_APP_PRODUCT_API_BASE_URL ||
+  process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
+  'https://shyamagrotools.com'
+).replace(/\/$/, '');
 export const PRODUCT_IMAGE_FALLBACK = '/assets/no-image.png';
 
 const getPath = (value) => {

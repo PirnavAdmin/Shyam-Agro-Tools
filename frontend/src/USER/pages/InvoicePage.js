@@ -4,18 +4,18 @@ import headerLogo from '../../asset/header logo.png';
 import './InvoicePage.css';
 
 const invoiceData = {
-  companyName: 'SAT Agricultural Tools & Equipment',
+  companyName: 'Shyam Agro Tools',
   invoiceNo: 'SAT/INV/2026/001',
   invoiceDate: '02-06-2026',
-  placeOfSupply: 'Telangana',
+  placeOfSupply: 'Gujarat',
   gstType: 'Intra-state GST',
   currency: 'INR',
   seller: {
-    name: 'SAT Agricultural Tools & Equipment',
-    address: 'Hyderabad, Telangana, India',
-    gstin: '36ABCDE1234F1Z5',
+    name: 'Shyam Agro Tools',
+    address: 'Sidhpur, Gujarat - 384151',
+    gstin: '24DYYPP1677P1Z6',
     phone: '+91 98765 43210',
-    email: 'sales@satagro.com',
+    email: 'sales@shyamagro.com',
   },
   buyer: {
     name: 'Ramesh Kumar',
@@ -38,10 +38,10 @@ const invoiceData = {
   },
   bank: {
     name: 'State Bank of India',
-    accountName: 'SAT Agricultural Tools & Equipment',
-    accountNo: '123456789012',
+    accountName: 'Shyam Agro Tools',
+    accountNo: '39482019482',
     ifsc: 'SBIN0001234',
-    branch: 'Hyderabad',
+    branch: 'Sidhpur',
   },
   warranty: [
     'Product warranty: 12 months',
@@ -52,7 +52,7 @@ const invoiceData = {
     'Goods once sold will not be returned',
     'Warranty as per manufacturer policy',
     'Taxes included as per GST rules',
-    'Subject to Hyderabad jurisdiction',
+    'Subject to Gujarat jurisdiction',
   ],
 };
 

@@ -5,7 +5,7 @@ import { getCategoryImage } from '../../services/categoryService';
 import './CategoryCard.css';
 
 const CategoryCard = ({ category, onExplore, className = '' }) => {
-  const { t } = useLanguage();
+  const { t, categoryText, subcategoryText } = useLanguage();
   const subcategories = Array.isArray(category.subcategories) ? category.subcategories : [];
   const categoryImage = getCategoryImage(category.imageUrl);
 
@@ -22,7 +22,7 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
       <span className="app-category-cover">
         <img
           src={categoryImage}
-          alt={category.name}
+          alt={categoryText(category)}
           className="app-category-cover-image"
           loading="lazy"
           onError={(event) => {
@@ -47,7 +47,7 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
           <span className="app-category-count app-category-cover-count">
             {subcategories.length} {t('subCategories')}
           </span>
-          <span className="app-category-cover-title">{category.name}</span>
+          <span className="app-category-cover-title">{categoryText(category)}</span>
         </span>
       </span>
 
@@ -61,9 +61,9 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
           </span>
         </span>
 
-        <span className="app-category-title">{category.name}</span>
+        <span className="app-category-title">{categoryText(category)}</span>
         <span className="mt-2 block text-xs leading-5 text-gray-500">
-          {category.description}
+          {categoryText(category, 'description')}
         </span>
 
         <span className="app-category-subcategory-list">
@@ -72,7 +72,7 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
               <span key={subcategory.id} className="app-category-subcategory-item">
                 <span className="app-category-subcategory-dot"></span>
                 <span>
-                  <span className="block">{subcategory.name}</span>
+                  <span className="block">{subcategoryText(subcategory)}</span>
                   {subcategory.description && (
                     <span className="mt-0.5 block text-[10px] font-normal leading-4 text-gray-400">
                       {subcategory.description}

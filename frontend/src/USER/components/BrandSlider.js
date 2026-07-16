@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getBrands } from '../../services/brandService';
 import { useToast } from '../context/ToastContext';
 import './BrandSlider.css';
@@ -134,14 +134,7 @@ const BrandSlider = () => {
         >
           <ChevronLeft size={18} />
         </button>
-        <button
-          type="button"
-          className="brand-slider-control brand-slider-control-toggle"
-          onClick={() => setIsPaused((current) => !current)}
-          aria-label={isPaused ? 'Play brand carousel' : 'Pause brand carousel'}
-        >
-          {isPaused ? <Play size={16} /> : <Pause size={16} />}
-        </button>
+
         <div
           className="brand-track-wrapper"
           ref={trackWrapperRef}

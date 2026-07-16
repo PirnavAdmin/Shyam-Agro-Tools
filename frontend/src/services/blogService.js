@@ -2,6 +2,7 @@ import axios from '../api/axios';
 
 export const BLOG_API_BASE_URL = (
   process.env.REACT_APP_BLOG_API_BASE_URL ||
+  process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   'https://shyamagrotools.com'
 ).replace(/\/$/, '');
 

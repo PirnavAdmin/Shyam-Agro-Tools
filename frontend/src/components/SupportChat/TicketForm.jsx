@@ -29,7 +29,8 @@ const TicketForm = ({ labels, defaultIssueType = 'Product Issue', onSubmit, onCa
 
   const updateField = (event) => {
     const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
+    const nextValue = name === 'mobile' ? value.replace(/\D/g, '').slice(0, 10) : value;
+    setForm((current) => ({ ...current, [name]: nextValue }));
     setErrors((current) => ({ ...current, [name]: '' }));
   };
 
@@ -41,8 +42,8 @@ const TicketForm = ({ labels, defaultIssueType = 'Product Issue', onSubmit, onCa
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       nextErrors.email = labels.ticketErrors?.email || 'Enter a valid email.';
     }
-    if (!/^[0-9+\-\s]{8,15}$/.test(form.mobile)) {
-      nextErrors.mobile = labels.ticketErrors?.mobile || 'Enter a valid mobile number.';
+    if (!/^\d{10}$/.test(form.mobile)) {
+      nextErrors.mobile = labels.ticketErrors?.mobile || 'Enter a valid 10-digit mobile number.';
     }
     if (!form.subject.trim()) nextErrors.subject = labels.ticketErrors?.subject || 'Subject is required.';
     if (form.message.trim().length < 12) {

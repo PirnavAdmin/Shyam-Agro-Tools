@@ -47,7 +47,7 @@ const SingleCategoryPage = () => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [productError, setProductError] = useState('');
   const productListRef = useRef(null);
-  const { t } = useLanguage();
+  const { t, categoryText, subcategoryText } = useLanguage();
   const {
     mappedCategories,
     categoriesLoading: loadingCategories,
@@ -58,8 +58,8 @@ const SingleCategoryPage = () => {
   const currentCategory = mappedCategories.find(
     (category) => String(category.id) === id || category.slug === id
   );
-  const title = currentCategory?.name || id.replace(/-/g, ' ');
-  const categoryDescription = currentCategory?.description || '';
+  const title = categoryText(currentCategory) || id.replace(/-/g, ' ');
+  const categoryDescription = categoryText(currentCategory, 'description') || '';
   const subcategoriesForCategory = currentCategory?.subcategories || [];
   const selectedSubcategoryData = subcategoriesForCategory.find(
     (subcategory) => String(subcategory.id) === selectedSubcategory
@@ -249,7 +249,7 @@ const SingleCategoryPage = () => {
                       >
                         <span className="subcategory-sidebar-media">
                           <span className="subcategory-sidebar-copy">
-                            <span className="subcategory-sidebar-name">{sub.name}</span>
+                            <span className="subcategory-sidebar-name">{subcategoryText(sub)}</span>
                             {sub.description && (
                               <span className="subcategory-sidebar-description">
                                 {sub.description}

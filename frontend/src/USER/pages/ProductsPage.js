@@ -34,7 +34,7 @@ const productMatchesPowerTillers = (product = {}) => {
     .join(' ')
     .toLowerCase();
 
-  return /\bpower\s*-?\s*tillers?\b/.test(searchableText) || /\btillers?\b/.test(searchableText);
+  return /\bpower\s*-?\s*tillers?\b/.test(searchableText);
 };
 
 const Pagination = ({ currentPage, totalPages, onPageChange, t }) => {

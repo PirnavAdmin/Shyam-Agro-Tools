@@ -880,10 +880,10 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  border: 2px solid #dce5ff;
+  border: 2px solid #d2ecd0;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #0C10A4;
+  background: #e9f7e4;
+  color: #2f8c19;
   font-size: 2.7rem;
   font-weight: 950;
 }
@@ -900,7 +900,7 @@
   gap: 0.45rem;
   border: 0;
   background: transparent;
-  color: #0C10A4;
+  color: #2f8c19;
   font-size: 0.86rem;
   font-weight: 900;
   cursor: pointer;
@@ -939,7 +939,7 @@
 
 .account-form-field input {
   min-height: 52px;
-  border: 1px solid #dce5ff;
+  border: 1px solid #d2ecd0;
   border-radius: 14px;
   background: #f8fafc;
   color: #111827;
@@ -980,13 +980,18 @@
   gap: 0.55rem;
   border: 0;
   border-radius: 14px;
-  background: #0C10A4;
+  background: #2f8c19;
   color: #ffffff;
   font-size: 0.94rem;
   font-weight: 950;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.account-save-profile:hover {
+  background: #236b13;
 }
 
 .account-save-profile:disabled {

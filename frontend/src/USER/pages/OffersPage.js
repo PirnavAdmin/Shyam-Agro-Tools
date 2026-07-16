@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, Check, Copy, ImageOff, RefreshCw, ShieldCheck, Tag } from 'lucide-react';
+import { CalendarDays, Check, Copy, RefreshCw, ShieldCheck, Tag } from 'lucide-react';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useToast } from '../context/ToastContext';
@@ -209,16 +209,6 @@ const OffersPage = () => {
 
               return (
                 <article key={coupon.id} className="offers-page-card border border-border bg-white p-4">
-                  {coupon.backgroundImage ? (
-                    <div className="offers-page-image mb-4 overflow-hidden bg-gray-100">
-                      <img src={coupon.backgroundImage} alt="" loading="lazy" />
-                    </div>
-                  ) : (
-                    <div className="offers-page-image offers-page-image-empty mb-4 flex items-center justify-center bg-gray-100 text-gray-400">
-                      <ImageOff size={22} />
-                    </div>
-                  )}
-
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="mb-2 flex flex-wrap items-center gap-2">
