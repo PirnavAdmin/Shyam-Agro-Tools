@@ -69,6 +69,7 @@ export const normalizeBackendOrder = (order = {}) => {
     customerId: order.customerId ?? order.CustomerId ?? '',
     items: (order.items || order.Items || []).map((item) => ({
       id: String(item.productId ?? item.ProductId ?? item.id ?? item.Id ?? ''),
+      orderItemId: String(item.id ?? item.Id ?? item.productId ?? item.ProductId ?? ''),
       sku: item.productCode || item.ProductCode || '',
       name: item.productName || item.ProductName || item.name || '',
       categoryName: item.categoryName || item.CategoryName || '',
@@ -152,3 +153,78 @@ export const getOrderSuccessTracking = async (orderId) => {
     return null;
   }
 };
+
+const getAdminRequestConfig = () => {
+  const adminToken = localStorage.getItem('adminToken');
+  return {
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+      Accept: 'application/json',
+      ...(adminToken && { Authorization: `Bearer ${adminToken}` }),
+    },
+  };
+};
+
+export const getOrdersTracking = async (search = '') => {
+  const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/tracking`, {
+    ...getAdminRequestConfig(),
+    params: { search },
+  });
+  return response.data;
+};
+
+export const getOrderTrackingById = async (id) => {
+  const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/tracking/${id}`, getAdminRequestConfig());
+  return response.data;
+};
+
+export const updateOrderTracking = async (id, status, notes) => {
+  const response = await axios.post(
+    `${ORDER_API_BASE_URL}/api/Orders/tracking/${id}`,
+    { status, notes },
+    {
+      ...getAdminRequestConfig(),
+      headers: {
+        ...getAdminRequestConfig().headers,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getOrdersShipping = async (search = '') => {
+  const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/shipping`, {
+    ...getAdminRequestConfig(),
+    params: { search },
+  });
+  return response.data;
+};
+
+export const getOrderShippingById = async (id) => {
+  const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/shipping/${id}`, getAdminRequestConfig());
+  return response.data;
+};
+
+export const packOrder = async (id, formData) => {
+  const response = await axios.post(`${ORDER_API_BASE_URL}/api/Orders/shipping/${id}/pack`, formData, {
+    ...getAdminRequestConfig(),
+    headers: {
+      ...getAdminRequestConfig().headers,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const dispatchOrder = async (id, formData) => {
+  const response = await axios.post(`${ORDER_API_BASE_URL}/api/Orders/shipping/${id}/dispatch`, formData, {
+    ...getAdminRequestConfig(),
+    headers: {
+      ...getAdminRequestConfig().headers,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+

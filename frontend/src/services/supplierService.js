@@ -2,6 +2,7 @@ import apiClient from '../api/axios';
 
 export const SUPPLIER_API_BASE_URL = (
   process.env.REACT_APP_SUPPLIER_API_BASE_URL ||
+  process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   'https://shyamagrotools.com'
 ).replace(/\/$/, '');
 

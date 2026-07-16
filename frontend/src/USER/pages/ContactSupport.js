@@ -1,20 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, ClipboardList, Mail, MessageSquareText, Phone, Send } from 'lucide-react';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useAuth } from '../context/AuthContext';
-import { getSupportConfig, sendSupportBotMessage, submitSupportTicket } from '../../services/supportService';
+import { useLanguage } from '../context/LanguageContext';
+import { getSupportConfig, submitSupportTicket } from '../../services/supportService';
 import './ContactSupport.css';
 
 const SUPPORT_TICKETS_STORAGE_KEY = 'shyamAgro:supportTickets';
-
-const issueTypes = [
-  'Order issue',
-  'Payment issue',
-  'Return issue',
-  'Product issue',
-  'General support',
-];
 
 const defaultSupportConfig = {
   supportPhoneNumber: '+91 9398649798',
@@ -37,10 +30,7 @@ const readStoredTickets = () => {
 
 const ContactSupport = () => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState([
-    { text: 'Hello! I am your Shyam Agro assistant. Tell me what happened and I will guide you.', sender: 'bot' },
-  ]);
-  const [inputText, setInputText] = useState('');
+  const { t } = useLanguage();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [supportConfig, setSupportConfig] = useState(defaultSupportConfig);
   const [tickets, setTickets] = useState(() => readStoredTickets());
@@ -52,15 +42,22 @@ const ContactSupport = () => {
     email: '',
     issueType: getQueryValue(window.location.search, 'issue') || 'Order issue',
     message: '',
-    orderId: getQueryValue(window.location.search, 'orderId'),
+    orderId: getQueryValue(window.location.search, 'orderId') || '',
   }));
-  const chatEndRef = useRef(null);
+
+  const issueTypes = useMemo(() => [
+    { value: 'Order issue', label: t('supportChat.issueTypes.cartWishlist') || 'Order issue' },
+    { value: 'Payment issue', label: t('supportChat.issueTypes.payment') || 'Payment issue' },
+    { value: 'Return issue', label: t('supportChat.issueTypes.returnRefund') || 'Return issue' },
+    { value: 'Product issue', label: t('supportChat.issueTypes.product') || 'Product issue' },
+    { value: 'General support', label: t('supportChat.issueTypes.other') || 'General support' },
+  ], [t]);
 
   const contactRows = useMemo(() => [
-    { icon: Phone, label: 'Phone', value: supportConfig.supportPhoneNumber || defaultSupportConfig.supportPhoneNumber, href: `tel:${supportConfig.supportPhoneNumber || defaultSupportConfig.supportPhoneNumber}` },
-    { icon: Mail, label: 'Email', value: supportConfig.supportEmail || defaultSupportConfig.supportEmail, href: `mailto:${supportConfig.supportEmail || defaultSupportConfig.supportEmail}` },
-    { icon: CheckCircle2, label: 'Availability', value: supportConfig.workTimings || defaultSupportConfig.workTimings },
-  ], [supportConfig]);
+    { icon: Phone, label: t('supportChat.mobile') || 'Phone', value: supportConfig.supportPhoneNumber || defaultSupportConfig.supportPhoneNumber, href: `tel:${supportConfig.supportPhoneNumber || defaultSupportConfig.supportPhoneNumber}` },
+    { icon: Mail, label: t('supportChat.email') || 'Email', value: supportConfig.supportEmail || defaultSupportConfig.supportEmail, href: `mailto:${supportConfig.supportEmail || defaultSupportConfig.supportEmail}` },
+    { icon: CheckCircle2, label: t('estimatedDelivery') || 'Availability', value: supportConfig.workTimings || defaultSupportConfig.workTimings },
+  ], [supportConfig, t]);
 
   useEffect(() => {
     getSupportConfig().then((config) => {
@@ -82,21 +79,17 @@ const ContactSupport = () => {
     localStorage.setItem(SUPPORT_TICKETS_STORAGE_KEY, JSON.stringify(tickets));
   }, [tickets]);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   const updateTicketField = (field, value) => {
-    const nextValue = field === 'phone' ? value.replace(/[^\d+ -]/g, '').slice(0, 15) : value;
+    const nextValue = field === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value;
     setTicketForm((current) => ({ ...current, [field]: nextValue }));
     setFormStatus('');
   };
 
   const validateTicket = () => {
-    if (!ticketForm.name.trim()) return 'Name is required.';
-    if (!/^[0-9+\-\s]{8,15}$/.test(ticketForm.phone.trim())) return 'Enter a valid phone number.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ticketForm.email.trim())) return 'Enter a valid email address.';
-    if (!ticketForm.message.trim() || ticketForm.message.trim().length < 12) return 'Please explain the issue clearly.';
+    if (!ticketForm.name.trim()) return t('supportChat.validation.nameRequired') || 'Name is required.';
+    if (!/^\d{10}$/.test(ticketForm.phone.trim())) return t('supportChat.validation.mobileInvalid') || 'Enter a valid 10-digit phone number.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ticketForm.email.trim())) return t('supportChat.validation.emailInvalid') || 'Enter a valid email address.';
+    if (!ticketForm.message.trim() || ticketForm.message.trim().length < 12) return t('supportChat.validation.messageRequired') || 'Please explain the issue clearly.';
     return '';
   };
 
@@ -124,30 +117,17 @@ const ContactSupport = () => {
         status: 'Submitted',
       };
       setTickets((current) => [savedTicket, ...current]);
-      setFormStatus(`Ticket ${savedTicket.serverId || savedTicket.id} submitted successfully.`);
+      
+      const successTemplate = t('supportChat.ticketSuccessWithId') || 'Ticket {{ticketId}} submitted successfully.';
+      setFormStatus(successTemplate.replace('{{ticketId}}', savedTicket.serverId || savedTicket.id));
       setTicketForm((current) => ({ ...current, message: '', orderId: '' }));
     } catch (error) {
       const savedTicket = { ...ticket, status: 'Pending sync', error: error.message };
       setTickets((current) => [savedTicket, ...current]);
-      setFormStatus(`Ticket saved locally. ${error.message}`);
+      setFormStatus(`Failed to submit ticket: ${error.message || 'Server Unreachable'}. The backend server appears to be offline. Your ticket has been saved locally.`);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleSend = async (event) => {
-    event.preventDefault();
-    const text = inputText.trim();
-    if (!text) return;
-
-    setMessages((current) => [...current, { text, sender: 'user' }]);
-    setInputText('');
-
-    const apiReply = await sendSupportBotMessage(text);
-    setMessages((current) => [...current, {
-      text: apiReply || 'Thanks for sharing. If this is linked to an order, submit a ticket with your Order ID so our team can follow up.',
-      sender: 'bot',
-    }]);
   };
 
   return (
@@ -156,9 +136,9 @@ const ContactSupport = () => {
 
       <main className="support-page-container">
         <section className="support-header">
-          <span>Contact Support</span>
-          <h1>Customer Support</h1>
-          <p>Raise support tickets for orders, payments, returns, products, or general help and track the submitted details here.</p>
+          <span>{t('contactUs') || 'Contact Support'}</span>
+          <h1>{t('supportChat.title') || 'Customer Support'}</h1>
+          <p>{t('supportChat.subtitle') || 'Raise support tickets for orders, payments, returns, products, or general help and track the submitted details here.'}</p>
         </section>
 
         <section className="support-layout">
@@ -167,43 +147,43 @@ const ContactSupport = () => {
               <div className="support-section-title">
                 <ClipboardList size={22} />
                 <div>
-                  <span>Submit Ticket</span>
-                  <h2>Tell us what went wrong</h2>
+                  <span>{t('supportChat.raiseTicket') || 'Submit Ticket'}</span>
+                  <h2>{t('supportChat.ticketIntro') || 'Tell us what went wrong'}</h2>
                 </div>
               </div>
 
               <div className="support-form-grid">
                 <label>
-                  <span>Name *</span>
+                  <span>{t('supportChat.name') || 'Name'} *</span>
                   <input value={ticketForm.name} onChange={(event) => updateTicketField('name', event.target.value)} autoComplete="name" />
                 </label>
                 <label>
-                  <span>Phone *</span>
+                  <span>{t('supportChat.mobile') || 'Phone'} *</span>
                   <input value={ticketForm.phone} onChange={(event) => updateTicketField('phone', event.target.value)} autoComplete="tel" />
                 </label>
                 <label>
-                  <span>Email *</span>
+                  <span>{t('supportChat.email') || 'Email'} *</span>
                   <input type="email" value={ticketForm.email} onChange={(event) => updateTicketField('email', event.target.value)} autoComplete="email" />
                 </label>
                 <label>
-                  <span>Issue type *</span>
+                  <span>{t('supportChat.issueType') || 'Issue type'} *</span>
                   <select value={ticketForm.issueType} onChange={(event) => updateTicketField('issueType', event.target.value)}>
-                    {issueTypes.map((issueType) => <option key={issueType} value={issueType}>{issueType}</option>)}
+                    {issueTypes.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                   </select>
                 </label>
                 <label>
-                  <span>Order ID optional</span>
+                  <span>{t('supportChat.orderIdOptional') || 'Order ID optional'}</span>
                   <input value={ticketForm.orderId} onChange={(event) => updateTicketField('orderId', event.target.value)} placeholder="Example: ORD-1024" />
                 </label>
                 <label className="support-message-field">
-                  <span>Message *</span>
-                  <textarea value={ticketForm.message} onChange={(event) => updateTicketField('message', event.target.value)} rows="5" placeholder="Describe the issue, product, payment, or return details." />
+                  <span>{t('supportChat.description') || 'Message'} *</span>
+                  <textarea value={ticketForm.message} onChange={(event) => updateTicketField('message', event.target.value)} rows="5" placeholder={t('reviewMessagePlaceholder') || 'Describe the issue...'} />
                 </label>
               </div>
 
-              {formStatus && <p className={`support-form-status ${formStatus.includes('successfully') ? 'success' : ''}`}>{formStatus}</p>}
+              {formStatus && <p className={`support-form-status ${formStatus.includes('successfully') || formStatus.includes('విజయవంతంగా') || formStatus.includes('सफलतापूर्वक') ? 'success' : ''}`}>{formStatus}</p>}
               <button type="submit" className="support-submit-btn" disabled={isSubmitting}>
-                <Send size={17} /> {isSubmitting ? 'Submitting...' : 'Submit ticket'}
+                <Send size={17} /> {isSubmitting ? `${t('supportChat.send') || 'Submitting'}...` : t('supportChat.submitTicket') || 'Submit ticket'}
               </button>
             </form>
 
@@ -211,12 +191,12 @@ const ContactSupport = () => {
               <div className="support-section-title">
                 <MessageSquareText size={22} />
                 <div>
-                  <span>Dynamic Data</span>
-                  <h2>Submitted Tickets</h2>
+                  <span>{t('supportChat.latestTracking') || 'Dynamic Data'}</span>
+                  <h2>{t('myOrders') || 'Submitted Tickets'}</h2>
                 </div>
               </div>
               {tickets.length === 0 ? (
-                <div className="support-empty-state">No tickets submitted yet. Your latest ticket details will appear here after submission.</div>
+                <div className="support-empty-state">{t('supportChat.fallback') || 'No tickets submitted yet. Your latest ticket details will appear here after submission.'}</div>
               ) : (
                 <div className="support-ticket-list">
                   {tickets.map((ticket) => (
@@ -226,12 +206,12 @@ const ContactSupport = () => {
                         <span>{ticket.status}</span>
                       </div>
                       <div className="support-ticket-data-grid">
-                        <p><span>Name</span>{ticket.name}</p>
-                        <p><span>Phone</span>{ticket.phone}</p>
-                        <p><span>Email</span>{ticket.email}</p>
-                        <p><span>Issue</span>{ticket.issueType}</p>
-                        <p><span>Order ID</span>{ticket.orderId || 'Not provided'}</p>
-                        <p><span>Created</span>{new Date(ticket.createdAt).toLocaleString('en-IN')}</p>
+                        <p><span>{t('supportChat.name') || 'Name'}</span>{ticket.name}</p>
+                        <p><span>{t('supportChat.mobile') || 'Phone'}</span>{ticket.phone}</p>
+                        <p><span>{t('supportChat.email') || 'Email'}</span>{ticket.email}</p>
+                        <p><span>{t('supportChat.issueType') || 'Issue'}</span>{ticket.issueType}</p>
+                        <p><span>{t('supportChat.orderIdOptional') || 'Order ID'}</span>{ticket.orderId || 'Not provided'}</p>
+                        <p><span>{t('estimatedDelivery') || 'Created'}</span>{new Date(ticket.createdAt).toLocaleString('en-IN')}</p>
                       </div>
                       <p className="support-ticket-message">{ticket.message}</p>
                     </article>
@@ -244,7 +224,7 @@ const ContactSupport = () => {
 
           <aside className="contact-sidebar">
             <div className="support-contact-card">
-              <h3>Contact Details</h3>
+              <h3>{t('getInTouch') || 'Contact Details'}</h3>
               {contactRows.map((row) => {
                 const Icon = row.icon;
                 const content = (
@@ -255,21 +235,6 @@ const ContactSupport = () => {
                 );
                 return row.href ? <a key={row.label} href={row.href}>{content}</a> : <p key={row.label}>{content}</p>;
               })}
-            </div>
-
-            <div className="chat-container">
-              <div className="chat-header">
-                <div className="bot-status"><span className="online-dot"></span><strong>Agro Bot</strong></div>
-                <span className="chat-subtitle">Online</span>
-              </div>
-              <div className="chat-messages">
-                {messages.map((message, index) => <div key={`${message.sender}-${index}`} className={`message-bubble ${message.sender}`}>{message.text}</div>)}
-                <div ref={chatEndRef} />
-              </div>
-              <form className="chat-input" onSubmit={handleSend}>
-                <input type="text" placeholder="Type your question here..." value={inputText} onChange={(event) => setInputText(event.target.value)} />
-                <button type="submit" aria-label="Send support message"><Send size={18} /></button>
-              </form>
             </div>
           </aside>
         </section>

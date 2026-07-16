@@ -2,12 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCategories } from '../context/CategoryContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ChevronRight } from 'lucide-react';
 import CategoryCard from './CategoryCard';
 import './HomeCategories.css';
 
 const HomeCategories = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const {
     mappedCategories,
     categoriesLoading,
@@ -26,21 +28,21 @@ const HomeCategories = () => {
               whileInView={{ opacity: 1, x: 0 }}
               className="mb-1 block text-xs font-semibold uppercase tracking-[3px] text-dark"
             >
-              Browse Collections
+              {t('ourCollections')}
             </motion.span>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               className="text-2xl font-semibold text-dark md:text-4xl"
             >
-              SHOP BY CATEGORY
+              {t('allCategories')}
             </motion.h2>
           </div>
           <button 
             onClick={() => navigate('/categories')}
             className="flex items-center gap-2 text-dark font-semibold hover:text-dark transition-colors group"
           >
-            VIEW ALL CATEGORIES 
+            {t('viewAllResults')} 
             <div className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center group-hover:bg-dark group-hover:text-white transition-all">
               <ChevronRight size={16} />
             </div>

@@ -111,6 +111,10 @@ export const validateCoinRedemption = ({ coinsToRedeem, availableCoins, cartTota
     return `Minimum redeemable coins is ${minRedeemableCoins}.`;
   }
 
+  if (requestedCoins > 500) {
+    return 'Maximum 500 coins can be used for a single purchase.';
+  }
+
   if (maxRedeemableCoins > 0 && requestedCoins > maxRedeemableCoins) {
     return `Maximum redeemable coins is ${maxRedeemableCoins}.`;
   }

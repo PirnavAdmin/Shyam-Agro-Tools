@@ -6,19 +6,19 @@ import { useLanguage } from '../context/LanguageContext';
 import headerLogo from '../../asset/headerlogo-cropped.png';
 import './Footer.css';
 
-const customerServiceLinks = [
-  { to: '/faq', label: 'FAQ' },
-  { to: '/help-center', label: 'Help Center' },
-  { to: '/contact-us', label: 'Contact Us' },
-  { to: '/terms-of-service', label: 'Terms of Service' },
-  { to: '/privacy-policy', label: 'Privacy Policy' },
-  { to: '/return-refund-policy', label: 'Return & Refund Policy' },
-];
-
 const Footer = () => {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState('');
+
+  const customerServiceLinks = [
+    { to: '/faq', label: t('faq') || 'FAQ' },
+    { to: '/help-center', label: t('helpCenter') || 'Help Center' },
+    { to: '/contact-us', label: t('contactUs') || 'Contact Us' },
+    { to: '/terms-of-service', label: t('termsConditions') || 'Terms of Service' },
+    { to: '/privacy-policy', label: t('privacyPolicy') || 'Privacy Policy' },
+    { to: '/return-refund-policy', label: t('refundPolicy') || 'Return & Refund Policy' },
+  ];
 
   const handleSubscribe = (event) => {
     event.preventDefault();
