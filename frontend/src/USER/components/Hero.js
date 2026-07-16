@@ -10,7 +10,7 @@ const Hero = () => {
   const slides = [
     {
       id: 1,
-      image: '/product-images/sprayer-field-hero.png',
+      image: '/hero_banner.png',
       titleKey: 'hero.sprayer.title',
       subtitleKey: 'hero.sprayer.subtitle',
       descriptionKey: 'hero.sprayer.description',
@@ -19,7 +19,7 @@ const Hero = () => {
     },
     {
       id: 2,
-      image: '/product-images/tractor-field-hero.png',
+      image: '/hero_banner.png',
       titleKey: 'hero.tractor.title',
       subtitleKey: 'hero.tractor.subtitle',
       descriptionKey: 'hero.tractor.description',

@@ -1,4 +1,5 @@
 import axios from '../api/axios';
+import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const SUBCATEGORY_API_BASE_URL = (
   process.env.REACT_APP_SUBCATEGORY_API_BASE_URL ||
@@ -6,7 +7,7 @@ export const SUBCATEGORY_API_BASE_URL = (
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   'https://shyamagrotools.com'
 ).replace(/\/$/, '');
-export const DEFAULT_SUBCATEGORY_IMAGE = '/category-banners/fallback.png';
+export const DEFAULT_SUBCATEGORY_IMAGE = '/hero_banner.png';
 const SUBCATEGORY_ENDPOINT = `${SUBCATEGORY_API_BASE_URL}/api/Subcategory`;
 const requestConfig = {
   headers: {
@@ -21,11 +22,7 @@ export const getSubcategoryImage = (image) => {
     return DEFAULT_SUBCATEGORY_IMAGE;
   }
 
-  if (image.startsWith('http') || image.startsWith('data:image') || image.startsWith('blob:')) {
-    return image;
-  }
-
-  return `${SUBCATEGORY_API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+  return normalizeAssetUrl(image, SUBCATEGORY_API_BASE_URL, DEFAULT_SUBCATEGORY_IMAGE);
 };
 
 export const getSubcategories = async () => {

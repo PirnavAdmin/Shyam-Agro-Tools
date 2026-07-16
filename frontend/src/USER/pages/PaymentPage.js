@@ -491,7 +491,7 @@ const mapCheckoutItems = (items) => {
       displayName: item.productName || '',
       image: item.imageUrl
         ? `${CART_CHECKOUT_API_BASE_URL}${item.imageUrl.startsWith('/') ? '' : '/'}${item.imageUrl}`
-        : '/product-images/fallback.png',
+        : '/hero_banner.png',
       sku: String(item.productId),
     };
   });

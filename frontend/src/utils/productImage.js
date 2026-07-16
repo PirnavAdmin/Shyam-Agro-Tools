@@ -1,10 +1,12 @@
+import { normalizeAssetUrl } from './assetUrl';
+
 export const PRODUCT_ASSET_BASE_URL = (
   process.env.REACT_APP_PRODUCT_ASSET_BASE_URL ||
   process.env.REACT_APP_PRODUCT_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   'https://shyamagrotools.com'
 ).replace(/\/$/, '');
-export const PRODUCT_IMAGE_FALLBACK = '/assets/no-image.png';
+export const PRODUCT_IMAGE_FALLBACK = '/hero_banner.png';
 
 const getPath = (value) => {
   if (typeof value === 'string') return value.trim();
@@ -40,8 +42,7 @@ export const getProductImage = (product) => {
   );
 
   if (!path) return PRODUCT_IMAGE_FALLBACK;
-  if (/^(https?:)?\/\//i.test(path) || /^(data|blob):/i.test(path)) return path;
-  return `${PRODUCT_ASSET_BASE_URL}/${path.replace(/^\/+/, '')}`;
+  return normalizeAssetUrl(path, PRODUCT_ASSET_BASE_URL, PRODUCT_IMAGE_FALLBACK);
 };
 
 export const handleProductImageError = (event) => {

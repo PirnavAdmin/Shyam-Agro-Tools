@@ -7,7 +7,7 @@ const TrustRatingSection = () => {
     <section className="trust-rating-section">
       <div className="trust-rating-inner">
         <div className="trust-rating-art" aria-hidden="true">
-          <img src="/images/customer-rating-banner-transparent.png" alt="" />
+          <img src="/hero_banner.png" alt="" />
         </div>
 
         <div className="trust-rating-card">

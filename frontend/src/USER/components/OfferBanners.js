@@ -23,7 +23,7 @@ const OfferBanners = () => {
           }}
         >
           <img 
-            src="/product-images/sprayer-field-hero.png" 
+            src="/hero_banner.png" 
             alt="Offer 1" 
             className="w-full h-full object-cover opacity-60 transition-transform duration-[2000ms] group-hover:scale-110"
           />
@@ -57,7 +57,7 @@ const OfferBanners = () => {
           }}
         >
           <img 
-            src="/product-images/tractor-field-hero.png" 
+            src="/hero_banner.png" 
             alt="Offer 2" 
             className="w-full h-full object-cover opacity-60 transition-transform duration-[2000ms] group-hover:scale-110"
           />
