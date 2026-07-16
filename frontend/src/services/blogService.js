@@ -1,4 +1,5 @@
 import axios from '../api/axios';
+import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const BLOG_API_BASE_URL = (
   process.env.REACT_APP_BLOG_API_BASE_URL ||
@@ -34,11 +35,7 @@ export const getBlogImageUrl = (coverImage) => {
     return null;
   }
 
-  if (coverImage.startsWith('http') || coverImage.startsWith('data:image') || coverImage.startsWith('blob:')) {
-    return coverImage;
-  }
-
-  return `${BLOG_API_BASE_URL}${coverImage.startsWith('/') ? '' : '/'}${coverImage}`;
+  return normalizeAssetUrl(coverImage, BLOG_API_BASE_URL);
 };
 
 const extractBlogs = (data) => {

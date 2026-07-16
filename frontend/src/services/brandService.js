@@ -1,4 +1,5 @@
 import axios from '../api/axios';
+import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const BRAND_API_BASE_URL = (
   process.env.REACT_APP_BRAND_API_BASE_URL ||
@@ -23,11 +24,7 @@ export const getBrandLogoUrl = (logoImage) => {
     return '';
   }
 
-  if (logoImage.startsWith('http') || logoImage.startsWith('data:image') || logoImage.startsWith('blob:')) {
-    return logoImage;
-  }
-
-  return `${BRAND_API_BASE_URL}${logoImage.startsWith('/') ? '' : '/'}${logoImage}`;
+  return normalizeAssetUrl(logoImage, BRAND_API_BASE_URL);
 };
 
 const normalizeBrand = (brand = {}) => ({

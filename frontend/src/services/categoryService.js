@@ -1,11 +1,12 @@
 import axios from '../api/axios';
+import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const CATEGORY_API_BASE_URL = (
   process.env.REACT_APP_CATEGORY_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   'https://shyamagrotools.com'
 ).replace(/\/$/, '');
-export const DEFAULT_CATEGORY_IMAGE = '/category-banners/fallback.png';
+export const DEFAULT_CATEGORY_IMAGE = '/hero_banner.png';
 const CATEGORY_ENDPOINT = `${CATEGORY_API_BASE_URL}/api/Category`;
 const requestConfig = {
   headers: {
@@ -20,11 +21,7 @@ export const getCategoryImage = (image) => {
     return DEFAULT_CATEGORY_IMAGE;
   }
 
-  if (image.startsWith('http') || image.startsWith('data:image')) {
-    return image;
-  }
-
-  return `${CATEGORY_API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+  return normalizeAssetUrl(image, CATEGORY_API_BASE_URL, DEFAULT_CATEGORY_IMAGE);
 };
 
 export const getCategories = async () => {
