@@ -55,7 +55,30 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [countdown, setCountdown] = useState(0);
+  const [timerTrigger, setTimerTrigger] = useState(0);
   const requestLock = useRef(false);
+
+  React.useEffect(() => {
+    if (step !== 'otp') {
+      setCountdown(0);
+      return undefined;
+    }
+
+    setCountdown(30);
+
+    const interval = window.setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [step, timerTrigger]);
 
   if (!isOpen) return null;
 
@@ -214,6 +237,42 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
     }
   };
 
+  const handleResendOtp = async () => {
+    if (isLoading || requestLock.current) return;
+    
+    requestLock.current = true;
+    setIsLoading(true);
+    setError('');
+    setOtp('');
+
+    try {
+      const response = await apiClient.post(
+        `${getAuthApiBaseUrl()}/test-auth/login`,
+        { mobileNumber: normalizeMobileNumber(phone) },
+        { headers: API_HEADERS, skipAuth: true }
+      );
+
+      const nextLoginApiData = {
+        success: response.data?.success === true,
+        isNewUser: response.data?.isNewUser === true,
+        otp: response.data?.otp || '',
+      };
+      setLoginApiData(nextLoginApiData);
+
+      if (nextLoginApiData.success) {
+        setTimerTrigger((prev) => prev + 1);
+      } else {
+        setError(response.data?.message || "Unable to resend OTP. Please try again.");
+      }
+    } catch (err) {
+      console.error("Resend OTP Error:", err.response?.data || err.message);
+      setError(getApiErrorMessage(err, "Failed to resend OTP. Please try again."));
+    } finally {
+      requestLock.current = false;
+      setIsLoading(false);
+    }
+  };
+
   const resetForm = () => {
     requestLock.current = false;
     setStep('phone');
@@ -222,6 +281,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
     setOtp('');
     setLoginApiData({ success: false, isNewUser: false, otp: '' });
     setError('');
+    setCountdown(0);
     onClose();
   };
 
@@ -231,6 +291,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
     setOtp('');
     setLoginApiData({ success: false, isNewUser: false, otp: '' });
     setError('');
+    setCountdown(0);
   };
 
   return (
@@ -351,6 +412,12 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
 
             {step === 'otp' && (
               <form onSubmit={handleVerify}>
+                {loginApiData.otp && (
+                  <div className="mb-4 rounded bg-[#FFF9E6] border border-[#FFE7A3] p-3 text-center text-xs font-bold text-[#8A6D1C] uppercase tracking-wider">
+                    Demo OTP: <strong className="text-sm font-black text-[#1a1a1a]">{loginApiData.otp}</strong>
+                  </div>
+                )}
+
                 <input
                   type="text"
                   name="otp"
@@ -371,12 +438,28 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
                   {isLoading ? 'VERIFYING...' : 'VERIFY & LOGIN'}
                 </button>
 
+                {countdown > 0 ? (
+                  <div className="mt-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Resend OTP in <span className="font-bold text-[#6dbd2f]">{countdown}s</span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={isLoading}
+                    className="mt-3 block w-full text-center text-xs font-black uppercase tracking-widest text-[#6dbd2f] hover:text-[#5eaa28]"
+                  >
+                    Resend OTP
+                  </button>
+                )}
+
                 <div
                   style={{
                     cursor: 'pointer',
                     fontSize: '10px',
                     color: '#888',
-                    marginTop: '5px'
+                    marginTop: '10px',
+                    textAlign: 'center'
                   }}
                   onClick={backToPhone}
                 >
@@ -387,7 +470,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
 
             <div className="remember-me-container">
               <input type="checkbox" id="remember-me" />
-              <label htmlFor="remember-me">REMEMBER ME .....!</label>
+              <label htmlFor="remember-me">REMEMBER ME</label>
             </div>
           </div>
         </div>

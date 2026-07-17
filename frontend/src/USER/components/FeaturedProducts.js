@@ -88,7 +88,7 @@ const FeaturedProducts = ({ title = "FEATURED ITEMS", subtitle = "Special Produc
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-xl font-bold text-dark md:text-3xl"
+            className="text-xl font-bold uppercase text-dark md:text-3xl"
           >
             {title}
           </motion.h2>

@@ -34,7 +34,7 @@ const formatBlogDate = (publishDate) => {
 };
 
 const BlogSection = () => {
-  const { t } = useLanguage();
+  const { t, productText } = useLanguage();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -267,9 +267,9 @@ const BlogSection = () => {
                         key={product.id}
                         className="blog-related-card"
                       >
-                        <img src={getProductImage(product)} alt={product.name} loading="lazy" onError={handleProductImageError} />
+                        <img src={getProductImage(product)} alt={productText(product, 'name')} loading="lazy" onError={handleProductImageError} />
                         <div>
-                          <h5>{product.name}</h5>
+                          <h5>{productText(product, 'name')}</h5>
                           <p>{product.price}</p>
                           <button type="button">
                             {t('blog.viewProduct')}

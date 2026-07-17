@@ -88,13 +88,15 @@
 }
 
 .app-category-card:hover .app-category-cover,
-.app-category-card:focus-visible .app-category-cover {
+.app-category-card:focus-visible .app-category-cover,
+.app-category-card.active .app-category-cover {
   opacity: 0;
   transform: scale(1.04);
 }
 
 .app-category-card:hover .app-category-detail,
-.app-category-card:focus-visible .app-category-detail {
+.app-category-card:focus-visible .app-category-detail,
+.app-category-card.active .app-category-detail {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;

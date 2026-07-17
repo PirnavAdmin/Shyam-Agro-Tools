@@ -4062,11 +4062,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\ShyamAgroSuite.Api.csproj",
+      "projectUniqueName": "C:\\Users\\ADMIN\\OneDrive\\Desktop\\Project Code\\Shyam-Agro-Tools\\backend\\ShyamAgroSuite.Api.csproj",
       "projectName": "ShyamAgroSuite.Api",
-      "projectPath": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\ShyamAgroSuite.Api.csproj",
+      "projectPath": "C:\\Users\\ADMIN\\OneDrive\\Desktop\\Project Code\\Shyam-Agro-Tools\\backend\\ShyamAgroSuite.Api.csproj",
       "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ADMIN\\source\\repos\\ShyamAgroSuite.Api\\obj\\",
+      "outputPath": "C:\\Users\\ADMIN\\OneDrive\\Desktop\\Project Code\\Shyam-Agro-Tools\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

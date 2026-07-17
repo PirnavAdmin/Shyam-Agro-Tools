@@ -471,7 +471,7 @@ const Header = ({ onLoginClick }) => {
           className="header-search-button"
           aria-label={t('search')}
         >
-          <img src="/search-magnifier.svg" alt="" className="header-search-icon" aria-hidden="true" />
+          <Search className="header-search-icon" size={15} aria-hidden="true" />
         </button>
 
         <AnimatePresence>
@@ -545,42 +545,44 @@ const Header = ({ onLoginClick }) => {
   return (
     <header className="site-header w-full font-poppins">
       {/* 1. TOP HEADER BAR */}
-      <div className="top-header-bar bg-dark text-white text-[10px] py-1.5 px-4 md:px-10 flex flex-wrap justify-between items-center border-b border-white/10 tracking-wider">
-        <div className="top-header-contact flex gap-6 items-center flex-wrap">
-          <div className="top-header-contact-item flex items-center gap-2">
-            <span className="icon-shade icon-teal icon-shade-sm"><Phone size={12} /></span>
-            <Link to="/contact-support" className="top-header-contact-link">+91 98765 43210</Link>
+      <div className="top-header-bar bg-dark text-white text-[10px] py-1.5 border-b border-white/10 tracking-wider">
+        <div className="max-w-[1440px] mx-auto w-full px-4 md:px-10 flex flex-wrap justify-between items-center">
+          <div className="top-header-contact flex gap-6 items-center flex-wrap">
+            <div className="top-header-contact-item flex items-center gap-2">
+              <span className="icon-shade icon-teal icon-shade-sm"><Phone size={12} /></span>
+              <Link to="/contact-support" className="top-header-contact-link">+91 98765 43210</Link>
+            </div>
+            <div className="top-header-contact-item flex items-center gap-2 hidden sm:flex">
+              <span className="icon-shade icon-grey icon-shade-sm"><Mail size={12} /></span>
+              <Link to="/contact-support" className="top-header-contact-link">support@shyamagro.com</Link>
+            </div>
+            <Link to="/become-seller" className="top-header-seller-link hidden sm:inline">
+              {t('becomeSeller')}
+            </Link>
           </div>
-          <div className="top-header-contact-item flex items-center gap-2 hidden sm:flex">
-            <span className="icon-shade icon-grey icon-shade-sm"><Mail size={12} /></span>
-            <Link to="/contact-support" className="top-header-contact-link">support@shyamagro.com</Link>
+          <div className="top-header-promo hidden md:block text-center flex-1">
+            {topBarAnnouncements.map((announcement, index) => (
+              <span
+                key={announcement}
+                className="top-header-announcement"
+                style={{ '--announcement-index': index }}
+              >
+                {announcement}
+              </span>
+            ))}
           </div>
-          <Link to="/become-seller" className="top-header-seller-link hidden sm:inline">
-            Become a Supplier
-          </Link>
-        </div>
-        <div className="top-header-promo hidden md:block text-center flex-1">
-          {topBarAnnouncements.map((announcement, index) => (
-            <span
-              key={announcement}
-              className="top-header-announcement"
-              style={{ '--announcement-index': index }}
-            >
-              {announcement}
-            </span>
-          ))}
-        </div>
-        <div className="top-header-tools flex gap-4 items-center font-semibold">
-          <Link to="/track-order" className="top-header-track-link border-l border-white/20 pl-4">
-            Track Order
-          </Link>
-          <LanguageDropdown />
+          <div className="top-header-tools flex gap-4 items-center font-semibold">
+            <Link to="/track-order" className="top-header-track-link border-l border-white/20 pl-4">
+              {t('orderTracking')}
+            </Link>
+            <LanguageDropdown />
+          </div>
         </div>
       </div>
 
       {/* 2. MAIN NAVBAR */}
       <div className="header-main-navbar w-full bg-white py-3 transition-shadow duration-300 z-[9998]">
-        <div className="header-main-inner w-full px-4 md:px-10 flex justify-between items-center">
+        <div className="header-main-inner max-w-[1440px] mx-auto w-full px-4 md:px-10 flex justify-between items-center">
           
           {/* Mobile Menu Toggle */}
           <button

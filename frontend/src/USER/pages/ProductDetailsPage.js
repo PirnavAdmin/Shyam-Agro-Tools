@@ -134,7 +134,7 @@ const ProductDetailsPage = () => {
   const [isImageLightboxOpen, setIsImageLightboxOpen] = useState(false);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const { addToCart, cartItems, removeFromCart } = useCart();
-  const { t, productText, productListText, productSpecLabel, productSpecValue, reviewText } = useLanguage();
+  const { t, productText, productListText, productSpecLabel, productSpecValue, reviewText, categoryText } = useLanguage();
   const { showToast } = useToast();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { mappedCategories } = useCategories();
@@ -332,8 +332,8 @@ const ProductDetailsPage = () => {
     product.description ||
     product.longDesc;
   const productName = productText(product, 'name');
-  const categoryName = category?.name || product.category;
-  const categoryDescription = category?.description || '';
+  const categoryName = categoryText(category) || product.category;
+  const categoryDescription = categoryText(category, 'description') || '';
   const maxRatingCount = Math.max(...Object.values(ratingBreakdown), 1);
   const reviewsPerPage = 20;
   const shouldPaginateReviews = reviews.length > reviewsPerPage;
@@ -836,11 +836,11 @@ const ProductDetailsPage = () => {
               </div>
 
               {isLoadingReviews ? (
-                <p className="mt-6 text-sm leading-6 text-gray-600">Loading...</p>
+                <p className="mt-4 text-sm leading-6 text-gray-600">Loading...</p>
               ) : reviewLoadError ? (
-                <p className="mt-6 text-sm leading-6 text-gray-600">{reviewLoadError}</p>
+                <p className="mt-4 text-sm leading-6 text-gray-600">{reviewLoadError}</p>
               ) : reviews.length > 0 ? (
-                <div className="mt-6 space-y-4">
+                <div className="mt-4 space-y-4">
                   {displayedReviews.map((review, index) => (
                     <article key={`${review.userName}-${index}`} className="review-card border border-border">
                       <div className="mb-2 flex flex-wrap items-center gap-3">

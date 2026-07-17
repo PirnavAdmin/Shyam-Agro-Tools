@@ -209,6 +209,11 @@ const OffersPage = () => {
 
               return (
                 <article key={coupon.id} className="offers-page-card border border-border bg-white p-4">
+                  {coupon.backgroundImage ? (
+                    <div className="offers-page-image mb-4 overflow-hidden">
+                      <img src={coupon.backgroundImage} alt={couponTitle} />
+                    </div>
+                  ) : null}
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="mb-2 flex flex-wrap items-center gap-2">

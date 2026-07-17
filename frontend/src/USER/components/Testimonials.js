@@ -93,7 +93,7 @@ const Testimonials = () => {
       <div className="max-w-[1440px] mx-auto relative z-10">
         <div className="mb-4 text-center">
           <span className="mb-1 block text-xs font-bold uppercase tracking-[4px] text-primary">Customer Reviews</span>
-          <h2 className="text-xl font-bold text-dark md:text-2xl">WHAT OUR CLIENTS SAY</h2>
+          <h2 className="text-xl font-bold uppercase text-dark md:text-3xl">WHAT OUR CLIENTS SAY</h2>
         </div>
 
         <Swiper
@@ -110,7 +110,7 @@ const Testimonials = () => {
         >
           {reviews.map((review) => (
             <SwiperSlide key={review.id}>
-              <div className="flex min-h-[190px] flex-col items-center bg-white p-4 text-center shadow-sm transition-all duration-500 hover:shadow-lg">
+              <div className="flex min-h-[220px] flex-col items-center bg-white p-6 text-center rounded-xl border border-gray-100/80 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/20 relative group">
                 <Quote size={22} className="mb-2 text-primary/20" />
                 {review.rating > 0 && (
                   <div className="mb-2 flex items-center justify-center gap-0.5 text-primary">
