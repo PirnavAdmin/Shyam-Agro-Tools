@@ -11,6 +11,7 @@ using ShyamAgroSuite.Api.DTOs;
 
 namespace ShyamAgroSuite.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CartController : ControllerBase

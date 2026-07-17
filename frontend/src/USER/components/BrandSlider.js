@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getBrands } from '../../services/brandService';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 import './BrandSlider.css';
 
 const brandColors = [
@@ -23,6 +24,7 @@ const getBrandColor = (brand, index) => {
 };
 
 const BrandSlider = () => {
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const trackWrapperRef = useRef(null);
   const autoScrollRef = useRef(null);
@@ -121,7 +123,7 @@ const BrandSlider = () => {
   return (
     <section className="brand-slider-section">
       <div className="brand-slider-header">
-        <span className="brand-label">OUR TRUSTED BRANDS</span>
+        <span className="brand-label">{t('ourTrustedBrands', 'OUR TRUSTED BRANDS')}</span>
         <div className="brand-divider" />
       </div>
 

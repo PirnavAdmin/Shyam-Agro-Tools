@@ -31,10 +31,23 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
     productText(product, 'shortDescription') ||
     product.shortDescription ||
     product.shortDesc;
-  const hasOffer = Boolean(product.hasOffer);
+  const hasOffer = Boolean(product.hasOffer) && (
+    Number(product.discountPercent) > 0 || 
+    (product.price && product.offerPrice && Number(product.price) > Number(product.offerPrice))
+  );
   const displayPrice = hasOffer ? product.offerPrice || product.price : product.price;
-  const discountLabel = hasOffer
-    ? product.discount || (product.discountPercent ? `${product.discountPercent}% ${t('off')}` : '')
+
+  let discountPercent = Number(product.discountPercent || 0);
+  if (hasOffer && !discountPercent && product.price && product.offerPrice) {
+    const original = Number(product.price);
+    const offer = Number(product.offerPrice);
+    if (original > offer) {
+      discountPercent = Math.round(((original - offer) / original) * 100);
+    }
+  }
+
+  const discountLabel = (hasOffer && discountPercent > 0)
+    ? `${discountPercent}% ${t('off') || 'OFF'}`
     : '';
 
   const handleViewDetails = () => navigate(`/product/${product.id}`);
@@ -87,7 +100,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
       tabIndex={0}
       className={`product-card-static flex h-full cursor-pointer overflow-hidden border border-border bg-white ${
         isList ? 'flex-col md:flex-row' : 'flex-col'
-      }`}
+      } ${isInStock ? '' : 'out-of-stock'}`}
     >
       <div
         className={`product-card-media product-image-wrapper relative bg-[#f7f8f4] ${
@@ -96,7 +109,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
       >
         <div className="absolute left-2.5 top-2.5 z-10 flex flex-col gap-1.5">
           {product.madeInIndia && (
-            <span className="w-fit bg-primary px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-white shadow-sm">
+            <span className="product-stock-badge product-made-in-india-badge">
               {t('madeInIndia')}
             </span>
           )}
@@ -168,15 +181,17 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
           </div>
         </div>
 
-        <div className="mb-1.5 text-left text-[13px] font-semibold uppercase leading-snug tracking-tight text-dark">
-          <span className="line-clamp-2">{productName}</span>
+        <div className="mb-1.5 text-left text-[13px] font-semibold uppercase leading-snug tracking-tight text-dark h-[38px] overflow-hidden line-clamp-2">
+          {productName}
         </div>
 
-        {shortDescription && (
-          <p className="mb-2 line-clamp-2 text-[11px] font-normal leading-4 text-gray-500">
-            {shortDescription}
-          </p>
-        )}
+        <div className="h-[32px] mb-2 overflow-hidden">
+          {shortDescription ? (
+            <p className="line-clamp-2 text-[11px] font-normal leading-4 text-gray-500">
+              {shortDescription}
+            </p>
+          ) : null}
+        </div>
 
         <div className={`mb-2 product-card-stock-line ${isInStock ? 'in-stock' : 'out-of-stock'}`}>
           {stockLabel}
@@ -188,10 +203,12 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
             <span className="text-base font-bold text-primary">{formatPrice(displayPrice)}</span>
           </div>
 
-          {product.codAvailable && (
+          {product.codAvailable ? (
             <div className="product-cod-available-badge mb-2 inline-flex max-w-full items-center gap-1 bg-green-50 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-green-700">
               <span className="icon-shade icon-teal icon-shade-sm"><ShieldCheck size={12} /></span> {t('codAvailable')}
             </div>
+          ) : (
+            <div className="mb-2 h-[18px]" />
           )}
 
           <div className="grid gap-1.5">

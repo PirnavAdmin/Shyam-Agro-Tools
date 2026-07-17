@@ -1,14 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 const OfferBanners = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const openFortyPercentCollection = () => navigate('/offers/40-percent');
   const openPowerTillersCollection = () => navigate('/power-tillers');
 
   return (
-    <section className="section-padding bg-white">
+    <section className="section-padding pb-0 bg-white">
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 gap-3 md:grid-cols-2">
         {/* Banner 1 */}
         <motion.div 
@@ -28,9 +30,15 @@ const OfferBanners = () => {
             className="w-full h-full object-cover opacity-60 transition-transform duration-[2000ms] group-hover:scale-110"
           />
           <div className="absolute inset-0 z-10 flex flex-col items-start justify-center p-5 text-white md:p-7">
-            <span className="mb-2 bg-primary px-3 py-1 text-[9px] font-black uppercase tracking-[2px] text-white">Special Offer</span>
-            <h3 className="mb-2 text-2xl font-bold leading-tight md:text-3xl">PREMIUM FARMING<br/>TOOLS 40% OFF & ABOVE</h3>
-            <p className="mb-4 max-w-sm text-sm font-light text-gray-300">Equip your farm with the best industrial tools at unbeatable prices this season.</p>
+            <span className="mb-2 bg-primary px-3 py-1 text-[9px] font-black uppercase tracking-[2px] text-white">
+              {t('specialOffer')}
+            </span>
+            <h3 className="mb-2 text-2xl font-bold leading-tight md:text-3xl whitespace-pre-line">
+              {t('premiumFarmingTools')}
+            </h3>
+            <p className="mb-4 max-w-sm text-sm font-light text-gray-300">
+              {t('premiumFarmingToolsDesc')}
+            </p>
             <button
               type="button"
               onClick={(event) => {
@@ -39,7 +47,7 @@ const OfferBanners = () => {
               }}
               className="btn-primary cursor-pointer"
             >
-              SHOP COLLECTION
+              {t('shopCollection')}
             </button>
           </div>
         </motion.div>
@@ -62,9 +70,15 @@ const OfferBanners = () => {
             className="w-full h-full object-cover opacity-60 transition-transform duration-[2000ms] group-hover:scale-110"
           />
           <div className="absolute inset-0 z-10 flex flex-col items-start justify-center p-5 text-white md:p-7">
-            <span className="mb-2 bg-white px-3 py-1 text-[9px] font-black uppercase tracking-[2px] text-dark">Power Tillers</span>
-            <h3 className="mb-2 text-2xl font-bold leading-tight md:text-3xl">POWERFUL<br/>POWER TILLERS</h3>
-            <p className="mb-4 max-w-sm text-sm font-light text-gray-300">Discover our newly launched range of high-performance industrial power tillers.</p>
+            <span className="mb-2 bg-white px-3 py-1 text-[9px] font-black uppercase tracking-[2px] text-dark">
+              {t('powerTillers')}
+            </span>
+            <h3 className="mb-2 text-2xl font-bold leading-tight md:text-3xl whitespace-pre-line">
+              {t('powerfulPowerTillers')}
+            </h3>
+            <p className="mb-4 max-w-sm text-sm font-light text-gray-300">
+              {t('powerfulPowerTillersDesc')}
+            </p>
             <button
               type="button"
               onClick={(event) => {
@@ -73,7 +87,7 @@ const OfferBanners = () => {
               }}
               className="btn-outline hero-outline-btn border-white hover:bg-white hover:text-dark cursor-pointer"
             >
-              EXPLORE NOW
+              {t('exploreNow')}
             </button>
           </div>
         </motion.div>

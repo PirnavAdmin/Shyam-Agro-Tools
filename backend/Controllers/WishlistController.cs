@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace ShyamAgroSuite.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class WishlistController : ControllerBase

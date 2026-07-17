@@ -35,7 +35,7 @@ const Footer = () => {
 
   return (
     <footer className="site-footer bg-dark text-white font-poppins">
-      <div className="site-footer-grid max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <div className="site-footer-grid max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_0.8fr_1.2fr] gap-8 md:gap-10">
         
         {/* About Section */}
         <div className="site-footer-col flex flex-col gap-3">

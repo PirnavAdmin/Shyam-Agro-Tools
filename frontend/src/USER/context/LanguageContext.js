@@ -30,12 +30,26 @@ const formatReadableKey = (label) =>
     .trim();
 
 const CATEGORY_ID_BY_ENGLISH_NAME = {
+  // Old categories (for safety)
   'Heavy Machinery': 'heavy-machinery',
   'Agriculture Tools': 'agriculture-tools',
   'Irrigation & Water': 'irrigation-water',
   'Workshop & MRO': 'workshop-mro',
   'Sprayer Units': 'sprayers-units',
   'Food Processing': 'food-processing',
+
+  // Database categories
+  'Farm & garden': 'farm-and-garden',
+  'Farm & Garden': 'farm-and-garden',
+  'Sprayers': 'sprayers',
+  'Landscaping': 'landscaping',
+  'Pumps & Motors': 'pumps-and-motors',
+  'commercial kitchen equipment': 'commercial-kitchen-equipment',
+  'Food packaging Tools': 'food-packaging-tools',
+  'Workshop, DIY & MRO': 'workshop,-diy-and-mro',
+  'Power Tools': 'power-tools',
+  'FERTILIZERS': 'fertilizers',
+  'Neutrilizer': 'neutrilizer',
 };
 
 const translations = {
@@ -221,10 +235,21 @@ const translations = {
     trustedDelivery: 'Trusted Delivery',
     afterSalesAssistance: 'After Sales Assistance',
     relatedProducts: 'Related Products',
+    ourTrustedBrands: 'OUR TRUSTED BRANDS',
+    noSubcategoriesAvailable: 'No Subcategories Available',
+    specialOffer: 'Special Offer',
+    premiumFarmingTools: 'PREMIUM FARMING\nTOOLS 40% OFF & ABOVE',
+    premiumFarmingToolsDesc: 'Equip your farm with the best industrial tools at unbeatable prices this season.',
+    shopCollection: 'SHOP COLLECTION',
+    powerTillers: 'Power Tillers',
+    powerfulPowerTillers: 'POWERFUL\nPOWER TILLERS',
+    powerfulPowerTillersDesc: 'Discover our newly launched range of high-performance industrial power tillers.',
+    exploreNow: 'EXPLORE NOW',
   },
   te: {
     freeShipping: '₹5000 పైబడిన అన్ని ఆర్డర్లకు ఉచిత షిప్పింగ్!',
     searchProducts: 'ఉత్పత్తులను వెతకండి...',
+    viewAllResults: 'అన్ని ఫలితాలను చూడండి',
     shoppingCart: 'షాపింగ్ కార్ట్',
     accountInfo: 'ఖాతా సమాచారం',
     myOrders: 'నా ఆర్డర్లు',
@@ -348,7 +373,7 @@ const translations = {
     refundPolicy: 'రిఫండ్ విధానం',
     getInTouch: 'సంప్రదించండి',
     footerAbout: 'ప్రొఫెషనల్ వ్యవసాయ యంత్రాలు మరియు పారిశ్రామిక పరికరాల కోసం ప్రముఖ మార్కెట్‌ప్లేస్.',
-    newsletter: 'Subscribe',
+    newsletter: 'సబ్‌స్క్రయిబ్',
     yourEmail: 'మీ ఈమెయిల్',
     allRightsReserved: 'అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి',
     madeInIndia: 'భారతదేశంలో తయారు చేయబడింది',
@@ -391,10 +416,21 @@ const translations = {
     trustedDelivery: 'Trusted Delivery',
     afterSalesAssistance: 'After Sales Assistance',
     relatedProducts: 'Related Products',
+    ourTrustedBrands: 'మా నమ్మకమైన బ్రాండ్లు',
+    noSubcategoriesAvailable: 'ఉపవర్గాలు అందుబాటులో లేవు',
+    specialOffer: 'ప్రత్యేక ఆఫర్',
+    premiumFarmingTools: 'ప్రీమియం వ్యవసాయ పరికరాలు\n40% అంతకంటే ఎక్కువ తగ్గింపు',
+    premiumFarmingToolsDesc: 'ఈ సీజన్‌లో సాటిలేని ధరలకు అత్యుత్తమ పారిశ్రామిక పరికరాలతో మీ వ్యవసాయాన్ని మెరుగుపరచండి.',
+    shopCollection: 'కలెక్షన్ చూడండి',
+    powerTillers: 'పవర్ టిల్లర్లు',
+    powerfulPowerTillers: 'శక్తివంతమైన\nపవర్ టిల్లర్లు',
+    powerfulPowerTillersDesc: 'మా కొత్తగా ప్రారంభించిన అధిక-పనితీరు గల పారిశ్రామిక పవర్ టిల్లర్ల శ్రేణిని కనుగొనండి.',
+    exploreNow: 'ఇప్పుడే అన్వేషించండి',
   },
   hi: {
     freeShipping: '₹5000 से अधिक सभी ऑर्डर पर मुफ्त शिपिंग!',
     searchProducts: 'उत्पाद खोजें...',
+    viewAllResults: 'सभी परिणाम देखें',
     shoppingCart: 'शॉपिंग कार्ट',
     accountInfo: 'खाता जानकारी',
     myOrders: 'मेरे ऑर्डर',
@@ -518,7 +554,7 @@ const translations = {
     refundPolicy: 'रिफंड नीति',
     getInTouch: 'संपर्क में रहें',
     footerAbout: 'पेशेवर कृषि मशीनरी और औद्योगिक उपकरणों के लिए प्रमुख मार्केटप्लेस.',
-    newsletter: 'Subscribe',
+    newsletter: 'सदस्यता लें',
     yourEmail: 'आपका ईमेल',
     allRightsReserved: 'सर्वाधिकार सुरक्षित',
     madeInIndia: 'भारत में निर्मित',
@@ -561,6 +597,16 @@ const translations = {
     trustedDelivery: 'Trusted Delivery',
     afterSalesAssistance: 'After Sales Assistance',
     relatedProducts: 'Related Products',
+    ourTrustedBrands: 'हमारे विश्वसनीय ब्रांड',
+    noSubcategoriesAvailable: 'कोई उपश्रेणी उपलब्ध नहीं है',
+    specialOffer: 'विशेष ऑफर',
+    premiumFarmingTools: 'प्रीमियम कृषि उपकरण\n40% और अधिक की छूट',
+    premiumFarmingToolsDesc: 'इस सीजन में बेजोड़ कीमतों पर सर्वोत्तम औद्योगिक उपकरणों के साथ अपने खेत को सुसज्जित करें।',
+    shopCollection: 'संग्रह देखें',
+    powerTillers: 'पावर टिलर',
+    powerfulPowerTillers: 'शक्तिशाली\nपावर टिलर',
+    powerfulPowerTillersDesc: 'हमारे नए लॉन्च किए गए उच्च-प्रदर्शन वाले औद्योगिक पावर टिलर की श्रृंखला देखें।',
+    exploreNow: 'अभी अन्वेषण करें',
   },
 };
 
@@ -1702,57 +1748,96 @@ const productTranslations = {
 
 const categoryTranslations = {
   te: {
-    'heavy-machinery': {
-      name: 'భారీ యంత్రాలు',
-      description: 'వేగవంతమైన భూమి సిద్ధం, కోత మరియు పెద్ద వ్యవసాయ పనుల కోసం బలమైన వ్యవసాయ యంత్రాలు.',
-    },
-    'agriculture-tools': {
-      name: 'వ్యవసాయ పరికరాలు',
-      description: 'రోజువారీ వ్యవసాయ పనులు, పంట సంరక్షణ, నేల సిద్ధం మరియు నిర్వహణ కోసం మన్నికైన పరికరాలు.',
-    },
-    'irrigation-water': {
-      name: 'నీటిపారుదల మరియు నీరు',
-      description: 'నీటి పొదుపు వ్యవసాయం, బోర్‌వెల్లు మరియు పంటలకు నీరు అందించడానికి సమర్థవంతమైన ఉత్పత్తులు.',
-    },
-    'workshop-mro': {
-      name: 'వర్క్‌షాప్ మరియు నిర్వహణ',
-      description: 'వ్యవసాయ మరమ్మతులు, సేవలు మరియు రోజువారీ పనుల కోసం నమ్మదగిన పరికరాలు.',
-    },
-    'sprayers-units': {
-      name: 'స్ప్రేయర్ యూనిట్లు',
-      description: 'పెస్టిసైడ్, ఎరువు, మిస్టింగ్ మరియు మొక్కల రక్షణ కోసం స్ప్రేయింగ్ పరిష్కారాలు.',
-    },
-    'food-processing': {
-      name: 'ఆహార ప్రాసెసింగ్',
-      description: 'మేత కట్టింగ్, ధాన్యం నిర్వహణ మరియు కోత తర్వాత పనుల కోసం యంత్రాలు.',
-    },
+    // Slugs
+    'farm-and-garden': { name: 'వ్యవసాయం & తోటపని', description: 'వ్యవసాయం, తోటల పెంపకం మరియు మొక్కల సంరక్షణ కోసం పరికరాలు.' },
+    'sprayers': { name: 'స్ప్రేయర్లు', description: 'పురుగుల మందులు మరియు ద్రవాలు పిచికారీ చేయడానికి ఉపయోగపడే స్ప్రేయర్లు.' },
+    'landscaping': { name: 'ల్యాండ్‌స్కేపింగ్', description: 'నేల చదును, తోట అలంకరణ మరియు ల్యాండ్‌స్కేపింగ్ పరికరాలు.' },
+    'pumps-and-motors': { name: 'పంపులు & మోటార్లు', description: 'నీటి సరఫరా, బోర్‌వెల్లు మరియు డ్రిప్ కోసం మోటార్లు మరియు పంపులు.' },
+    'food-processing': { name: 'ఆహార ప్రాసెసింగ్', description: 'ఆహార పదార్థాల ప్రాసెసింగ్ మరియు కోత తర్వాత పనులకు యంత్రాలు.' },
+    'commercial-kitchen-equipment': { name: 'వాణిజ్య వంటగది పరికరాలు', description: 'హోటళ్ళు మరియు క్యాటరింగ్ కోసం నాణ్యమైన వంటగది పరికరాలు.' },
+    'food-packaging-tools': { name: 'ఆహార ప్యాకేజింగ్ పరికరాలు', description: 'ఆహార పదార్థాల ప్యాకేజింగ్ మరియు ప్యాకింగ్ టూల్స్.' },
+    'workshop,-diy-and-mro': { name: 'వర్క్‌షాప్, డీఐవై & ఎంఆర్ఓ', description: 'మరమ్మతులు, వర్క్‌షాప్ మరియు దినచర్య పనుల కోసం ఎంఆర్ఓ టూల్స్.' },
+    'power-tools': { name: 'పవర్ టూల్స్', description: 'డ్రిల్లింగ్, కట్టింగ్ మరియు వర్క్‌షాప్ పవర్ పరికరాలు.' },
+    'fertilizers': { name: 'ఎరువులు', description: 'పంటల ఎదుగుదలకు ఉపయోగపడే వివిధ రకాల సేంద్రీయ ఎరువులు.' },
+    'neutrilizer': { name: 'న్యూట్రలైజర్', description: 'నేల సారాన్ని పెంచడానికి మరియు సమతుల్యతకు సహాయపడే న్యూట్రలైజర్లు.' },
+
+    // IDs
+    '7': { name: 'వ్యవసాయం & తోటపని', description: 'వ్యవసాయం, తోటల పెంపకం మరియు మొక్కల సంరక్షణ కోసం పరికరాలు.' },
+    '8': { name: 'స్ప్రేయర్లు', description: 'పురుగుల మందులు మరియు ద్రవాలు పిచికారీ చేయడానికి ఉపయోగపడే స్ప్రేయర్లు.' },
+    '9': { name: 'ల్యాండ్‌స్కేపింగ్', description: 'నేల చదును, తోట అలంకరణ మరియు ల్యాండ్‌స్కేపింగ్ పరికరాలు.' },
+    '10': { name: 'పంపులు & మోటార్లు', description: 'నీటి సరఫరా, బోర్‌వెల్లు మరియు డ్రిప్ కోసం మోటార్లు మరియు పంపులు.' },
+    '11': { name: 'ఆహార ప్రాసెసింగ్', description: 'ఆహార పదార్థాల ప్రాసెసింగ్ మరియు కోత తర్వాత పనులకు యంత్రాలు.' },
+    '12': { name: 'వాణిజ్య వంటగది పరికరాలు', description: 'హోటళ్ళు మరియు క్యాటరింగ్ కోసం నాణ్యమైన వంటగది పరికరాలు.' },
+    '13': { name: 'ఆహార ప్యాకేజింగ్ పరికరాలు', description: 'ఆహార పదార్థాల ప్యాకేజింగ్ మరియు ప్యాకింగ్ టూల్స్.' },
+    '14': { name: 'వర్క్‌షాప్, డీఐవై & ఎంఆర్ఓ', description: 'మరమ్మతులు, వర్క్‌షాప్ మరియు దినచర్య పనుల కోసం ఎంఆర్ఓ టూల్స్.' },
+    '15': { name: 'పవర్ టూಲ್స్', description: 'డ్రిల్లింగ్, కట్టింగ్ మరియు వర్క్‌షాప్ పవర్ పరికరాలు.' },
+    '17': { name: 'ఎరువులు', description: 'పంటల ఎదుగుదలకు ఉపయోగపడే వివిధ రకాల సేంద్రీయ ఎరువులు.' },
+    '18': { name: 'న్యూట్రలైజర్', description: 'నేల సారాన్ని పెంచడానికి మరియు సమతుల్యతకు సహాయపడే న్యూట్రలైజర్లు.' },
   },
   hi: {
-    'heavy-machinery': {
-      name: 'भारी मशीनरी',
-      description: 'तेज भूमि तैयारी, कटाई और बड़े कृषि कार्यों के लिए मजबूत कृषि मशीनें.',
-    },
-    'agriculture-tools': {
-      name: 'कृषि उपकरण',
-      description: 'दैनिक खेती, फसल देखभाल, मिट्टी तैयारी और खेत रखरखाव के लिए टिकाऊ उपकरण.',
-    },
-    'irrigation-water': {
-      name: 'सिंचाई और पानी',
-      description: 'पानी बचाने वाली खेती, बोरवेल और फसल सिंचाई के लिए प्रभावी उत्पाद.',
-    },
-    'workshop-mro': {
-      name: 'वर्कशॉप और रखरखाव',
-      description: 'फार्म मरम्मत, सर्विसिंग और दैनिक उपयोग के लिए भरोसेमंद उपकरण.',
-    },
-    'sprayers-units': {
-      name: 'स्प्रेयर यूनिट',
-      description: 'कीटनाशक, खाद, मिस्टिंग और पौधा सुरक्षा के लिए स्प्रे समाधान.',
-    },
-    'food-processing': {
-      name: 'फूड प्रोसेसिंग',
-      description: 'चारा काटने, अनाज संभालने और कटाई के बाद तैयारी के लिए मशीनें.',
-    },
+    // Slugs
+    'farm-and-garden': { name: 'फार्म और गार्डन', description: 'खेती, बागवानी और पौधों की देखभाल के लिए उपकरण.' },
+    'sprayers': { name: 'स्प्रेयर', description: 'कीटनाशकों और रसायनों के छिड़काव के लिए स्प्रेयर.' },
+    'landscaping': { name: 'लैंडस्केपिंग', description: 'मिट्टी समतल करने, उद्यान सजावट और लैंडस्केपिंग उपकरण.' },
+    'pumps-and-motors': { name: 'पंप और मोटर', description: 'जलापूर्ति, बोरवेल और ड्रिप सिंचाई के लिए मोटर और पंप.' },
+    'food-processing': { name: 'खाद्य प्रसंस्करण', description: 'खाद्य सामग्री के प्रसंस्करण और कटाई के बाद के काम की मशीनें.' },
+    'commercial-kitchen-equipment': { name: 'वाणिज्यिक रसोई उपकरण', description: 'होटल और खानपान के लिए गुणवत्तापूर्ण रसोई उपकरण.' },
+    'food-packaging-tools': { name: 'खाद्य पैकेजिंग उपकरण', description: 'खाद्य पैकेजिंग और पैकिंग टूल.' },
+    'workshop,-diy-and-mro': { name: 'वर्कशॉप, डीआईवाई और एमआरओ', description: 'मरम्मत, वर्कशॉप और दैनिक रखरखाव के लिए एमआरओ टूल.' },
+    'power-tools': { name: 'पावर टूल्स', description: 'ड्रिलिंग, कटिंग और वर्कशॉप पावर उपकरण.' },
+    'fertilizers': { name: 'उर्वरक', description: 'फसल की वृद्धि के लिए जैविक और रासायनिक उर्वरक.' },
+    'neutrilizer': { name: 'न्यूट्रलाइजज़र', description: 'मिट्टी के स्वास्थ्य और पीएच संतुलन के लिए न्यूट्रलाइजज़र.' },
+
+    // IDs
+    '7': { name: 'फार्म और गार्डन', description: 'खेती, बागवानी और पौधों की देखभाल के लिए उपकरण.' },
+    '8': { name: 'स्प्रेयर', description: 'कीटनाशकों और रसायनों के छिड़काव के लिए स्प्रेयर.' },
+    '9': { name: 'लैंडस्केपिंग', description: 'मिट्टी समतल करने, उद्यान सजावट और लैंडस्केपिंग उपकरण.' },
+    '10': { name: 'पंप और मोटर', description: 'जलापूर्ति, बोरवेल और ड्रिप सिंचाई के लिए मोटर और पंप.' },
+    '11': { name: 'खाद्य प्रसंस्करण', description: 'खाद्य सामग्री के प्रसंस्करण और कटाई के बाद के काम की मशीनें.' },
+    '12': { name: 'वाणिज्यिक रसोई उपकरण', description: 'होटल और खानपान के लिए गुणवत्तापूर्ण रसोई उपकरण.' },
+    '13': { name: 'खाद्य पैकेजिंग उपकरण', description: 'खाद्य पैकेजिंग और पैकिंग टूल.' },
+    '14': { name: 'वर्कशॉप, डीआईवाई और एमआरओ', description: 'मरम्मत, वर्कशॉप और दैनिक रखरखाव के लिए एमआरओ टूल.' },
+    '15': { name: 'पावर टूल्स', description: 'ड्रिलिंग, कटिंग और वर्कशॉप पावर उपकरण.' },
+    '17': { name: 'उर्वरक', description: 'फसल की वृद्धि के लिए जैविक और रासायनिक उर्वरक.' },
+    '18': { name: 'न्यूट्रलाइजज़र', description: 'मिट्टी के स्वास्थ्य और पीएच संतुलन के लिए न्यूट्रलाइजज़र.' },
   },
+};
+
+const subcategoryTranslations = {
+  te: {
+    'Cultivators / Tillers / Weeders': 'కల్టివేటర్లు / టిల్లర్లు / వీడర్లు',
+    'Special Farm Tools': 'ప్రత్యేక వ్యవసాయ పరికరాలు',
+    'Garden Tools': 'తోట పరికరాలు',
+    'Brush Cutter': 'బ్రష్ కట్టర్',
+    'Sprayers': 'స్ప్రేయర్లు',
+    'Fogging Machine': 'ఫాగింగ్ యంత్రం',
+    'Solar Products': 'సౌర విద్యుత్ ఉత్పత్తులు',
+    'Inputs | Supplies': 'ఇన్‌పుట్‌లు | సామాగ్రి',
+    'Agriculture Pumps': 'వ్యవసాయ పంపులు',
+    'Harvester': 'హార్వెస్టర్',
+    'Pipe & Sprinklers': 'పైపులు & స్ప్రింక్లర్లు',
+    'Aquaculture': 'ఆక్వాకల్చర్',
+    'Mist Blower': 'మిస్ట్ బ్లోయర్',
+    'Power Sprayer': 'పవర్ స్ప్రేయర్',
+    'Agricultural Sprayers': 'వ్యవసాయ స్ప్రేయర్లు'
+  },
+  hi: {
+    'Cultivators / Tillers / Weeders': 'कल्टीवेटर / टिलर / वीडर',
+    'Special Farm Tools': 'विशेष कृषि उपकरण',
+    'Garden Tools': 'बागवानी के उपकरण',
+    'Brush Cutter': 'ब्रश कटर',
+    'Sprayers': 'स्प्रेयर',
+    'Fogging Machine': 'फॉगिंग मशीन',
+    'Solar Products': 'सौर उत्पाद',
+    'Inputs | Supplies': 'इनपुट | आपूर्ति',
+    'Agriculture Pumps': 'कृषि पंप',
+    'Harvester': 'हार्वेस्टर',
+    'Pipe & Sprinklers': 'पाइप और स्प्रिंकलर',
+    'Aquaculture': 'जलीय कृषि (एक्वाकल्चर)',
+    'Mist Blower': 'मिस्ट ब्लोअर',
+    'Power Sprayer': 'पावर स्प्रेयर',
+    'Agricultural Sprayers': 'कृषि स्प्रेयर'
+  }
 };
 
 Object.assign(categoryTranslations, {
@@ -1943,6 +2028,28 @@ const productTermTranslations = {
     'MINI REAPER': 'మినీ రీపర్',
     'REAPER BINDER': 'రీపర్ బైండర్',
     'CHAFF CUTTER': 'చాఫ్ కట్టర్',
+    'HEAVY DUTY SCYTHE WITH 23 INCH BLADE FOR HARVESTING GRASS OR CROPS': 'గ్రాస్ మరియు పంటల కోతకు 23 ఇంచుల బ్లేడ్‌తో కూడిన హెవీ డ్యూటీ కొడవలి',
+    'HEAVY-DUTY 6 TOOTH SPIKE HARROW - DURABLE AGRICULTURAL TOOL FOR SOIL TILLING, LEVELING & WEEDING': 'నేల దున్నడం మరియు కలుపు తీయడానికి హెవీ-డ్యూటీ 6 టూత్ స్పైక్ హారో',
+    'GRAMSTRONG REPUBLIC SOLAR STREET LIGHT 120W, 140 LEDS WATERPROOF STREET LIGHT WITH SOLAR PANEL FOR FARM USE WITH REMOTE': 'రిమోట్‌తో కూడిన గ్రామ్‌స్ట్రాంగ్ రిపబ్లిక్ సోలార్ స్ట్రీట్ లైట్ 120W',
+    'HEAVY-DUTY AGRICULTURAL IMPACT SPRINKLER FOR IRRIGATION': 'సాగు నీటిపారుదల కోసం హెవీ-డ్యూటీ అగ్రికల్చరల్ ఇంపాక్ట్ స్ప్రింక్లర్',
+    'FARMIO GRASS CUTTING MACHINE (WITHOUT BATTERY) / CORDED BRUSH CUTTER MACHINE': 'ఫార్మియో గ్రాస్ కటింగ్ మెషిన్ (బ్యాటరీ లేకుండా) / కార్డెడ్ బ్రష్ కట్టర్ మెషిన్',
+    'PREMIUM QUALITY THERMAL FOGGING MACHINE, 16 LITRE': 'ప్రీమియం నాణ్యత థర్మల్ ఫాగింగ్ మెషిన్, 16 లీటర్లు',
+    'KISANKRAFT KK-STB-050 GRASS STUBBLE MOWER 4-STROKE PETROL 6.7 HP USED FOR GRASS/TWIGS & LOW VEGETATION/SCRUB & STUBBLE': 'కిసాన్‌క్రాఫ్ట్ KK-STB-050 గ్రాస్ స్టబుల్ మోవర్ 6.7 HP',
+    '1 INCH PORTABLE PETROL WATER PUMP': '1 ఇంచ్ పోర్టబుల్ పెట్రోల్ వాటర్ పంప్',
+    '15 L MIST BLOWER 2 STROKE PETROL ENGINE, 21 TO 25 FEET SPRAYING': '15 లీటర్ల మిస్ట్ బ్లోయర్ 2 స్ట్రోక్ పెట్రోల్ ఇంజిన్',
+    '360 DEGREE ROTATABLE DOUBLE FACED ELECTRIC LIGHT': '360 డిగ్రీల తిరిగే డబుల్ ఫేస్డ్ ఎలక్ట్రిక్ లైట్',
+    'RESUN ACO-001 AIR PUMP ELECTROMAGNETIC AIR AQUARIUM PUMP (136 CM) FOR TANK WATER AERATION & ANY AQUARIUM FILTRATION': 'రెసన్ ACO-001 ఎయిర్ పంప్ అక్వేరియం ఎయిరేషన్ పంప్',
+    'MINI CORDLESS CHAINSAW DUAL BATTERY (21V X 2) WITH 6 INCH GUIDE BAR | COMES WITH FREE ACCESSORIES': 'మినీ కార్డ్‌లెస్ చైన్సా డ్యూయల్ బ్యాటరీ (21V x 2) 6 ఇంచ్ గైడ్ బార్‌తో',
+    'HEAVY DUTY 63 CC 2 STROKE EARTH AUGER / POST HOLE DIGGER / EARTH DRILL MACHINE WITH 12 INCH BIT': 'హెవీ డ్యూటీ 63 cc 2 స్ట్రోక్ ఎర్త్ ఆగర్ డ్రిల్ మెషిన్',
+    'BRUSH CUTTER WITH HEDGE TRIMMER ATTACHMENT': 'హెడ్జ్ ట్రిమ్మర్ అటాచ్‌మెంట్‌తో కూడిన బ్రష్ కట్టర్',
+    'HEAVY DUTY 18 INCH STEEL FRAME WHEEL TYPE PUSH MOWER | IDEAL FOR GRASS CUTTING, TRIMMING': 'హెవీ డ్యూటీ 18 ఇంచుల పుష్ మోవర్ (పచ్చిక కోతకు అనువైనది)',
+    'HEAVY DUTY 63-CC POWERFUL PETROL OPERATED LEAF BLOWER | 300 LITER / SECOND AIR VOLUME': 'హెవీ డ్యూటీ 63-cc పవర్ఫుల్ పెట్రోల్ లీఫ్ బ్లోయర్',
+    'KORAMANDAL': 'కోరమాండల్',
+    'TF 545P 7.2 HP PETROL OPERATED POWER TILLER': 'TF 545P 7.2 HP పెట్రోల్ పవర్ టిల్లర్',
+    'DRIP IRRIGATION KIT (1 ACRE)': 'డ్రిప్ ఇరిగేషన్ కిట్ (1 ఎకరం)',
+    'SPRINKLER NOZZLE SET (10 PCS)': 'స్ప్రింక్లర్ నాజిల్ సెట్ (10 పీసులు)',
+    'MANUAL REAPER BINDER': 'మాన్యువల్ రీపర్ బైండర్',
+    'NPK FERTILIZER SPREADER': 'NPK ఎరువుల స్ప్రెడర్',
   },
   hi: {
     'MODERN TRACTOR': 'आधुनिक ट्रैक्टर',
@@ -1989,6 +2096,28 @@ const productTermTranslations = {
     'MINI REAPER': 'मिनी रीपर',
     'REAPER BINDER': 'रीपर बाइंडर',
     'CHAFF CUTTER': 'चाफ कटर',
+    'HEAVY DUTY SCYTHE WITH 23 INCH BLADE FOR HARVESTING GRASS OR CROPS': 'घास और फसलों की कटाई के लिए 23 इंच ब्लेड वाला हेवी ड्यूटी हंसिया (सिकल)',
+    'HEAVY-DUTY 6 TOOTH SPIKE HARROW - DURABLE AGRICULTURAL TOOL FOR SOIL TILLING, LEVELING & WEEDING': 'मिट्टी जोतने और खरपतवार निकालने के लिए हेवी-ड्यूटी 6 टूथ स्पाइक हैरो',
+    'GRAMSTRONG REPUBLIC SOLAR STREET LIGHT 120W, 140 LEDS WATERPROOF STREET LIGHT WITH SOLAR PANEL FOR FARM USE WITH REMOTE': 'रिमोट के साथ ग्रामस्ट्रॉन्ग रिपब्लिक सोलर स्ट्रीट लाइट 120W',
+    'HEAVY-DUTY AGRICULTURAL IMPACT SPRINKLER FOR IRRIGATION': 'सिंचाई के लिए हेवी-ड्यूटी कृषि प्रभाव स्प्रिंकलर',
+    'FARMIO GRASS CUTTING MACHINE (WITHOUT BATTERY) / CORDED BRUSH CUTTER MACHINE': 'फार्मियो ग्रास कटिंग मशीन (बिना बैटरी) / कॉर्डेड ब्रश कटर मशीन',
+    'PREMIUM QUALITY THERMAL FOGGING MACHINE, 16 LITRE': 'प्रीमियम गुणवत्ता वाली थर्मल फॉगिंग मशीन, 16 लीटर',
+    'KISANKRAFT KK-STB-050 GRASS STUBBLE MOWER 4-STROKE PETROL 6.7 HP USED FOR GRASS/TWIGS & LOW VEGETATION/SCRUB & STUBBLE': 'किसानक्राफ्ट KK-STB-050 ग्रास स्टबल मूवर 6.7 HP',
+    '1 INCH PORTABLE PETROL WATER PUMP': '1 इंच पोर्टेबल पेट्रोल वॉटर पंप',
+    '15 L MIST BLOWER 2 STROKE PETROL ENGINE, 21 TO 25 FEET SPRAYING': '15 लीटर मिस्ट ब्लोअर 2 स्ट्रोक पेट्रोल इंजन',
+    '360 DEGREE ROTATABLE DOUBLE FACED ELECTRIC LIGHT': '360 डिग्री घूमने वाली डबल फेस वाली इलेक्ट्रिक लाइट',
+    'RESUN ACO-001 AIR PUMP ELECTROMAGNETIC AIR AQUARIUM PUMP (136 CM) FOR TANK WATER AERATION & ANY AQUARIUM FILTRATION': 'रेसुन ACO-001 एयर पंप एक्वेरियम वातन पंप',
+    'MINI CORDLESS CHAINSAW DUAL BATTERY (21V X 2) WITH 6 INCH GUIDE BAR | COMES WITH FREE ACCESSORIES': 'मिनी कॉर्डलेस चेनसॉ ड्यूल बैटरी (21V x 2) 6 इंच गाइड बार के साथ',
+    'HEAVY DUTY 63 CC 2 STROKE EARTH AUGER / POST HOLE DIGGER / EARTH DRILL MACHINE WITH 12 INCH BIT': 'हेवी ड्यूटी 63 सीसी 2 स्ट्रोक अर्थ ऑगर ड्रिल मशीन',
+    'BRUSH CUTTER WITH HEDGE TRIMMER ATTACHMENT': 'हेज ट्रिमर अटैचमेंट के साथ ब्रश कटर',
+    'HEAVY DUTY 18 INCH STEEL FRAME WHEEL TYPE PUSH MOWER | IDEAL FOR GRASS CUTTING, TRIMMING': 'हेवी ड्यूटी 18 इंच पुश मूवर (घास काटने के लिए आदर्श)',
+    'HEAVY DUTY 63-CC POWERFUL PETROL OPERATED LEAF BLOWER | 300 LITER / SECOND AIR VOLUME': 'हेवी ड्यूटी 63-सीसी शक्तिशाली पेट्रोल संचालित लीफ ब्लोअर',
+    'KORAMANDAL': 'कोरोमंडल',
+    'TF 545P 7.2 HP PETROL OPERATED POWER TILLER': 'TF 545P 7.2 एचपी पेट्रोल संचालित पावर टिलर',
+    'DRIP IRRIGATION KIT (1 ACRE)': 'ड्रिप सिंचाई किट (1 एकड़)',
+    'SPRINKLER NOZZLE SET (10 PCS)': 'स्प्रिंकलर नोजल सेट (10 नग)',
+    'MANUAL REAPER BINDER': 'मैनुअल रीपर बाइंडर',
+    'NPK FERTILIZER SPREADER': 'एनपीके उर्वरक स्प्रेडर',
   },
 };
 
@@ -2448,7 +2577,8 @@ Object.assign(productFieldTemplates, {
 
 const translateProductFallback = (product, field, language, categoryName) => {
   if (language === 'en') return product[field] || '';
-  const translatedName = productTermTranslations[language]?.[product.name] || product.name;
+  const nameKey = String(product.name || '').trim().toUpperCase();
+  const translatedName = productTermTranslations[language]?.[nameKey] || product.name;
   if (field === 'name') return translatedName;
   const template = productFieldTemplates[language]?.[field];
   return template ? template(translatedName, categoryName) : product[field] || translatedName;
@@ -2505,7 +2635,18 @@ export const LanguageProvider = ({ children }) => {
       );
 
     const getLocalizedCategoryName = (categoryName) => {
-      const categoryId = CATEGORY_ID_BY_ENGLISH_NAME[categoryName];
+      if (!categoryName) return '';
+      let categoryId = CATEGORY_ID_BY_ENGLISH_NAME[categoryName];
+      if (!categoryId) {
+        // Fallback: generate slug from name
+        categoryId = String(categoryName).toLowerCase()
+          .replace(/ & /g, '-and-')
+          .replace(/&/g, '-and-')
+          .replace(/ /g, '-')
+          .replace(/\//g, '-')
+          .replace(/\\/g, '-')
+          .trim('-');
+      }
       return categoryTranslations[language]?.[categoryId]?.name || categoryName;
     };
 
@@ -2531,7 +2672,8 @@ export const LanguageProvider = ({ children }) => {
       const keyedTranslation = category[keyField] ? t(category[keyField]) : '';
       if (keyedTranslation && keyedTranslation !== category[keyField]) return keyedTranslation;
       return cleanTranslation(
-        categoryTranslations[language]?.[category.id]?.[field],
+        categoryTranslations[language]?.[category.id]?.[field] ||
+        categoryTranslations[language]?.[category.slug]?.[field],
         category[field] || ''
       );
     };
@@ -2541,7 +2683,7 @@ export const LanguageProvider = ({ children }) => {
       const key = subcategory.nameKey || subcategory.subCategoryKey;
       const keyedTranslation = key ? t(key) : '';
       if (keyedTranslation && keyedTranslation !== key) return keyedTranslation;
-      return subcategory.name || '';
+      return subcategoryTranslations[language]?.[subcategory.name] || subcategory.name || '';
     };
 
     const productGenericText = (templateKey, values = {}, fallback = '') => {

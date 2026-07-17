@@ -196,10 +196,11 @@ header {
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.12em;
+    border-radius: 6px;
     transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
   }
 
-  .pagination-btn:hover {
+  .pagination-btn:hover:not(.pagination-btn-active) {
     border-color: var(--primary-green);
     color: var(--primary-green);
   }
@@ -212,7 +213,7 @@ header {
   .pagination-btn-active {
     border-color: var(--primary-green);
     background: var(--primary-green);
-    color: #ffffff;
+    color: #ffffff !important;
   }
 
   .category-auto-grid {
@@ -466,6 +467,13 @@ header {
     color: #0F3D2E !important;
     box-shadow: 0 10px 22px rgba(15, 61, 46, 0.14) !important;
     transition: transform 0.22s ease, background-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
   }
 
   .product-card-actions .icon-shade:hover {
@@ -1689,4 +1697,13 @@ section + .brand-slider-section {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
   }
+}
+
+.product-card-static.out-of-stock {
+  opacity: 0.8;
+}
+
+.product-made-in-india-badge {
+  background: var(--primary-green) !important;
+  color: #ffffff !important;
 }

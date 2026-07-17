@@ -176,6 +176,13 @@ export const CartProvider = ({ children }) => {
       return Promise.resolve(false);
     }
 
+    if (!isLoggedIn) {
+      window.dispatchEvent(new CustomEvent('auth:unauthorized', {
+        detail: { returnTo: `${window.location.pathname}${window.location.search}${window.location.hash}` },
+      }));
+      return Promise.resolve(false);
+    }
+
     if (!productsRef.current.some((item) => String(item.id) === String(product.id))) {
       productsRef.current = [...productsRef.current, product];
     }

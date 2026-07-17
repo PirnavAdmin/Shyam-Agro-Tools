@@ -1,4 +1,5 @@
 import apiClient from '../api/axios';
+import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const COUPON_API_BASE_URL = (
   process.env.REACT_APP_COUPON_API_BASE_URL ||
@@ -119,18 +120,22 @@ export const normalizeCoupon = (coupon = {}, index = 0) => {
     startDate: getFirstValue(coupon, ['startDate', 'StartDate', 'validFrom', 'ValidFrom']),
     endDate: getFirstValue(coupon, ['endDate', 'EndDate', 'validTill', 'ValidTill', 'validTo', 'ValidTo']),
     isActive: toBoolean(getFirstValue(coupon, ['isActive', 'IsActive', 'active', 'Active', 'status', 'Status']), true),
-    backgroundImage: String(
-      getFirstValue(coupon, [
-        'backgroundImage',
-        'BackgroundImage',
-        'backgroundImageUrl',
-        'BackgroundImageUrl',
-        'imageUrl',
-        'ImageUrl',
-        'bannerImage',
-        'BannerImage',
-      ]) || ''
-    ).trim(),
+    backgroundImage: normalizeAssetUrl(
+      String(
+        getFirstValue(coupon, [
+          'backgroundImage',
+          'BackgroundImage',
+          'backgroundImageUrl',
+          'BackgroundImageUrl',
+          'imageUrl',
+          'ImageUrl',
+          'bannerImage',
+          'BannerImage',
+        ]) || ''
+      ).trim(),
+      COUPON_API_BASE_URL,
+      '/hero_banner.png'
+    ),
     termsAndConditions:
       getFirstValue(coupon, [
         'termsAndConditions',
