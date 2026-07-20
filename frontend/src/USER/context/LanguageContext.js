@@ -245,6 +245,7 @@ const translations = {
     powerfulPowerTillers: 'POWERFUL\nPOWER TILLERS',
     powerfulPowerTillersDesc: 'Discover our newly launched range of high-performance industrial power tillers.',
     exploreNow: 'EXPLORE NOW',
+    rememberMe: 'REMEMBER ME',
   },
   te: {
     freeShipping: '₹5000 పైబడిన అన్ని ఆర్డర్లకు ఉచిత షిప్పింగ్!',
@@ -426,6 +427,7 @@ const translations = {
     powerfulPowerTillers: 'శక్తివంతమైన\nపవర్ టిల్లర్లు',
     powerfulPowerTillersDesc: 'మా కొత్తగా ప్రారంభించిన అధిక-పనితీరు గల పారిశ్రామిక పవర్ టిల్లర్ల శ్రేణిని కనుగొనండి.',
     exploreNow: 'ఇప్పుడే అన్వేషించండి',
+    rememberMe: 'నన్ను గుర్తుంచుకో',
   },
   hi: {
     freeShipping: '₹5000 से अधिक सभी ऑर्डर पर मुफ्त शिपिंग!',
@@ -607,6 +609,7 @@ const translations = {
     powerfulPowerTillers: 'शक्तिशाली\nपावर टिलर',
     powerfulPowerTillersDesc: 'हमारे नए लॉन्च किए गए उच्च-प्रदर्शन वाले औद्योगिक पावर टिलर की श्रृंखला देखें।',
     exploreNow: 'अभी अन्वेषण करें',
+    rememberMe: 'मुझे याद रखें',
   },
 };
 
