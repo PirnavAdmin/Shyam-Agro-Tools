@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import apiClient from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import headerLogo from '../../asset/header logo.png';
 import './LoginPopup.css';
 
@@ -44,10 +45,12 @@ const getApiErrorMessage = (err, fallback) => {
 const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [step, setStep] = useState('phone');
   const [phone, setPhone] = useState('');
   const [details, setDetails] = useState({ name: '', email: '' });
   const [otp, setOtp] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [loginApiData, setLoginApiData] = useState({
     success: false,
     isNewUser: false,
@@ -469,8 +472,13 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
             )}
 
             <div className="remember-me-container">
-              <input type="checkbox" id="remember-me" />
-              <label htmlFor="remember-me">REMEMBER ME</label>
+              <input
+                type="checkbox"
+                id="remember-me"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <label htmlFor="remember-me">{t('rememberMe')}</label>
             </div>
           </div>
         </div>
