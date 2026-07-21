@@ -270,12 +270,23 @@ export const CartProvider = ({ children }) => {
       .finally(() => setIsCartMutating(false));
   };
 
+  const isInCart = useCallback((productId) => {
+    if (!productId) return false;
+    const targetId = String(productId);
+    return cartItems.some((item) => (
+      String(item.id) === targetId ||
+      String(item.productId) === targetId ||
+      String(item.rawId) === targetId
+    ));
+  }, [cartItems]);
+
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const cartSubtotal = cartItems.reduce((acc, item) => acc + item.lineTotal, 0);
 
   return (
     <CartContext.Provider value={{
       cartItems,
+      isInCart,
       addToCart,
       removeFromCart,
       updateQuantity,

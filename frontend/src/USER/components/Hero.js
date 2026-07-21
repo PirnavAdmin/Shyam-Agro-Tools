@@ -1,164 +1,165 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useLanguage } from '../context/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import heroMachinery from '../../asset/hero-machinery.png';
+import heroSprayers from '../../asset/hero-sprayers.png';
 
 const Hero = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
   const slides = [
     {
       id: 1,
-      image: '/hero_banner.png',
-      titleKey: 'hero.sprayer.title',
-      subtitleKey: 'hero.sprayer.subtitle',
-      descriptionKey: 'hero.sprayer.description',
-      btn1Path: '/category/sprayers-units',
-      btn2Path: '/offers'
+      image: heroMachinery,
+      alt: 'Featured Machinery - Explore Powerful Farming Equipment',
+      targetPath: '/categories',
     },
     {
       id: 2,
-      image: '/hero_banner.png',
-      titleKey: 'hero.tractor.title',
-      subtitleKey: 'hero.tractor.subtitle',
-      descriptionKey: 'hero.tractor.description',
-      btn1Path: '/category/heavy-machinery',
-      btn2Path: '/offers'
-    }
+      image: heroSprayers,
+      alt: 'Advanced & Reliable Sprayers - Powerful Performance & Better Farming',
+      targetPath: '/categories',
+    },
   ];
+
+  const totalSlides = slides.length;
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
+  }, [totalSlides]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+  }, [totalSlides]);
+
+  // Auto play every 5 seconds with hover pause
+  useEffect(() => {
+    if (isPaused) return undefined;
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isPaused, nextSlide]);
+
+  // Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (event.key === 'ArrowRight') {
+        nextSlide();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [nextSlide, prevSlide]);
+
+  // Touch Swipe Handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 40;
+
+    if (distance > minSwipeDistance) {
+      nextSlide();
+    } else if (distance < -minSwipeDistance) {
+      prevSlide();
+    }
+
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
+
   const activeSlide = slides[currentSlide];
 
-  useEffect(() => {
-    const slideTimer = window.setInterval(() => {
-      setCurrentSlide((slideIndex) => (slideIndex === slides.length - 1 ? 0 : slideIndex + 1));
-    }, 4200);
-
-    return () => window.clearInterval(slideTimer);
-  }, [slides.length]);
-
   return (
-    <section className="hero-slider relative h-[300px] max-h-[50vh] min-h-[280px] w-full cursor-default overflow-hidden bg-[#0F3D2E] sm:h-[320px] lg:h-[360px]">
-      <div className="relative flex h-full w-full items-center">
-        <div className="absolute inset-0 overflow-hidden">
+    <section
+      className="hero-slider relative w-full h-[240px] sm:h-[360px] md:h-[480px] lg:h-[580px] xl:h-[640px] overflow-hidden bg-[#0A261D] select-none"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      aria-label="Hero Carousel"
+    >
+      {/* Full Bleed Edge-to-Edge Hero Banner Image */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeSlide.id}
+          initial={{ opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          onClick={() => navigate(activeSlide.targetPath)}
+          className="absolute inset-0 w-full h-full cursor-pointer flex items-center justify-center bg-[#0F3D2E]"
+        >
           <img
-            key={activeSlide.image}
             src={activeSlide.image}
-            alt={t(activeSlide.titleKey)}
-            className="hero-slider-image h-full w-full object-cover object-center"
+            alt={activeSlide.alt}
+            className="w-full h-full object-cover object-center"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F3D2E]/95 via-[#0F3D2E]/78 to-[#0F3D2E]/38"></div>
-          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent"></div>
-        </div>
+        </motion.div>
+      </AnimatePresence>
 
-        <div className="relative z-10 mx-auto w-full max-w-[1440px] px-4 sm:px-8 md:px-12 lg:px-16">
-          <motion.div
-            key={activeSlide.id}
-            initial={{ opacity: 0, x: 28 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.58, ease: 'easeOut' }}
-            className="max-w-xl text-white"
-          >
-            <motion.span
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.08 }}
-              className="mb-2 inline-block border-l-4 border-primary bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[3px] text-[#a7ef8a] backdrop-blur-md sm:text-xs"
-            >
-              {t(activeSlide.subtitleKey)}
-            </motion.span>
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.14 }}
-              className="mb-2 cursor-default select-none caret-transparent text-3xl font-bold leading-tight drop-shadow-2xl sm:text-4xl lg:text-5xl"
-            >
-              {t(activeSlide.titleKey)}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="mb-4 max-w-lg text-sm font-light leading-6 text-gray-100 sm:text-base"
-            >
-              {t(activeSlide.descriptionKey)}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.26 }}
-              className="flex flex-wrap gap-2.5"
-            >
-              <button
-                type="button"
-                onClick={() => navigate(activeSlide.btn1Path)}
-                className="btn-primary min-w-[132px] cursor-pointer py-2.5 text-xs"
-              >
-                {t('exploreNow')}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(activeSlide.btn2Path)}
-                className="hero-offers-btn min-w-[132px] cursor-pointer py-2.5 text-xs"
-              >
-                {t('offers')}
-              </button>
-            </motion.div>
-          </motion.div>
-        </div>
+      {/* Previous Arrow Button - Left edge */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          prevSlide();
+        }}
+        className="absolute left-[12px] md:left-[20px] lg:left-[28px] top-1/2 -translate-y-1/2 z-30 w-[42px] h-[42px] md:w-[54px] md:h-[54px] rounded-full bg-black/30 hover:bg-[#58B82E] backdrop-blur-md border border-white/30 text-white shadow-2xl flex items-center justify-center transition-all duration-250 ease-out hover:scale-110 hover:border-[#58B82E] hover:shadow-[0_0_24px_rgba(88,184,46,0.6)] cursor-pointer active:scale-95"
+        aria-label="Previous Slide"
+      >
+        <ChevronLeft size={26} className="stroke-[2.5]" />
+      </button>
+
+      {/* Next Arrow Button - Right edge */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          nextSlide();
+        }}
+        className="absolute right-[12px] md:right-[20px] lg:right-[28px] top-1/2 -translate-y-1/2 z-30 w-[42px] h-[42px] md:w-[54px] md:h-[54px] rounded-full bg-black/30 hover:bg-[#58B82E] backdrop-blur-md border border-white/30 text-white shadow-2xl flex items-center justify-center transition-all duration-250 ease-out hover:scale-110 hover:border-[#58B82E] hover:shadow-[0_0_24px_rgba(88,184,46,0.6)] cursor-pointer active:scale-95"
+        aria-label="Next Slide"
+      >
+        <ChevronRight size={26} className="stroke-[2.5]" />
+      </button>
+
+      {/* Pagination Indicator Dots */}
+      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2.5 items-center">
+        {slides.map((slide, index) => (
+          <button
+            key={slide.id}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentSlide(index);
+            }}
+            aria-label={`Go to slide ${index + 1}`}
+            className={`transition-all duration-300 rounded-full cursor-pointer ${
+              index === currentSlide
+                ? 'w-8 h-2.5 bg-[#58B82E] shadow-lg scale-105'
+                : 'w-2.5 h-2.5 bg-white/50 hover:bg-white/80 backdrop-blur-sm'
+            }`}
+          />
+        ))}
       </div>
-
-      <style jsx="true">{`
-        .hero-slider-image {
-          animation: heroFadeSlide 0.72s ease both;
-        }
-        .hero-offers-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border: 2px solid #ffffff;
-          border-radius: 50px;
-          background: #ffffff;
-          color: #0F3D2E;
-          padding: 10px 32px;
-          font-size: 0.7rem;
-          font-weight: 900;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-          transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
-        }
-        [data-theme="dark"] .hero-slider .hero-offers-btn {
-          background: #ffffff !important;
-          color: #0F3D2E !important;
-          border: 2px solid #ffffff !important;
-          box-shadow: 0 6px 18px rgba(255, 255, 255, 0.18) !important;
-        }
-        .hero-offers-btn:hover,
-        .hero-offers-btn:focus-visible {
-          border-color: #58B82E;
-          background: #58B82E;
-          color: #ffffff;
-          transform: translateY(-1px);
-        }
-        [data-theme="dark"] .hero-slider .hero-offers-btn:hover,
-        [data-theme="dark"] .hero-slider .hero-offers-btn:focus-visible {
-          background: #58B82E !important;
-          color: #ffffff !important;
-          border-color: #58B82E !important;
-        }
-        @keyframes heroFadeSlide {
-          from {
-            opacity: 0;
-            transform: translateX(18px) scale(1.02);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-          }
-        }
-      `}</style>
     </section>
   );
 };

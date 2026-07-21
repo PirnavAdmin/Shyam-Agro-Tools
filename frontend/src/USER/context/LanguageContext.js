@@ -2,19 +2,28 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import enMessages from '../../locales/en.json';
 import teMessages from '../../locales/te.json';
 import hiMessages from '../../locales/hi.json';
+import enCommon from '../../locales/en/common.json';
+import enHome from '../../locales/en/home.json';
+import enProducts from '../../locales/en/products.json';
+import teCommon from '../../locales/te/common.json';
+import teHome from '../../locales/te/home.json';
+import teProducts from '../../locales/te/products.json';
+import hiCommon from '../../locales/hi/common.json';
+import hiHome from '../../locales/hi/home.json';
+import hiProducts from '../../locales/hi/products.json';
 
 const STORAGE_KEY = 'Agro_language';
 
 export const languages = [
   { code: 'en', shortLabel: 'ENG', label: 'English', nativeLabel: 'English' },
-  { code: 'te', shortLabel: 'TEL', label: 'Telugu', nativeLabel: '\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41' },
-  { code: 'hi', shortLabel: 'HIN', label: 'Hindi', nativeLabel: '\u0939\u093F\u0928\u094D\u0926\u0940' },
+  { code: 'te', shortLabel: 'TEL', label: 'Telugu', nativeLabel: 'తెలుగు' },
+  { code: 'hi', shortLabel: 'HIN', label: 'Hindi', nativeLabel: 'हिन्दी' },
 ];
 
 const i18nMessages = {
-  en: enMessages,
-  te: teMessages,
-  hi: hiMessages,
+  en: { ...enMessages, ...enCommon, ...enHome, ...enProducts },
+  te: { ...teMessages, ...teCommon, ...teHome, ...teProducts },
+  hi: { ...hiMessages, ...hiCommon, ...hiHome, ...hiProducts },
 };
 
 const RTL_LANGUAGES = new Set(['ar']);
@@ -2575,6 +2584,13 @@ Object.assign(productFieldTemplates, {
     longDesc: (name, category) => `${name}은 ${category} 작업을 위해 설계되었습니다. 현장에서 시간을 절약하고 효율을 높이는 데 도움을 줍니다.`,
     aboutProduct: (name) => `${name}은 농업 요구에 적합한 전문 제품입니다.`,
     productWork: (name) => `${name}은 작물 관리, 유지보수 및 현장 작업을 쉽게 해줍니다.`,
+  },
+  es: {
+    displayName: (name, category) => `${name} - herramienta agrícola de calidad para ${category}`,
+    shortDesc: (name) => `${name} es un producto fuerte y confiable para el trabajo agrícola diario.`,
+    longDesc: (name, category) => `${name} está diseñado para tareas de ${category}. Ayuda a ahorrar tiempo y mejorar la eficiencia en el campo.`,
+    aboutProduct: (name) => `${name} es un producto profesional adecuado para las necesidades agrícolas.`,
+    productWork: (name) => `${name} ayuda a simplificar el cuidado de los cultivos, el mantenimiento y el trabajo de campo.`,
   },
 });
 

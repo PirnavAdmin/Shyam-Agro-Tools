@@ -121,6 +121,23 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  const updateUser = useCallback((updatedUserData = {}) => {
+    const current = getAuthSession();
+    if (!current?.user) return null;
+    const nextUser = {
+      ...current.user,
+      ...updatedUserData,
+    };
+    const nextSession = {
+      ...current,
+      user: nextUser,
+    };
+    const saved = setAuthSession(nextSession);
+    setSession(saved);
+    window.dispatchEvent(new CustomEvent('auth:user-updated', { detail: saved.user }));
+    return saved.user;
+  }, []);
+
   const value = useMemo(() => ({
     user: session?.user || null,
     token: session?.token || '',
@@ -131,11 +148,12 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    updateUser,
     restoreSession,
     refreshSession,
     authChallenge,
     clearAuthChallenge: () => setAuthChallenge(null),
-  }), [session, loading, login, logout, restoreSession, refreshSession, authChallenge]);
+  }), [session, loading, login, logout, updateUser, restoreSession, refreshSession, authChallenge]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,0 +1,10 @@
+{
+  "checkout": "Checkout",
+  "orderSummary": "Order Summary",
+  "shippingAddress": "Shipping Address",
+  "paymentMethod": "Payment Method",
+  "placeOrder": "Place Order",
+  "applyCoupon": "Apply Coupon",
+  "discount": "Discount",
+  "totalAmount": "Total Amount"
+}

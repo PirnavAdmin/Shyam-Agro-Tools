@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, Heart, Share2, ShieldCheck, ShoppingCart, Star } from 'lucide-react';
+import { ArrowRight, Eye, Heart, Loader2, Share2, ShieldCheck, ShoppingCart, Star } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '../context/ToastContext';
@@ -16,10 +16,12 @@ const formatPrice = (value) => {
 
 const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, isInCart } = useCart();
   const { t, productText } = useLanguage();
   const { showToast } = useToast();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const [isAdding, setIsAdding] = useState(false);
+  const inCart = isInCart(product.id);
   const isWishlisted = isInWishlist(product.id);
   const isList = layout === 'list';
   const productName = productText(product, 'name');
@@ -73,15 +75,24 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
     }
   };
 
-  const handleAddToCart = async (event) => {
+  const handleCartButtonClick = async (event) => {
     event.stopPropagation();
+    if (inCart) {
+      navigate('/cart');
+      return;
+    }
     if (!isInStock) {
       showToast(t('productUnavailable'), 'error');
       return;
     }
 
-    const wasAdded = await addToCart(product);
-    if (wasAdded) showToast(`${productName} ${t('addedToCart')}`);
+    setIsAdding(true);
+    try {
+      const wasAdded = await addToCart(product);
+      if (wasAdded) showToast(`${productName} ${t('addedToCart')}`);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -214,11 +225,28 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
           <div className="grid gap-1.5">
             <button
               type="button"
-              onClick={handleAddToCart}
-              disabled={!isInStock}
-              className="product-card-add-btn flex items-center justify-center gap-2 bg-dark px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+              onClick={handleCartButtonClick}
+              disabled={!isInStock || isAdding}
+              className={`product-card-add-btn flex items-center justify-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-all duration-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 ${
+                inCart ? 'bg-[#58B82E] hover:bg-[#489b25]' : 'bg-dark hover:bg-black'
+              }`}
             >
-              <span className="icon-shade icon-grey icon-shade-sm"><ShoppingCart size={15} /></span> {t('addToCart')}
+              {isAdding ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span>{t('adding') || 'ADDING...'}</span>
+                </>
+              ) : inCart ? (
+                <>
+                  <span>{t('goToCart') || 'GO TO CART'}</span>
+                  <ArrowRight size={15} />
+                </>
+              ) : (
+                <>
+                  <ShoppingCart size={15} />
+                  <span>{t('addToCart')}</span>
+                </>
+              )}
             </button>
           </div>
         </div>

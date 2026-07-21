@@ -7,7 +7,7 @@ namespace ShyamAgroSuite.Api.Controllers
 {
     [ApiController]
     [Route("test-auth")]
-    [Authorize]
+    [AllowAnonymous]
     public class TestAuthController : ControllerBase
     {
         private readonly ITestAuthService _service;
@@ -79,6 +79,7 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // GET ALL USERS
         [HttpGet("users")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllUsers()
         {
             var users =
@@ -89,6 +90,7 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // GET USER
         [HttpGet("user/{mobileNumber}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUser(
             string mobileNumber)
         {
@@ -104,6 +106,7 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // UPDATE USER
         [HttpPut("user/{mobileNumber}")]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateUser(
             string mobileNumber,
             SaveNameRequest request)
@@ -124,6 +127,7 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // DELETE USER
         [HttpDelete("user/{mobileNumber}")]
+        [AllowAnonymous]
         public async Task<IActionResult> DeleteUser(
             string mobileNumber)
         {

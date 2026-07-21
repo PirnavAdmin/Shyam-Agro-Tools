@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
+import SectionHeading from './SectionHeading';
 import { Quote, Star } from 'lucide-react';
 import { getActiveTestimonials, getTestimonials } from '../../services/testimonialService';
 import 'swiper/css';
@@ -91,10 +92,7 @@ const Testimonials = () => {
       </div>
 
       <div className="max-w-[1440px] mx-auto relative z-10">
-        <div className="mb-4 text-center">
-          <span className="mb-1 block text-xs font-bold uppercase tracking-[4px] text-primary">Customer Reviews</span>
-          <h2 className="text-xl font-bold uppercase text-dark md:text-3xl">WHAT OUR CLIENTS SAY</h2>
-        </div>
+        <SectionHeading title="WHAT OUR CLIENTS SAY" subtitle="TESTIMONIALS" />
 
         <Swiper
           modules={[Pagination, Autoplay]}
