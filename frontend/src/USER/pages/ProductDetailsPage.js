@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
+  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Heart,
+  Loader2,
   Minus,
   Plus,
   Share2,
@@ -379,6 +381,10 @@ const ProductDetailsPage = () => {
   };
 
   const handleAddToCart = async () => {
+    if (isProductInCart) {
+      navigate('/cart');
+      return;
+    }
     if (!isInStock) {
       showToast(t('productUnavailable'), 'error');
       return;
@@ -707,8 +713,25 @@ const ProductDetailsPage = () => {
                     <Plus size={16} />
                   </button>
                 </div>
-                <button type="button" onClick={handleAddToCart} className="product-add-cart-btn" disabled={!isInStock || isAddingToCart}>
-                  <ShoppingCart size={18} /> {isAddingToCart ? 'Adding...' : isProductInCart ? t('addedToCartStandalone') : t('addToCart')}
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className={`product-add-cart-btn ${isProductInCart ? 'bg-[#58B82E] text-white hover:bg-[#489b25]' : ''}`}
+                  disabled={!isInStock || isAddingToCart}
+                >
+                  {isAddingToCart ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> {t('adding') || 'ADDING...'}
+                    </>
+                  ) : isProductInCart ? (
+                    <>
+                      {t('goToCart') || 'GO TO CART'} <ArrowRight size={18} />
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart size={18} /> {t('addToCart')}
+                    </>
+                  )}
                 </button>
                 <button type="button" onClick={handleBuyNow} className="product-buy-now-btn" disabled={!isInStock}>
                   {t('buyItNow')}

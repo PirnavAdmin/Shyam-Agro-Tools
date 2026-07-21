@@ -1,0 +1,22 @@
+{
+  "searchEverything": "Search products by name",
+  "searchResults": "Search Results",
+  "allResults": "results for",
+  "viewAllResults": "View all results",
+  "noSearchResults": "No matching results found",
+  "shoppingCart": "Shopping Cart",
+  "accountInfo": "Account info",
+  "myOrders": "My Orders",
+  "wallet": "Wallet",
+  "signOut": "Sign Out",
+  "emptyCart": "There are no items in your cart.",
+  "subtotal": "Subtotal:",
+  "viewCart": "View Cart",
+  "checkout": "Checkout",
+  "home": "HOME",
+  "categories": "CATEGORIES",
+  "featured": "FEATURED",
+  "menu": "MENU",
+  "myAccount": "MY ACCOUNT",
+  "signIn": "SIGN IN"
+}

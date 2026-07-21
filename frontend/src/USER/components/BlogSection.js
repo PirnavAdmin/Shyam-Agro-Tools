@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SectionHeading from './SectionHeading';
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowRight, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -123,12 +124,10 @@ const BlogSection = () => {
   return (
     <section className="bg-white px-3 py-5 md:px-5 lg:px-6">
       <div className="max-w-[1440px] mx-auto">
-        <div className="mb-4 text-center">
-          <span className="mb-1 block text-xs font-bold uppercase tracking-[4px] text-primary">
-            {t('blog.latestNews')}
-          </span>
-          <h2 className="text-xl font-bold uppercase text-dark md:text-3xl">{t('blog.fromOurBlog')}</h2>
-        </div>
+        <SectionHeading
+          title={t('blog.fromOurBlog') || 'FROM OUR BLOG'}
+          subtitle={t('blog.latestNews') || 'LATEST NEWS'}
+        />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {loading && (

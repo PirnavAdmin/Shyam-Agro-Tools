@@ -1,45 +1,52 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getCategoryImage } from '../../services/categoryService';
 import './CategoryCard.css';
 
 const CategoryCard = ({ category, onExplore, className = '' }) => {
+  const navigate = useNavigate();
   const { t, categoryText, subcategoryText } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
   const subcategories = Array.isArray(category.subcategories) ? category.subcategories : [];
   const categoryImage = getCategoryImage(category.imageUrl);
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log(category.name, category.imageUrl, categoryImage);
-  }
+  const handleClickCategory = (event) => {
+    event?.stopPropagation();
+    if (onExplore) {
+      onExplore(category);
+    } else {
+      navigate(`/category/${category.id}`);
+    }
+  };
+
+  const handleSubcategoryClick = (event, subcat) => {
+    event.stopPropagation();
+    navigate(`/category/${category.id}?subcategory=${encodeURIComponent(subcat.id || subcat.name)}`);
+  };
 
   return (
-    <div className={`app-category-card group ${isOpen ? 'active' : ''} ${className}`}>
-      {/* Cover View (Click to Toggle Detail panel) */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setIsOpen(!isOpen)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') setIsOpen(!isOpen);
-        }}
-        className="app-category-cover cursor-pointer"
-        aria-label={`View ${categoryText(category)} details`}
-      >
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleClickCategory}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleClickCategory(event);
+        }
+      }}
+      className={`app-category-card group cursor-pointer ${className}`}
+      aria-label={`Explore ${categoryText(category)} products`}
+    >
+      {/* Cover View */}
+      <div className="app-category-cover cursor-pointer">
         <img
           src={categoryImage}
           alt={categoryText(category)}
           className="app-category-cover-image"
           loading="lazy"
           onError={(event) => {
-            if (process.env.NODE_ENV === 'development') {
-              console.error(
-                'Category image failed',
-                category.id,
-                category.imageUrl
-              );
-            }
             event.currentTarget.onerror = null;
             if (event.currentTarget.src !== getCategoryImage(null)) {
               event.currentTarget.src = getCategoryImage(null);
@@ -58,24 +65,12 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
         </span>
       </div>
 
-      {/* Details View */}
+      {/* Details View (Shows on hover/touch) */}
       <span className="app-category-detail">
         <span className="app-category-card-top">
           <span className="app-category-icon">
             <i className="fas fa-layer-group"></i>
           </span>
-          {/* Close button for touch devices */}
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              setIsOpen(false);
-            }}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F3FAEF] text-[#58B82E] hover:bg-[#58B82E] hover:text-white transition-all md:hidden border border-dashed border-[#58B82E]/30"
-            aria-label="Close category details"
-          >
-            <i className="fas fa-times text-[10px]"></i>
-          </button>
           <span className="app-category-count">
             {subcategories.length} {t('subCategories')}
           </span>
@@ -89,12 +84,16 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
         <span className="app-category-subcategory-list">
           {subcategories.length > 0 ? (
             subcategories.map((subcategory) => (
-              <span key={subcategory.id} className="app-category-subcategory-item">
+              <span
+                key={subcategory.id || subcategory.name}
+                onClick={(e) => handleSubcategoryClick(e, subcategory)}
+                className="app-category-subcategory-item hover:text-[#58B82E] transition-colors"
+              >
                 <span className="app-category-subcategory-dot"></span>
                 <span>
-                  <span className="block">{subcategoryText(subcategory)}</span>
+                  <span className="block font-semibold">{subcategoryText(subcategory)}</span>
                   {subcategory.description && (
-                    <span className="mt-0.5 block text-[10px] font-normal leading-4 text-gray-400">
+                    <span className="mt-0.5 block text-[10px] font-normal leading-4 text-gray-400 line-clamp-1">
                       {subcategory.description}
                     </span>
                   )}
@@ -112,10 +111,7 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
 
         <button
           type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onExplore?.(category);
-          }}
+          onClick={handleClickCategory}
           className="app-category-footer w-full text-left flex items-center justify-between gap-3"
         >
           <span>{t('exploreCollection')}</span>

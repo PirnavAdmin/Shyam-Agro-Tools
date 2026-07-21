@@ -25,22 +25,26 @@ namespace ShyamAgroSuite.Api.Services
             _jwtService = jwtService;
         }
 
-        // LOGIN
+        // LOGIN / RESEND OTP
         public async Task<LoginResponse> LoginAsync(
             LoginRequest request)
         {
             var user = await _repository
                 .GetByMobileAsync(request.MobileNumber);
 
+            var random = new Random();
+            string newOtp;
+            do
+            {
+                newOtp = random.Next(1000, 9999).ToString();
+            } while (user != null && !string.IsNullOrEmpty(user.OTP) && newOtp == user.OTP);
+
             if (user == null)
             {
-                var random = new Random();
-                string otp = random.Next(1000, 9999).ToString();
-
                 user = new TestUser
                 {
                     MobileNumber = request.MobileNumber,
-                    OTP = otp,
+                    OTP = newOtp,
                     OTPGeneratedAt = DateTime.UtcNow,
                     CreatedDate = DateTime.UtcNow
                 };
@@ -51,26 +55,21 @@ namespace ShyamAgroSuite.Api.Services
                 {
                     Success = true,
                     IsNewUser = true,
-                    OTP = otp
+                    OTP = newOtp
                 };
             }
 
-            if (string.IsNullOrEmpty(user.OTP))
-            {
-                var random = new Random();
-                string otp = random.Next(1000, 9999).ToString();
+            // Always update with a fresh unique OTP on login / resend
+            user.OTP = newOtp;
+            user.OTPGeneratedAt = DateTime.UtcNow;
 
-                user.OTP = otp;
-                user.OTPGeneratedAt = DateTime.UtcNow;
-
-                await _repository.UpdateAsync(user);
-            }
+            await _repository.UpdateAsync(user);
 
             return new LoginResponse
             {
                 Success = true,
                 IsNewUser = string.IsNullOrEmpty(user.FullName),
-                OTP = user.OTP!
+                OTP = newOtp
             };
         }
 
@@ -87,7 +86,10 @@ namespace ShyamAgroSuite.Api.Services
             user.FullName = request.FullName;
             user.Email = request.Email;
 
-            user.ProfileImageUrl = request.ProfileImageUrl;
+            if (!string.IsNullOrEmpty(request.ProfileImageUrl))
+            {
+                user.ProfileImageUrl = request.ProfileImageUrl;
+            }
 
             user.DoorNo = request.DoorNo;
             user.StreetArea = request.StreetArea;
@@ -110,8 +112,20 @@ namespace ShyamAgroSuite.Api.Services
             if (user == null)
                 throw new Exception("User not found");
 
-            if (user.OTP != request.OTP)
-                throw new Exception("Invalid OTP");
+            if (string.IsNullOrEmpty(user.OTP) || user.OTP != request.OTP)
+                throw new Exception("Invalid or expired OTP");
+
+            // Expire OTP after 10 minutes
+            if (user.OTPGeneratedAt.HasValue && DateTime.UtcNow - user.OTPGeneratedAt.Value > TimeSpan.FromMinutes(10))
+            {
+                user.OTP = null;
+                await _repository.UpdateAsync(user);
+                throw new Exception("OTP has expired. Please request a new OTP.");
+            }
+
+            // Invalidate OTP immediately upon successful verification so it cannot be reused
+            user.OTP = null;
+            await _repository.UpdateAsync(user);
 
             // Generate JWT Token
             string token = _jwtService.GenerateTokenForTestUser(user);
@@ -222,12 +236,13 @@ namespace ShyamAgroSuite.Api.Services
             user.FullName = request.FullName;
             user.Email = request.Email;
 
-            user.ProfileImageUrl =
-                request.ProfileImageUrl;
+            if (!string.IsNullOrEmpty(request.ProfileImageUrl))
+            {
+                user.ProfileImageUrl = request.ProfileImageUrl;
+            }
 
             user.DoorNo = request.DoorNo;
-            user.StreetArea =
-                request.StreetArea;
+            user.StreetArea = request.StreetArea;
             user.City = request.City;
             user.State = request.State;
             user.Pincode = request.Pincode;

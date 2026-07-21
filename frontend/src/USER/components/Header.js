@@ -31,10 +31,67 @@ const topBarAnnouncements = [
   '🎁 Exciting Offers Available This Week',
 ].filter((announcement) => !announcement.toLowerCase().includes('offers'));
 
+const resolveAvatarUrl = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  const baseUrl = (process.env.REACT_APP_AUTH_API_BASE_URL || 'https://shyamagrotools.com').replace(/\/$/, '');
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const uniqueProducts = (products) =>
   Array.from(
     new Map(products.filter(Boolean).map((product, index) => [product.id || `product-${index}`, product])).values()
   );
+
+const UserAvatar = ({ user }) => {
+  const [hasError, setHasError] = useState(false);
+  const imageUrl = user?.profileImage || user?.profileImageUrl;
+
+  useEffect(() => {
+    setHasError(false);
+  }, [imageUrl]);
+
+  if (imageUrl && !hasError) {
+    return (
+      <img
+        src={resolveAvatarUrl(imageUrl)}
+        alt={user?.name || 'User'}
+        className="w-full h-full object-cover rounded-full"
+        onError={() => setHasError(true)}
+      />
+    );
+  }
+
+  return <User size={18} />;
+};
+
+const ModalAvatar = ({ accountForm, user }) => {
+  const [hasError, setHasError] = useState(false);
+  const imageUrl = accountForm?.profileImage;
+
+  useEffect(() => {
+    setHasError(false);
+  }, [imageUrl]);
+
+  if (imageUrl && !hasError) {
+    return (
+      <img
+        src={resolveAvatarUrl(imageUrl)}
+        alt="Profile"
+        className="w-full h-full object-cover rounded-full"
+        onError={() => setHasError(true)}
+      />
+    );
+  }
+
+  return (
+    <span className="text-2xl font-black text-[#58B82E]">
+      {String(accountForm?.name || user?.name || 'U').charAt(0).toUpperCase()}
+    </span>
+  );
+};
 
 const Header = ({ onLoginClick }) => {
   const navigate = useNavigate();
@@ -379,8 +436,13 @@ const Header = ({ onLoginClick }) => {
         const uploadedImageUrl = await uploadUserProfileImage(currentPhone, profileImageFile);
         if (uploadedImageUrl) profileImageUrl = uploadedImageUrl;
       }
-      nextForm.profileImage = profileImageUrl;
-      nextForm.profileImageUrl = profileImageUrl;
+      const timestamp = Date.now();
+      const finalImageUrl = profileImageUrl
+        ? (profileImageUrl.includes('?') ? `${profileImageUrl}&t=${timestamp}` : `${profileImageUrl}?t=${timestamp}`)
+        : '';
+
+      nextForm.profileImage = finalImageUrl;
+      nextForm.profileImageUrl = finalImageUrl;
 
       const updatedUser = await updateUserProfile(currentPhone, nextForm);
       const savedFields = {
@@ -388,7 +450,8 @@ const Header = ({ onLoginClick }) => {
         name: updatedUser.name || updatedUser.fullName || updatedUser.FullName || nextForm.name,
         phone: updatedUser.phone || updatedUser.mobileNumber || updatedUser.MobileNumber || nextForm.phone,
         email: updatedUser.email || updatedUser.Email || nextForm.email,
-        profileImage: updatedUser.profileImage || updatedUser.profileImageUrl || updatedUser.ProfileImageUrl || nextForm.profileImage,
+        profileImage: finalImageUrl || updatedUser.profileImage || updatedUser.profileImageUrl || nextForm.profileImage,
+        profileImageUrl: finalImageUrl || updatedUser.profileImage || updatedUser.profileImageUrl || nextForm.profileImage,
         doorNo: updatedUser.doorNo || updatedUser.DoorNo || nextForm.doorNo,
         street: updatedUser.street || updatedUser.streetArea || updatedUser.StreetArea || nextForm.street,
         city: updatedUser.city || updatedUser.City || nextForm.city,
@@ -546,8 +609,8 @@ const Header = ({ onLoginClick }) => {
     <header className="site-header w-full font-poppins">
       {/* 1. TOP HEADER BAR */}
       <div className="top-header-bar bg-dark text-white text-[10px] py-1.5 border-b border-white/10 tracking-wider">
-        <div className="max-w-[1440px] mx-auto w-full px-4 md:px-10 flex flex-wrap justify-between items-center">
-          <div className="top-header-contact flex gap-6 items-center flex-wrap">
+        <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-6 flex flex-wrap justify-between items-center">
+          <div className="top-header-contact flex gap-4 md:gap-6 items-center flex-wrap">
             <div className="top-header-contact-item flex items-center gap-2">
               <span className="icon-shade icon-teal icon-shade-sm"><Phone size={12} /></span>
               <Link to="/contact-support" className="top-header-contact-link">+91 98765 43210</Link>
@@ -582,7 +645,7 @@ const Header = ({ onLoginClick }) => {
 
       {/* 2. MAIN NAVBAR */}
       <div className="header-main-navbar w-full bg-white py-3 transition-shadow duration-300 z-[9998]">
-        <div className="header-main-inner max-w-[1440px] mx-auto w-full px-4 md:px-10 flex justify-between items-center">
+        <div className="header-main-inner max-w-[1600px] mx-auto w-full px-4 lg:px-6 flex justify-between items-center">
           
           {/* Mobile Menu Toggle */}
           <button
@@ -637,8 +700,8 @@ const Header = ({ onLoginClick }) => {
                 aria-haspopup={user ? 'menu' : undefined}
                 aria-expanded={user ? profileOpen : undefined}
               >
-                <div className="header-icon-button icon-shade icon-grey border border-gray-100">
-                  <User size={18} />
+                <div className="header-icon-button icon-shade icon-grey border border-gray-100 overflow-hidden relative">
+                  <UserAvatar user={user} />
                 </div>
                 {user && <span className="text-xs font-bold whitespace-nowrap hidden lg:block">{String(user.name || 'User').split(' ')[0]}</span>}
               </button>
@@ -846,12 +909,8 @@ const Header = ({ onLoginClick }) => {
 
               <div className="account-profile-form">
                 <div className="account-photo-section">
-                  <div className="account-avatar">
-                    {accountForm.profileImage ? (
-                      <img src={accountForm.profileImage} alt="Profile" />
-                    ) : (
-                      <span>{String(accountForm.name || user.name || 'U').charAt(0).toUpperCase()}</span>
-                    )}
+                  <div className="account-avatar flex items-center justify-center overflow-hidden rounded-full w-20 h-20 bg-[#58B82E]/10 border-2 border-[#58B82E]">
+                    <ModalAvatar accountForm={accountForm} user={user} />
                   </div>
                   <button
                     type="button"
