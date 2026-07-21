@@ -8,7 +8,6 @@ import heroSprayers from '../../asset/hero-sprayers.png';
 const Hero = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
@@ -37,14 +36,13 @@ const Hero = () => {
     setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
   }, [totalSlides]);
 
-  // Auto play every 5 seconds with hover pause
+  // Continuous auto play every 3 seconds
   useEffect(() => {
-    if (isPaused) return undefined;
     const timer = setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 3000);
     return () => clearInterval(timer);
-  }, [isPaused, nextSlide]);
+  }, [nextSlide]);
 
   // Keyboard Navigation
   useEffect(() => {
@@ -87,9 +85,7 @@ const Hero = () => {
 
   return (
     <section
-      className="hero-slider relative w-full h-[240px] sm:h-[360px] md:h-[480px] lg:h-[580px] xl:h-[640px] overflow-hidden bg-[#0A261D] select-none"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      className="hero-slider relative w-full aspect-[2.4/1] min-h-[220px] max-h-[660px] overflow-hidden bg-[#0A261D] select-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

@@ -22,22 +22,25 @@ const HomeCategories = () => {
   return (
     <section className="home-categories-section bg-light">
       <div className="mx-auto max-w-[1840px]">
-        <div className="mb-6 flex flex-col items-center justify-between gap-4 md:flex-row md:items-end">
+        <div className="mb-6 relative flex flex-col items-center justify-center gap-4">
           <SectionHeading
             title={t('allCategories')}
             subtitle={t('ourCollections')}
-            align="left"
-            className="mb-0"
+            align="center"
+            className="mb-0 text-center"
           />
-          <button 
-            onClick={() => navigate('/categories')}
-            className="flex items-center gap-2 text-dark font-semibold hover:text-dark transition-colors group mb-4 md:mb-0"
-          >
-            {t('viewAllResults')} 
-            <div className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center group-hover:bg-dark group-hover:text-white transition-all">
-              <ChevronRight size={16} />
-            </div>
-          </button>
+          <div className="md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2">
+            <button 
+              type="button"
+              onClick={() => navigate('/categories')}
+              className="flex items-center gap-2 text-dark font-semibold hover:text-[#58B82E] transition-colors group"
+            >
+              <span>{t('viewAllResults')}</span> 
+              <div className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center group-hover:bg-[#58B82E] group-hover:text-white group-hover:border-[#58B82E] transition-all shadow-sm">
+                <ChevronRight size={16} />
+              </div>
+            </button>
+          </div>
         </div>
 
         <div className="home-category-card-grid">
