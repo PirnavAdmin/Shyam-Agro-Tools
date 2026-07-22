@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Upload, RefreshCw } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
 import { Toast } from '../components/Toast';
 
-const API_BASE   = 'https://shyamagrotools.com/api/Blog';
-const IMG_BASE   = 'https://shyamagrotools.com';
+const API_BASE   = `${getApiDomain()}/api/Blog`;
+const IMG_BASE   = getApiDomain();
 const GET_HEADERS = {
   'ngrok-skip-browser-warning': 'true',
   'Accept': 'application/json',

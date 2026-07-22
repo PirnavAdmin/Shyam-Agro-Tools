@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Eye, Plus, X } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import { OutlookDeleteButton, Pagination } from '../components/ActionButtons';
 
 const CustomersList = () => {
@@ -38,7 +39,7 @@ const CustomersList = () => {
 
   const fetchCustomers = () => {
     setLoading(true);
-    fetch('https://shyamagrotools.com/api/Customers', {
+    fetch(`${getApiDomain()}/api/Customers`, {
       headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
     })
       .then(res => {
@@ -58,7 +59,7 @@ const CustomersList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this customer?')) return;
     try {
-      const res = await fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
+      const res = await fetch(`${getApiDomain()}/api/Customers/${id}`, {
         method: 'DELETE',
         headers: { 'ngrok-skip-browser-warning': 'true' }
       });
@@ -95,7 +96,7 @@ const CustomersList = () => {
         }
       };
 
-      const res = await fetch('https://shyamagrotools.com/api/Customers', {
+      const res = await fetch(`${getApiDomain()}/api/Customers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

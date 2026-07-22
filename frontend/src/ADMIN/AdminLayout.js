@@ -81,11 +81,14 @@ const AdminLayout = () => {
     if (path === 'dashboard' || path === 'profile' || path === 'account-settings' || path === 'testimonials' || path === 'tickets' || path === 'reports' || path === '') return true;
 
     let moduleKey = path;
-    if (path === 'stock-updates') moduleKey = 'stockupdates';
+    if (path === 'stock-updates' || path === 'stock') moduleKey = 'stockupdates';
     if (path === 'coins') moduleKey = 'coins converter';
     if (path === 'call-history') moduleKey = 'call history';
     if (path === 'invoice') moduleKey = 'invoices';
     if (path === 'returns') moduleKey = 'orders';
+    if (path === 'categories' || path === 'products' || path === 'descriptions' || path === 'image-categorizer') moduleKey = 'catalog';
+    if (path === 'users') moduleKey = 'customers';
+    if (path === 'contact-card' || path === 'footer' || path === 'payments') moduleKey = 'settings';
 
     // If explicit permissions list exists, check it first
     if (userPermissions.length > 0) {

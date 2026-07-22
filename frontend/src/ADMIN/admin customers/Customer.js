@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { getApiDomain } from '../../utils/apiConfig';
 import { ArrowLeft, User, Phone, Mail, MapPin, Tractor, CreditCard, Activity, Edit, Plus, X, Search, ChevronDown } from 'lucide-react';
 
 const Customer = () => {
@@ -38,7 +39,7 @@ const Customer = () => {
 
   // Fetch all customers for the search/select capability
   useEffect(() => {
-    fetch('https://shyamagrotools.com/api/Customers', {
+    fetch(`${getApiDomain()}/api/Customers`, {
       headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
     })
       .then(res => {
@@ -63,7 +64,7 @@ const Customer = () => {
 
     setLoading(true);
     setError(null);
-    fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
+    fetch(`${getApiDomain()}/api/Customers/${id}`, {
       headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
     })
       .then(res => {
@@ -114,7 +115,7 @@ const Customer = () => {
         }
       };
 
-      const res = await fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
+      const res = await fetch(`${getApiDomain()}/api/Customers/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +125,7 @@ const Customer = () => {
       });
       if (!res.ok) throw new Error('Update failed');
       // PUT returns 204 NoContent — refetch the profile to get updated data
-      const refreshed = await fetch(`https://shyamagrotools.com/api/Customers/${id}`, {
+      const refreshed = await fetch(`${getApiDomain()}/api/Customers/${id}`, {
         headers: { 'ngrok-skip-browser-warning': 'true', 'Accept': 'application/json' }
       });
       if (refreshed.ok) {
@@ -146,7 +147,7 @@ const Customer = () => {
       return;
     }
     try {
-      const res = await fetch(`https://shyamagrotools.com/api/Customers/${id}/advisory`, {
+      const res = await fetch(`${getApiDomain()}/api/Customers/${id}/advisory`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

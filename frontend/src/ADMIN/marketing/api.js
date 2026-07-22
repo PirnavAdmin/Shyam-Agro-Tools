@@ -1,4 +1,5 @@
-const BASE_URL = 'https://shyamagrotools.com/api/Coupons';
+import { getApiDomain } from '../../utils/apiConfig';
+const BASE_URL = `${getApiDomain()}/api/Coupons`;
 
 function mapBackendToFrontend(apiCoupon) {
   return {

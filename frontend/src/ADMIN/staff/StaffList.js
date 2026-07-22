@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Plus, Mail, Phone } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../components/ActionButtons';
 import { Toast } from '../components/Toast';
 
-const BASE_URL = 'https://shyamagrotools.com/api';
+const BASE_URL = `${getApiDomain()}/api`;
 
 const getHeaders = () => {
   const headers = {

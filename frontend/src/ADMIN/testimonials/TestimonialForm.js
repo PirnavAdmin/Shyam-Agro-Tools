@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Upload } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
 import { Toast } from '../components/Toast';
 
-const API_BASE = 'https://shyamagrotools.com/api/Testimonials';
+const API_BASE = `${getApiDomain()}/api/Testimonials`;
 
 const getHeaders = () => {
   const headers = {

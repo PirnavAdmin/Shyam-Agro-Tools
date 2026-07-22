@@ -1,5 +1,6 @@
+import { getApiDomain } from '../../utils/apiConfig';
 // All Orders endpoints use /api/Orders (plural) as the base
-const BASE_URL = 'https://shyamagrotools.com/api/Orders';
+const BASE_URL = `${getApiDomain()}/api/Orders`;
 
 const DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',
@@ -19,12 +20,14 @@ const toUrlEncoded = (obj) => {
 const unwrapArray = (data) => {
   if (Array.isArray(data)) return data;
   if (!data) return [];
+  if (Array.isArray(data.Orders)) return data.Orders;
   if (Array.isArray(data.orders)) return data.orders;
   if (Array.isArray(data.data)) return data.data;
   if (Array.isArray(data.value)) return data.value;
   if (Array.isArray(data.$values)) return data.$values;
   if (Array.isArray(data.Value)) return data.Value;
   if (Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data.Items)) return data.Items;
   return [];
 };
 

@@ -2,14 +2,15 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Plus, Image as ImageIcon, Tag } from 'lucide-react';
 
+import { getApiDomain } from '../../utils/apiConfig';
 import './brands.css';
 import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../components/ActionButtons';
 import { Toast } from '../components/Toast';
 
 // Inline API utilities
-const API_BASE = 'https://shyamagrotools.com/api/Brand';
-const API_DOMAIN = 'https://shyamagrotools.com';
-const API_ITEM = (id) => `https://shyamagrotools.com/api/Brand/${encodeURIComponent(id)}`;
+const API_BASE = `${getApiDomain()}/api/Brand`;
+const API_DOMAIN = getApiDomain();
+const API_ITEM = (id) => `${getApiDomain()}/api/Brand/${encodeURIComponent(id)}`;
 
 // Normalize brand object: map any possible image field name to `logo`
 const normalizeBrand = (b) => {

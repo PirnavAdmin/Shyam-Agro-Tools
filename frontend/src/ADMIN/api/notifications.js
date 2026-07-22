@@ -1,4 +1,5 @@
-const BASE_URL = 'https://shyamagrotools.com/api/Notifications';
+import { getApiDomain } from '../../utils/apiConfig';
+const BASE_URL = `${getApiDomain()}/api/Notifications`;
 
 const DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',

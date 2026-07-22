@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getApiDomain } from '../../utils/apiConfig';
 
 // ─── Base URL ────────────────────────────────────────────────────────────────
-export const BASE_URL = 'https://shyamagrotools.com';
+export const BASE_URL = getApiDomain();
 
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 const api = axios.create({

@@ -7,6 +7,7 @@ import {
   LogOut
 } from 'lucide-react';
 import NotificationsDropdown from './components/NotificationsDropdown';
+import { getApiDomain } from '../utils/apiConfig';
 import './AdminTopBar.css';
 
 const AdminTopBar = () => {
@@ -50,7 +51,7 @@ const AdminTopBar = () => {
     if (apiVersion === 'new' && token) {
       try {
         console.log("Calling new API logout...");
-        await fetch('https://shyamagrotools.com/api/Auth/logout', {
+        await fetch(`${getApiDomain()}/api/Auth/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
