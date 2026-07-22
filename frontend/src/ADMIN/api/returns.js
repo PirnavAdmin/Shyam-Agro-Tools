@@ -1,5 +1,6 @@
-const BASE_URL = 'https://shyamagrotools.com/api/Returns';
-const ADMIN_BASE_URL = 'https://shyamagrotools.com/api/ReturnsAdmin';
+import { getApiDomain } from '../../utils/apiConfig';
+const BASE_URL = `${getApiDomain()}/api/Returns`;
+const ADMIN_BASE_URL = `${getApiDomain()}/api/ReturnsAdmin`;
 
 const DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',
@@ -232,7 +233,13 @@ export const getMyReturns = async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     const response = await fetch(`${BASE_URL}/my?${query}`, { headers: DEFAULT_HEADERS });
     if (!response.ok) throw new Error('Failed to fetch returns');
-    return await response.json();
+    const data = await response.json();
+    return {
+      returns: data.returns || data.items || data.Returns || data.Items || [],
+      totalCount: data.totalCount ?? data.TotalCount ?? 0,
+      page: data.page ?? data.Page ?? 1,
+      pageSize: data.pageSize ?? data.PageSize ?? 20
+    };
   } catch (error) {
     console.warn('Backend unavailable, loading customer returns from local storage:', error.message);
     let list = getLocalReturns();
@@ -301,13 +308,19 @@ export const getAdminReturns = async (params = {}) => {
   try {
     const query = new URLSearchParams();
     Object.keys(params).forEach(k => {
-      if (params[k] !== undefined && params[k] !== null && params[k] !== '') {
+      if (params[k] !== undefined && params[k] !== null && params[k] !== '' && params[k] !== 'All') {
         query.append(k, params[k]);
       }
     });
     const response = await fetch(`${ADMIN_BASE_URL}/admin?${query.toString()}`, { headers: DEFAULT_HEADERS });
     if (!response.ok) throw new Error('Failed to fetch admin returns list');
-    return await response.json();
+    const data = await response.json();
+    return {
+      returns: data.returns || data.items || data.Returns || data.Items || [],
+      totalCount: data.totalCount ?? data.TotalCount ?? 0,
+      page: data.page ?? data.Page ?? 1,
+      pageSize: data.pageSize ?? data.PageSize ?? 10
+    };
   } catch (error) {
     console.warn('Backend unavailable, loading admin returns from local storage:', error.message);
     let list = getLocalReturns();

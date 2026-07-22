@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, Save, Shield, User, Key, Plus, Trash2 } from "lucide-react";
 import { Toast } from "../components/Toast";
+import { getApiDomain } from '../../utils/apiConfig';
 import './AddStaff.css';
 
-const BASE_URL = 'https://shyamagrotools.com/api';
+const BASE_URL = `${getApiDomain()}/api`;
 
 const getHeaders = () => {
   const headers = {

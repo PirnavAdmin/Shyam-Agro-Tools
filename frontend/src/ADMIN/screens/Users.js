@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { User, Trash2, RefreshCw } from 'lucide-react';
 
-const API_BASE = "https://shyamagrotools.com/api/Auth";
+import { getApiDomain } from '../../utils/apiConfig';
+
+const API_BASE = `${getApiDomain()}/api/Auth`;
 
 const Users = () => {
   const [users, setUsers] = useState([]);

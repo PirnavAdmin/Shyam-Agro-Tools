@@ -7,9 +7,10 @@ import {
 } from 'lucide-react';
 import { getOrders, updateOrderStatus } from '../api/orders';
 import { Toast } from '../components/Toast';
+import { getApiDomain } from '../../utils/apiConfig';
 import './PaymentHistory.css';
 
-const BASE_PAYMENT_URL = 'https://shyamagrotools.com/api/Payment';
+const BASE_PAYMENT_URL = `${getApiDomain()}/api/Payment`;
 const HEADERS = {
   'ngrok-skip-browser-warning': 'true',
   'Accept': 'application/json',
@@ -172,7 +173,7 @@ const PaymentHistory = () => {
         const serverQr = await fetchQrConfig();
         if (serverQr && serverQr.qrImageUrl) {
           const fullQrUrl = serverQr.qrImageUrl.startsWith('/') 
-            ? `https://shyamagrotools.com${serverQr.qrImageUrl}` 
+            ? `${getApiDomain()}${serverQr.qrImageUrl}` 
             : serverQr.qrImageUrl;
           setQrPreview(fullQrUrl);
         }
@@ -327,15 +328,18 @@ const PaymentHistory = () => {
     if (!window.confirm(`Verify payment of INR ${totalAmount.toLocaleString('en-IN')} for Order #${orderId}?`)) return;
     
     try {
-      // 1. Update order status to Processing on the server
-      await updateOrderStatus(realOrderId, 'Processing');
+      const isNumericId = /^\d+$/.test(String(realOrderId));
+      if (isNumericId) {
+        // 1. Update order status to Processing on the server
+        await updateOrderStatus(Number(realOrderId), 'Processing');
+      }
 
       // 2. Approve manual verification record if present
       if (verificationRecordId) {
         await updateManualVerificationStatus(verificationRecordId, 'Approved');
       }
       
-      showBannerStatus('success', `Payment for Order #${orderId} verified successfully. Order status updated to Processing.`);
+      showBannerStatus('success', `Payment for Order #${orderId} verified successfully.${isNumericId ? ' Order status updated to Processing.' : ''}`);
       loadOrdersList();
     } catch (e) {
       showBannerStatus('error', `Failed to verify payment: ${e.message}`);
@@ -347,15 +351,18 @@ const PaymentHistory = () => {
     if (!window.confirm(`Reject payment details for Order #${orderId}?`)) return;
     
     try {
-      // 1. Cancel order status on the server
-      await updateOrderStatus(realOrderId, 'Cancelled');
+      const isNumericId = /^\d+$/.test(String(realOrderId));
+      if (isNumericId) {
+        // 1. Cancel order status on the server
+        await updateOrderStatus(Number(realOrderId), 'Cancelled');
+      }
 
       // 2. Reject manual verification record if present
       if (verificationRecordId) {
         await updateManualVerificationStatus(verificationRecordId, 'Rejected');
       }
       
-      showBannerStatus('success', `Payment for Order #${orderId} rejected. Order status updated to Cancelled.`);
+      showBannerStatus('success', `Payment for Order #${orderId} rejected.${isNumericId ? ' Order status updated to Cancelled.' : ''}`);
       loadOrdersList();
     } catch (e) {
       showBannerStatus('error', `Failed to reject payment: ${e.message}`);
@@ -591,10 +598,14 @@ const PaymentHistory = () => {
     
     // First, process manual verification submissions from server
     manualVerifications.forEach(mv => {
-      const o = orders.find(ord => 
-        String(ord.id || ord.orderId) === String(mv.orderId) ||
-        String(ord.orderNumber) === String(mv.orderId)
-      );
+      const mvDigits = String(mv.orderId || '').replace(/\D/g, '');
+      const o = orders.find(ord => {
+        const ordIdDigits = String(ord.id || ord.orderId || '').replace(/\D/g, '');
+        const ordNumDigits = String(ord.orderNumber || '').replace(/\D/g, '');
+        return (mvDigits && (mvDigits === ordIdDigits || mvDigits === ordNumDigits)) ||
+               String(ord.id || ord.orderId) === String(mv.orderId) ||
+               String(ord.orderNumber) === String(mv.orderId);
+      });
       
       if (o) {
         matchedOrderIds.add(String(o.id || o.orderId));
@@ -833,7 +844,7 @@ const PaymentHistory = () => {
                               </span>
                               {payment.screenshotUrl && (
                                 <a 
-                                  href={`https://shyamagrotools.com${payment.screenshotUrl}`} 
+                                  href={`${getApiDomain()}${payment.screenshotUrl}`} 
                                   target="_blank" 
                                   rel="noopener noreferrer" 
                                   className="screenshot-link"

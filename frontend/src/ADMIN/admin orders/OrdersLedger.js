@@ -14,9 +14,11 @@ import {
   Mail,
   User,
   ShieldCheck,
-  DollarSign
+  DollarSign,
+  Printer
 } from 'lucide-react';
 import { getOrders, getOrder } from '../api/orders';
+import { getApiDomain } from '../../utils/apiConfig';
 import { Pagination } from '../components/ActionButtons';
 import './adminOrders.css';
 
@@ -111,6 +113,99 @@ const normaliseOrder = (o) => {
   };
 };
 
+const printInvoice = (order) => {
+  const printWindow = window.open('', '_blank');
+  const itemsHtml = order.items.map(item => `
+    <tr>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: left;">${item.name}<br/><small>${item.sku}</small></td>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.qty}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">₹${(item.price * item.qty).toLocaleString('en-IN')}</td>
+    </tr>
+  `).join('');
+
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Invoice - ${order.invoiceNo}</title>
+        <style>
+          body { font-family: 'Poppins', sans-serif; margin: 40px; color: #333; }
+          .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; }
+          .header { display: flex; justify-content: space-between; border-bottom: 2px solid #10b981; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { font-size: 24px; font-weight: bold; color: #10b981; }
+          .details { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 13px; line-height: 1.6; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          th { background: #f8fafc; text-align: left; padding: 10px; font-weight: bold; border-bottom: 2px solid #ddd; }
+          .totals { text-align: right; font-size: 14px; line-height: 1.8; }
+          .footer { margin-top: 50px; text-align: center; font-size: 11px; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-box">
+          <div class="header">
+            <div>
+              <div class="logo">SHYAM AGRO TOOLS</div>
+              <div style="font-size: 12px; color: #666; margin-top: 4px;">Premium Farming Tools & Machinery</div>
+            </div>
+            <div style="text-align: right;">
+              <h2 style="margin: 0; color: #333;">INVOICE</h2>
+              <div style="font-size: 13px; margin-top: 6px;">
+                <strong>Invoice:</strong> ${order.invoiceNo}<br/>
+                <strong>Date:</strong> ${order.date}
+              </div>
+            </div>
+          </div>
+          
+          <div class="details">
+            <div>
+              <strong>Billed To:</strong><br/>
+              ${order.customer}<br/>
+              Phone: ${order.phone}<br/>
+              ${order.email ? `Email: ${order.email}<br/>` : ''}
+              Address: ${order.shippingAddress || 'N/A'}
+            </div>
+            <div style="text-align: right;">
+              <strong>Seller Details:</strong><br/>
+              Shyam Agro Tools & Equipments<br/>
+              Sidhpur, Gujarat - 384151<br/>
+              GSTIN: 24DYYPP1677P1Z6
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Item Description</th>
+                <th style="text-align: center;">Qty</th>
+                <th style="text-align: right;">Price</th>
+                <th style="text-align: right;">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+          
+          <div class="totals">
+            <div>Taxable Value: ₹${(order.total * 0.84).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+            <div>GST (18%): ₹${(order.total * 0.16).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+            <div style="font-size: 18px; font-weight: bold; color: #10b981; margin-top: 6px;">Total Amount: ₹${order.total.toLocaleString('en-IN')}</div>
+          </div>
+          
+          <div class="footer">
+            Thank you for your business!<br/>
+            For support, contact sales@shyamagro.com or call +91 98765 43210.
+          </div>
+        </div>
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
 const OrdersLedger = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +234,7 @@ const OrdersLedger = () => {
         
         let customerMap = {};
         try {
-          const custResponse = await fetch('https://shyamagrotools.com/api/Customers', {
+          const custResponse = await fetch(`${getApiDomain()}/api/Customers`, {
             headers: {
               'ngrok-skip-browser-warning': 'true',
               'Accept': 'application/json'
@@ -181,11 +276,8 @@ const OrdersLedger = () => {
   }, []);
 
   // Filter out orders that are NOT verified success in payment method screen
-  // Verified success means: paymentStatus is 'Paid', 'Verified', or 'Success' (case-insensitive)
   const verifiedOrders = useMemo(() => {
-    return orders.filter(o => 
-      ['paid', 'verified', 'success'].includes(o.paymentStatus?.toLowerCase())
-    );
+    return orders;
   }, [orders]);
 
   // Apply filters: Search & Date preset/custom range
@@ -237,18 +329,22 @@ const OrdersLedger = () => {
     setCurrentPage(1);
   }, [searchTerm, dateFilter, startDate, endDate]);
 
-  // Metrics (only verified success orders)
+  // Metrics (revenue only for verified success orders)
   const metrics = useMemo(() => {
-    return verifiedOrders.reduce(
-      (summary, order) => ({
-        revenue: summary.revenue + order.total,
-        completed: summary.completed + (order.status === 'Completed' ? 1 : 0),
-        dispatched: summary.dispatched + (order.status === 'Dispatched' ? 1 : 0),
-        processing: summary.processing + (order.status === 'Processing' ? 1 : 0)
-      }),
+    return orders.reduce(
+      (summary, order) => {
+        const pStatus = order.paymentStatus?.toLowerCase() || '';
+        const isPaid = pStatus.includes('paid') || pStatus.includes('verified') || pStatus.includes('success');
+        return {
+          revenue: summary.revenue + (isPaid ? order.total : 0),
+          completed: summary.completed + (order.status === 'Completed' ? 1 : 0),
+          dispatched: summary.dispatched + (order.status === 'Dispatched' ? 1 : 0),
+          processing: summary.processing + (order.status === 'Processing' ? 1 : 0)
+        };
+      },
       { revenue: 0, completed: 0, dispatched: 0, processing: 0 }
     );
-  }, [verifiedOrders]);
+  }, [orders]);
 
   // Pagination details
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -495,9 +591,18 @@ const OrdersLedger = () => {
                   Order #{selectedOrder.id} • Invoice {selectedOrder.invoiceNo}
                 </span>
               </div>
-              <button className="orders-modal-close-btn" onClick={() => setSelectedOrder(null)}>
-                <X size={18} />
-              </button>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  onClick={() => printInvoice(selectedOrder)}
+                  className="catalog-btn catalog-btn--primary"
+                  style={{ padding: '6px 12px', fontSize: '12px', background: '#4f46e5', display: 'flex', alignItems: 'center', gap: '6px', border: 'none', color: '#fff', borderRadius: '8px', cursor: 'pointer' }}
+                >
+                  <Printer size={14} /> Print Invoice
+                </button>
+                <button className="orders-modal-close-btn" onClick={() => setSelectedOrder(null)}>
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}

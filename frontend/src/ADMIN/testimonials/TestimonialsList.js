@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Plus, User, MessageSquare, RefreshCw } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
 import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../components/ActionButtons';
 
-const API_BASE = 'https://shyamagrotools.com/api/Testimonials';
+const API_BASE = `${getApiDomain()}/api/Testimonials`;
 
 const getHeaders = () => {
   const headers = {

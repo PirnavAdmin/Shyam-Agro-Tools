@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getApiDomain } from '../../utils/apiConfig';
 import {
   Bar,
   BarChart,
@@ -106,7 +107,7 @@ const AdminDashboard = () => {
 
       // Fetch brands count
       try {
-        const brandRes = await fetch('https://shyamagrotools.com/api/Brand', {
+        const brandRes = await fetch(`${getApiDomain()}/api/Brand`, {
           headers: { 'ngrok-skip-browser-warning': 'true' }
         });
         if (brandRes.ok) {
@@ -121,7 +122,7 @@ const AdminDashboard = () => {
 
       // Fetch staff count
       try {
-        const staffRes = await fetch('https://shyamagrotools.com/api/Staff', {
+        const staffRes = await fetch(`${getApiDomain()}/api/Staff`, {
           headers: { 'ngrok-skip-browser-warning': 'true' }
         });
         if (staffRes.ok) {

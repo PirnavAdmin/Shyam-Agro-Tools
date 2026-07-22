@@ -19,6 +19,7 @@ import {
 } from './catalogStore';
 import { fetchCategories, fetchSubcategories, fetchProduct, saveProduct as saveProductApi } from './productsApi';
 import { fetchSuppliers } from '../suppliers/suppliersApi';
+import { getApiDomain } from '../../utils/apiConfig';
 import { Toast } from '../components/Toast';
 import './adminModule.css';
 import './ProductsForm.css';
@@ -188,7 +189,7 @@ const ProductsForm = () => {
     Promise.all([
       fetchCategories(),
       fetchSubcategories(),
-      fetch('https://shyamagrotools.com/api/Brand', {
+      fetch(`${getApiDomain()}/api/Brand`, {
         headers: { 'ngrok-skip-browser-warning': 'true' }
       }).then(res => res.json()).catch(() => []),
       fetchSuppliers().catch(() => [])

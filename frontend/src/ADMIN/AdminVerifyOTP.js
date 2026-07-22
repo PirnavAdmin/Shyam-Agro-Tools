@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { getApiDomain } from '../utils/apiConfig';
 import './AdminVerifyOTP.css';
 
-const ADMIN_AUTH_API = "https://shyamagrotools.com/api/Auth";
+const ADMIN_AUTH_API = `${getApiDomain()}/api/Auth`;
 
 const HEADERS      = { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' };
 const REQUEST_TIMEOUT = 20000;

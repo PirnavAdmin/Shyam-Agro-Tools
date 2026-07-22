@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getApiDomain } from '../utils/apiConfig';
 import './AdminLoginPage.css';
 
-const ADMIN_AUTH_API = "https://shyamagrotools.com/api/Auth";
+const ADMIN_AUTH_API = `${getApiDomain()}/api/Auth`;
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' };
 const REQUEST_TIMEOUT = 8000;
 
@@ -77,14 +78,14 @@ const AdminLoginPage = () => {
 
       let profile = null;
       try {
-        const res = await axios.get('https://shyamagrotools.com/api/Auth/profile', { headers, timeout: 5000 });
+        const res = await axios.get(`${getApiDomain()}/api/Auth/profile`, { headers, timeout: 5000 });
         if (res.data) {
           profile = res.data.data || res.data.value || res.data;
         }
       } catch (e) {
         console.warn('Auth profile fetch failed, trying Staff profile:', e.message);
         try {
-          const res = await axios.get('https://shyamagrotools.com/api/Staff/profile', { headers, timeout: 5000 });
+          const res = await axios.get(`${getApiDomain()}/api/Staff/profile`, { headers, timeout: 5000 });
           if (res.data) {
             profile = res.data.data || res.data.value || res.data;
           }
@@ -95,7 +96,7 @@ const AdminLoginPage = () => {
 
       let permissions = [];
       try {
-        const res = await axios.get('https://shyamagrotools.com/api/Permission/my-permissions', { headers, timeout: 5000 });
+        const res = await axios.get(`${getApiDomain()}/api/Permission/my-permissions`, { headers, timeout: 5000 });
         const permsData = res.data?.data || res.data?.value || res.data;
         if (Array.isArray(permsData)) {
           permsData.forEach(p => {
@@ -136,7 +137,7 @@ const AdminLoginPage = () => {
       try {
         console.log("Attempting login via new API...");
         const newResponse = await axios.post(
-          "https://shyamagrotools.com/api/Auth/login",
+          `${getApiDomain()}/api/Auth/login`,
           buildLoginPayload(email, password),
           { headers: HEADERS, timeout: REQUEST_TIMEOUT }
         );

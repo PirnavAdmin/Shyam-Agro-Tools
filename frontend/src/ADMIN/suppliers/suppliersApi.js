@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { getApiDomain } from '../../utils/apiConfig';
 
-const BASE_URL = 'https://shyamagrotools.com';
+const BASE_URL = getApiDomain();
 
 // Create central Axios instance skipping ngrok warnings
 const api = axios.create({

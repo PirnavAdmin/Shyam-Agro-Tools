@@ -13,6 +13,7 @@ import {
   TrendingUp,
   WalletCards
 } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
 
 const initialSettings = {
@@ -46,7 +47,7 @@ const StatCard = ({ icon: Icon, label, value, detail }) => (
   </div>
 );
 
-const API_URL = 'https://shyamagrotools.com/api/Coins';
+const API_URL = `${getApiDomain()}/api/Coins`;
 
 const CoinsConverterScreen = () => {
   const [settings, setSettings] = useState(initialSettings);

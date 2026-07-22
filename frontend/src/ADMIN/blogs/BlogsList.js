@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Plus, FileText, Calendar, User, Eye, RefreshCw, AlertCircle } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
 import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../components/ActionButtons';
 
-const API_BASE = 'https://shyamagrotools.com/api/Blog';
-const IMG_BASE = 'https://shyamagrotools.com';
+const API_BASE = `${getApiDomain()}/api/Blog`;
+const IMG_BASE = getApiDomain();
 
 const HEADERS = {
   'ngrok-skip-browser-warning': 'true',
