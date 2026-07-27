@@ -4,12 +4,6 @@ import { getToken } from '../utils/auth';
 const getAuthApiBaseUrl = () => {
   const configuredBaseUrl = process.env.REACT_APP_AUTH_API_BASE_URL;
   if (configuredBaseUrl) return configuredBaseUrl.replace(/\/$/, '');
-
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') return '';
-  }
-
   return 'https://shyamagrotools.com';
 };
 
@@ -33,11 +27,99 @@ const getHeaders = (isFormData = false) => {
 
 const getResponseData = (data) => data?.data?.user || data?.user || data?.data || data || {};
 
+const getApiErrorMessage = (error, fallback) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  error?.message ||
+  fallback;
+
 const getFirstValue = (source, keys) => {
   for (const key of keys) {
     if (source?.[key] !== undefined && source?.[key] !== null && source[key] !== '') return source[key];
   }
   return '';
+};
+
+const findNestedValue = (source, keys, depth = 0) => {
+  if (!source || typeof source !== 'object' || depth > 4) return '';
+
+  const directValue = getFirstValue(source, keys);
+  if (directValue) return directValue;
+
+  for (const value of Object.values(source)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const nestedValue = findNestedValue(item, keys, depth + 1);
+        if (nestedValue) return nestedValue;
+      }
+    } else if (value && typeof value === 'object') {
+      const nestedValue = findNestedValue(value, keys, depth + 1);
+      if (nestedValue) return nestedValue;
+    }
+  }
+
+  return '';
+};
+
+const PROFILE_IMAGE_KEYS = [
+  'profileImageUrl',
+  'ProfileImageUrl',
+  'profileImage',
+  'ProfileImage',
+  'profile_picture',
+  'profilePicture',
+  'profilePhoto',
+  'ProfilePhoto',
+  'photoUrl',
+  'PhotoUrl',
+  'avatar',
+  'avatarUrl',
+  'imageUrl',
+  'ImageUrl',
+  'image',
+  'photo',
+  'url',
+];
+
+export const normalizeProfileImageUrl = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://')
+  ) {
+    return trimmed;
+  }
+  const baseUrl = getAuthApiBaseUrl();
+  return `${baseUrl}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
+};
+
+export const getProfileImageFromSource = (source) =>
+  normalizeProfileImageUrl(findNestedValue(source, PROFILE_IMAGE_KEYS));
+
+export const withImageCacheBust = (url, version = Date.now()) => {
+  const normalizedUrl = normalizeProfileImageUrl(url);
+  if (!normalizedUrl || normalizedUrl.startsWith('data:') || normalizedUrl.startsWith('blob:')) return normalizedUrl;
+  return normalizedUrl.includes('?') ? `${normalizedUrl}&v=${version}` : `${normalizedUrl}?v=${version}`;
+};
+
+export const withoutImageCacheBust = (url) => {
+  const normalizedUrl = normalizeProfileImageUrl(url);
+  if (!normalizedUrl || normalizedUrl.startsWith('data:') || normalizedUrl.startsWith('blob:')) return normalizedUrl;
+
+  try {
+    const parsedUrl = new URL(normalizedUrl);
+    parsedUrl.searchParams.delete('v');
+    parsedUrl.searchParams.delete('t');
+    return parsedUrl.toString();
+  } catch {
+    return normalizedUrl
+      .replace(/([?&])(v|t)=[^&]*&?/g, '$1')
+      .replace(/[?&]$/, '');
+  }
 };
 
 export const uploadUserProfileImage = async (mobileNumber, imageFile) => {
@@ -64,12 +146,14 @@ export const uploadUserProfileImage = async (mobileNumber, imageFile) => {
       }
     );
     const data = getResponseData(response.data);
-    if (typeof data === 'string') return data;
-    return getFirstValue(data, ['profileImageUrl', 'ProfileImageUrl', 'profileImage', 'imageUrl', 'url']) || URL.createObjectURL(imageFile);
+    const uploadedUrl = normalizeProfileImageUrl(typeof data === 'string' ? data : findNestedValue(data, PROFILE_IMAGE_KEYS));
+    if (!uploadedUrl) {
+      throw new Error('Profile image upload succeeded but no image URL was returned.');
+    }
+    return uploadedUrl;
   } catch (error) {
-    console.warn("Upload profile image fallback:", error.message);
-    // Graceful fallback URL if backend returns 401 or network error
-    return URL.createObjectURL(imageFile);
+    console.warn("Upload profile image failed:", error.message);
+    throw new Error(getApiErrorMessage(error, 'Unable to upload profile image.'));
   }
 };
 
@@ -92,7 +176,9 @@ export const getUserProfile = async (currentMobileNumber) => {
       }
     );
 
-    return getResponseData(response.data);
+    const profile = getResponseData(response.data);
+    const profileImage = getProfileImageFromSource(profile);
+    return profileImage ? { ...profile, profileImage, profileImageUrl: profileImage } : profile;
   } catch (error) {
     console.warn("Get user profile fallback:", error.message);
     return {};
@@ -106,7 +192,8 @@ export const updateUserProfile = async (currentMobileNumber, values) => {
     mobileNumber,
     fullName: String(values.name || '').trim(),
     email: String(values.email || '').trim(),
-    profileImageUrl: String(values.profileImageUrl || values.profileImage || '').trim(),
+    profileImageUrl: withoutImageCacheBust(String(values.profileImageUrl || values.profileImage || '').trim()),
+    profileImage: withoutImageCacheBust(String(values.profileImage || values.profileImageUrl || '').trim()),
     doorNo: String(values.doorNo || '').trim(),
     streetArea: String(values.street || values.streetArea || '').trim(),
     city: String(values.city || '').trim(),
@@ -127,9 +214,11 @@ export const updateUserProfile = async (currentMobileNumber, values) => {
       }
     );
 
-    return getResponseData(response.data) || payload;
+    const updatedProfile = getResponseData(response.data) || payload;
+    const profileImage = getProfileImageFromSource(updatedProfile) || normalizeProfileImageUrl(payload.profileImageUrl);
+    return profileImage ? { ...updatedProfile, profileImage, profileImageUrl: profileImage } : updatedProfile;
   } catch (error) {
     console.warn("Update user profile fallback:", error.message);
-    return payload;
+    throw new Error(getApiErrorMessage(error, 'Unable to update profile.'));
   }
 };

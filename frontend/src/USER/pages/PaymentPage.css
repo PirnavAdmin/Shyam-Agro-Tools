@@ -1077,7 +1077,7 @@ button.file-input-custom-btn {
 
 .payment-option-card {
   min-width: 0;
-  min-height: 72px;
+  min-height: 92px;
   display: grid;
   place-items: center;
   gap: 5px;
@@ -1093,6 +1093,13 @@ button.file-input-custom-btn {
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(23, 32, 24, 0.04);
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.payment-option-asset {
+  width: min(100%, 118px);
+  height: 48px;
+  object-fit: contain;
+  display: block;
 }
 
 .payment-option-card:hover,
@@ -1114,6 +1121,21 @@ button.file-input-custom-btn {
   background: #edf7e8;
   color: var(--payment-primary-dark);
   font-size: 16px;
+}
+
+.payment-method-hero-asset {
+  width: min(100%, 220px);
+  height: 88px;
+  object-fit: contain;
+  display: block;
+  margin: 0 0 12px;
+}
+
+.cod-payment-asset {
+  width: 150px;
+  height: 60px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .payment-content-pane {

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getApiDomain } from '../../utils/apiConfig';
 import {
   Bar,
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
       .reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
 
     const activeOrdersCount = orders.filter(o => o.status === 'Processing' || o.status === 'Pending' || o.status === 'On Hold').length;
-    const lowStockCount = products.filter(p => Number(p.stock) <= 5).length;
+    const lowStockCount = products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock').length;
     const pendingSuppliersCount = suppliers.filter(s => s.status === 'Pending').length;
 
     // Fulfillment Rate
@@ -170,6 +170,10 @@ const AdminDashboard = () => {
       fulfillmentRate
     };
   }, [orders, products, suppliers]);
+
+  const lowStockProducts = useMemo(() => {
+    return products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock');
+  }, [products]);
 
   // Chart Data preparation
   const salesSeriesData = useMemo(() => {
@@ -362,7 +366,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="operation-tile">
+        <div className="operation-tile" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/stock-updates')}>
           <div className="tile-icon tile-icon--amber">
             <Boxes size={20} aria-hidden="true" />
           </div>
@@ -688,6 +692,103 @@ const AdminDashboard = () => {
                 <tr>
                   <td colSpan={6} style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
                     No orders registered in the system. Go to storefront to place order first.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Stock Alerts panel */}
+      <section className="dashboard-panel orders-panel" style={{ marginTop: '22px' }}>
+        <div className="panel-header">
+          <div>
+            <span className="section-kicker" style={{ color: '#b7791f' }}>Inventory Alerts</span>
+            <h2>Stock Alert Details</h2>
+          </div>
+          <button type="button" className="catalog-btn" onClick={() => navigate('/admin/stock-updates')} style={{ padding: '4px 10px', fontSize: '12px', minHeight: 'auto' }}>
+            Manage Inventory
+          </button>
+        </div>
+
+        <div className="table-responsive">
+          <table className="dashboard-table orders-table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>SKU</th>
+                <th>Supplier</th>
+                <th className="amount-cell">Current Stock</th>
+                <th className="amount-cell">Reorder Level</th>
+                <th className="amount-cell">Deficit</th>
+                <th>Severity</th>
+                <th className="amount-cell">Restock Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lowStockProducts.length > 0 ? (
+                lowStockProducts.slice(0, 5).map((product) => {
+                  const stock = Number(product.stock) || 0;
+                  const reorderLevel = Number(product.reorderLevel) || 0;
+                  const deficit = Math.max(0, reorderLevel - stock);
+                  const isOutOfStock = stock === 0;
+                  const costPrice = Number(product.costPrice) || 0;
+                  const restockValuation = deficit * costPrice;
+
+                  let severity = "Medium";
+                  let severityColorBg = "#fff7df";
+                  let severityColorText = "#b45309";
+
+                  if (stock === 0) {
+                    severity = "Critical";
+                    severityColorBg = "#fee2e2";
+                    severityColorText = "#b91c1c";
+                  } else if (stock <= reorderLevel * 0.3) {
+                    severity = "High";
+                    severityColorBg = "#ffedd5";
+                    severityColorText = "#c2410c";
+                  }
+
+                  return (
+                    <tr key={product.id} style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/stock-updates')}>
+                      <td><strong>{product.name}</strong></td>
+                      <td className="order-id">{product.sku}</td>
+                      <td>{product.supplier || 'N/A'}</td>
+                      <td className="amount-cell">
+                        <span style={{ 
+                          fontWeight: '700',
+                          color: isOutOfStock ? '#ef4444' : '#d97706'
+                        }}>
+                          {stock}
+                        </span>
+                      </td>
+                      <td className="amount-cell">{reorderLevel}</td>
+                      <td className="amount-cell" style={{ fontWeight: '600', color: deficit > 0 ? '#dc2626' : '#64748b' }}>
+                        {deficit}
+                      </td>
+                      <td>
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: severityColorBg,
+                          color: severityColorText
+                        }}>
+                          {severity}
+                        </span>
+                      </td>
+                      <td className="amount-cell" style={{ fontWeight: '700', color: '#1e293b' }}>
+                        {formatCurrency(restockValuation)}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                    All products are well-stocked. No active alerts.
                   </td>
                 </tr>
               )}

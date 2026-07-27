@@ -85,9 +85,9 @@ const BrandSlider = () => {
     autoScrollRef.current = window.setInterval(() => {
       const wrapper = trackWrapperRef.current;
       if (!wrapper) return;
-      wrapper.scrollLeft += 1;
+      wrapper.scrollLeft += 2.5;
       resetLoopPosition();
-    }, 20);
+    }, 16);
 
     return () => {
       if (autoScrollRef.current) {

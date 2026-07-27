@@ -526,7 +526,7 @@ const CartPage = () => {
                     disabled={isCartMutating || isValidatingStock || unavailableProductIds.size > 0}
                     className="btn-primary flex w-full items-center justify-center gap-2 py-3.5"
                   >
-                    {isValidatingStock ? 'Validating Stock...' : t('proceedToCheckout')} <ArrowRight size={18} />
+                    {isValidatingStock ? t('validatingStock') : t('proceedToCheckout')} <ArrowRight size={18} />
                   </button>
                   <button
                     type="button"
@@ -534,7 +534,7 @@ const CartPage = () => {
                     disabled={isCartMutating}
                     className="mt-3 flex w-full items-center justify-center gap-2 border border-red-200 py-3 text-xs font-black uppercase tracking-widest text-red-500 disabled:opacity-50"
                   >
-                    <Trash2 size={15} /> {isCartMutating ? 'Clearing Cart...' : 'Clear Cart'}
+                    <Trash2 size={15} /> {isCartMutating ? t('clearingCart') : t('clearCart')}
                   </button>
 
                   <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">

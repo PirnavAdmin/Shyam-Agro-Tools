@@ -4,6 +4,7 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import SectionHeading from './SectionHeading';
 import { Quote, Star } from 'lucide-react';
 import { getActiveTestimonials, getTestimonials } from '../../services/testimonialService';
+import { useLanguage } from '../context/LanguageContext';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -45,8 +46,10 @@ const getInitials = (name = 'Customer') => (
 );
 
 const Testimonials = () => {
+  const { t, dynamicText, activeLanguage } = useLanguage();
   const [apiReviews, setApiReviews] = useState([]);
   const [failedImageIds, setFailedImageIds] = useState({});
+  const languageCode = activeLanguage?.code || 'en';
 
   useEffect(() => {
     let isMounted = true;
@@ -92,7 +95,7 @@ const Testimonials = () => {
       </div>
 
       <div className="max-w-[1440px] mx-auto relative z-10">
-        <SectionHeading title="WHAT OUR CLIENTS SAY" subtitle="TESTIMONIALS" />
+        <SectionHeading title={t('testimonialsHeading')} subtitle={t('testimonialsSubtitle')} />
 
         <Swiper
           modules={[Pagination, Autoplay]}
@@ -106,8 +109,14 @@ const Testimonials = () => {
           }}
           className="pb-5"
         >
-          {reviews.map((review) => (
-            <SwiperSlide key={review.id}>
+          {reviews.map((review) => {
+            const imageFailureKey = `${review.id}-${languageCode}-${review.image || ''}`;
+            const name = dynamicText(review, 'name');
+            const role = dynamicText(review, 'role');
+            const text = dynamicText(review, 'text');
+
+            return (
+            <SwiperSlide key={`${review.id}-${languageCode}`}>
               <div className="flex min-h-[220px] flex-col items-center bg-white p-6 text-center rounded-xl border border-gray-100/80 shadow-md transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/20 relative group">
                 <Quote size={22} className="mb-2 text-primary/20" />
                 {review.rating > 0 && (
@@ -117,28 +126,29 @@ const Testimonials = () => {
                     ))}
                   </div>
                 )}
-                <p className="mb-3 line-clamp-3 text-xs italic leading-5 text-gray-600">"{review.text}"</p>
+                <p className="mb-3 line-clamp-3 text-xs italic leading-5 text-gray-600">"{text}"</p>
                 <div className="flex flex-col items-center">
-                  {review.image && !failedImageIds[review.id] ? (
+                  {review.image && !failedImageIds[imageFailureKey] ? (
                     <img
                       src={review.image}
-                      alt={review.name}
+                      alt={name}
                       className="mb-2 h-10 w-10 rounded-full border-4 border-light object-cover"
                       onError={() => {
-                        setFailedImageIds((current) => ({ ...current, [review.id]: true }));
+                        setFailedImageIds((current) => ({ ...current, [imageFailureKey]: true }));
                       }}
                     />
                   ) : (
                     <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full border-4 border-light bg-primary/10 text-xs font-bold text-primary">
-                      {getInitials(review.name)}
+                      {getInitials(name)}
                     </span>
                   )}
-                  <h4 className="text-sm font-bold uppercase tracking-wide text-dark">{review.name}</h4>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{review.role}</span>
+                  <h4 className="text-sm font-bold uppercase tracking-wide text-dark">{name}</h4>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{role}</span>
                 </div>
               </div>
             </SwiperSlide>
-          ))}
+            );
+          })}
         </Swiper>
       </div>
     </section>

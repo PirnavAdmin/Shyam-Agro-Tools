@@ -166,8 +166,23 @@ namespace ShyamAgroSuite.Api.Services
                 request.Image.Length == 0)
                 return null;
 
+            var webRootPath = _environment.WebRootPath;
+
+            if (string.IsNullOrWhiteSpace(webRootPath))
+            {
+                webRootPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot");
+            }
+
+            if (!Directory.Exists(webRootPath))
+            {
+                Directory.CreateDirectory(
+                    webRootPath);
+            }
+
             var uploadsFolder = Path.Combine(
-                _environment.WebRootPath,
+                webRootPath,
                 "profile-images");
 
             if (!Directory.Exists(uploadsFolder))

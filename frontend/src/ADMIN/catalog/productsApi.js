@@ -195,7 +195,14 @@ export const mapProductFromApi = (
 
     // Inventory
     stock: String(stock),
-    status: raw.stockStatus || (stock > 0 ? 'In Stock' : 'Out of Stock'),
+    status: (() => {
+      const reorderLevel = raw.reorderLevel !== undefined ? Number(raw.reorderLevel) : (raw.ReorderLevel !== undefined ? Number(raw.ReorderLevel) : 30);
+      if (stock === 0) return 'Out of Stock';
+      if (stock <= reorderLevel) return 'Low Stock';
+      return 'In Stock';
+    })(),
+    reorderLevel: raw.reorderLevel !== undefined ? Number(raw.reorderLevel) : (raw.ReorderLevel !== undefined ? Number(raw.ReorderLevel) : 30),
+    costPrice: raw.costPrice !== undefined ? Number(raw.costPrice) : (raw.CostPrice !== undefined ? Number(raw.CostPrice) : (raw.sellingPrice ? Number(raw.sellingPrice) * 0.7 : (raw.mrp ? Number(raw.mrp) * 0.7 : 0))),
 
     // Delivery
     countryOfOrigin: raw.countryOfOrigin || 'India',

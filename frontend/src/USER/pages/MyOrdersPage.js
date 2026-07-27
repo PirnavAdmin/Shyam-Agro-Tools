@@ -4,6 +4,7 @@ import { CalendarDays, CreditCard, Headphones, MapPin, Package, RefreshCw, Truck
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency, getOrderTracking, getOrders } from '../utils/orders';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
 import { getCurrentUserOrdersFromApi } from '../../services/orderService';
@@ -44,6 +45,7 @@ const MyOrdersPage = () => {
   const [ordersError, setOrdersError] = useState('');
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const mobileNumber = getUserMobile(user);
   const [dateFilter, setDateFilter] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
@@ -778,12 +780,12 @@ const MyOrdersPage = () => {
 
                  <div className="order-info-grid">
                    <div className="order-info-card">
-                     <h3><MapPin size={16} /> Shipping Address</h3>
+                     <h3><MapPin size={16} /> {t('shippingAddress')}</h3>
                      <p>{selectedOrder.shippingAddress?.address || '-'}</p>
                      <p>{[selectedOrder.shippingAddress?.city, selectedOrder.shippingAddress?.state, selectedOrder.shippingAddress?.zip].filter(Boolean).join(', ')}</p>
                    </div>
                    <div className="order-info-card">
-                     <h3><CreditCard size={16} /> Billing & Payment</h3>
+                     <h3><CreditCard size={16} /> {t('billingAddress')} & {t('paymentMethod')}</h3>
                      <p>{selectedOrder.billingDetails?.name || '-'}</p>
                      <p>{selectedOrder.billingDetails?.email || ''}</p>
                      <p>{selectedOrder.paymentMethod || '-'} · {selectedOrder.paymentStatus || 'Payment Pending'}</p>

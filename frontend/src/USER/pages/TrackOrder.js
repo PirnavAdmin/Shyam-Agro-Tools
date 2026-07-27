@@ -3,11 +3,72 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency, getOrderById, getOrderTracking } from '../utils/orders';
 import { getOrderSuccessTracking } from '../../services/orderService';
 import './TrackOrder.css';
 
 const getQueryOrderId = (search) => new URLSearchParams(search).get('orderId') || '';
+
+const STATUS_LABEL_KEYS = {
+  'Order Placed': 'orderPlaced',
+  Confirmed: 'trackingConfirmed',
+  Packed: 'trackingPacked',
+  Shipped: 'trackingShipped',
+  'Out for Delivery': 'trackingOutForDelivery',
+  Delivered: 'trackingDelivered',
+};
+
+const STATUS_ALIASES = {
+  'order placed': 'Order Placed',
+  ordered: 'Order Placed',
+  pending: 'Order Placed',
+  placed: 'Order Placed',
+  '\u0C06\u0C30\u0C4D\u0C21\u0C30\u0C4D \u0C07\u0C35\u0C4D\u0C35\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F': 'Order Placed',
+  '\u0C06\u0C30\u0C4D\u0C21\u0C30\u0C4D \u0C1A\u0C47\u0C2F\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F': 'Order Placed',
+  '\u0911\u0930\u094D\u0921\u0930 \u0926\u093F\u092F\u093E \u0917\u092F\u093E': 'Order Placed',
+  confirmed: 'Confirmed',
+  '\u0C28\u0C3F\u0C30\u0C4D\u0C27\u0C3E\u0C30\u0C3F\u0C02\u0C1A\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F': 'Confirmed',
+  '\u092A\u0941\u0937\u094D\u091F\u093F \u0939\u094B \u0917\u0908': 'Confirmed',
+  packed: 'Packed',
+  '\u0C2A\u0C4D\u0C2F\u0C3E\u0C15\u0C4D \u0C1A\u0C47\u0C2F\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F': 'Packed',
+  '\u092A\u0948\u0915 \u0915\u093F\u092F\u093E \u0917\u092F\u093E': 'Packed',
+  shipped: 'Shipped',
+  dispatched: 'Shipped',
+  '\u0C30\u0C35\u0C3E\u0C23\u0C3E \u0C1A\u0C47\u0C2F\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F': 'Shipped',
+  '\u092D\u0947\u091C \u0926\u093F\u092F\u093E \u0917\u092F\u093E': 'Shipped',
+  'out for delivery': 'Out for Delivery',
+  '\u0C21\u0C46\u0C32\u0C3F\u0C35\u0C30\u0C40\u0C15\u0C3F \u0C2C\u0C2F\u0C32\u0C41\u0C26\u0C47\u0C30\u0C3F\u0C02\u0C26\u0C3F': 'Out for Delivery',
+  '\u0921\u093F\u0932\u0940\u0935\u0930\u0940 \u0915\u0947 \u0932\u093F\u090F \u0928\u093F\u0915\u0932\u093E': 'Out for Delivery',
+  delivered: 'Delivered',
+  completed: 'Delivered',
+  '\u0C21\u0C46\u0C32\u0C3F\u0C35\u0C30\u0C4D \u0C05\u0C2F\u0C3F\u0C02\u0C26\u0C3F': 'Delivered',
+  '\u0921\u093F\u0932\u0940\u0935\u0930 \u0939\u094B \u0917\u092F\u093E': 'Delivered',
+};
+
+const normalizeLookup = (value) => String(value || '').trim().toLowerCase();
+const getCanonicalStatus = (status) => STATUS_ALIASES[normalizeLookup(status)] || status || 'Order Placed';
+
+const translateStatus = (status, t) => {
+  const canonicalStatus = getCanonicalStatus(status);
+  return t(STATUS_LABEL_KEYS[canonicalStatus] || '') || canonicalStatus;
+};
+
+const translatePaymentMethod = (paymentMethod, t) => {
+  const normalized = normalizeLookup(paymentMethod);
+  if (!normalized) return '';
+  if (['cod', 'cash on delivery'].includes(normalized)) return t('cashOnDelivery');
+  if (normalized.includes('upi')) return t('netBankingUpi');
+  if (normalized.includes('card')) return t('cardPayment');
+  if (normalized.includes('bank')) return t('bankTransfer');
+  return paymentMethod;
+};
+
+const translateDeliveryEstimate = (estimate, t) => {
+  const normalized = normalizeLookup(estimate);
+  if (!normalized || normalized === '3-7 business days') return t('trackingEstimatedDeliveryValue');
+  return estimate;
+};
 
 const buildTrackingData = (orderId, mobileNumber) => {
   if (!orderId) return null;
@@ -15,11 +76,12 @@ const buildTrackingData = (orderId, mobileNumber) => {
   const savedOrder = getOrderById(orderId, mobileNumber);
   if (!savedOrder) return null;
 
-  const tracking = getOrderTracking(savedOrder);
+  const status = getCanonicalStatus(savedOrder.status || 'Order Placed');
+  const tracking = getOrderTracking({ ...savedOrder, status });
 
   return {
     orderId,
-    status: tracking.status,
+    status,
     activeIndex: tracking.activeIndex,
     progressPercent: tracking.progressPercent,
     total: savedOrder.total,
@@ -33,6 +95,7 @@ const TrackOrder = () => {
   const location = useLocation();
   const queryOrderId = useMemo(() => getQueryOrderId(location.search), [location.search]);
   const { user } = useAuth();
+  const { t } = useLanguage();
   const mobileNumber = user?.phone || user?.mobileNumber || user?.MobileNumber || '';
   const [orderId, setOrderId] = useState(queryOrderId);
   const [trackingData, setTrackingData] = useState(() => buildTrackingData(queryOrderId, mobileNumber));
@@ -59,15 +122,17 @@ const TrackOrder = () => {
     try {
       const apiTracking = await getOrderSuccessTracking(trimmedOrderId);
       if (apiTracking) {
+        const status = getCanonicalStatus(apiTracking.status || apiTracking.orderStatus || 'Order Placed');
+        const tracking = getOrderTracking({ status });
         setTrackingData({
           orderId: apiTracking.orderId || apiTracking.orderNumber || trimmedOrderId,
-          status: apiTracking.status || apiTracking.orderStatus || 'Order Placed',
-          activeIndex: 0,
-          progressPercent: 0,
+          status,
+          activeIndex: tracking.activeIndex,
+          progressPercent: tracking.progressPercent,
           total: apiTracking.finalAmount ?? apiTracking.totalAmount ?? null,
           paymentMethod: apiTracking.paymentMethod || '',
           estDelivery: apiTracking.estimatedDelivery || apiTracking.estDelivery || '3-7 business days',
-          steps: getOrderTracking({ status: apiTracking.status || apiTracking.orderStatus || 'Order Placed' }).steps,
+          steps: tracking.steps,
         });
         return;
       }
@@ -94,25 +159,25 @@ const TrackOrder = () => {
         <span className="track-leaf track-leaf-one" aria-hidden="true"></span>
         <span className="track-leaf track-leaf-two" aria-hidden="true"></span>
         <div className="track-card">
-          <span className="track-eyebrow">Plant-to-door delivery journey</span>
-          <h1>Track Your Shipment</h1>
+          <span className="track-eyebrow">{t('trackingEyebrow')}</span>
+          <h1>{t('trackYourShipment')}</h1>
           <p>
             {queryOrderId
-              ? 'Your order tracking details are shown below.'
-              : 'Enter your Order ID or Tracking Number to see real-time updates.'}
+              ? t('trackingDetailsShown')
+              : t('trackingEnterDetails')}
           </p>
 
           {!queryOrderId && (
             <form className="track-form" onSubmit={handleTrack}>
               <input
                 type="text"
-                placeholder="Enter Order ID"
+                placeholder={t('enterOrderId')}
                 value={orderId}
                 onChange={(event) => setOrderId(event.target.value)}
                 required
               />
               <button type="submit" className="track-btn" disabled={isTrackingLoading}>
-                {isTrackingLoading ? 'Tracking...' : 'Track Order'}
+                {isTrackingLoading ? t('trackingInProgress') : t('trackOrder')}
               </button>
             </form>
           )}
@@ -121,28 +186,28 @@ const TrackOrder = () => {
             <div className="tracking-result">
               <div className="tracking-summary">
                 <div className="summary-item">
-                  <span>Order ID</span>
+                  <span>{t('orderId')}</span>
                   <strong>{trackingData.orderId}</strong>
                 </div>
                 <div className="summary-item">
-                  <span>Current Status</span>
-                  <strong className="status-badge">{trackingData.status}</strong>
+                  <span>{t('currentStatus')}</span>
+                  <strong className="status-badge">{translateStatus(trackingData.status, t)}</strong>
                 </div>
                 {trackingData.total !== null && (
                   <div className="summary-item">
-                    <span>Total Amount</span>
+                    <span>{t('totalAmount')}</span>
                     <strong>{formatCurrency(trackingData.total)}</strong>
                   </div>
                 )}
                 {trackingData.paymentMethod && (
                   <div className="summary-item">
-                    <span>Payment Method</span>
-                    <strong>{trackingData.paymentMethod}</strong>
+                    <span>{t('paymentMethod')}</span>
+                    <strong>{translatePaymentMethod(trackingData.paymentMethod, t)}</strong>
                   </div>
                 )}
                 <div className="summary-item">
-                  <span>Est. Delivery</span>
-                  <strong>{trackingData.estDelivery}</strong>
+                  <span>{t('estDelivery')}</span>
+                  <strong>{translateDeliveryEstimate(trackingData.estDelivery, t)}</strong>
                 </div>
               </div>
 
@@ -159,7 +224,7 @@ const TrackOrder = () => {
                       {step.completed ? <i className="fas fa-check"></i> : index + 1}
                     </div>
                     <div className="step-info">
-                      <h4>{step.label}</h4>
+                      <h4>{translateStatus(step.label, t)}</h4>
                       <span>{step.date}</span>
                     </div>
                   </div>
@@ -169,9 +234,9 @@ const TrackOrder = () => {
           ) : (
             <div className="no-orders-msg">
               <div className="empty-box-icon"><i className="fas fa-seedling"></i></div>
-              <h2>No active order selected</h2>
-              <p>Place an order or enter your order ID to track the shipment.</p>
-              <button className="shop-btn" onClick={() => navigate('/categories')}>Shop products</button>
+              <h2>{t('noActiveOrderSelected')}</h2>
+              <p>{t('placeOrderOrEnterOrderId')}</p>
+              <button className="shop-btn" onClick={() => navigate('/categories')}>{t('shopProducts')}</button>
             </div>
           )}
         </div>

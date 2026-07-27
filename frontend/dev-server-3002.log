@@ -1,0 +1,2567 @@
+
+> augro@0.1.0 start
+> concurrently "npm run watch:css" "craco start"
+
+[0] 
+[0] > augro@0.1.0 watch:css
+[0] > tailwindcss -i ./src/index.css -o ./src/tailwind-output.css --watch
+[0] 
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 1215ms.
+[1] (node:37676) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+[1] (Use `node --trace-deprecation ...` to show where the warning was created)
+[1] (node:37676) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[1] (node:37676) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[1] Starting the development server...
+[1] 
+[1] Compiled successfully!
+[1] 
+[1] You can now view augro in the browser.
+[1] 
+[1]   Local:            http://localhost:3002
+[1]   On Your Network:  http://192.168.1.76:3002
+[1] 
+[1] Note that the development build is not optimized.
+[1] To create a production build, use npm run build.
+[1] 
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 902ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 715ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 711ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 1832:7:  'dynamicTextTranslations' is assigned a value but never used  no-unused-vars
+[1]   Line 1881:7:  'normalizeDynamicTextKey' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 1832:7:  'dynamicTextTranslations' is assigned a value but never used  no-unused-vars
+[1]   Line 1881:7:  'normalizeDynamicTextKey' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 400ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 333ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 405ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 559ms.
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 1357ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2832:7:  'getLocalizedListValue' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2832:7:  'getLocalizedListValue' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 515ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 496ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 598ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 1956:7:  'translateKnownDynamicText' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 1956:7:  'translateKnownDynamicText' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 635ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 2571ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 637ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 609ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 307ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 562ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 564ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 199ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 158ms.
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 609ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2247:7:  'translateProductDataByTerms' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2247:7:  'translateProductDataByTerms' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 621ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Done in 837ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 1039ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 523ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 627ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 462ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 407ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 353ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 392ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 446ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 302ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 285ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 342ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 258ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 288ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 595ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 321ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 329ms.
+[0] 
+[0] Rebuilding...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Done in 451ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 390ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 403ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 481ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 399ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 283ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 371ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 403ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 335ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 315ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 271ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 312ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 300ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 238ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 422ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 316ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 398ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 283ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 312ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 341ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 227ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:  'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:  'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1]   Line 49:7:  'getAccountFieldsFromUser' is assigned a value but never used       no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:  'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:  'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1]   Line 49:7:  'getAccountFieldsFromUser' is assigned a value but never used       no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 360ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:   'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:   'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1]   Line 179:9:  'profileFetchIdRef' is assigned a value but never used              no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:   'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:   'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1]   Line 179:9:  'profileFetchIdRef' is assigned a value but never used              no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 307ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:  'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:  'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:  'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:  'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 359ms.
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:  'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:  'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 46:7:  'MAX_PROFILE_IMAGE_SIZE' is assigned a value but never used         no-unused-vars
+[1]   Line 47:7:  'SUPPORTED_PROFILE_IMAGE_TYPES' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 377ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 457ms.
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[0] 
+[0] Rebuilding...
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[0] 
+[0] Done in 20658ms.
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 266ms.
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[0] 
+[0] Rebuilding...
+[0] 
+[0] Done in 275ms.
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[0] 
+[0] <--- Last few GCs --->
+[0] 
+[0] [34324:00000254D9187000]  6406733 ms: Mark-Compact 2039.8 (2054.3) -> 2036.6 (2055.1) MB, pooled: 0 MB, 1364.45 / 0.00 ms  (average mu = 0.111, current mu = 0.020) allocation failure; scavenge might not succeed
+[0] [34324:00000254D9187000]  6408252 ms: Mark-Compact 2040.6 (2055.1) -> 2037.4 (2055.8) MB, pooled: 0 MB, 1493.01 / 0.00 ms  (average mu = 0.065, current mu = 0.017) allocation failure; scavenge might not succeed
+[0] 
+[0] FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+[0] ----- Native stack trace -----
+[0] 
+[0]  1: 00007FF71A93B6AF node::OnFatalError+1343
+[0]  2: 00007FF71B583257 v8::Function::NewInstance+423
+[0]  3: 00007FF71B383937 v8::base::AddressSpaceReservation::AddressSpaceReservation+322071
+[0]  4: 00007FF71B387644 v8::base::AddressSpaceReservation::AddressSpaceReservation+337700
+[0]  5: 00007FF71B3965DC v8::internal::StrongRootAllocatorBase::deallocate_impl+16604
+[0]  6: 00007FF71B395E1B v8::internal::StrongRootAllocatorBase::deallocate_impl+14619
+[0]  7: 00007FF71C814BAD v8::base::UnsignedDivisionByConstant<unsigned __int64>+2791405
+[0]  8: 00007FF71B381400 v8::base::AddressSpaceReservation::AddressSpaceReservation+312544
+[0]  9: 00007FF71B39BC8A X509_STORE_set_cleanup+5098
+[0] 10: 00007FF71B3A8126 uv_timer_set_repeat+20694
+[0] 11: 00007FF71AF7B207 v8::String::Utf8Value::~Utf8Value+143495
+[0] 12: 000002549FE77750 
+[0] npm run watch:css exited with code 134
+[1] Compiling...
+[1] Compiled successfully!
+[1] webpack compiled [1m[32msuccessfully[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used    no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used      no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used      no-unused-vars
+[1]   Line 264:9:   'localizedAddressType' is assigned a value but never used  no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used         no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used   no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used    no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used      no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used      no-unused-vars
+[1]   Line 264:9:   'localizedAddressType' is assigned a value but never used  no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used         no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used   no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used    no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used      no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used      no-unused-vars
+[1]   Line 264:9:   'localizedAddressType' is assigned a value but never used  no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used         no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used   no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used    no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used      no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used      no-unused-vars
+[1]   Line 264:9:   'localizedAddressType' is assigned a value but never used  no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used         no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used   no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Failed to compile.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each error.
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] [1m[31mERROR[39m[22m in [1m[eslint] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 388:14:  't' is not defined  no-undef
+[1] 
+[1] Search for the keywords to learn more about each [1m[31merror[39m[22m[1m.[39m[22m
+[1] 
+[1] webpack compiled with [1m[31m1 error[39m[22m and [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\PaymentPage.js
+[1]   Line 46:7:  'paymentMethodOptions' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 244:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 245:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 246:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 288:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 293:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 15:10:   'getPaymentAsset' is defined but never used               no-unused-vars
+[1]   Line 15:27:   'withLanguageAssetVersion' is defined but never used      no-unused-vars
+[1]   Line 202:27:  'language' is assigned a value but never used             no-unused-vars
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 289:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 294:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 15:10:   'getPaymentAsset' is defined but never used               no-unused-vars
+[1]   Line 15:27:   'withLanguageAssetVersion' is defined but never used      no-unused-vars
+[1]   Line 202:27:  'language' is assigned a value but never used             no-unused-vars
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 289:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 294:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 15:27:   'withLanguageAssetVersion' is defined but never used       no-unused-vars
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used    no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used      no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used      no-unused-vars
+[1]   Line 265:9:   'checkoutPaymentAsset' is assigned a value but never used  no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used         no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used   no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 15:27:   'withLanguageAssetVersion' is defined but never used       no-unused-vars
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used    no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used      no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used      no-unused-vars
+[1]   Line 265:9:   'checkoutPaymentAsset' is assigned a value but never used  no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used         no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used   no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 15:27:   'withLanguageAssetVersion' is defined but never used      no-unused-vars
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 15:27:   'withLanguageAssetVersion' is defined but never used      no-unused-vars
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2172:7:  'getDynamicTextTranslation' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2172:7:  'getDynamicTextTranslation' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2172:7:  'getDynamicTextTranslation' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\context\LanguageContext.js
+[1]   Line 2172:7:  'getDynamicTextTranslation' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 67:7:  'setStoredProfileImage' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\components\Header.js
+[1]   Line 67:7:  'setStoredProfileImage' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 2:10:   'Link' is defined but never used                  no-unused-vars
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 2:10:   'Link' is defined but never used                  no-unused-vars
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m
+[1] Compiling...
+[1] Compiled with warnings.
+[1] 
+[1] [eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] Search for the keywords to learn more about each warning.
+[1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] [1m[33mWARNING[39m[22m in [1m[eslint] 
+[1] src\ADMIN\dashboard\AdminDashboard.js
+[1]   Line 89:10:  'brandsCount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] src\USER\pages\CheckoutPage.js
+[1]   Line 245:10:  'coinsConfigLoading' is assigned a value but never used   no-unused-vars
+[1]   Line 246:10:  'coinsConfigError' is assigned a value but never used     no-unused-vars
+[1]   Line 247:10:  'coinsRedeemError' is assigned a value but never used     no-unused-vars
+[1]   Line 290:9:   'maxInputCoins' is assigned a value but never used        no-unused-vars
+[1]   Line 295:9:   'maxCartRedeemAmount' is assigned a value but never used  no-unused-vars
+[1] 
+[1] [39m[22m
+[1] 
+[1] webpack compiled with [1m[33m1 warning[39m[22m

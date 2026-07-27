@@ -12,6 +12,7 @@ import { formatCurrency, saveOrder } from '../utils/orders';
 import apiClient from '../../api/axios';
 import { CART_CHECKOUT_API_BASE_URL, placeOrderSuccess } from '../../services/cartCheckoutService';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
+import { getPaymentAsset, withLanguageAssetVersion } from '../utils/paymentAssets';
 import {
   calculateEarnedCoins,
   calculateMaxCartRedeemAmount,
@@ -198,7 +199,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     clearCart,
     waitForCartSync,
   } = useCart();
-  const { t, productText } = useLanguage();
+  const { t, productText, language } = useLanguage();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -259,7 +260,15 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     'debit-card': t('debitCard'),
     'credit-card': t('creditCard'),
     'net-banking': t('netBanking'),
-    'qr-payment': 'QR Payment',
+    'qr-payment': t('qrPayment'),
+  };
+  const checkoutPaymentAsset = (method) => getPaymentAsset(language, method);
+  const localizedAddressType = (type) => {
+    const normalizedType = String(type || '').toLowerCase();
+    if (normalizedType === 'home') return t('homeAddress');
+    if (normalizedType === 'work' || normalizedType === 'office') return t('office');
+    if (normalizedType === 'other') return t('other');
+    return type || t('address');
   };
 
   const cartItems = useMemo(
@@ -421,28 +430,28 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     const state = data.state.trim();
     const zip = data.zip.trim();
 
-    if (!firstName) errors.firstName = 'First name is required.';
-    else if (!nameRegex.test(firstName)) errors.firstName = 'First name should contain only letters and spaces.';
+    if (!firstName) errors.firstName = t('firstNameRequired');
+    else if (!nameRegex.test(firstName)) errors.firstName = t('firstNameLettersOnly');
 
-    if (!lastName) errors.lastName = 'Last name is required.';
-    else if (!nameRegex.test(lastName)) errors.lastName = 'Last name should contain only letters and spaces.';
+    if (!lastName) errors.lastName = t('lastNameRequired');
+    else if (!nameRegex.test(lastName)) errors.lastName = t('lastNameLettersOnly');
 
-    if (!email) errors.email = 'Email address is required.';
-    else if (!emailRegex.test(email)) errors.email = 'Enter a valid email address.';
+    if (!email) errors.email = t('emailRequired');
+    else if (!emailRegex.test(email)) errors.email = t('validEmailAddress');
 
-    if (!phone) errors.phone = 'Phone number is required.';
-    else if (!/^\d{10}$/.test(phone)) errors.phone = 'Phone number must be exactly 10 digits.';
+    if (!phone) errors.phone = t('phoneRequired');
+    else if (!/^\d{10}$/.test(phone)) errors.phone = t('phoneTenDigits');
 
-    if (!address) errors.address = 'Full address is required.';
-    else if (address.length < 10) errors.address = 'Full address must be at least 10 characters.';
+    if (!address) errors.address = t('fullAddressRequired');
+    else if (address.length < 10) errors.address = t('fullAddressMinLength');
 
-    if (!city) errors.city = 'City is required.';
-    if (!state) errors.state = 'State is required.';
+    if (!city) errors.city = t('cityRequired');
+    if (!state) errors.state = t('stateRequired');
 
-    if (!zip) errors.zip = 'Pincode is required.';
-    else if (!/^\d{6}$/.test(zip)) errors.zip = 'Pincode must be exactly 6 digits.';
+    if (!zip) errors.zip = t('pincodeRequired');
+    else if (!/^\d{6}$/.test(zip)) errors.zip = t('pincodeSixDigits');
 
-    if (!data.addressType) errors.addressType = 'Address type is required.';
+    if (!data.addressType) errors.addressType = t('addressTypeRequired');
 
     return errors;
   };
@@ -752,7 +761,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
       if (!cardNumber) errors.cardNumber = t('cardNumberRequired');
       else if (!/^\d{16}$/.test(cardNumber)) errors.cardNumber = t('cardNumberInvalid');
       if (!paymentDetails.cardName.trim()) errors.cardName = t('cardNameRequired');
-      else if (!nameRegex.test(paymentDetails.cardName.trim())) errors.cardName = 'Name on card should contain only letters and spaces.';
+      else if (!nameRegex.test(paymentDetails.cardName.trim())) errors.cardName = t('nameOnCardLettersOnly');
       if (!paymentDetails.expiryDate.trim()) errors.expiryDate = t('expiryDateRequired');
       else if (!expiryRegex.test(paymentDetails.expiryDate.trim())) errors.expiryDate = t('expiryDateFormat');
       else if (isExpiredCard(paymentDetails.expiryDate.trim())) errors.expiryDate = t('expiryDateExpired');
@@ -1264,7 +1273,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
         <div className="checkout-header">
           <span className="checkout-eyebrow">{t('ecoSecureCheckout')}</span>
           <h1>{isPaymentPage ? t('paymentMethod') : t('secureCheckout')}</h1>
-          <p>{isPaymentPage ? 'Choose your payment method and complete the order securely.' : t('checkoutSubtitle')}</p>
+          <p>{isPaymentPage ? t('choosePaymentMethodSecurely') : t('checkoutSubtitle')}</p>
         </div>
 
         <div className="checkout-layout">
@@ -1277,7 +1286,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                   onClick={() => navigate('/checkout', { state: checkoutDiscount })}
                 >
                   <i className="fas fa-arrow-left"></i>
-                  Back to Checkout
+                  {t('backToCheckout')}
                 </button>
               )}
               {!isPaymentPage && (
@@ -1285,11 +1294,11 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                 <h3><i className="fas fa-shipping-fast"></i> {t('shippingInformation')}</h3>
                 <div className="checkout-warning-box">
                   <i className="fas fa-exclamation-circle"></i>
-                  <span>Ensure your shipping details are accurate for a smooth delivery experience.</span>
+                  <span>{t('shippingNotice')}</span>
                 </div>
                 {addressError && <span className="field-error">{addressError}</span>}
                 {addresses.length > 0 && (
-                  <div className="payment-options" aria-label="Saved addresses">
+                  <div className="payment-options" aria-label={t('selectAddress')}>
                     {addresses.map((address) => {
                       const addressId = getAddressId(address);
                       const isSelected = String(selectedAddressId) === String(addressId);
@@ -1314,7 +1323,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                           </div>
                           <div className="pay-text">
                             <strong>
-                              {address.addressType || 'Address'} {isSelected ? '• Selected' : ''}
+                              {localizedAddressType(address.addressType)} {isSelected ? `- ${t('selected')}` : ''}
                             </strong>
                             <span>
                               {[address.fullAddress, address.city, address.state, address.pincode]
@@ -1330,7 +1339,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                               }}
                               disabled={isSavingAddress || isPlacingOrder}
                             >
-                              Delete
+                              {t('delete')}
                             </button>
                           </div>
                         </div>
@@ -1347,7 +1356,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.firstName}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="Enter first name"
+                      placeholder={t('enterFirstName')}
                       className={getFieldClassName('firstName')}
                     />
                     {shouldShowError('firstName') && formErrors.firstName && (
@@ -1362,7 +1371,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.lastName}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="Enter last name"
+                      placeholder={t('enterLastName')}
                       className={getFieldClassName('lastName')}
                     />
                     {shouldShowError('lastName') && formErrors.lastName && (
@@ -1379,7 +1388,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.email}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="Enter email address"
+                      placeholder={t('enterEmailAddress')}
                       className={getFieldClassName('email')}
                     />
                     {shouldShowError('email') && formErrors.email && (
@@ -1394,7 +1403,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="Enter 10-digit mobile number"
+                      placeholder={t('enterMobileNumber')}
                       maxLength="10"
                       inputMode="numeric"
                       className={getFieldClassName('phone')}
@@ -1405,13 +1414,13 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                   </div>
                 </div>
                 <div className="input-group full-width">
-                  <label>Alternate Phone Number</label>
+                  <label>{t('alternatePhoneNumber')}</label>
                   <input
                     type="tel"
                     name="alternatePhone"
                     value={formData.alternatePhone}
                     onChange={handleInputChange}
-                    placeholder="Enter alternate mobile number"
+                    placeholder={t('enterAlternateMobileNumber')}
                     maxLength="10"
                     inputMode="numeric"
                   />
@@ -1424,7 +1433,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     rows="3"
-                    placeholder="Flat/House/Building name"
+                    placeholder={t('flatHouseBuildingName')}
                     className={getFieldClassName('address')}
                   ></textarea>
                   {shouldShowError('address') && formErrors.address && (
@@ -1440,7 +1449,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.city}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="City"
+                      placeholder={t('city')}
                       className={getFieldClassName('city')}
                     />
                     {shouldShowError('city') && formErrors.city && (
@@ -1455,7 +1464,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.state}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="State"
+                      placeholder={t('state')}
                       className={getFieldClassName('state')}
                     />
                     {shouldShowError('state') && formErrors.state && (
@@ -1470,7 +1479,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       value={formData.zip}
                       onChange={handleInputChange}
                       onBlur={handleInputBlur}
-                      placeholder="Pincode"
+                      placeholder={t('pincode')}
                       maxLength="6"
                       inputMode="numeric"
                       className={getFieldClassName('zip')}
@@ -1481,7 +1490,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                   </div>
                 </div>
                 <div className="address-actions">
-                  <div className="address-type-group" aria-label="Address type">
+                  <div className="address-type-group" aria-label={t('addressType')}>
                     {['Home', 'Work'].map((type) => (
                       <button
                         key={type}
@@ -1490,7 +1499,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                         onClick={() => handleAddressTypeChange(type)}
                       >
                         <i className={type === 'Home' ? 'fas fa-home' : 'fas fa-briefcase'}></i>
-                        {type}
+                        {localizedAddressType(type)}
                       </button>
                     ))}
                   </div>
@@ -1501,7 +1510,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                     disabled={isSavingAddress || isPlacingOrder}
                   >
                     <i className="fas fa-bookmark"></i>
-                    {isSavingAddress ? 'Saving...' : 'Save Address'}
+                    {isSavingAddress ? t('saving') : t('saveAddress')}
                   </button>
                 </div>
               </div>
@@ -1520,7 +1529,14 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       checked={formData.paymentMethod === 'cod'}
                       onChange={handleInputChange}
                     />
-                    <div className="pay-icon"><i className="fas fa-money-bill-wave"></i></div>
+                    <div className="pay-icon pay-icon-asset">
+                      <img
+                        key={`${language}-checkout-cod`}
+                        src={checkoutPaymentAsset('cod')}
+                        alt={t('cashOnDelivery')}
+                        loading="lazy"
+                      />
+                    </div>
                     <div className="pay-text">
                       <strong>{t('cashOnDelivery')}</strong>
                       <span>{t('payOnDelivery')}</span>
@@ -1534,7 +1550,14 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       checked={formData.paymentMethod === 'online'}
                       onChange={handleInputChange}
                     />
-                    <div className="pay-icon"><i className="fas fa-university"></i></div>
+                    <div className="pay-icon pay-icon-asset">
+                      <img
+                        key={`${language}-checkout-online`}
+                        src={checkoutPaymentAsset('upi')}
+                        alt={t('netBankingUpi')}
+                        loading="lazy"
+                      />
+                    </div>
                     <div className="pay-text">
                       <strong>{t('netBankingUpi')}</strong>
                       <span>{t('onlinePaymentDescription')}</span>
@@ -1548,11 +1571,11 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                       <h4>{t('paymentDetails')}</h4>
                       <div className="payment-type-grid">
                       {[
-                        { id: 'upi', label: t('upiId') },
-                        { id: 'debit-card', label: t('debitCard') },
-                        { id: 'credit-card', label: t('creditCard') },
-                        { id: 'net-banking', label: t('netBanking') },
-                        { id: 'qr-payment', label: 'QR Payment' },
+                        { id: 'upi', label: t('upiId'), asset: 'upi' },
+                        { id: 'debit-card', label: t('debitCard'), asset: 'card' },
+                        { id: 'credit-card', label: t('creditCard'), asset: 'card' },
+                        { id: 'net-banking', label: t('netBanking'), asset: 'bank' },
+                        { id: 'qr-payment', label: t('qrPayment'), asset: 'qr' },
                       ].map((option) => (
                         <button
                           key={option.id}
@@ -1573,6 +1596,13 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                           }}
                           className={`payment-type-btn ${onlinePaymentType === option.id ? 'active' : ''}`}
                         >
+                          <img
+                            key={`${language}-${option.id}`}
+                            className="checkout-payment-type-asset"
+                            src={checkoutPaymentAsset(option.asset)}
+                            alt={option.label}
+                            loading="lazy"
+                          />
                           {option.label}
                         </button>
                       ))}
@@ -1720,50 +1750,54 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                         <div className="payment-qr-heading">
                           <span className="payment-qr-lock"><i className="fas fa-lock"></i></span>
                           <div>
-                            <span>Secure UPI Payment</span>
-                            <h4>Scan &amp; Pay</h4>
+                            <span>{t('secureUpiPayment')}</span>
+                            <h4>{t('scanAndPay')}</h4>
                           </div>
                         </div>
 
                         {qrPayment.isLoading ? (
                           <div className="payment-qr-loading">
                             <span className="payment-qr-spinner" aria-hidden="true"></span>
-                            <strong>Generating Secure Payment QR...</strong>
+                            <strong>{t('generatingSecurePaymentQr')}</strong>
                           </div>
                         ) : qrPayment.qrSource ? (
                           <>
                             <div className="payment-qr-code-wrap">
-                              <img src={qrPayment.qrSource} alt={`Payment QR for order ${qrPayment.orderId}`} />
+                              <img
+                                key={`${language}-${qrPayment.qrSource}`}
+                                src={withLanguageAssetVersion(qrPayment.qrSource, language)}
+                                alt={`${t('qrPayment')} ${qrPayment.orderId}`}
+                              />
                             </div>
                             <div className="payment-qr-meta">
-                              <div><span>Amount</span><strong>{formatCurrency(grandTotal)}</strong></div>
-                              <div><span>Order ID</span><strong>{qrPayment.orderId}</strong></div>
+                              <div><span>{t('total')}</span><strong>{formatCurrency(grandTotal)}</strong></div>
+                              <div><span>{t('orderId')}</span><strong>{qrPayment.orderId}</strong></div>
                             </div>
                             <div className="payment-qr-apps">
-                              <span>Scan using</span>
-                              <p>Google Pay · PhonePe · Paytm · BHIM UPI · Any UPI App</p>
+                              <span>{t('scanUsing')}</span>
+                              <p>{t('phonePePaytmBhimUpi')}</p>
                             </div>
                           </>
                         ) : qrPayment.error ? (
                           <div className="payment-qr-error">
                             <i className="fas fa-exclamation-circle"></i>
-                            <strong>QR unavailable</strong>
+                            <strong>{t('qrUnavailable')}</strong>
                             <p>{qrPayment.error}</p>
                           </div>
                         ) : (
                           <>
                             {/* Replace this placeholder when the gateway returns a URL, Base64 image, or SVG. */}
-                            <div className="payment-qr-placeholder" aria-label="Payment QR placeholder">
+                            <div className="payment-qr-placeholder" aria-label={t('qrPayment')}>
                               <i className="fas fa-qrcode" aria-hidden="true"></i>
-                              <span>Secure QR will appear here</span>
+                              <span>{t('secureQrWillAppear')}</span>
                             </div>
                             <div className="payment-qr-meta">
-                              <div><span>Amount</span><strong>{formatCurrency(grandTotal)}</strong></div>
-                              <div><span>Order ID</span><strong>{qrPayment.orderId}</strong></div>
+                              <div><span>{t('total')}</span><strong>{formatCurrency(grandTotal)}</strong></div>
+                              <div><span>{t('orderId')}</span><strong>{qrPayment.orderId}</strong></div>
                             </div>
                             <div className="payment-qr-apps">
-                              <span>Supported Apps</span>
-                              <p>Google Pay · PhonePe · Paytm · BHIM UPI · Any UPI App</p>
+                              <span>{t('supportedApps')}</span>
+                              <p>{t('phonePePaytmBhimUpi')}</p>
                             </div>
                           </>
                         )}
@@ -1771,12 +1805,12 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                         <div className={`payment-qr-status ${qrPayment.status}`}>
                           <span aria-hidden="true"></span>
                           {qrPayment.status === 'processing'
-                            ? 'Payment Processing'
+                            ? t('paymentProcessing')
                             : qrPayment.status === 'failed'
-                              ? 'Payment Failed'
+                              ? t('paymentFailedStatus')
                               : qrPayment.status === 'generating'
-                                ? 'Connecting securely'
-                                : 'Waiting for Payment'}
+                                ? t('connectingSecurely')
+                                : t('waitingForPayment')}
                         </div>
                       </aside>
                     )}
@@ -1791,9 +1825,9 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                 disabled={!isCheckoutFormValid || isSavingAddress || isPlacingOrder}
               >
                 {!isPaymentPage
-                  ? `${isPlacingOrder || isSavingAddress ? 'Saving...' : 'Confirm & Pay'} ${formatCurrency(grandTotal)}`
+                  ? `${isPlacingOrder || isSavingAddress ? t('saving') : t('confirmAndPay')} ${formatCurrency(grandTotal)}`
                   : `${isPlacingOrder
-                    ? 'Processing Payment...'
+                    ? t('processingPayment')
                     : formData.paymentMethod === 'online' && onlinePaymentType === 'qr-payment'
                     ? t('payNow')
                     : t('payNow')} ${formatCurrency(grandTotal)}`}
@@ -1814,7 +1848,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                     <div className="s-item-info">
                       <h4>{productText(item, 'displayName')}</h4>
                       <span>{t('sku')}: {item.sku}</span>
-                      <span>Selling Price: {formatCurrency(item.price)}</span>
+                      <span>{t('sellingPrice')}: {formatCurrency(item.price)}</span>
                     </div>
                     <div className="s-item-price">
                       {formatCurrency(item.lineTotal)}
@@ -1831,17 +1865,17 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                     type="text"
                     value={couponCode}
                     onChange={(event) => setCouponCode(event.target.value)}
-                    placeholder="Coupon code"
-                    aria-label="Coupon code"
+                    placeholder={t('couponPlaceholder')}
+                    aria-label={t('couponCode')}
                   />
                   <button type="button" onClick={loadCheckoutSummary} disabled={loading}>
-                    Apply Coupon
+                    {t('applyCoupon')}
                   </button>
                 </div>
                 <div className="total-row flex-col items-start gap-1">
                   <div className="flex justify-between w-full">
-                    <label htmlFor="checkout-coins">Available Coins: {checkoutSummary?.availableCoins ?? 0}</label>
-                    <span className="text-[10px] text-gray-500 font-semibold">(Max 500 per order)</span>
+                    <label htmlFor="checkout-coins">{t('availableCoins')}: {checkoutSummary?.availableCoins ?? 0}</label>
+                    <span className="text-[10px] text-gray-500 font-semibold">({t('maxCoinsPerOrder')})</span>
                   </div>
                   <input
                     id="checkout-coins"
@@ -1850,14 +1884,14 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                     max={Math.min(checkoutSummary?.availableCoins ?? 0, 500)}
                     value={coinsRedeem}
                     onChange={(event) => setCoinsRedeem(Math.min(500, Math.max(0, Number(event.target.value) || 0)))}
-                    aria-label="Coins to redeem"
+                    aria-label={t('redeemCoins')}
                     className="w-full"
                   />
                 </div>
                 </>
                 )}
                 <div className="total-row">
-                  <span>Total Items</span>
+                  <span>{t('totalItems')}</span>
                   <span>{checkoutSummary?.totalItems ?? 0}</span>
                 </div>
                 <div className="total-row">
@@ -1872,11 +1906,11 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                   <span>{formatCurrency(totalGst)}</span>
                 </div>
                 <div className="total-row">
-                  <span>CGST</span>
+                  <span>{t('cgst')}</span>
                   <span>{formatCurrency(cgst)}</span>
                 </div>
                 <div className="total-row">
-                  <span>SGST</span>
+                  <span>{t('sgst')}</span>
                   <span>{formatCurrency(sgst)}</span>
                 </div>
                 <div className="total-row">
@@ -1993,7 +2027,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                   <div className="bank-payment-actions">
                     {netBankingFlow.errors.api && <span className="field-error">{netBankingFlow.errors.api}</span>}
                     <button type="button" className="bank-primary-btn" onClick={handleNetBankingLoginSubmit} disabled={netBankingFlow.isLoading}>
-                      {netBankingFlow.isLoading ? 'Please wait...' : t('proceedToOtp')}
+                      {netBankingFlow.isLoading ? t('pleaseWait') : t('proceedToOtp')}
                     </button>
                     <button type="button" className="bank-secondary-btn" onClick={closeNetBankingFlow}>
                       {t('cancel')}
@@ -2025,7 +2059,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                   <div className="bank-payment-actions">
                     {netBankingFlow.errors.api && <span className="field-error">{netBankingFlow.errors.api}</span>}
                     <button type="button" className="bank-primary-btn" onClick={handleNetBankingOtpSubmit} disabled={netBankingFlow.isLoading}>
-                      {netBankingFlow.isLoading ? 'Please wait...' : t('verifyOtp')}
+                      {netBankingFlow.isLoading ? t('pleaseWait') : t('verifyOtp')}
                     </button>
                     <button
                       type="button"

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -9,7 +9,14 @@ import { useCategories } from '../context/CategoryContext';
 import { getCategoryImage } from '../../services/categoryService';
 import { getSubcategoryImage } from '../../services/subcategoryService';
 import { getProducts, searchProducts } from '../../services/productService';
-import { getUserProfile, updateUserProfile, uploadUserProfileImage } from '../../services/userProfileService';
+import {
+  getProfileImageFromSource,
+  getUserProfile,
+  normalizeProfileImageUrl,
+  updateUserProfile,
+  uploadUserProfileImage,
+  withImageCacheBust,
+} from '../../services/userProfileService';
 import { getWallet } from '../../services/walletService';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
 import { getAuthSession, setAuthSession } from '../../utils/auth';
@@ -31,23 +38,80 @@ const topBarAnnouncements = [
   '🎁 Exciting Offers Available This Week',
 ].filter((announcement) => !announcement.toLowerCase().includes('offers'));
 
-const resolveAvatarUrl = (url) => {
-  if (!url || typeof url !== 'string') return '';
-  if (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  const baseUrl = (process.env.REACT_APP_AUTH_API_BASE_URL || 'https://shyamagrotools.com').replace(/\/$/, '');
-  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
-};
-
 const uniqueProducts = (products) =>
   Array.from(
     new Map(products.filter(Boolean).map((product, index) => [product.id || `product-${index}`, product])).values()
   );
 
+const MAX_PROFILE_IMAGE_SIZE = 2 * 1024 * 1024;
+const SUPPORTED_PROFILE_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const isLocalProfileImage = (url = '') => String(url).startsWith('blob:') || String(url).startsWith('data:');
+const PROFILE_IMAGE_STORAGE_PREFIX = 'Agro_profile_image_';
+
+const getProfileOwnerKey = (source = {}) => {
+  const account = source || {};
+  const phone = account.phone || account.mobileNumber || account.MobileNumber || account.Mobile || account.mobile || '';
+  const normalizedPhone = String(phone).replace(/\D/g, '').slice(-10);
+  return normalizedPhone || account.id || account.userId || account.customerId || '';
+};
+
+const getStoredProfileImage = (source = {}) => {
+  const ownerKey = getProfileOwnerKey(source || {});
+  if (!ownerKey) return '';
+  try {
+    return localStorage.getItem(`${PROFILE_IMAGE_STORAGE_PREFIX}${ownerKey}`) || '';
+  } catch {
+    return '';
+  }
+};
+
+const setStoredProfileImage = (source = {}, imageUrl = '') => {
+  const ownerKey = getProfileOwnerKey(source || {});
+  if (!ownerKey || !imageUrl) return;
+  try {
+    localStorage.setItem(`${PROFILE_IMAGE_STORAGE_PREFIX}${ownerKey}`, imageUrl);
+  } catch (error) {
+    console.warn('Unable to persist profile image preview:', error);
+  }
+};
+
+const getResolvedProfileImage = (source = {}, fallback = {}) => {
+  const primary = source || {};
+  const secondary = fallback || {};
+  return (
+    getStoredProfileImage(primary) ||
+    getStoredProfileImage(secondary) ||
+    getProfileImageFromSource(primary) ||
+    getProfileImageFromSource(secondary) ||
+    secondary.profileImage ||
+    secondary.profileImageUrl ||
+    ''
+  );
+};
+
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('Unable to read profile image.'));
+    reader.readAsDataURL(file);
+  });
+
+const getAccountFieldsFromUser = (source = {}, fallback = {}) => ({
+  name: source.name || source.fullName || source.FullName || fallback.name || '',
+  phone: source.phone || source.mobileNumber || source.MobileNumber || fallback.phone || '',
+  email: source.email || source.Email || fallback.email || '',
+  profileImage: getResolvedProfileImage(source, fallback) || '',
+  doorNo: source.doorNo || source.DoorNo || source.address?.doorNo || fallback.doorNo || '',
+  street: source.street || source.streetArea || source.StreetArea || source.address?.street || fallback.street || '',
+  city: source.city || source.City || source.address?.city || fallback.city || '',
+  state: source.state || source.State || source.address?.state || fallback.state || '',
+  pincode: source.pincode || source.Pincode || source.address?.pincode || fallback.pincode || '',
+});
+
 const UserAvatar = ({ user }) => {
   const [hasError, setHasError] = useState(false);
-  const imageUrl = user?.profileImage || user?.profileImageUrl;
+  const imageUrl = getResolvedProfileImage(user);
 
   useEffect(() => {
     setHasError(false);
@@ -56,7 +120,7 @@ const UserAvatar = ({ user }) => {
   if (imageUrl && !hasError) {
     return (
       <img
-        src={resolveAvatarUrl(imageUrl)}
+        src={normalizeProfileImageUrl(imageUrl)}
         alt={user?.name || 'User'}
         className="w-full h-full object-cover rounded-full"
         onError={() => setHasError(true)}
@@ -69,7 +133,7 @@ const UserAvatar = ({ user }) => {
 
 const ModalAvatar = ({ accountForm, user }) => {
   const [hasError, setHasError] = useState(false);
-  const imageUrl = accountForm?.profileImage;
+  const imageUrl = getResolvedProfileImage(accountForm, user);
 
   useEffect(() => {
     setHasError(false);
@@ -78,7 +142,7 @@ const ModalAvatar = ({ accountForm, user }) => {
   if (imageUrl && !hasError) {
     return (
       <img
-        src={resolveAvatarUrl(imageUrl)}
+        src={normalizeProfileImageUrl(imageUrl)}
         alt="Profile"
         className="w-full h-full object-cover rounded-full"
         onError={() => setHasError(true)}
@@ -163,6 +227,7 @@ const Header = ({ onLoginClick }) => {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const profileMenuRef = useRef(null);
   const profilePhotoInputRef = useRef(null);
+  const profileFetchIdRef = useRef(0);
 
   const headerWalletCoins = walletDetails ? walletDetails.balance : (user?.wallet || 0);
   const headerWalletRate = walletDetails?.raw?.conversionRate || 1;
@@ -203,7 +268,8 @@ const Header = ({ onLoginClick }) => {
   const pageSuggestions = searchResults.pages.map((page) => ({
     id: `page-${page.id}`,
     title: page.title,
-    type: page.type,
+    type: t('pages'),
+    resultKind: 'page',
     image: '',
     path: page.path,
   }));
@@ -264,19 +330,10 @@ const Header = ({ onLoginClick }) => {
 
   useEffect(() => {
     if (!user) return;
-    setAccountForm({
-      name: user.name || '',
-      phone: user.phone || user.mobileNumber || user.MobileNumber || '',
-      email: user.email || user.Email || '',
-      profileImage: user.profileImage || user.profileImageUrl || '',
-      doorNo: user.doorNo || user.address?.doorNo || '',
-      street: user.street || user.streetArea || user.address?.street || '',
-      city: user.city || user.address?.city || '',
-      state: user.state || user.address?.state || '',
-      pincode: user.pincode || user.address?.pincode || '',
-    });
+    if (accountInfoOpen) return;
+    setAccountForm(getAccountFieldsFromUser(user));
     setProfileImageFile(null);
-  }, [user]);
+  }, [accountInfoOpen, user]);
 
   const handleSignOut = () => {
     logout();
@@ -292,62 +349,28 @@ const Header = ({ onLoginClick }) => {
       onLoginClick?.();
       return;
     }
-    setAccountForm({
-      name: user.name || '',
-      phone: user.phone || user.mobileNumber || user.MobileNumber || '',
-      email: user.email || user.Email || '',
-      profileImage: user.profileImage || user.profileImageUrl || '',
-      doorNo: user.doorNo || user.address?.doorNo || '',
-      street: user.street || user.streetArea || user.address?.street || '',
-      city: user.city || user.address?.city || '',
-      state: user.state || user.address?.state || '',
-      pincode: user.pincode || user.address?.pincode || '',
-    });
+    setAccountForm(getAccountFieldsFromUser(user));
     setProfileImageFile(null);
     setProfileOpen(false);
     setIsMobileMenuOpen(false);
     setAccountInfoOpen(true);
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    const currentPhone = user?.phone || user?.mobileNumber || user?.MobileNumber || '';
-
-    if (!accountInfoOpen || !currentPhone) return undefined;
-
-    setLoadingAccountProfile(true);
-    getUserProfile(currentPhone)
-      .then((profile) => {
-        if (!isMounted || !profile) return;
-        const nextFields = {
-          name: profile.name || profile.fullName || profile.FullName || accountForm.name,
-          phone: currentPhone,
-          email: profile.email || profile.Email || accountForm.email,
-          profileImage: profile.profileImage || profile.profileImageUrl || profile.ProfileImageUrl || accountForm.profileImage,
-          doorNo: profile.doorNo || profile.DoorNo || accountForm.doorNo,
-          street: profile.street || profile.streetArea || profile.StreetArea || accountForm.street,
-          city: profile.city || profile.City || accountForm.city,
-          state: profile.state || profile.State || accountForm.state,
-          pincode: profile.pincode || profile.Pincode || accountForm.pincode,
-        };
-        setAccountForm(nextFields);
-        persistAccountUser(nextFields);
-      })
-      .catch(() => {
-        if (isMounted) showToast('Showing saved profile details.');
-      })
-      .finally(() => {
-        if (isMounted) setLoadingAccountProfile(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [accountInfoOpen, user?.phone, user?.mobileNumber, user?.MobileNumber]);
-
-  const persistAccountUser = (nextFields) => {
+  const persistAccountUser = useCallback((nextFields) => {
     if (!user) return;
     const session = getAuthSession() || { user, token: user.token || '', refreshToken: user.refreshToken || '' };
+    const owner = {
+      ...session.user,
+      ...user,
+      ...nextFields,
+    };
+    const resolvedProfileImage = getResolvedProfileImage(nextFields, owner);
+    const sessionProfileImage = isLocalProfileImage(resolvedProfileImage)
+      ? getProfileImageFromSource(session.user) || getProfileImageFromSource(user) || ''
+      : normalizeProfileImageUrl(resolvedProfileImage);
+    if (resolvedProfileImage) {
+      setStoredProfileImage(owner, resolvedProfileImage);
+    }
     const nextUser = {
       ...session.user,
       ...user,
@@ -357,8 +380,13 @@ const Header = ({ onLoginClick }) => {
       fullName: nextFields.name,
       FullName: nextFields.name,
       Email: nextFields.email,
-      profileImage: nextFields.profileImage,
-      profileImageUrl: nextFields.profileImage,
+      profileImage: sessionProfileImage,
+      ProfileImage: sessionProfileImage,
+      profileImageUrl: sessionProfileImage,
+      ProfileImageUrl: sessionProfileImage,
+      profilePicture: sessionProfileImage,
+      profilePhoto: sessionProfileImage,
+      avatar: sessionProfileImage,
       doorNo: nextFields.doorNo,
       street: nextFields.street,
       streetArea: nextFields.street,
@@ -376,7 +404,37 @@ const Header = ({ onLoginClick }) => {
     };
     const saved = setAuthSession({ ...session, user: nextUser });
     window.dispatchEvent(new CustomEvent('auth:user-updated', { detail: saved.user }));
-  };
+  }, [user]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const currentPhone = user?.phone || user?.mobileNumber || user?.MobileNumber || '';
+
+    if (!accountInfoOpen || !currentPhone) return undefined;
+    if (savingAccountField) return undefined;
+    if (profileImageFile) return undefined;
+
+    const fetchId = profileFetchIdRef.current + 1;
+    profileFetchIdRef.current = fetchId;
+    setLoadingAccountProfile(true);
+    getUserProfile(currentPhone)
+      .then((profile) => {
+        if (!isMounted || profileFetchIdRef.current !== fetchId || !profile) return;
+        setAccountForm((current) => {
+          return getAccountFieldsFromUser(profile, { ...current, phone: currentPhone });
+        });
+      })
+      .catch(() => {
+        if (isMounted && profileFetchIdRef.current === fetchId) showToast(t('showingSavedProfileDetails'));
+      })
+      .finally(() => {
+        if (isMounted && profileFetchIdRef.current === fetchId) setLoadingAccountProfile(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accountInfoOpen, profileImageFile, savingAccountField, showToast, t, user?.phone, user?.mobileNumber, user?.MobileNumber]);
 
   const handleAccountInputChange = (field, value) => {
     if (field === 'phone') return;
@@ -386,15 +444,41 @@ const Header = ({ onLoginClick }) => {
     setAccountForm((current) => ({ ...current, [field]: nextValue }));
   };
 
-  const handleProfilePhotoChange = (event) => {
+  const handleProfilePhotoChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setAccountForm((current) => {
-      if (current.profileImage?.startsWith('blob:')) URL.revokeObjectURL(current.profileImage);
-      return { ...current, profileImage: URL.createObjectURL(file) };
-    });
+    if (!SUPPORTED_PROFILE_IMAGE_TYPES.has(file.type)) {
+      showToast(t('unsupportedProfileImageType') || 'Please select a JPG, PNG, WEBP, or GIF image.', 'error');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      showToast(t('profileImageTooLarge') || 'Profile image must be smaller than 2MB.', 'error');
+      event.target.value = '';
+      return;
+    }
+
     setProfileImageFile(file);
+
+    try {
+      const previewUrl = await readFileAsDataUrl(file);
+      setAccountForm((current) => {
+        if (current.profileImage?.startsWith('blob:')) URL.revokeObjectURL(current.profileImage);
+        const next = { ...current, profileImage: previewUrl, profileImageUrl: previewUrl };
+        setStoredProfileImage(next, previewUrl);
+        return next;
+      });
+    } catch {
+      setAccountForm((current) => {
+        if (current.profileImage?.startsWith('blob:')) URL.revokeObjectURL(current.profileImage);
+        const previewUrl = URL.createObjectURL(file);
+        const next = { ...current, profileImage: previewUrl, profileImageUrl: previewUrl };
+        setStoredProfileImage(next, previewUrl);
+        return next;
+      });
+    }
   };
 
   const saveProfileForm = async () => {
@@ -416,57 +500,76 @@ const Header = ({ onLoginClick }) => {
     nextForm.phone = currentPhone;
 
     if (!nextForm.name) {
-      showToast('Name is required.', 'error');
+      showToast(t('nameRequired'), 'error');
       return;
     }
     if (nextForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextForm.email)) {
-      showToast('Enter a valid email address.', 'error');
+      showToast(t('validEmailAddress'), 'error');
       return;
     }
     if (!/^\d{10}$/.test(nextForm.phone)) {
-      showToast('Mobile number must be 10 digits.', 'error');
+      showToast(t('mobileNumberTenDigits'), 'error');
       return;
     }
 
     setSavingAccountField('profile');
+    setLoadingAccountProfile(false);
+    profileFetchIdRef.current += 1;
 
     try {
       let profileImageUrl = nextForm.profileImage;
-      if (profileImageFile) {
-        const uploadedImageUrl = await uploadUserProfileImage(currentPhone, profileImageFile);
-        if (uploadedImageUrl) profileImageUrl = uploadedImageUrl;
+      let uploadedImageUrl = '';
+      const localPreviewImage = isLocalProfileImage(nextForm.profileImage) ? nextForm.profileImage : '';
+      if (localPreviewImage) {
+        setStoredProfileImage(nextForm, localPreviewImage);
       }
-      const timestamp = Date.now();
-      const finalImageUrl = profileImageUrl
-        ? (profileImageUrl.includes('?') ? `${profileImageUrl}&t=${timestamp}` : `${profileImageUrl}?t=${timestamp}`)
-        : '';
+      if (profileImageFile) {
+        try {
+          uploadedImageUrl = await uploadUserProfileImage(currentPhone, profileImageFile);
+          if (uploadedImageUrl) profileImageUrl = uploadedImageUrl;
+        } catch (uploadError) {
+          console.warn('Profile image upload did not return a usable URL. Keeping local preview.', uploadError);
+          profileImageUrl = localPreviewImage || profileImageUrl;
+        }
+      }
+      if (uploadedImageUrl) {
+        setStoredProfileImage(nextForm, withImageCacheBust(uploadedImageUrl));
+      }
+      const finalImageUrl = withImageCacheBust(profileImageUrl);
 
       nextForm.profileImage = finalImageUrl;
       nextForm.profileImageUrl = finalImageUrl;
 
-      const updatedUser = await updateUserProfile(currentPhone, nextForm);
+      const serverProfileImage = uploadedImageUrl || (isLocalProfileImage(profileImageUrl) ? '' : profileImageUrl);
+      const updatedUser = await updateUserProfile(currentPhone, {
+        ...nextForm,
+        profileImage: serverProfileImage,
+        profileImageUrl: serverProfileImage,
+      });
+      const latestProfile = await getUserProfile(currentPhone).catch(() => updatedUser);
+      const persistedImage =
+        uploadedImageUrl ||
+        getProfileImageFromSource(updatedUser) ||
+        getProfileImageFromSource(latestProfile) ||
+        localPreviewImage ||
+        finalImageUrl;
       const savedFields = {
         ...nextForm,
-        name: updatedUser.name || updatedUser.fullName || updatedUser.FullName || nextForm.name,
-        phone: updatedUser.phone || updatedUser.mobileNumber || updatedUser.MobileNumber || nextForm.phone,
-        email: updatedUser.email || updatedUser.Email || nextForm.email,
-        profileImage: finalImageUrl || updatedUser.profileImage || updatedUser.profileImageUrl || nextForm.profileImage,
-        profileImageUrl: finalImageUrl || updatedUser.profileImage || updatedUser.profileImageUrl || nextForm.profileImage,
-        doorNo: updatedUser.doorNo || updatedUser.DoorNo || nextForm.doorNo,
-        street: updatedUser.street || updatedUser.streetArea || updatedUser.StreetArea || nextForm.street,
-        city: updatedUser.city || updatedUser.City || nextForm.city,
-        state: updatedUser.state || updatedUser.State || nextForm.state,
-        pincode: updatedUser.pincode || updatedUser.Pincode || nextForm.pincode,
+        ...getAccountFieldsFromUser(latestProfile, getAccountFieldsFromUser(updatedUser, nextForm)),
+        profileImage: isLocalProfileImage(persistedImage) ? persistedImage : withImageCacheBust(persistedImage || nextForm.profileImage),
+        profileImageUrl: isLocalProfileImage(persistedImage) ? persistedImage : withImageCacheBust(persistedImage || nextForm.profileImage),
       };
 
       setAccountForm(savedFields);
       setProfileImageFile(null);
+      if (profilePhotoInputRef.current) profilePhotoInputRef.current.value = '';
       persistAccountUser(savedFields);
-      showToast('Profile updated.');
+      showToast(t('profileUpdated'));
     } catch (error) {
-      showToast(error.message || 'Unable to update profile.', 'error');
+      showToast(error.message || t('unableUpdateProfile'), 'error');
     } finally {
       setSavingAccountField('');
+      setLoadingAccountProfile(false);
     }
   };
 
@@ -523,8 +626,8 @@ const Header = ({ onLoginClick }) => {
             setIsSearchOpen(true);
           }}
           onFocus={() => setIsSearchOpen(true)}
-          placeholder="Search categories, products..."
-          aria-label="Search categories, products and pages"
+          placeholder={t('searchCategoriesProducts')}
+          aria-label={t('searchCategoriesProductsPages')}
           className={`header-search-input ${
             isDesktop ? 'header-search-input-desktop' : 'header-search-input-mobile'
           }`}
@@ -568,7 +671,7 @@ const Header = ({ onLoginClick }) => {
                           />
                         ) : (
                           <span className="icon-shade icon-teal h-10 w-10 shrink-0">
-                            {item.type === 'Page' ? <FileText size={15} /> : <Search size={15} />}
+                            {item.resultKind === 'page' ? <FileText size={15} /> : <Search size={15} />}
                           </span>
                         )}
                         <span className="min-w-0 flex-1">
@@ -591,7 +694,7 @@ const Header = ({ onLoginClick }) => {
                 </>
               ) : isSearchingProducts ? (
                 <div className="p-6 text-center">
-                  <p className="text-xs font-black uppercase tracking-widest text-gray-400">Loading...</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-gray-400">{t('loading')}</p>
                 </div>
               ) : (
                 <div className="p-6 text-center">
@@ -708,12 +811,12 @@ const Header = ({ onLoginClick }) => {
               {user && profileOpen && (
                 <div className="account-dropdown absolute right-0 top-full mt-4 w-52 shadow-2xl z-[9999]">
                   <div className="account-dropdown-header">
-                    <p className="account-dropdown-kicker">Profile</p>
+                    <p className="account-dropdown-kicker">{t('profile')}</p>
                     <p className="account-dropdown-name">{user.name || 'User'}</p>
                   </div>
                   <div className="account-dropdown-menu">
                     <button type="button" className="account-dropdown-item" onClick={openAccountInfo}>
-                      <User size={16} /> Profile
+                      <User size={16} /> {t('profile')}
                     </button>
                     <Link to="/my-orders" onClick={() => setProfileOpen(false)} className="account-dropdown-item">
                       <Package size={16} /> {t('myOrders')}
@@ -854,7 +957,7 @@ const Header = ({ onLoginClick }) => {
                 {user ? (
                   <>
                     <button type="button" onClick={openAccountInfo} className="btn-outline w-full py-4">
-                      Profile
+                      {t('profile')}
                     </button>
                     <button type="button" onClick={() => navigateFromMobileMenu('/wallet')} className="btn-outline w-full py-4">
                       {t('wallet')}
@@ -898,11 +1001,11 @@ const Header = ({ onLoginClick }) => {
             >
               <div className="account-info-modal-header">
                 <div>
-                  <span>Profile</span>
-                  <h2 id="account-info-title">Edit Profile</h2>
-                  {loadingAccountProfile && <small>Loading latest profile...</small>}
+                  <span>{t('profile')}</span>
+                  <h2 id="account-info-title">{t('editProfile')}</h2>
+                  {loadingAccountProfile && <small>{t('loadingLatestProfile')}</small>}
                 </div>
-                <button type="button" onClick={() => setAccountInfoOpen(false)} aria-label="Close profile">
+                <button type="button" onClick={() => setAccountInfoOpen(false)} aria-label={t('closeProfile')}>
                   <X size={18} />
                 </button>
               </div>
@@ -917,7 +1020,7 @@ const Header = ({ onLoginClick }) => {
                     className="account-change-photo"
                     onClick={() => profilePhotoInputRef.current?.click()}
                   >
-                    <Camera size={16} /> Change Photo
+                    <Camera size={16} /> {t('changePhoto')}
                   </button>
                   <input
                     ref={profilePhotoInputRef}
@@ -929,11 +1032,11 @@ const Header = ({ onLoginClick }) => {
                 </div>
 
                 <section className="account-form-section">
-                  <h3>Personal Details</h3>
+                  <h3>{t('personalDetails')}</h3>
                   {[
-                    { key: 'name', label: 'Full Name', icon: User, type: 'text', placeholder: 'Enter your full name', required: true },
-                    { key: 'email', label: 'Email Address', icon: Mail, type: 'email', placeholder: 'Enter your email address' },
-                    { key: 'phone', label: 'Mobile Number', icon: Phone, type: 'tel', placeholder: 'Mobile number', required: true, readOnly: true },
+                    { key: 'name', label: t('fullName'), icon: User, type: 'text', placeholder: t('enterFullName'), required: true },
+                    { key: 'email', label: t('emailAddress'), icon: Mail, type: 'email', placeholder: t('enterEmailAddress') },
+                    { key: 'phone', label: t('mobileNumber'), icon: Phone, type: 'tel', placeholder: t('mobileNumber'), required: true, readOnly: true },
                   ].map((field) => {
                     const Icon = field.icon;
                     return (
@@ -947,20 +1050,20 @@ const Header = ({ onLoginClick }) => {
                           aria-readonly={field.readOnly || undefined}
                           onChange={(event) => handleAccountInputChange(field.key, event.target.value)}
                         />
-                        {field.readOnly && <small>Mobile number cannot be edited.</small>}
+                        {field.readOnly && <small>{t('mobileNumberCannotBeEdited')}</small>}
                       </label>
                     );
                   })}
                 </section>
 
                 <section className="account-form-section">
-                  <h3>Address Information</h3>
+                  <h3>{t('addressInformation')}</h3>
                   {[
-                    { key: 'doorNo', label: 'Door No / House No', placeholder: 'Enter door or house number' },
-                    { key: 'street', label: 'Street / Area', placeholder: 'Enter street or area' },
-                    { key: 'city', label: 'City', placeholder: 'Enter city' },
-                    { key: 'state', label: 'State', placeholder: 'Enter state' },
-                    { key: 'pincode', label: 'Pincode', placeholder: 'Enter pincode' },
+                    { key: 'doorNo', label: t('doorNoHouseNo'), placeholder: t('enterDoorHouseNumber') },
+                    { key: 'street', label: t('streetArea'), placeholder: t('enterStreetArea') },
+                    { key: 'city', label: t('city'), placeholder: t('enterCity') },
+                    { key: 'state', label: t('state'), placeholder: t('enterState') },
+                    { key: 'pincode', label: t('pincode'), placeholder: t('enterPincode') },
                   ].map((field) => (
                     <label className="account-form-field" key={field.key}>
                       <span><MapPin size={16} /> {field.label}</span>
@@ -983,7 +1086,7 @@ const Header = ({ onLoginClick }) => {
                   disabled={Boolean(savingAccountField)}
                 >
                   {savingAccountField ? <span className="account-info-saving-dot" /> : <Check size={17} />}
-                  {savingAccountField ? 'Saving...' : 'Save Profile'}
+                  {savingAccountField ? t('saving') : t('saveProfile')}
                 </button>
               </div>
             </motion.div>

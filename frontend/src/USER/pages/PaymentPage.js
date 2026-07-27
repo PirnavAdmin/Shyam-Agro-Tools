@@ -24,6 +24,7 @@ import {
 } from '../../services/paymentService';
 import { updateLocalWalletAfterOrder } from '../../services/walletService';
 import { loadCoins, calculateEarnedCoins } from '../../services/CoinsService';
+import { getPaymentAsset, withLanguageAssetVersion } from '../utils/paymentAssets';
 import './PaymentPage.css';
 
 const upiRegex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
@@ -42,14 +43,6 @@ const formatExpiryDate = (value) => {
   if (digits.length <= 2) return digits;
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 };
-
-const paymentMethodOptions = [
-  { id: 'qr', label: 'QR Payment' },
-  { id: 'upi', label: 'UPI' },
-  { id: 'bankTransfer', label: 'Bank Transfer' },
-  { id: 'debitCard', label: 'Debit Card' },
-  { id: 'creditCard', label: 'Credit Card' },
-];
 
 const manualPaymentMethods = ['qr', 'upi', 'bankTransfer'];
 
@@ -96,7 +89,7 @@ const getManualStatusClass = (status = '') => {
   return 'pending';
 };
 
-const validateManualVerification = ({ values, orderAmount }) => {
+const validateManualVerification = ({ values, orderAmount, t }) => {
   const errors = {};
   const orderId = values.orderId.trim();
   const transactionId = values.transactionId.trim();
@@ -108,47 +101,47 @@ const validateManualVerification = ({ values, orderAmount }) => {
   const attachment = values.attachment;
 
   if (!orderId) {
-    errors.orderId = 'Order ID is required.';
+    errors.orderId = t('orderIdRequired');
   } else if (!/^[A-Za-z0-9/_-]{3,50}$/.test(orderId)) {
-    errors.orderId = 'Use 3 to 50 letters or numbers. Hyphen, underscore, and slash are allowed.';
+    errors.orderId = t('orderIdFormat');
   }
 
   if (!transactionId) {
-    errors.transactionId = 'Transaction / UTR Number is required.';
+    errors.transactionId = t('transactionUtrRequired');
   } else if (!/^[A-Za-z0-9-]{8,30}$/.test(transactionId)) {
-    errors.transactionId = 'Use 8 to 30 letters or numbers. Only hyphen is allowed.';
+    errors.transactionId = t('transactionUtrFormat');
   }
 
   if (!values.amount) {
-    errors.amount = 'Amount Paid is required.';
+    errors.amount = t('amountPaidRequired');
   } else if (!Number.isFinite(amount) || Math.abs(amount - orderTotal) > 0.01) {
-    errors.amount = `Amount Paid must equal ${formatCurrency(orderTotal)}.`;
+    errors.amount = `${t('amountPaidMustEqual')} ${formatCurrency(orderTotal)}.`;
   }
 
   if (!values.paymentDate) {
-    errors.paymentDate = 'Payment Date is required.';
+    errors.paymentDate = t('paymentDateRequired');
   } else if (paymentDate > today) {
-    errors.paymentDate = 'Payment Date cannot be in the future.';
+    errors.paymentDate = t('paymentDateFuture');
   }
 
-  if (!values.paymentTime) errors.paymentTime = 'Payment Time is required.';
-  if (!values.customerName.trim()) errors.customerName = 'Customer Name is required.';
+  if (!values.paymentTime) errors.paymentTime = t('paymentTimeRequired');
+  if (!values.customerName.trim()) errors.customerName = t('customerNameRequired');
 
   if (!mobileNumber) {
-    errors.mobileNumber = 'Mobile Number is required.';
+    errors.mobileNumber = t('mobileNumberRequired');
   } else if (!/^\d{10}$/.test(mobileNumber)) {
-    errors.mobileNumber = 'Mobile Number must be exactly 10 digits.';
+    errors.mobileNumber = t('mobileNumberTenDigits');
   }
 
   if (!attachment) {
-    errors.attachment = 'Payment screenshot is required.';
+    errors.attachment = t('paymentScreenshotRequired');
   } else {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
     const allowedExtensions = /\.(jpe?g|png|pdf)$/i;
     if (!allowedTypes.includes(attachment.type) && !allowedExtensions.test(attachment.name)) {
-      errors.attachment = 'Upload a JPG, JPEG, PNG, or PDF file.';
+      errors.attachment = t('paymentScreenshotFileType');
     } else if (attachment.size > 5 * 1024 * 1024) {
-      errors.attachment = 'Attachment must be 5 MB or smaller.';
+      errors.attachment = t('paymentScreenshotFileSize');
     }
   }
 
@@ -156,6 +149,8 @@ const validateManualVerification = ({ values, orderAmount }) => {
 };
 
 const ManualPaymentStatusCard = ({ submission }) => {
+  const { t } = useLanguage();
+
   if (!submission) return null;
 
   const status = submission.status || 'Pending Verification';
@@ -164,27 +159,27 @@ const ManualPaymentStatusCard = ({ submission }) => {
     <div className="manual-status-card">
       <div className="manual-status-header">
         <div>
-          <h4>{submission.message || 'Payment Verification Submitted Successfully'}</h4>
-          <p>Verification is currently pending. Once verified, your order status will be updated.</p>
+          <h4>{submission.message || t('paymentVerificationSubmitted')}</h4>
+          <p>{t('paymentVerificationPendingMessage')}</p>
         </div>
         <span className={`manual-status-badge ${getManualStatusClass(status)}`}>{status}</span>
       </div>
 
       <div className="manual-status-grid">
         <div>
-          <span>Order ID</span>
+          <span>{t('orderId')}</span>
           <strong>{submission.orderId}</strong>
         </div>
         <div>
-          <span>Reference Number</span>
+          <span>{t('referenceNumber')}</span>
           <strong>{submission.referenceNumber}</strong>
         </div>
         <div>
-          <span>Submission Date</span>
+          <span>{t('submissionDate')}</span>
           <strong>{submission.submissionDate}</strong>
         </div>
         <div>
-          <span>Payment Status</span>
+          <span>{t('paymentStatus')}</span>
           <strong>{status}</strong>
         </div>
       </div>
@@ -210,30 +205,33 @@ const ManualVerificationForm = ({
   onConfirmCapture,
   onSubmit,
   onReset,
-}) => (
+}) => {
+  const { t } = useLanguage();
+
+  return (
   <div className="manual-verification-section">
     <ManualPaymentStatusCard submission={submission} />
 
     <div className="manual-verification-card">
       <div className="manual-verification-heading">
-        <h4>Manual Payment Verification</h4>
-        <p>Enter the payment details after completing the transfer externally.</p>
+        <h4>{t('manualPaymentVerification')}</h4>
+        <p>{t('manualPaymentVerificationDescription')}</p>
       </div>
 
       <div className="payment-form-group remarks-field">
-        <label>Remarks (Optional)</label>
+        <label>{t('remarksOptional')}</label>
         <textarea
           name="remarks"
           className="payment-input"
           value={values.remarks}
           onChange={onChange}
-          placeholder="Add any additional payment notes"
+          placeholder={t('additionalPaymentNotes')}
         />
       </div>
 
       <div className="payment-form-row">
         <div className="payment-form-group">
-          <label>Order ID *</label>
+          <label>{t('orderId')} *</label>
           <input
             type="text"
             name="orderId"
@@ -241,21 +239,21 @@ const ManualVerificationForm = ({
             value={values.orderId}
             readOnly
             aria-readonly="true"
-            placeholder="Order ID will be generated automatically"
+            placeholder={t('orderIdAutoGenerated')}
             maxLength="50"
           />
           {errors.orderId && <span className="field-error-msg">{errors.orderId}</span>}
         </div>
 
         <div className="payment-form-group">
-          <label>Transaction / UTR Number *</label>
+          <label>{t('transactionUtrNumber')} *</label>
           <input
             type="text"
             name="transactionId"
             className="payment-input"
             value={values.transactionId}
             onChange={onChange}
-            placeholder="Enter UTR or reference ID"
+            placeholder={t('enterUtrReferenceId')}
             maxLength="30"
           />
           {errors.transactionId && <span className="field-error-msg">{errors.transactionId}</span>}
@@ -264,7 +262,7 @@ const ManualVerificationForm = ({
 
       <div className="payment-form-row">
         <div className="payment-form-group">
-          <label>Amount Paid *</label>
+          <label>{t('amountPaid')} *</label>
           <input
             type="number"
             name="amount"
@@ -281,7 +279,7 @@ const ManualVerificationForm = ({
 
       <div className="payment-form-row">
         <div className="payment-form-group">
-          <label>Payment Date *</label>
+          <label>{t('paymentDate')} *</label>
           <input
             type="date"
             name="paymentDate"
@@ -294,7 +292,7 @@ const ManualVerificationForm = ({
         </div>
 
         <div className="payment-form-group">
-          <label>Payment Time *</label>
+          <label>{t('paymentTime')} *</label>
           <input
             type="time"
             name="paymentTime"
@@ -308,27 +306,27 @@ const ManualVerificationForm = ({
 
       <div className="payment-form-row">
         <div className="payment-form-group">
-          <label>Customer Name *</label>
+          <label>{t('customerName')} *</label>
           <input
             type="text"
             name="customerName"
             className="payment-input"
             value={values.customerName}
             onChange={onChange}
-            placeholder="Enter customer name"
+            placeholder={t('enterCustomerName')}
           />
           {errors.customerName && <span className="field-error-msg">{errors.customerName}</span>}
         </div>
 
         <div className="payment-form-group">
-          <label>Mobile Number *</label>
+          <label>{t('mobileNumber')} *</label>
           <input
             type="tel"
             name="mobileNumber"
             className="payment-input"
             value={values.mobileNumber}
             onChange={onChange}
-            placeholder="10 digit mobile number"
+            placeholder={t('tenDigitMobileNumber')}
             maxLength="10"
             inputMode="numeric"
           />
@@ -337,12 +335,12 @@ const ManualVerificationForm = ({
       </div>
 
       <div className="payment-form-group">
-        <label>Upload Payment Screenshot *</label>
+        <label>{t('uploadPaymentScreenshot')} *</label>
         <div className="file-input-wrapper">
           <label className="file-input-action">
             <span className="file-input-custom-btn">
               <i className="fas fa-paperclip" aria-hidden="true"></i>
-              Choose File
+              {t('chooseFile')}
             </span>
             <input
               type="file"
@@ -356,11 +354,11 @@ const ManualVerificationForm = ({
           </label>
           <button type="button" className="file-input-custom-btn capture-file-btn" onClick={onOpenCamera}>
               <i className="fas fa-camera" aria-hidden="true"></i>
-              Capture Photo
+              {t('capturePhoto')}
           </button>
         </div>
         {cameraOpen && (
-          <div className="camera-capture-modal" role="dialog" aria-modal="true" aria-label="Capture payment screenshot">
+          <div className="camera-capture-modal" role="dialog" aria-modal="true" aria-label={t('capturePaymentScreenshot')}>
             <div className="camera-capture-panel">
               <div className="camera-capture-preview">
                 <video ref={cameraVideoRef} autoPlay playsInline muted />
@@ -372,7 +370,7 @@ const ManualVerificationForm = ({
                   OK
                 </button>
                 <button type="button" className="payment-secondary-btn" onClick={onCloseCamera}>
-                  Cancel
+                  {t('cancel')}
                 </button>
               </div>
             </div>
@@ -380,12 +378,12 @@ const ManualVerificationForm = ({
         )}
         {attachmentPreview && (
           <div className="uploaded-file-preview">
-            <img src={attachmentPreview} alt="Selected payment screenshot preview" />
+            <img src={attachmentPreview} alt={t('selectedPaymentScreenshotPreview')} />
           </div>
         )}
         {values.attachment && (
           <span className="uploaded-file-name">
-            Selected: {values.attachment.name}
+            {t('selectedFile')}: {values.attachment.name}
           </span>
         )}
         {errors.attachment && <span className="field-error-msg">{errors.attachment}</span>}
@@ -395,15 +393,16 @@ const ManualVerificationForm = ({
 
       <div className="manual-verification-actions">
         <button type="button" className="payment-primary-btn" onClick={onSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Submit Verification'}
+          {isSubmitting ? t('submitting') : t('submitVerification')}
         </button>
         <button type="button" className="payment-secondary-btn" onClick={onReset} disabled={isSubmitting}>
-          Reset
+          {t('reset')}
         </button>
       </div>
     </div>
   </div>
-);
+  );
+};
 
 const qrPaymentInitialState = {
   isVisible: false,
@@ -531,7 +530,7 @@ const getApiErrorMessage = (error, fallbackMessage) => {
 const PaymentPage = () => {
   const { user } = useAuth();
   const { clearCart, waitForCartSync } = useCart();
-  const { t, productText } = useLanguage();
+  const { t, productText, language } = useLanguage();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [coinsConfig, setCoinsConfig] = useState(null);
 
@@ -648,8 +647,8 @@ const PaymentPage = () => {
     upi: t('upi') || 'UPI',
     'debit-card': t('debitCard') || 'Debit Card',
     'credit-card': t('creditCard') || 'Credit Card',
-    'net-banking': t('netBanking') || 'Bank Transfer',
-    'qr-payment': 'QR Payment',
+    'net-banking': t('netBanking') || t('bankTransfer'),
+    'qr-payment': t('qrPayment'),
   };
 
   const cartItems = useMemo(
@@ -787,7 +786,7 @@ const PaymentPage = () => {
 
     if (method === 'qr') {
       // Auto-initiate QR payment generation
-      openQrPayment('QR Payment');
+      openQrPayment(t('qrPayment'));
     } else {
       setQrPayment(qrPaymentInitialState);
     }
@@ -933,8 +932,8 @@ const PaymentPage = () => {
       if (!cardNumber) errors.cardNumber = t('cardNumberRequired') || 'Card Number is required.';
       else if (!/^\d{16}$/.test(cardNumber)) errors.cardNumber = t('cardNumberInvalid') || 'Card Number must be 16 digits.';
       
-      if (!paymentDetails.cardName.trim()) errors.cardName = t('cardNameRequired') || 'Card Holder Name is required.';
-      else if (!nameRegex.test(paymentDetails.cardName.trim())) errors.cardName = 'Name on card should contain only letters and spaces.';
+      if (!paymentDetails.cardName.trim()) errors.cardName = t('cardNameRequired');
+      else if (!nameRegex.test(paymentDetails.cardName.trim())) errors.cardName = t('nameOnCardLettersOnly');
       
       if (!debitCardDetails.expiryMonth || !debitCardDetails.expiryYear) {
         errors.expiryDate = 'Expiry month and year are required.';
@@ -956,8 +955,8 @@ const PaymentPage = () => {
       if (!cardNumber) errors.cardNumber = t('cardNumberRequired') || 'Card Number is required.';
       else if (!/^\d{16}$/.test(cardNumber)) errors.cardNumber = t('cardNumberInvalid') || 'Card Number must be 16 digits.';
       
-      if (!paymentDetails.cardName.trim()) errors.cardName = t('cardNameRequired') || 'Card Holder Name is required.';
-      else if (!nameRegex.test(paymentDetails.cardName.trim())) errors.cardName = 'Name on card should contain only letters and spaces.';
+      if (!paymentDetails.cardName.trim()) errors.cardName = t('cardNameRequired');
+      else if (!nameRegex.test(paymentDetails.cardName.trim())) errors.cardName = t('nameOnCardLettersOnly');
       
       if (!paymentDetails.expiryDate.trim()) errors.expiryDate = t('expiryDateRequired') || 'Expiry Date is required.';
       else if (!expiryRegex.test(paymentDetails.expiryDate.trim())) errors.expiryDate = t('expiryDateFormat') || 'Expiry must be MM/YY.';
@@ -966,7 +965,7 @@ const PaymentPage = () => {
       if (!paymentDetails.cvv.trim()) errors.cvv = t('cvvRequired') || 'CVV is required.';
       else if (!/^\d{3}$/.test(paymentDetails.cvv.trim())) errors.cvv = t('cvvInvalid') || 'CVV must be 3 digits.';
       
-      if (!creditCardDetails.billingAddress.trim()) errors.billingAddress = 'Billing Address is required.';
+      if (!creditCardDetails.billingAddress.trim()) errors.billingAddress = t('billingAddressRequired');
     }
 
     setPaymentErrors(errors);
@@ -1168,7 +1167,7 @@ const PaymentPage = () => {
   useEffect(() => {
     if (loading || defaultQrInitializedRef.current || selectedPaymentMethod !== 'qr') return;
     defaultQrInitializedRef.current = true;
-    openQrPayment('QR Payment');
+    openQrPayment(t('qrPayment'));
     // The QR initializer should run once after checkout data loads; openQrPayment reads the current page state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, selectedPaymentMethod]);
@@ -1321,7 +1320,7 @@ const PaymentPage = () => {
     const canvas = cameraCanvasRef.current;
 
     if (!video || !canvas || !video.videoWidth || !video.videoHeight) {
-      setCameraCaptureError('Camera is still loading. Please try again.');
+      setCameraCaptureError(t('cameraStillLoading'));
       return;
     }
 
@@ -1332,7 +1331,7 @@ const PaymentPage = () => {
 
     canvas.toBlob((blob) => {
       if (!blob) {
-        setCameraCaptureError('Unable to capture photo. Please try again.');
+        setCameraCaptureError(t('unableCapturePhoto'));
         return;
       }
 
@@ -1385,6 +1384,7 @@ const PaymentPage = () => {
     const validationErrors = validateManualVerification({
       values: manualVerification,
       orderAmount: grandTotal,
+      t,
     });
 
     if (Object.keys(validationErrors).length > 0) {
@@ -1422,7 +1422,7 @@ const PaymentPage = () => {
         status: result?.status || 'Pending Verification',
         paymentMethod,
         orderId,
-        message: result?.message || 'Payment Verification Submitted Successfully',
+        message: result?.message || t('paymentVerificationSubmitted'),
       };
 
       persistPaymentTransaction({
@@ -1464,15 +1464,30 @@ const PaymentPage = () => {
 
   const continueShopping = () => navigate('/products');
 
-  const selectedPaymentLabel =
-    paymentMethodOptions.find((option) => option.id === selectedPaymentMethod)?.label || 'QR Payment';
+  const paymentMethodLabel = (id) => {
+    if (id === 'qr') return t('qrPayment');
+    if (id === 'upi') return t('upi');
+    if (id === 'bankTransfer') return t('bankTransfer');
+    if (id === 'debitCard') return t('debitCard');
+    if (id === 'creditCard') return t('creditCard');
+    return t('qrPayment');
+  };
+  const paymentVisualMethod = (id) => {
+    if (id === 'qr') return 'qr';
+    if (id === 'bankTransfer') return 'bank';
+    if (id === 'cards' || id === 'debitCard' || id === 'creditCard') return 'card';
+    if (id === 'cod') return 'cod';
+    return 'upi';
+  };
+  const paymentVisualSrc = (id) => getPaymentAsset(language, paymentVisualMethod(id));
+  const selectedPaymentLabel = paymentMethodLabel(selectedPaymentMethod);
 
   const paymentOptionCards = [
-    { id: 'upi', label: 'UPI', icon: 'fas fa-mobile-alt' },
-    { id: 'qr', label: 'QR', icon: 'fas fa-qrcode' },
-    { id: 'bankTransfer', label: 'Bank Transfer', icon: 'fas fa-university' },
-    { id: 'cards', label: 'Debit / Credit Card', icon: 'fas fa-credit-card', method: 'debitCard' },
-    { id: 'cod', label: 'Cash on Delivery', icon: 'fas fa-money-bill-wave' },
+    { id: 'upi' },
+    { id: 'qr' },
+    { id: 'bankTransfer' },
+    { id: 'cards', method: 'debitCard' },
+    { id: 'cod' },
   ];
 
   const selectPaymentOptionCard = (option) => {
@@ -1530,27 +1545,26 @@ const PaymentPage = () => {
         <div className="payment-gateway-card">
           <aside className="payment-info-panel">
             <div>
-              <span className="payment-info-kicker">Secure Checkout</span>
-              <h2>Payment Information</h2>
+              <span className="payment-info-kicker">{t('secureCheckout')}</span>
+              <h2>{t('paymentInformation')}</h2>
               <p>
-                Complete your payment through a protected payment form. Your transaction details are encrypted
-                and used only to confirm this order.
+                {t('paymentInformationDescription')}
               </p>
             </div>
 
             <div className="payment-info-list">
               <div className="payment-info-item">
                 <i className="fas fa-lock" aria-hidden="true"></i>
-                <span>SSL secured payment session</span>
+                <span>{t('sslSecuredPaymentSession')}</span>
               </div>
               <div className="payment-info-item">
                 <i className="fas fa-shield-alt" aria-hidden="true"></i>
-                <span>Card and UPI details stay protected</span>
+                <span>{t('cardUpiDetailsProtected')}</span>
               </div>
             </div>
 
             <a className="payment-help-link" href="/contact-support">
-              Need Help?
+              {t('needHelp')}
             </a>
           </aside>
 
@@ -1558,9 +1572,9 @@ const PaymentPage = () => {
             {(paymentConfigState.isLoading || paymentConfigState.error) && (
               <div className={`payment-config-banner ${paymentConfigState.error ? 'warning' : ''}`}>
                 <i className={`fas ${paymentConfigState.isLoading ? 'fa-spinner fa-spin' : 'fa-info-circle'}`} aria-hidden="true"></i>
-                <span>{paymentConfigState.isLoading ? 'Refreshing payment details from backend...' : paymentConfigState.error}</span>
+                <span>{paymentConfigState.isLoading ? t('refreshingPaymentDetails') : paymentConfigState.error}</span>
                 {paymentConfigState.error && (
-                  <button type="button" onClick={loadPaymentConfiguration}>Retry</button>
+                  <button type="button" onClick={loadPaymentConfiguration}>{t('retryPayment')}</button>
                 )}
               </div>
             )}
@@ -1581,10 +1595,14 @@ const PaymentPage = () => {
                     className={`payment-option-card ${isSelected ? 'selected' : ''}`}
                     onClick={() => selectPaymentOptionCard(option)}
                   >
-                    <span className="payment-option-icon">
-                      <i className={option.icon} aria-hidden="true"></i>
-                    </span>
-                    <span>{option.label}</span>
+                    <img
+                      key={`${language}-${option.id}`}
+                      className="payment-option-asset"
+                      src={paymentVisualSrc(option.id)}
+                      alt={paymentMethodLabel(option.id)}
+                      loading="lazy"
+                    />
+                    <span>{paymentMethodLabel(option.id)}</span>
                   </button>
                 );
               })}
@@ -1595,33 +1613,40 @@ const PaymentPage = () => {
                 {/* UPI CONTAINER */}
                 {selectedPaymentMethod === 'upi' && (
                   <div className="manual-payment-pane">
-                    <h3 className="payment-pane-heading">Pay using UPI</h3>
+                    <h3 className="payment-pane-heading">{t('payUsingUpi')}</h3>
+                    <img
+                      key={`${language}-upi-pane`}
+                      className="payment-method-hero-asset"
+                      src={paymentVisualSrc('upi')}
+                      alt={t('upi')}
+                      loading="lazy"
+                    />
                     <div className="manual-payment-details">
                       <div className="manual-payment-detail-row">
-                        <span>Merchant UPI ID</span>
+                        <span>{t('merchantUpiId')}</span>
                         <strong>{merchantPaymentProfile.upiId}</strong>
                       </div>
                       <div className="manual-payment-detail-row">
-                        <span>Merchant Name</span>
+                        <span>{t('merchantName')}</span>
                         <strong>{merchantPaymentProfile.name}</strong>
                       </div>
                       {merchantPaymentProfile.bankDisplayName && (
                         <div className="manual-payment-detail-row">
-                          <span>Linked Bank</span>
+                          <span>{t('linkedBank')}</span>
                           <strong>{merchantPaymentProfile.bankDisplayName}</strong>
                         </div>
                       )}
                       <div className="manual-payment-detail-row">
-                        <span>Currency</span>
+                        <span>{t('currency')}</span>
                         <strong>{merchantPaymentProfile.currency}</strong>
                       </div>
                       <button type="button" className="copy-upi-btn" onClick={copyUpiToClipboard}>
-                        {copiedUpi ? 'UPI ID Copied' : 'Copy UPI ID'}
+                        {copiedUpi ? t('upiIdCopied') : t('copyUpiId')}
                       </button>
                     </div>
 
                     <div className="payment-form-group">
-                      <label>Supported Apps</label>
+                      <label>{t('supportedApps')}</label>
                       <div className="upi-apps-grid">
                         {[
                           { id: 'gpay', label: 'Google Pay' },
@@ -1644,7 +1669,7 @@ const PaymentPage = () => {
                     </div>
 
                     <p className="manual-payment-instruction">
-                      Complete the payment using your preferred UPI application.
+                      {t('completePaymentUsingUpi')}
                     </p>
 
                     <ManualVerificationForm
@@ -1672,33 +1697,40 @@ const PaymentPage = () => {
                 {/* BANK TRANSFER CONTAINER */}
                 {selectedPaymentMethod === 'bankTransfer' && (
                   <div className="manual-payment-pane">
-                    <h3 className="payment-pane-heading">Bank Transfer</h3>
+                    <h3 className="payment-pane-heading">{t('bankTransfer')}</h3>
+                    <img
+                      key={`${language}-bank-pane`}
+                      className="payment-method-hero-asset"
+                      src={paymentVisualSrc('bankTransfer')}
+                      alt={t('bankTransfer')}
+                      loading="lazy"
+                    />
 
                     <div className="manual-payment-details bank-details">
                       <div className="manual-payment-detail-row">
-                        <span>Account Holder Name</span>
+                        <span>{t('accountHolderName')}</span>
                         <strong>{merchantPaymentProfile.bankAccountHolder}</strong>
                       </div>
                       <div className="manual-payment-detail-row">
-                        <span>Bank Name</span>
+                        <span>{t('bankName')}</span>
                         <strong>{merchantPaymentProfile.bankName}</strong>
                       </div>
                       <div className="manual-payment-detail-row">
-                        <span>Account Number</span>
+                        <span>{t('accountNumber')}</span>
                         <strong>{merchantPaymentProfile.accountNumber}</strong>
                       </div>
                       <div className="manual-payment-detail-row">
-                        <span>IFSC Code</span>
+                        <span>{t('ifscCode')}</span>
                         <strong>{merchantPaymentProfile.ifscCode}</strong>
                       </div>
                       <div className="manual-payment-detail-row">
-                        <span>Branch</span>
+                        <span>{t('branch')}</span>
                         <strong>{merchantPaymentProfile.branch}</strong>
                       </div>
                     </div>
 
                     <p className="manual-payment-instruction">
-                      Transfer the amount using NEFT / IMPS / RTGS.
+                      {t('transferUsingBank')}
                     </p>
 
                     <ManualVerificationForm
@@ -1726,24 +1758,31 @@ const PaymentPage = () => {
                 {/* DEBIT CARD CONTAINER */}
                 {selectedPaymentMethod === 'debitCard' && (
                   <div className="card-payment-pane">
-                    <h3 className="payment-pane-heading">Pay using Debit / Credit Card</h3>
-                    <div className="payment-unavailable-note">Card payments are currently unavailable.</div>
+                    <h3 className="payment-pane-heading">{t('payUsingDebitCreditCard')}</h3>
+                    <img
+                      key={`${language}-debit-card-pane`}
+                      className="payment-method-hero-asset"
+                      src={paymentVisualSrc('cards')}
+                      alt={paymentMethodLabel('debitCard')}
+                      loading="lazy"
+                    />
+                    <div className="payment-unavailable-note">{t('cardPaymentsUnavailable')}</div>
                     <div className="payment-form-group">
-                      <label>Card Holder Name *</label>
+                      <label>{t('cardHolderName')} *</label>
                       <input
                         type="text"
                         name="cardName"
                         className="payment-input"
                         value={paymentDetails.cardName}
                         onChange={handlePaymentDetailChange}
-                        placeholder="Enter name on card"
+                        placeholder={t('enterNameOnCard')}
                         disabled
                       />
                       {paymentErrors.cardName && <span className="field-error-msg">{paymentErrors.cardName}</span>}
                     </div>
 
                     <div className="payment-form-group">
-                      <label>Card Number *</label>
+                      <label>{t('cardNumber')} *</label>
                       <input
                         type="text"
                         name="cardNumber"
@@ -1761,7 +1800,7 @@ const PaymentPage = () => {
 
                     <div className="payment-form-row">
                       <div className="payment-form-group">
-                        <label>Expiry Month *</label>
+                        <label>{t('expiryMonth')} *</label>
                         <select
                           name="expiryMonth"
                           className="payment-input"
@@ -1769,7 +1808,7 @@ const PaymentPage = () => {
                           onChange={handleDebitCardDetailChange}
                           disabled
                         >
-                          <option value="">Month</option>
+                          <option value="">{t('month')}</option>
                           {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map((m) => (
                             <option key={m} value={m}>{m}</option>
                           ))}
@@ -1777,7 +1816,7 @@ const PaymentPage = () => {
                       </div>
 
                       <div className="payment-form-group">
-                        <label>Expiry Year *</label>
+                        <label>{t('expiryYear')} *</label>
                         <select
                           name="expiryYear"
                           className="payment-input"
@@ -1785,7 +1824,7 @@ const PaymentPage = () => {
                           onChange={handleDebitCardDetailChange}
                           disabled
                         >
-                          <option value="">Year</option>
+                          <option value="">{t('year')}</option>
                           {Array.from({ length: 15 }, (_, i) => String(new Date().getFullYear() + i)).map((y) => (
                             <option key={y} value={y}>{y}</option>
                           ))}
@@ -1800,7 +1839,7 @@ const PaymentPage = () => {
 
                     <div className="payment-form-row">
                       <div className="payment-form-group">
-                        <label>CVV *</label>
+                        <label>{t('cvv')} *</label>
                         <input
                           type="password"
                           name="cvv"
@@ -1826,7 +1865,7 @@ const PaymentPage = () => {
                           onChange={handleDebitCardDetailChange}
                           disabled
                         />
-                        <span className="payment-checkbox-label">Save this card</span>
+                        <span className="payment-checkbox-label">{t('saveThisCard')}</span>
                       </label>
                     </div>
 
@@ -1835,7 +1874,7 @@ const PaymentPage = () => {
                       className="payment-primary-btn"
                       disabled
                     >
-                      Pay {formatCurrency(grandTotal)}
+                      {t('pay')} {formatCurrency(grandTotal)}
                     </button>
                   </div>
                 )}
@@ -1843,24 +1882,31 @@ const PaymentPage = () => {
                 {/* CREDIT CARD CONTAINER */}
                 {selectedPaymentMethod === 'creditCard' && (
                   <div className="card-payment-pane">
-                    <h3 className="payment-pane-heading">Pay using Credit Card</h3>
-                    <div className="payment-unavailable-note">Card payments are currently unavailable.</div>
+                    <h3 className="payment-pane-heading">{t('payUsingCreditCard')}</h3>
+                    <img
+                      key={`${language}-credit-card-pane`}
+                      className="payment-method-hero-asset"
+                      src={paymentVisualSrc('cards')}
+                      alt={paymentMethodLabel('creditCard')}
+                      loading="lazy"
+                    />
+                    <div className="payment-unavailable-note">{t('cardPaymentsUnavailable')}</div>
                     <div className="payment-form-group">
-                      <label>Card Holder Name *</label>
+                      <label>{t('cardHolderName')} *</label>
                       <input
                         type="text"
                         name="cardName"
                         className="payment-input"
                         value={paymentDetails.cardName}
                         onChange={handlePaymentDetailChange}
-                        placeholder="Enter name on card"
+                        placeholder={t('enterNameOnCard')}
                         disabled
                       />
                       {paymentErrors.cardName && <span className="field-error-msg">{paymentErrors.cardName}</span>}
                     </div>
 
                     <div className="payment-form-group">
-                      <label>Card Number *</label>
+                      <label>{t('cardNumber')} *</label>
                       <input
                         type="text"
                         name="cardNumber"
@@ -1878,7 +1924,7 @@ const PaymentPage = () => {
 
                     <div className="payment-form-row">
                       <div className="payment-form-group">
-                        <label>Expiry Month *</label>
+                        <label>{t('expiryMonth')} *</label>
                         <select
                           className="payment-input"
                           value={creditExpiryMonth}
@@ -1890,7 +1936,7 @@ const PaymentPage = () => {
                           }}
                           disabled
                         >
-                          <option value="">Month</option>
+                          <option value="">{t('month')}</option>
                           {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map((m) => (
                             <option key={m} value={m}>{m}</option>
                           ))}
@@ -1898,7 +1944,7 @@ const PaymentPage = () => {
                       </div>
 
                       <div className="payment-form-group">
-                        <label>Expiry Year *</label>
+                        <label>{t('expiryYear')} *</label>
                         <select
                           className="payment-input"
                           value={creditExpiryYear}
@@ -1910,7 +1956,7 @@ const PaymentPage = () => {
                           }}
                           disabled
                         >
-                          <option value="">Year</option>
+                          <option value="">{t('year')}</option>
                           {Array.from({ length: 15 }, (_, i) => String(new Date().getFullYear() + i)).map((y) => (
                             <option key={y} value={y}>{y}</option>
                           ))}
@@ -1925,7 +1971,7 @@ const PaymentPage = () => {
 
                     <div className="payment-form-row payment-form-row-compact">
                       <div className="payment-form-group">
-                        <label>CVV *</label>
+                        <label>{t('cvv')} *</label>
                         <input
                           type="password"
                           name="cvv"
@@ -1943,14 +1989,14 @@ const PaymentPage = () => {
                     </div>
 
                     <div className="payment-form-group">
-                      <label>Billing Address *</label>
+                      <label>{t('billingAddress')} *</label>
                       <textarea
                         name="billingAddress"
                         className="payment-input"
                         style={{ height: '88px', resize: 'vertical' }}
                         value={creditCardDetails.billingAddress}
                         onChange={handleCreditCardDetailChange}
-                        placeholder="Enter billing address"
+                        placeholder={t('enterBillingAddress')}
                         disabled
                       />
                       {paymentErrors.billingAddress && <span className="field-error-msg">{paymentErrors.billingAddress}</span>}
@@ -1965,7 +2011,7 @@ const PaymentPage = () => {
                           onChange={handleCreditCardDetailChange}
                           disabled
                         />
-                        <span className="payment-checkbox-label">Save Card</span>
+                        <span className="payment-checkbox-label">{t('saveCard')}</span>
                       </label>
                     </div>
 
@@ -1974,7 +2020,7 @@ const PaymentPage = () => {
                       className="payment-primary-btn"
                       disabled
                     >
-                      Pay {formatCurrency(grandTotal)}
+                      {t('pay')} {formatCurrency(grandTotal)}
                     </button>
                   </div>
                 )}
@@ -1982,12 +2028,16 @@ const PaymentPage = () => {
                 {selectedPaymentMethod === 'cod' && (
                   <div className="cod-payment-pane">
                     <div className="cod-payment-card">
-                      <span className="cod-payment-icon">
-                        <i className="fas fa-money-bill-wave" aria-hidden="true"></i>
-                      </span>
+                      <img
+                        key={`${language}-cod-pane`}
+                        className="cod-payment-asset"
+                        src={paymentVisualSrc('cod')}
+                        alt={t('cashOnDelivery')}
+                        loading="lazy"
+                      />
                       <div>
-                        <strong>Cash on Delivery</strong>
-                        <p>Pay in cash when your order is delivered to your address.</p>
+                        <strong>{t('cashOnDelivery')}</strong>
+                        <p>{t('payCashOnDeliveryDescription')}</p>
                       </div>
                     </div>
                     <button
@@ -1995,7 +2045,7 @@ const PaymentPage = () => {
                       className="payment-primary-btn"
                       disabled={isPlacingOrder}
                     >
-                      {isPlacingOrder ? 'Placing Order...' : `Place COD Order ${formatCurrency(grandTotal)}`}
+                      {isPlacingOrder ? t('placingOrder') : `${t('placeCodOrder')} ${formatCurrency(grandTotal)}`}
                     </button>
                   </div>
                 )}
@@ -2003,16 +2053,27 @@ const PaymentPage = () => {
                 {/* QR PAYMENT CONTAINER */}
                 {selectedPaymentMethod === 'qr' && (
                   <div className="qr-container-box">
-                    <h3 className="payment-pane-heading" style={{ width: '100%' }}>Scan QR Code</h3>
+                    <h3 className="payment-pane-heading" style={{ width: '100%' }}>{t('scanQrCode')}</h3>
+                    <img
+                      key={`${language}-qr-pane`}
+                      className="payment-method-hero-asset"
+                      src={paymentVisualSrc('qr')}
+                      alt={t('qrPayment')}
+                      loading="lazy"
+                    />
                     
                     <div className="qr-image-wrapper">
                       {qrPayment.isLoading ? (
                         <div className="qr-placeholder">
                           <i className="fas fa-spinner fa-spin qr-placeholder-icon"></i>
-                          <span>Generating Secure QR...</span>
+                          <span>{t('generatingSecureQr')}</span>
                         </div>
                       ) : qrPayment.qrSource || merchantPaymentProfile.qrImageUrl ? (
-                        <img src={qrPayment.qrSource || merchantPaymentProfile.qrImageUrl} alt="Payment QR Code" />
+                        <img
+                          key={`${language}-${qrPayment.qrSource || merchantPaymentProfile.qrImageUrl}`}
+                          src={withLanguageAssetVersion(qrPayment.qrSource || merchantPaymentProfile.qrImageUrl, language)}
+                          alt={t('qrPayment')}
+                        />
                       ) : qrPayment.error ? (
                         <div className="qr-placeholder" style={{ color: '#D32F2F' }}>
                           <i className="fas fa-exclamation-circle qr-placeholder-icon"></i>
@@ -2021,40 +2082,40 @@ const PaymentPage = () => {
                       ) : (
                         <div className="qr-placeholder">
                           <i className="fas fa-qrcode qr-placeholder-icon"></i>
-                          <span>Secure QR will appear here</span>
+                          <span>{t('secureQrWillAppear')}</span>
                         </div>
                       )}
                     </div>
 
                     <div className="qr-details">
                       <div className="qr-detail-row">
-                        <span className="qr-detail-label">Merchant Name</span>
+                        <span className="qr-detail-label">{t('merchantName')}</span>
                         <span className="qr-detail-value">{merchantPaymentProfile.name}</span>
                       </div>
 
                       <div className="qr-detail-row">
-                        <span className="qr-detail-label">Merchant UPI ID</span>
+                        <span className="qr-detail-label">{t('merchantUpiId')}</span>
                         <span className="qr-detail-value">{merchantUpiId}</span>
                       </div>
 
                       <div className="qr-detail-row">
-                        <span className="qr-detail-label">Amount</span>
+                        <span className="qr-detail-label">{t('amount')}</span>
                         <span className="qr-detail-value" style={{ fontSize: '16px', fontWeight: '700' }}>{formatCurrency(grandTotal)}</span>
                       </div>
                       {merchantPaymentProfile.qrUpdatedAt && (
                         <div className="qr-detail-row">
-                          <span className="qr-detail-label">QR Updated</span>
+                          <span className="qr-detail-label">{t('qrUpdated')}</span>
                           <span className="qr-detail-value">{new Date(merchantPaymentProfile.qrUpdatedAt).toLocaleString()}</span>
                         </div>
                       )}
 
                       <button type="button" className="copy-upi-btn" onClick={copyUpiToClipboard}>
-                        {copiedUpi ? 'UPI ID Copied' : 'Copy UPI ID'}
+                        {copiedUpi ? t('upiIdCopied') : t('copyUpiId')}
                       </button>
                     </div>
 
                     <p className="manual-payment-instruction">
-                      Scan the QR code using any UPI application and complete the payment.
+                      {t('scanQrUsingAnyUpi')}
                     </p>
 
                     <ManualVerificationForm

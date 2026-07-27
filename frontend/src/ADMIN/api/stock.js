@@ -56,7 +56,17 @@ export const mapStockItemFromApi = (raw = {}) => {
 export const getStockLedger = async (params = {}) => {
   const response = await api.get('/api/Stock/ledger', { params });
   const data = response.data;
-  const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : (Array.isArray(data?.items) ? data.items : []));
+  const list = Array.isArray(data) 
+    ? data 
+    : (Array.isArray(data?.products) 
+      ? data.products 
+      : (Array.isArray(data?.Products) 
+        ? data.Products 
+        : (Array.isArray(data?.data) 
+          ? data.data 
+          : (Array.isArray(data?.items) 
+            ? data.items 
+            : []))));
   return list.map(mapStockItemFromApi);
 };
 

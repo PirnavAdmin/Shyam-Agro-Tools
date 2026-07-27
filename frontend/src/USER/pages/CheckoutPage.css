@@ -377,10 +377,31 @@
   font-size: 1.1rem;
 }
 
+.pay-icon-asset {
+  width: 78px;
+  height: 42px;
+  min-width: 78px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.pay-icon-asset img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .payment-option.active .pay-icon {
   background: var(--eco-primary);
   color: #ffffff;
   border-color: var(--eco-primary);
+}
+
+.payment-option.active .pay-icon-asset {
+  background: #ffffff;
+  color: inherit;
 }
 
 .pay-text {
@@ -666,11 +687,23 @@
   background: #ffffff;
   color: var(--eco-forest);
   border-radius: 999px;
-  padding: 0.7rem 0.55rem;
+  padding: 0.5rem 0.55rem;
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.checkout-payment-type-asset {
+  width: 52px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
 }
 
 .payment-type-btn:hover {

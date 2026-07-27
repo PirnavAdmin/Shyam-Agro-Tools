@@ -149,11 +149,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/dashboard"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Dashboard"
+                  data-tooltip="Dashboard"
                 >
                   <div className="nav-left">
                     <Home size={18} className="nav-icon" />
-                    {expanded && <span>Dashboard</span>}
+                    <span className="nav-label-text">Dashboard</span>
                   </div>
                 </NavLink>
               </li>
@@ -165,11 +165,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('catalog')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/catalog') ? 'active-parent' : ''}`}
-                  title="Catalog"
+                  data-tooltip="Catalog"
                 >
                   <div className="nav-left">
                     <Box size={18} className="nav-icon" />
-                    {expanded && <span>Catalog</span>}
+                    <span className="nav-label-text">Catalog</span>
                   </div>
                   {expanded && (openDropdowns.catalog
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -193,11 +193,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('customers')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/customers') || location.pathname.includes('/admin/users') ? 'active-parent' : ''}`}
-                  title="Customers"
+                  data-tooltip="Customers"
                 >
                   <div className="nav-left">
                     <Users size={18} className="nav-icon" />
-                    {expanded && <span>Customers</span>}
+                    <span className="nav-label-text">Customers</span>
                   </div>
                   {expanded && (openDropdowns.customers
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -217,11 +217,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/reports"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Reports"
+                  data-tooltip="Reports"
                 >
                   <div className="nav-left">
                     <BarChart2 size={18} className="nav-icon" />
-                    {expanded && <span>Reports</span>}
+                    <span className="nav-label-text">Reports</span>
                   </div>
                 </NavLink>
               </li>
@@ -233,11 +233,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/tickets"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Tickets"
+                  data-tooltip="Tickets"
                 >
                   <div className="nav-left">
                     <Ticket size={18} className="nav-icon" />
-                    {expanded && <span>Tickets</span>}
+                    <span className="nav-label-text">Tickets</span>
                   </div>
                 </NavLink>
               </li>
@@ -249,11 +249,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('orders')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/orders') || location.pathname.includes('/admin/returns') ? 'active-parent' : ''}`}
-                  title="Orders"
+                  data-tooltip="Orders"
                 >
                   <div className="nav-left">
                     <ShoppingCart size={18} className="nav-icon" />
-                    {expanded && <span>Orders</span>}
+                    <span className="nav-label-text">Orders</span>
                   </div>
                   {expanded && (openDropdowns.orders
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -275,11 +275,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('invoices')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/invoice') ? 'active-parent' : ''}`}
-                  title="Invoices"
+                  data-tooltip="Invoices"
                 >
                   <div className="nav-left">
                     <FileSpreadsheet size={18} className="nav-icon" />
-                    {expanded && <span>Invoices</span>}
+                    <span className="nav-label-text">Invoices</span>
                   </div>
                   {expanded && (openDropdowns.invoices
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -299,11 +299,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/call-history"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Call History"
+                  data-tooltip="Call History"
                 >
                   <div className="nav-left">
                     <PhoneCall size={18} className="nav-icon" />
-                    {expanded && <span>Call History</span>}
+                    <span className="nav-label-text">Call History</span>
                   </div>
                 </NavLink>
               </li>
@@ -315,11 +315,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/stock-updates"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Stock Updates"
+                  data-tooltip="Stock Updates"
                 >
                   <div className="nav-left">
                     <Boxes size={18} className="nav-icon" />
-                    {expanded && <span>Stock Updates</span>}
+                    <span className="nav-label-text">Stock Updates</span>
                   </div>
                 </NavLink>
               </li>
@@ -331,11 +331,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('marketing')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/marketing') ? 'active-parent' : ''}`}
-                  title="Marketing"
+                  data-tooltip="Marketing"
                 >
                   <div className="nav-left">
                     <Target size={18} className="nav-icon" />
-                    {expanded && <span>Marketing</span>}
+                    <span className="nav-label-text">Marketing</span>
                   </div>
                   {expanded && (openDropdowns.marketing
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -355,11 +355,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('brands')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/brands') ? 'active-parent' : ''}`}
-                  title="Brands"
+                  data-tooltip="Brands"
                 >
                   <div className="nav-left">
                     <Box size={18} className="nav-icon" />
-                    {expanded && <span>Brands</span>}
+                    <span className="nav-label-text">Brands</span>
                   </div>
                   {expanded && (openDropdowns.brands ? <ChevronDown size={15} className="nav-arrow" /> : <ChevronRight size={15} className="nav-arrow" />)}
                 </div>
@@ -376,11 +376,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('blogs')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/blogs') ? 'active-parent' : ''}`}
-                  title="Blogs"
+                  data-tooltip="Blogs"
                 >
                   <div className="nav-left">
                     <FileText size={18} className="nav-icon" />
-                    {expanded && <span>Blogs</span>}
+                    <span className="nav-label-text">Blogs</span>
                   </div>
                   {expanded && (openDropdowns.blogs
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -400,11 +400,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('testimonials')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/testimonials') ? 'active-parent' : ''}`}
-                  title="Testimonials"
+                  data-tooltip="Testimonials"
                 >
                   <div className="nav-left">
                     <MessageSquare size={18} className="nav-icon" />
-                    {expanded && <span>Testimonials</span>}
+                    <span className="nav-label-text">Testimonials</span>
                   </div>
                   {expanded && (openDropdowns.testimonials
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -424,11 +424,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('staff')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/staff') ? 'active-parent' : ''}`}
-                  title="Staff"
+                  data-tooltip="Staff"
                 >
                   <div className="nav-left">
                     <Shield size={18} className="nav-icon" />
-                    {expanded && <span>Staff</span>}
+                    <span className="nav-label-text">Staff</span>
                   </div>
                   {expanded && (openDropdowns.staff
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -448,11 +448,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('settings')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/settings') ? 'active-parent' : ''}`}
-                  title="Settings"
+                  data-tooltip="Settings"
                 >
                   <div className="nav-left">
                     <Settings size={18} className="nav-icon" />
-                    {expanded && <span>Settings</span>}
+                    <span className="nav-label-text">Settings</span>
                   </div>
                   {expanded && (openDropdowns.settings
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -472,11 +472,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <div
                   onClick={() => toggleDropdown('suppliers')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/suppliers') ? 'active-parent' : ''}`}
-                  title="Suppliers"
+                  data-tooltip="Suppliers"
                 >
                   <div className="nav-left">
                     <FolderOpen size={18} className="nav-icon" />
-                    {expanded && <span>Suppliers</span>}
+                    <span className="nav-label-text">Suppliers</span>
                   </div>
                   {expanded && (openDropdowns.suppliers
                     ? <ChevronDown size={15} className="nav-arrow" />
@@ -497,11 +497,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/coins"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Coins Converter"
+                  data-tooltip="Coins Converter"
                 >
                   <div className="nav-left">
                     <BarChart2 size={18} className="nav-icon" />
-                    {expanded && <span>Coins Converter</span>}
+                    <span className="nav-label-text">Coins Converter</span>
                   </div>
                 </NavLink>
               </li>
@@ -513,11 +513,11 @@ const AdminMenuBar = ({ expanded = false }) => {
                 <NavLink
                   to="/admin/payments"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  title="Payment Settings"
+                  data-tooltip="Payment Settings"
                 >
                   <div className="nav-left">
                     <CreditCard size={18} className="nav-icon" />
-                    {expanded && <span>Payment Settings</span>}
+                    <span className="nav-label-text">Payment Settings</span>
                   </div>
                 </NavLink>
               </li>

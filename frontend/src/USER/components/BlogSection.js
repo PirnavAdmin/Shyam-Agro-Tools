@@ -7,17 +7,17 @@ import { getBlogImageUrl, getBlogs } from '../../services/blogService';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
 import './BlogSection.css';
 
-const BlogImagePlaceholder = ({ className = '' }) => (
+const BlogImagePlaceholder = ({ label, className = '' }) => (
   <div
     className={`flex h-full w-full items-center justify-center bg-gray-100 text-xs font-bold uppercase tracking-widest text-gray-400 ${className}`}
     role="img"
-    aria-label="Image not available"
+    aria-label={label}
   >
-    Image not available
+    {label}
   </div>
 );
 
-const formatBlogDate = (publishDate) => {
+const formatBlogDate = (publishDate, locale = 'en-IN') => {
   if (!publishDate || String(publishDate).startsWith('0001-01-01')) {
     return null;
   }
@@ -27,15 +27,63 @@ const formatBlogDate = (publishDate) => {
     return null;
   }
 
-  return date.toLocaleDateString('en-IN', {
+  return date.toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
 };
 
+const localizedImageKeys = (field, language) => {
+  const fieldPascal = field.charAt(0).toUpperCase() + field.slice(1);
+  const languagePascal = language.charAt(0).toUpperCase() + language.slice(1);
+
+  return [
+    `${field}_${language}`,
+    `${field}_${language.toUpperCase()}`,
+    `${field}${language.toUpperCase()}`,
+    `${field}${languagePascal}`,
+    `${fieldPascal}_${language}`,
+    `${fieldPascal}_${language.toUpperCase()}`,
+    `${fieldPascal}${language.toUpperCase()}`,
+    `${fieldPascal}${languagePascal}`,
+  ];
+};
+
+const getLocalizedBlogImageValue = (blog, language) => {
+  if (!blog || !language || language === 'en') return '';
+  const raw = blog.raw || {};
+  const fields = ['coverImage', 'coverImageUrl', 'imageUrl', 'image', 'thumbnail'];
+
+  for (const field of fields) {
+    for (const key of localizedImageKeys(field, language)) {
+      const value = blog[key] ?? raw[key];
+      if (value) return value;
+    }
+  }
+
+  const translationsBlock = blog.translations || raw.translations || blog.i18n || raw.i18n;
+  for (const field of fields) {
+    const value = translationsBlock?.[language]?.[field] || translationsBlock?.[field]?.[language];
+    if (value) return value;
+  }
+
+  return '';
+};
+
+const getLanguageAwareBlogImageUrl = (blog, language) => {
+  const localizedImage = getLocalizedBlogImageValue(blog, language);
+  return getBlogImageUrl(localizedImage) || blog.coverImageUrl || getBlogImageUrl(blog.coverImage);
+};
+
+const withBlogImageVersion = (url, blogId, language) => {
+  if (!url) return '';
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${encodeURIComponent(blogId)}&lang=${encodeURIComponent(language || 'en')}`;
+};
+
 const BlogSection = () => {
-  const { t, productText } = useLanguage();
+  const { t, productText, dynamicText, activeLanguage } = useLanguage();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -58,7 +106,7 @@ const BlogSection = () => {
       } catch {
         if (isMounted) {
           setBlogs([]);
-          setError('Unable to load blogs.');
+          setError('unableLoadBlogs');
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -88,7 +136,7 @@ const BlogSection = () => {
     }
   }, [blogs]);
 
-  const markImageAsFailed = (blog) => {
+  const markImageAsFailed = (blog, failureKey = blog?.id) => {
     const imageUrl = blog.coverImageUrl || getBlogImageUrl(blog.coverImage);
 
     if (process.env.NODE_ENV === 'development') {
@@ -97,13 +145,20 @@ const BlogSection = () => {
 
     setFailedImageIds((current) => ({
       ...current,
-      [blog.id]: true,
+      [failureKey]: true,
     }));
   };
 
   const relatedProducts = useMemo(() => {
     return [];
   }, []);
+
+  const dateLocale = activeLanguage?.code === 'hi'
+    ? 'hi-IN'
+    : activeLanguage?.code === 'te'
+      ? 'te-IN'
+      : 'en-IN';
+  const languageCode = activeLanguage?.code || 'en';
 
   useEffect(() => {
     if (!activeBlog) return undefined;
@@ -125,14 +180,14 @@ const BlogSection = () => {
     <section className="bg-white px-3 py-5 md:px-5 lg:px-6">
       <div className="max-w-[1440px] mx-auto">
         <SectionHeading
-          title={t('blog.fromOurBlog') || 'FROM OUR BLOG'}
-          subtitle={t('blog.latestNews') || 'LATEST NEWS'}
+          title={t('blog.fromOurBlog')}
+          subtitle={t('blog.latestNews')}
         />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {loading && (
             <div className="col-span-full py-8 text-center text-xs font-bold uppercase tracking-widest text-gray-400">
-              Loading...
+              {t('loading')}
             </div>
           )}
 
@@ -140,20 +195,25 @@ const BlogSection = () => {
             <div className="col-span-full py-8 text-center text-xs font-bold uppercase tracking-widest text-gray-400">
               {error ? (
                 <>
-                  {error}
+                  {t(error)}
                   <br />
-                  Please try again.
+                  {t('pleaseTryAgain')}
                 </>
               ) : (
-                'No Blogs Available'
+                t('noBlogsAvailable')
               )}
             </div>
           )}
 
           {!loading && blogs.map((blog, index) => {
-            const blogImageUrl = blog.coverImageUrl || getBlogImageUrl(blog.coverImage);
-            const formattedPublishDate = formatBlogDate(blog.publishDate);
-            const isImageAvailable = blogImageUrl && !failedImageIds[blog.id];
+            const blogImageUrl = getLanguageAwareBlogImageUrl(blog, languageCode);
+            const formattedPublishDate = formatBlogDate(blog.publishDate, dateLocale);
+            const imageFailureKey = `${blog.id}-${languageCode}-${blogImageUrl}`;
+            const isImageAvailable = blogImageUrl && !failedImageIds[imageFailureKey];
+            const title = dynamicText(blog, 'title');
+            const summary = dynamicText(blog, 'summary');
+            const authorName = dynamicText(blog, 'authorName');
+            const category = dynamicText(blog, 'category');
 
             return (
               <motion.div
@@ -172,15 +232,15 @@ const BlogSection = () => {
                 <div className="relative mb-2 aspect-[16/8] overflow-hidden">
                   {isImageAvailable ? (
                     <img
-                      key={blog.id}
-                      src={`${blogImageUrl}?v=${blog.id}`}
-                      alt={blog.title}
+                      key={imageFailureKey}
+                      src={withBlogImageVersion(blogImageUrl, blog.id, languageCode)}
+                      alt={title}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={() => markImageAsFailed(blog)}
+                      onError={() => markImageAsFailed(blog, imageFailureKey)}
                     />
                   ) : (
-                    <BlogImagePlaceholder />
+                    <BlogImagePlaceholder label={t('imageNotAvailable')} />
                   )}
                   {formattedPublishDate && (
                     <div className="absolute left-3 top-3 bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl">
@@ -191,17 +251,17 @@ const BlogSection = () => {
                 <div className="mb-2 flex gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">
                   <div className="flex items-center gap-2">
                     <User size={14} className="text-primary" />
-                    {t('blog.by')} {blog.authorName}
+                    {t('blog.by')} {authorName}
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar size={14} className="text-primary" />
-                    {blog.category}
+                    {category}
                   </div>
                 </div>
                 <h3 className="mb-2 text-base font-bold leading-tight text-dark transition-colors group-hover:text-primary">
-                  {String(blog.title || '').toUpperCase()}
+                  {String(title || '').toUpperCase()}
                 </h3>
-                <p className="mb-3 line-clamp-2 text-xs leading-5 text-gray-500">{blog.summary}</p>
+                <p className="mb-3 line-clamp-2 text-xs leading-5 text-gray-500">{summary}</p>
                 <button type="button" className="flex items-center gap-2 text-dark font-black text-xs uppercase tracking-widest hover:text-primary transition-colors group/btn">
                   {t('blog.readMore')} <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-2" />
                 </button>
@@ -223,7 +283,7 @@ const BlogSection = () => {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="blog-modal-header">
-              <h3>{activeBlog.title}</h3>
+              <h3>{dynamicText(activeBlog, 'title')}</h3>
               <button
                 type="button"
                 onClick={() => setActiveBlog(null)}
@@ -236,27 +296,33 @@ const BlogSection = () => {
             <div className="blog-modal-scroll">
               <div className="blog-modal-body">
                 <div className="blog-modal-meta">
-                  <span><User size={15} /> {t('blog.by')} {activeBlog.authorName}</span>
-                  {formatBlogDate(activeBlog.publishDate) && (
+                  <span><User size={15} /> {t('blog.by')} {dynamicText(activeBlog, 'authorName')}</span>
+                  {formatBlogDate(activeBlog.publishDate, dateLocale) && (
                     <span>
                       <Calendar size={15} />
-                      {formatBlogDate(activeBlog.publishDate)}
+                      {formatBlogDate(activeBlog.publishDate, dateLocale)}
                     </span>
                   )}
-                  <span>{activeBlog.category}</span>
+                  <span>{dynamicText(activeBlog, 'category')}</span>
                 </div>
-                {(activeBlog.coverImageUrl || getBlogImageUrl(activeBlog.coverImage)) && !failedImageIds[activeBlog.id] ? (
+                {(() => {
+                  const activeBlogImageUrl = getLanguageAwareBlogImageUrl(activeBlog, languageCode);
+                  const activeImageFailureKey = `${activeBlog.id}-${languageCode}-${activeBlogImageUrl}`;
+
+                  return activeBlogImageUrl && !failedImageIds[activeImageFailureKey] ? (
                   <img
-                    src={`${activeBlog.coverImageUrl || getBlogImageUrl(activeBlog.coverImage)}?v=${activeBlog.id}`}
-                    alt={activeBlog.title}
+                    key={activeImageFailureKey}
+                    src={withBlogImageVersion(activeBlogImageUrl, activeBlog.id, languageCode)}
+                    alt={dynamicText(activeBlog, 'title')}
                     className="blog-modal-image"
-                    onError={() => markImageAsFailed(activeBlog)}
+                    onError={() => markImageAsFailed(activeBlog, activeImageFailureKey)}
                   />
-                ) : (
-                  <BlogImagePlaceholder className="blog-modal-image" />
-                )}
+                  ) : (
+                  <BlogImagePlaceholder label={t('imageNotAvailable')} className="blog-modal-image" />
+                  );
+                })()}
                 <p className="blog-tip-list" style={{ whiteSpace: 'pre-line' }}>
-                  {activeBlog.description || ''}
+                  {dynamicText(activeBlog, 'description')}
                 </p>
                 <div className="blog-related-section">
                   <h4>{t('blog.relatedProducts')}</h4>
