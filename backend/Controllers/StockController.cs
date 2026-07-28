@@ -97,8 +97,9 @@ namespace ShyamAgroSuite.Api.Controllers
                     displayStatus = "Low Stock";
                 }
 
-                var actualPrice = p.MRP > 0 ? p.MRP : (p.SellingPrice ?? 0);
-                var sellingPriceFinal = (p.SellingPrice.HasValue && p.SellingPrice > 0) ? p.SellingPrice.Value : actualPrice;
+                var baseSelling = (p.SellingPrice.HasValue && p.SellingPrice > 0) ? p.SellingPrice.Value : (p.MRP > 0 ? p.MRP : 0);
+                var actualPrice = baseSelling; // Actual Product Price (e.g. ₹42,320)
+                var sellingPriceWithTax = Math.Round(baseSelling * 1.18m, 1); // Grand total including 18% Tax / GST (e.g. ₹49,937.6)
 
                 return new
                 {
@@ -113,7 +114,7 @@ namespace ShyamAgroSuite.Api.Controllers
                     Status = displayStatus,
                     Trend30Day = p.Trend30Day ?? "+10%",
                     CostPrice = $"₹{actualPrice:N0}",
-                    SellingPrice = $"₹{sellingPriceFinal:N0}",
+                    SellingPrice = $"₹{sellingPriceWithTax:N1}",
                     LastUpdated = p.LastUpdated.ToString("yyyy-MM-dd")
                 };
             }).ToList();

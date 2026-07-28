@@ -53,7 +53,10 @@ const statusMeta = {
   'Out of Stock':{ className: 'stock-badge--out', icon: X },
 };
 
-const formatINR = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+const formatINR = (n) => {
+  const num = Number(n || 0);
+  return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: num % 1 !== 0 ? 1 : 0, maximumFractionDigits: 2 })}`;
+};
 
 /* ─── Stock Badge ─────────────────────────────────────── */
 const StockBadge = ({ status }) => {
