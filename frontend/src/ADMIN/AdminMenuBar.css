@@ -305,11 +305,21 @@
 }
 
 /* ── Collapsed Icons Strip State ── */
+.sidebar-collapsed {
+  overflow: visible !important;
+}
+
+.sidebar-collapsed .sidebar-scrollable {
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+}
+
 .sidebar-collapsed .stroyka-nav-link {
   padding: 12px 0;
   justify-content: center;
   border-left: 3px solid transparent;
   position: relative;
+  overflow: visible !important;
 }
 
 .sidebar-collapsed .nav-left {
