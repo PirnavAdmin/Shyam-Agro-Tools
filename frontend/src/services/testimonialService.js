@@ -1,9 +1,10 @@
 import axios from '../api/axios';
+import { getApiDomain } from '../utils/apiConfig';
 
 export const TESTIMONIAL_API_BASE_URL = (
   process.env.REACT_APP_TESTIMONIAL_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 
 const TESTIMONIAL_ENDPOINT = `${TESTIMONIAL_API_BASE_URL}/api/Testimonials`;
@@ -35,11 +36,17 @@ export const getTestimonialImageUrl = (image) => {
     return '';
   }
 
-  if (image.startsWith('http') || image.startsWith('data:image') || image.startsWith('blob:')) {
+  if (image.startsWith('http') || image.startsWith('data:') || image.startsWith('blob:')) {
     return image;
   }
 
-  return `${TESTIMONIAL_API_BASE_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+  const domain = getApiDomain();
+  if (image.includes('/uploads/')) {
+    const uploadPath = image.slice(image.indexOf('/uploads/'));
+    return `${domain}${uploadPath}`;
+  }
+
+  return `${domain}${image.startsWith('/') ? '' : '/'}${image}`;
 };
 
 export const normalizeTestimonial = (testimonial = {}, index = 0) => {
