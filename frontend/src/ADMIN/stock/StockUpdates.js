@@ -53,10 +53,7 @@ const statusMeta = {
   'Out of Stock':{ className: 'stock-badge--out', icon: X },
 };
 
-const formatINR = (n) => {
-  const num = Number(n || 0);
-  return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: num % 1 !== 0 ? 1 : 0, maximumFractionDigits: 2 })}`;
-};
+const formatINR = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
 
 /* ─── Stock Badge ─────────────────────────────────────── */
 const StockBadge = ({ status }) => {
@@ -265,13 +262,6 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
-
-  // Clear subcategory when category changes
-  const handleCategoryChange = (val) => {
-    setCategory(val);
-    setSubcategory('');
-  };
-
   const [supplier, setSupplier] = useState('');
   const [currentStock, setCurrentStock] = useState('');
   const [reorderLevel, setReorderLevel] = useState('');
@@ -358,7 +348,7 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
               <div className="stock-field-row">
                 <div className="catalog-field">
                   <label>Category <span className="field-required">*</span></label>
-                  <select value={category} onChange={(e) => handleCategoryChange(e.target.value)} required>
+                  <select value={category} onChange={(e) => setCategory(e.target.value)} required>
                     <option value="">Select Category...</option>
                     {categories.map(c => {
                       const name = c.name || c;
@@ -369,21 +359,12 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
 
                 <div className="catalog-field">
                   <label>Subcategory</label>
-                  <select 
-                    value={subcategory} 
+                  <input
+                    type="text"
+                    placeholder="e.g. Pumps & Motors"
+                    value={subcategory}
                     onChange={(e) => setSubcategory(e.target.value)}
-                    disabled={!category}
-                  >
-                    <option value="">Select Subcategory...</option>
-                    {(() => {
-                      const catObj = categories.find(c => (c.name || c) === category);
-                      const subcats = catObj?.subCategories || catObj?.subcategories || catObj?.Subcategories || [];
-                      return subcats.map(sc => {
-                        const scName = sc.name || sc.subcategoryName || sc.Name || sc;
-                        return <option key={scName} value={scName}>{scName}</option>;
-                      });
-                    })()}
-                  </select>
+                  />
                 </div>
               </div>
 
@@ -513,7 +494,6 @@ const StockUpdates = () => {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
-  const [subcategoryFilter, setSubcategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [adjustingItem, setAdjustingItem] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -538,11 +518,13 @@ const StockUpdates = () => {
       const data = await getStockLedger();
       if (data && data.length > 0) {
         setItems(data);
+        saveLocalStock(data);
       } else {
-        setItems([]);
+        setItems(getLocalStock());
       }
     } catch (err) {
-      console.warn("Failed to fetch stock ledger from API:", err);
+      console.warn("Failed to fetch stock ledger from API, using localStorage:", err);
+      setItems(getLocalStock());
     } finally {
       setLoading(false);
     }
@@ -577,11 +559,10 @@ const StockUpdates = () => {
     return items.filter(i => {
       const matchSearch = !q || [i.sku, i.name, i.category, i.supplier].join(' ').toLowerCase().includes(q);
       const matchCat = categoryFilter === 'All' || i.category === categoryFilter;
-      const matchSubcat = subcategoryFilter === 'All' || i.subcategory === subcategoryFilter;
       const matchStatus = statusFilter === 'All' || i.status === statusFilter;
-      return matchSearch && matchCat && matchSubcat && matchStatus;
+      return matchSearch && matchCat && matchStatus;
     });
-  }, [items, search, categoryFilter, subcategoryFilter, statusFilter]);
+  }, [items, search, categoryFilter, statusFilter]);
 
   // Extract unique categories from actual items dynamically for the filter dropdown
   const filterCategories = useMemo(() => {
@@ -589,22 +570,10 @@ const StockUpdates = () => {
     return ['All', ...Array.from(list)];
   }, [items]);
 
-  // Extract unique subcategories, optionally filtered by selected category
-  const filterSubcategories = useMemo(() => {
-    const relevant = categoryFilter === 'All' ? items : items.filter(i => i.category === categoryFilter);
-    const list = new Set(relevant.map(i => i.subcategory).filter(Boolean));
-    return ['All', ...Array.from(list)];
-  }, [items, categoryFilter]);
-
   // Reset page when filter/search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, categoryFilter, subcategoryFilter, statusFilter]);
-
-  // Reset subcategory filter when category filter changes
-  useEffect(() => {
-    setSubcategoryFilter('All');
-  }, [categoryFilter]);
+  }, [search, categoryFilter, statusFilter]);
 
   const handleSaveAdjust = async (item, adjustmentData) => {
     setLoading(true);
@@ -813,12 +782,6 @@ const StockUpdates = () => {
               </select>
             </label>
             <label className="catalog-filter">
-              <Package size={15} />
-              <select value={subcategoryFilter} onChange={(e) => setSubcategoryFilter(e.target.value)}>
-                {filterSubcategories.map(sc => <option key={sc} value={sc}>{sc === 'All' ? 'All Subcategories' : sc}</option>)}
-              </select>
-            </label>
-            <label className="catalog-filter">
               <ClipboardList size={15} />
               <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                 {STATUSES.map(s => <option key={s} value={s}>{s === 'All' ? 'All Statuses' : s}</option>)}
@@ -834,12 +797,14 @@ const StockUpdates = () => {
               <tr style={{ fontSize: '11px' }}>
                 <th style={{ padding: '8px 12px' }}>Product / SKU</th>
                 <th style={{ padding: '8px 12px' }}>Category</th>
-                <th style={{ padding: '8px 12px' }}>Subcategory</th>
                 <th style={{ padding: '8px 12px' }}>Supplier</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Current Stock</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Reorder Level</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Actual Price</th>
+                <th style={{ padding: '8px 12px' }}>Status</th>
+                <th style={{ padding: '8px 12px' }}>30-Day Trend</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Cost Price</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Selling Price</th>
+                <th style={{ padding: '8px 12px' }}>Last Updated</th>
                 <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Actions</th>
               </tr>
             </thead>
@@ -862,9 +827,7 @@ const StockUpdates = () => {
                   </td>
                   <td style={{ padding: '6px 12px' }}>
                     <div className="catalog-table__title" style={{ fontSize: '12px' }}>{item.category}</div>
-                  </td>
-                  <td style={{ padding: '6px 12px' }}>
-                    <div className="catalog-table__title" style={{ fontSize: '12px' }}>{item.subcategory}</div>
+                    <div className="catalog-table__muted" style={{ fontSize: '10px' }}>{item.subcategory}</div>
                   </td>
                   <td style={{ padding: '6px 12px' }}>{item.supplier}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>
@@ -872,9 +835,14 @@ const StockUpdates = () => {
                       {item.currentStock}
                     </span>
                   </td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel > 0 ? item.reorderLevel : 30}</td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel}</td>
+                  <td style={{ padding: '6px 12px' }}><StockBadge status={item.status} /></td>
+                  <td style={{ padding: '6px 12px' }}><TrendIndicator trend={item.trend} change={item.change} /></td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice)}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.sellingPrice)}</td>
+                  <td style={{ padding: '6px 12px' }}>
+                    <div className="catalog-table__muted" style={{ fontSize: '11px' }}>{item.lastUpdated}</div>
+                  </td>
                   <td className="catalog-center-cell" style={{ padding: '6px 12px' }}>
                     <button
                       className="catalog-btn catalog-btn--icon stock-adjust-btn"
@@ -889,7 +857,7 @@ const StockUpdates = () => {
               ))}
               {!filtered.length && (
                 <tr>
-                  <td colSpan="9">
+                  <td colSpan="11">
                     <div className="orders-empty">No products match the current filters.</div>
                   </td>
                 </tr>

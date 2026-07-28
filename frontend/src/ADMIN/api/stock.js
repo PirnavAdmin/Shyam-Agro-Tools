@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { getApiDomain } from '../../utils/apiConfig';
 
-export const BASE_URL = getApiDomain();
+export const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -15,22 +14,8 @@ const api = axios.create({
 
 export const mapStockItemFromApi = (raw = {}) => {
   const currentStock = Number(raw.currentStock ?? raw.stockQuantity ?? raw.stock ?? 0);
-  const rawReorder = Number(raw.reorderLevel ?? raw.ReorderLevel ?? 0);
-  const reorderLevel = rawReorder > 0 ? rawReorder : 30;
+  const reorderLevel = Number(raw.reorderLevel ?? 0);
   
-  // Parse price fields (backend passes costPrice as string formatted ₹1,017 or raw MRP/SellingPrice)
-  const parseAmount = (val) => {
-    if (typeof val === 'number') return val;
-    if (typeof val === 'string') {
-      const clean = val.replace(/[^0-9.]/g, '');
-      return parseFloat(clean) || 0;
-    }
-    return 0;
-  };
-
-  const costPrice = parseAmount(raw.costPrice ?? raw.mrp ?? raw.MRP ?? 0);
-  const sellingPrice = parseAmount(raw.sellingPrice ?? raw.SellingPrice ?? raw.price ?? raw.costPrice ?? 0);
-
   // Determine status
   let status = raw.status || raw.stockStatus;
   if (!status) {
@@ -45,17 +30,17 @@ export const mapStockItemFromApi = (raw = {}) => {
 
   return {
     id: raw.id ?? raw.productId ?? '',
-    sku: raw.sku || raw.SKU || '',
+    sku: raw.sku || '',
     name: raw.productName || raw.name || '',
-    category: raw.categoryName || raw.CategoryName || raw.category || 'General',
+    category: raw.categoryName || raw.category || 'General',
     categoryId: raw.categoryId ?? '',
-    subcategory: raw.subcategoryName || raw.SubcategoryName || raw.subcategory || raw.Subcategory || 'General',
-    supplier: raw.supplierName || raw.SupplierName || raw.supplier || 'AquaFlow Pvt Ltd',
+    subcategory: raw.subcategoryName || raw.subcategory || 'General',
+    supplier: raw.supplierName || raw.supplier || 'Unknown',
     currentStock,
     reorderLevel,
     unit: raw.stockUnit || raw.unit || 'Pcs',
-    costPrice,
-    sellingPrice,
+    costPrice: Number(raw.costPrice ?? raw.basePrice ?? 0),
+    sellingPrice: Number(raw.sellingPrice ?? raw.price ?? 0),
     status,
     lastUpdated: raw.lastUpdated ? raw.lastUpdated.slice(0, 10) : new Date().toISOString().slice(0, 10),
     trend: raw.trend || 'stable',
@@ -70,17 +55,7 @@ export const mapStockItemFromApi = (raw = {}) => {
 export const getStockLedger = async (params = {}) => {
   const response = await api.get('/api/Stock/ledger', { params });
   const data = response.data;
-  const list = Array.isArray(data) 
-    ? data 
-    : (Array.isArray(data?.products) 
-      ? data.products 
-      : (Array.isArray(data?.Products) 
-        ? data.Products 
-        : (Array.isArray(data?.data) 
-          ? data.data 
-          : (Array.isArray(data?.items) 
-            ? data.items 
-            : []))));
+  const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : (Array.isArray(data?.items) ? data.items : []));
   return list.map(mapStockItemFromApi);
 };
 
