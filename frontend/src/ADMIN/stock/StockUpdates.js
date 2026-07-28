@@ -374,9 +374,9 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
                     <option value="">Select Subcategory...</option>
                     {(() => {
                       const catObj = categories.find(c => (c.name || c) === category);
-                      const subcats = catObj?.subCategories || [];
+                      const subcats = catObj?.subCategories || catObj?.subcategories || catObj?.Subcategories || [];
                       return subcats.map(sc => {
-                        const scName = sc.name || sc;
+                        const scName = sc.name || sc.subcategoryName || sc.Name || sc;
                         return <option key={scName} value={scName}>{scName}</option>;
                       });
                     })()}
