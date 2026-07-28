@@ -248,7 +248,7 @@ const AdjustModal = ({ item: initialItem, products = [], onClose, onSave }) => {
             disabled={!selectedItem || !qty || Number(qty) <= 0}
           >
             <Save size={16} />
-            Save Adjustment
+            Update Adjustment
           </button>
         </div>
       </div>
