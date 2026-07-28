@@ -108,16 +108,21 @@ const StaffList = () => {
             console.warn(`Could not load permissions for staff #${actualId}`, err);
           }
         }
-        const isActive = staff.isActive ?? staff.IsActive ?? true;
+        const isActive = staff.isActive ?? staff.IsActive ?? (staff.status ? staff.status.toLowerCase() === 'active' : true);
+        const nameVal = staff.name || staff.Name || `${staff.firstName || staff.FirstName || ''} ${staff.lastName || staff.LastName || ''}`.trim() || 'N/A';
+        const empIdVal = staff.employeeId || staff.EmployeeId || (actualId ? `EMP-${String(actualId).padStart(4, '0')}` : 'N/A');
+        const phoneVal = staff.phone || staff.Phone || staff.mobileNumber || staff.MobileNumber || staff.mobile || staff.Mobile || '';
+
         return {
           ...staff,
           id: actualId,
-          firstName: staff.firstName || staff.FirstName || '',
-          lastName: staff.lastName || staff.LastName || '',
+          name: nameVal,
+          firstName: staff.firstName || staff.FirstName || nameVal.split(' ')[0] || '',
+          lastName: staff.lastName || staff.LastName || nameVal.split(' ').slice(1).join(' ') || '',
           email: staff.email || staff.Email || '',
-          employeeId: staff.employeeId || staff.EmployeeId || '',
+          employeeId: empIdVal,
           role: staff.role || staff.Role || 'staff',
-          mobile: staff.mobileNumber || staff.MobileNumber || staff.mobile || staff.Mobile || '',
+          mobile: phoneVal,
           status: isActive ? 'Active' : 'Inactive',
           isActive,
           permissions
@@ -251,9 +256,9 @@ const StaffList = () => {
                   </td>
                 </tr>
               ) : pagedStaff.map((staff) => {
-                const name = `${staff.firstName || staff.FirstName || ''} ${staff.lastName || staff.LastName || ''}`.trim() || 'N/A';
+                const name = staff.name || `${staff.firstName || ''} ${staff.lastName || ''}`.trim() || 'N/A';
                 const staffId = staff.id ?? staff.Id ?? 'N/A';
-                const employeeCode = staff.employeeId || staff.EmployeeId || 'N/A';
+                const employeeCode = staff.employeeId || (staffId !== 'N/A' ? `EMP-${String(staffId).padStart(4, '0')}` : 'N/A');
                 const roleName = staff.role || staff.Role ? String(staff.role || staff.Role).toUpperCase() : 'STAFF';
                 const statusStr = staff.status || 'Active';
                 const perms = Array.isArray(staff.permissions) ? staff.permissions : [];

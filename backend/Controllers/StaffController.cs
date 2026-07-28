@@ -21,7 +21,23 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Staff>>> GetAll()
         {
-            return await _context.Staff.ToListAsync();
+            var staffList = await _context.Staff.ToListAsync();
+            if (staffList.Count == 0)
+            {
+                var seedStaff = new List<Staff>
+                {
+                    new Staff { Name = "Ramesh Kumar", Email = "ramesh@shyamagro.com", Phone = "9876543210", Role = "Advisory", Status = "Active" },
+                    new Staff { Name = "Sunita Sharma", Email = "sunita@shyamagro.com", Phone = "9876543211", Role = "Sales", Status = "Active" },
+                    new Staff { Name = "Amit Patel", Email = "amit@shyamagro.com", Phone = "9876543212", Role = "Inventory", Status = "Active" },
+                    new Staff { Name = "Vijay Singh", Email = "vijay@shyamagro.com", Phone = "9876543213", Role = "Advisory", Status = "Active" }
+                };
+
+                _context.Staff.AddRange(seedStaff);
+                await _context.SaveChangesAsync();
+                staffList = await _context.Staff.ToListAsync();
+            }
+
+            return Ok(staffList);
         }
 
         [HttpGet("{id}")]
