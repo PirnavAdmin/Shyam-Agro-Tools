@@ -262,6 +262,13 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
+
+  // Clear subcategory when category changes
+  const handleCategoryChange = (val) => {
+    setCategory(val);
+    setSubcategory('');
+  };
+
   const [supplier, setSupplier] = useState('');
   const [currentStock, setCurrentStock] = useState('');
   const [reorderLevel, setReorderLevel] = useState('');
@@ -348,7 +355,7 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
               <div className="stock-field-row">
                 <div className="catalog-field">
                   <label>Category <span className="field-required">*</span></label>
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                  <select value={category} onChange={(e) => handleCategoryChange(e.target.value)} required>
                     <option value="">Select Category...</option>
                     {categories.map(c => {
                       const name = c.name || c;
@@ -359,12 +366,21 @@ const AddEntryModal = ({ categories = [], onClose, onSave }) => {
 
                 <div className="catalog-field">
                   <label>Subcategory</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Pumps & Motors"
-                    value={subcategory}
+                  <select 
+                    value={subcategory} 
                     onChange={(e) => setSubcategory(e.target.value)}
-                  />
+                    disabled={!category}
+                  >
+                    <option value="">Select Subcategory...</option>
+                    {(() => {
+                      const catObj = categories.find(c => (c.name || c) === category);
+                      const subcats = catObj?.subCategories || [];
+                      return subcats.map(sc => {
+                        const scName = sc.name || sc;
+                        return <option key={scName} value={scName}>{scName}</option>;
+                      });
+                    })()}
+                  </select>
                 </div>
               </div>
 
