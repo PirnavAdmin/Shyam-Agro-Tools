@@ -183,7 +183,7 @@ namespace ShyamAgroSuite.Api.Services
 
             var uploadsFolder = Path.Combine(
                 webRootPath,
-                "profile-images");
+                "uploads");
 
             if (!Directory.Exists(uploadsFolder))
             {
@@ -211,7 +211,7 @@ namespace ShyamAgroSuite.Api.Services
             }
 
             user.ProfileImageUrl =
-                "/profile-images/" + fileName;
+                "/uploads/" + fileName;
 
             await _repository.UpdateAsync(user);
 
