@@ -4,9 +4,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   Eye,
-  Filter,
   Mail,
-  MapPin,
   Phone,
   Plus,
   Search,
@@ -158,7 +156,6 @@ const SupplierStatusBadge = ({ status }) => {
 const SuppliersList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [categoryFilter, setCategoryFilter] = useState('All');
 
   // Popup detail state
   const [activePopupSupplier, setActivePopupSupplier] = useState(null);
@@ -204,30 +201,26 @@ const SuppliersList = () => {
         supplier.name,
         supplier.contactPerson,
         supplier.email,
-        supplier.phone,
-        supplier.city,
-        supplier.products
+        supplier.phone
       ].join(' ').toLowerCase().includes(normalizedSearch);
       const matchesStatus = statusFilter === 'All' || supplier.status === statusFilter;
-      const matchesCategory = categoryFilter === 'All' || supplier.category === categoryFilter;
 
-      return matchesSearch && matchesStatus && matchesCategory;
+      return matchesSearch && matchesStatus;
     });
-  }, [suppliersList, categoryFilter, searchTerm, statusFilter]);
+  }, [suppliersList, searchTerm, statusFilter]);
 
   // Reset page when filter/search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, categoryFilter]);
+  }, [searchTerm, statusFilter]);
 
   const summary = useMemo(() => {
     return suppliersList.reduce(
       (acc, supplier) => ({
         verified: acc.verified + (supplier.status === 'Verified' ? 1 : 0),
-        activePo: acc.activePo + supplier.activePo,
-        spend: acc.spend + supplier.monthlySpend
+        total: acc.total + 1
       }),
-      { verified: 0, activePo: 0, spend: 0 }
+      { verified: 0, total: 0 }
     );
   }, [suppliersList]);
 
@@ -251,12 +244,8 @@ const SuppliersList = () => {
             <strong style={{ fontSize: '14px', color: '#1e293b' }}>{summary.verified}</strong>
           </div>
           <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-center min-w-[90px]">
-            <span style={{ fontSize: '9px', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>Active POs</span>
-            <strong style={{ fontSize: '14px', color: '#1e293b' }}>{summary.activePo}</strong>
-          </div>
-          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-center min-w-[120px]">
-            <span style={{ fontSize: '9px', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>Spend</span>
-            <strong style={{ fontSize: '14px', color: '#1e293b' }}>{formatSupplierCurrency(summary.spend)}</strong>
+            <span style={{ fontSize: '9px', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>Total</span>
+            <strong style={{ fontSize: '14px', color: '#1e293b' }}>{summary.total}</strong>
           </div>
         </div>
       </section>
@@ -278,22 +267,12 @@ const SuppliersList = () => {
             <Search size={16} />
             <input
               type="search"
-              placeholder="Search supplier, contact, city, phone..."
+              placeholder="Search supplier, contact, phone..."
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               style={{ fontSize: '12px', padding: '4px 8px 4px 32px' }}
             />
           </div>
-
-          <label className="catalog-filter">
-            <Filter size={14} />
-            <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} style={{ fontSize: '12px', padding: '4px' }}>
-              <option value="All">All categories</option>
-              {supplierCategories.map((category) => (
-                <option value={category} key={category}>{category}</option>
-              ))}
-            </select>
-          </label>
 
           <label className="catalog-filter">
             <ShieldCheck size={14} />
@@ -313,10 +292,7 @@ const SuppliersList = () => {
               <tr style={{ fontSize: '11px' }}>
                 <th style={{ padding: '8px 12px' }}>Supplier</th>
                 <th style={{ padding: '8px 12px' }}>Contact</th>
-                <th style={{ padding: '8px 12px' }}>Category</th>
                 <th style={{ padding: '8px 12px' }}>Lead Time</th>
-                <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Active POs</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Monthly Spend</th>
                 <th style={{ padding: '8px 12px' }}>Status</th>
                 <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Action</th>
               </tr>
@@ -331,11 +307,7 @@ const SuppliersList = () => {
                 >
                   <td style={{ padding: '6px 12px' }}>
                     <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: 600 }}>{supplier.name}</div>
-                    <div className="catalog-table__muted" style={{ fontSize: '10px' }}>{supplier.id} | Rating {supplier.rating}/5</div>
-                    <div className="supplier-location" style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
-                      <MapPin size={11} />
-                      {supplier.city}
-                    </div>
+                    <div className="catalog-table__muted" style={{ fontSize: '10px' }}>Rating {supplier.rating}/5</div>
                   </td>
                   <td style={{ padding: '6px 12px' }}>
                     <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: 600 }}>{supplier.contactPerson}</div>
@@ -349,18 +321,12 @@ const SuppliersList = () => {
                     </div>
                   </td>
                   <td style={{ padding: '6px 12px' }}>
-                    <span className="catalog-badge" style={{ fontSize: '10px' }}>{supplier.category}</span>
-                    <div className="catalog-table__muted" style={{ fontSize: '10px', marginTop: '2px' }}>{supplier.products}</div>
-                  </td>
-                  <td style={{ padding: '6px 12px' }}>
                     <div className="supplier-lead-time" style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px' }}>
                       <Truck size={12} />
-                      {supplier.leadTime}
+                      {supplier.leadTime || '4-6 days'}
                     </div>
                     <div className="catalog-table__muted" style={{ fontSize: '10px' }}>Last: {supplier.lastSupply}</div>
                   </td>
-                  <td className="catalog-center-cell" style={{ padding: '6px 12px', fontWeight: 600 }}>{supplier.activePo}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontWeight: 600 }}>{formatSupplierCurrency(supplier.monthlySpend)}</td>
                   <td style={{ padding: '6px 12px' }}><SupplierStatusBadge status={supplier.status} /></td>
                   <td className="catalog-center-cell" style={{ padding: '6px 12px' }} onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -397,7 +363,7 @@ const SuppliersList = () => {
 
               {!filteredSuppliers.length && (
                 <tr>
-                  <td colSpan="8">
+                  <td colSpan="5">
                     <div className="suppliers-empty">No suppliers match the current search or filters.</div>
                   </td>
                 </tr>
