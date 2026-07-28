@@ -94,19 +94,36 @@ const StaffList = () => {
       const mappedList = await Promise.all(list.map(async (staff) => {
         let permissions = [];
         const actualId = staff.id ?? staff.Id;
+        const role = (staff.role || staff.Role || 'staff').toLowerCase();
+
+        // Role-based default permissions
+        const ROLE_DEFAULTS = {
+          advisory: ['dashboard', 'customers', 'call history', 'reports'],
+          sales: ['dashboard', 'catalog', 'orders', 'invoices', 'customers', 'marketing'],
+          inventory: ['dashboard', 'catalog', 'stockupdates', 'suppliers'],
+          admin: ['dashboard', 'catalog', 'customers', 'orders', 'stockupdates', 'marketing', 'brands', 'blogs', 'settings', 'suppliers', 'coins converter', 'call history', 'invoices', 'reports'],
+          staff: ['dashboard'],
+        };
+
         if (actualId) {
           try {
             const permsResponse = await fetch(`${BASE_URL}/Permission/${actualId}`, { headers: getHeaders() });
             if (permsResponse.ok) {
               const permsJson = await safeParseJson(permsResponse);
               const permsData = unwrapList(permsJson);
-              permissions = permsData
+              const allowed = permsData
                 .filter(p => p.isAllowed ?? p.IsAllowed ?? false)
                 .map(p => p.moduleName || p.ModuleName || (p.module && (p.module.moduleName || p.module.ModuleName)) || '');
+              permissions = allowed.length > 0 ? allowed : (ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff);
+            } else {
+              permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
             }
           } catch (err) {
             console.warn(`Could not load permissions for staff #${actualId}`, err);
+            permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
           }
+        } else {
+          permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
         }
         const isActive = staff.isActive ?? staff.IsActive ?? (staff.status ? staff.status.toLowerCase() === 'active' : true);
         const nameVal = staff.name || staff.Name || `${staff.firstName || staff.FirstName || ''} ${staff.lastName || staff.LastName || ''}`.trim() || 'N/A';
