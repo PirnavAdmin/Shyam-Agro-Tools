@@ -834,8 +834,8 @@ const StockUpdates = () => {
                     </span>
                   </td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice)}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.sellingPrice)}</td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice > 0 && item.sellingPrice > 0 ? Math.min(item.costPrice, item.sellingPrice) : item.costPrice)}</td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice > 0 && item.sellingPrice > 0 ? Math.max(item.costPrice, item.sellingPrice) : item.sellingPrice)}</td>
                   <td style={{ padding: '6px 12px' }}>
                     <div className="catalog-table__muted" style={{ fontSize: '11px' }}>{item.lastUpdated}</div>
                   </td>

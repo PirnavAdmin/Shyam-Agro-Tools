@@ -37,8 +37,17 @@ export const mapStockItemFromApi = (raw = {}) => {
     return 0;
   };
 
-  const costPrice = parseAmount(raw.costPrice ?? raw.CostPrice ?? raw.basePrice ?? 0);
-  const sellingPrice = parseAmount(raw.sellingPrice ?? raw.SellingPrice ?? raw.price ?? 0);
+  let cp = parseAmount(raw.costPrice ?? raw.CostPrice ?? raw.basePrice ?? 0);
+  let sp = parseAmount(raw.sellingPrice ?? raw.SellingPrice ?? raw.price ?? 0);
+
+  // If cost price is higher than selling price, swap/adjust so CP is purchase cost (lower) and SP is customer price (higher)
+  if (cp > 0 && sp > 0 && cp > sp) {
+    const temp = cp;
+    cp = sp;
+    sp = temp;
+  } else if (cp > 0 && (sp === 0 || sp === cp)) {
+    sp = Math.round(cp * 1.18);
+  }
 
   return {
     id: raw.id ?? raw.productId ?? '',
@@ -51,8 +60,8 @@ export const mapStockItemFromApi = (raw = {}) => {
     currentStock,
     reorderLevel,
     unit: raw.stockUnit || raw.unit || 'Pcs',
-    costPrice,
-    sellingPrice,
+    costPrice: cp,
+    sellingPrice: sp,
     status,
     lastUpdated: raw.lastUpdated ? raw.lastUpdated.slice(0, 10) : new Date().toISOString().slice(0, 10),
     trend: raw.trend || 'stable',
@@ -67,7 +76,17 @@ export const mapStockItemFromApi = (raw = {}) => {
 export const getStockLedger = async (params = {}) => {
   const response = await api.get('/api/Stock/ledger', { params });
   const data = response.data;
-  const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : (Array.isArray(data?.items) ? data.items : []));
+  const list = Array.isArray(data) 
+    ? data 
+    : (Array.isArray(data?.Products) 
+      ? data.Products 
+      : (Array.isArray(data?.products) 
+        ? data.products 
+        : (Array.isArray(data?.data) 
+          ? data.data 
+          : (Array.isArray(data?.items) 
+            ? data.items 
+            : []))));
   return list.map(mapStockItemFromApi);
 };
 
