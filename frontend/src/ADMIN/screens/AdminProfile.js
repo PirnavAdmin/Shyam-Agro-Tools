@@ -18,7 +18,7 @@ const AdminProfile = () => {
     const storedName = localStorage.getItem('adminName') || 'Admin User';
     const storedEmail = localStorage.getItem('adminEmail') || 'admin@shyamagro.com';
     let storedRole = localStorage.getItem('adminRole') || 'super admin';
-    if (storedEmail.toLowerCase().trim() === 'charanbhaskar4455@gmail.com') {
+    if (storedEmail.toLowerCase().trim() === 'vineethavinni70@gmail.com') {
       storedRole = 'super admin';
     }
     const storedPerms = localStorage.getItem('adminPermissions');
