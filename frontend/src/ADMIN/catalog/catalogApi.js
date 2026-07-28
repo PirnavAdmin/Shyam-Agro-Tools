@@ -19,6 +19,10 @@ const api = axios.create({
 /** Resolve a relative image path to a full URL */
 const resolveImageUrl = (url) => {
   if (!url) return '';
+  if (url.includes('/uploads/')) {
+    const uploadPath = url.slice(url.indexOf('/uploads/'));
+    return `${BASE_URL}${uploadPath}`;
+  }
   if (/^https?:\/\//i.test(url)) return url;
   return `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
 };

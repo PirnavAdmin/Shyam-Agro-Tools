@@ -1311,7 +1311,7 @@ const ProductsForm = () => {
 
         <div className="catalog-actions product-form-actions" style={{ padding: '12px 20px', background: '#fff', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '10px' }}>
           <button type="submit" className="catalog-btn catalog-btn--primary" disabled={isSaving} style={{ padding: '8px 16px', fontSize: '13px' }}>
-            <Save size={14} /> {isSaving ? 'Saving...' : 'Save Product'}
+            <Save size={14} /> {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Product' : 'Save Product')}
           </button>
           <button type="button" className="catalog-btn" onClick={() => navigate('/admin/catalog/products')} style={{ padding: '8px 16px', fontSize: '13px', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#64748b', cursor: 'pointer', borderRadius: '6px' }}>
             Cancel

@@ -149,7 +149,7 @@ const CouponEditModal = ({ coupon, onClose, onSave }) => {
           <div className="coupon-modal__actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
             <button className="catalog-btn cancel-btn" type="button" onClick={onClose} style={{ fontSize: '12px' }}>Cancel</button>
             <button className="catalog-btn catalog-btn--primary save-btn" type="submit" style={{ fontSize: '12px' }}>
-              Save Changes
+              Update Coupon
             </button>
           </div>
         </form>

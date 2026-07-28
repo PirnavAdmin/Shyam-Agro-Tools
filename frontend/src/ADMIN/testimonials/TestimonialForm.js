@@ -152,7 +152,7 @@ const TestimonialForm = () => {
       }, 1000);
     } catch (err) {
       console.error(err);
-      setToastMessage(err.message || 'Failed to save testimonial. Please try again.');
+      setToastMessage(err.message || (isEditing ? 'Failed to update testimonial. Please try again.' : 'Failed to save testimonial. Please try again.'));
       setToastType('error');
       setSaving(false);
     }
@@ -181,7 +181,7 @@ const TestimonialForm = () => {
         <div className="catalog-header__actions">
           <button className="catalog-btn catalog-btn--primary" onClick={handleSubmit} disabled={saving || loading}>
             <Save size={16} />
-            {saving ? 'Saving...' : 'Save Testimonial'}
+            {saving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Testimonial' : 'Save Testimonial')}
           </button>
         </div>
       </section>

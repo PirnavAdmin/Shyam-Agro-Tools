@@ -102,13 +102,13 @@ const Category = () => {
         metaDescription: formData.metaDescription || formData.description,
       });
       if (saved) {
-        setToast({ message: 'Category saved successfully!', type: 'success' });
+        setToast({ message: isEditing ? 'Category updated successfully!' : 'Category saved successfully!', type: 'success' });
         setTimeout(() => {
           navigate('/admin/catalog/categories');
         }, 1500);
       }
     } catch (apiError) {
-      setToast({ message: apiError.message || 'Failed to save category.', type: 'error' });
+      setToast({ message: apiError.message || (isEditing ? 'Failed to update category.' : 'Failed to save category.'), type: 'error' });
     } finally {
       setIsSaving(false);
     }
@@ -134,7 +134,7 @@ const Category = () => {
             <ArrowLeft size={14} /> Categories List
           </Link>
           <button type="button" className="catalog-btn catalog-btn--primary" onClick={handleSave} disabled={isSaving} style={{ padding: '6px 12px', fontSize: '13px' }}>
-            <Save size={14} /> {isSaving ? 'Saving...' : 'Save Category'}
+            <Save size={14} /> {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Category' : 'Save Category')}
           </button>
         </div>
       </section>

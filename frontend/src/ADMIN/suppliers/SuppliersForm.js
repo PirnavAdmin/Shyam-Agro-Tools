@@ -35,6 +35,7 @@ const initialSupplier = {
 
 const SuppliersForm = () => {
   const { id } = useParams();
+  const isEditing = Boolean(id);
   const [supplier, setSupplier] = useState(initialSupplier);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -117,7 +118,7 @@ const SuppliersForm = () => {
           </Link>
           <div>
             <span className="catalog-kicker" style={{ fontSize: '10px', textTransform: 'uppercase', color: '#059669', fontWeight: 700 }}>Procurement</span>
-            <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Add Supplier Profile</h1>
+            <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', margin: 0 }}>{isEditing ? 'Edit Supplier Profile' : 'Add Supplier Profile'}</h1>
           </div>
         </div>
 
@@ -128,7 +129,7 @@ const SuppliersForm = () => {
           </button>
           <button className="catalog-btn catalog-btn--primary" onClick={handleSubmit} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
             <Save size={14} style={{ marginRight: '4px' }} />
-            Save Supplier
+            {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Supplier' : 'Save Supplier')}
           </button>
         </div>
       </section>
@@ -395,7 +396,7 @@ const SuppliersForm = () => {
               disabled={isSaving}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-sm flex items-center gap-1"
             >
-              <Check size={14} /> Save Supplier
+              <Check size={14} /> {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Supplier' : 'Save Supplier')}
             </button>
           </div>
         </aside>

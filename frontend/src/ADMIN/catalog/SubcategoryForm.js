@@ -107,13 +107,13 @@ const SubcategoryForm = () => {
       });
 
       if (saved) {
-        setToast({ message: 'Subcategory saved successfully!', type: 'success' });
+        setToast({ message: isEditing ? 'Subcategory updated successfully!' : 'Subcategory saved successfully!', type: 'success' });
         setTimeout(() => {
           navigate('/admin/catalog/subcategories');
         }, 1500);
       }
     } catch (apiError) {
-      setToast({ message: apiError.message || 'Unable to save subcategory.', type: 'error' });
+      setToast({ message: apiError.message || (isEditing ? 'Failed to update subcategory.' : 'Unable to save subcategory.'), type: 'error' });
     } finally {
       setIsSaving(false);
     }
@@ -155,7 +155,7 @@ const SubcategoryForm = () => {
             <ArrowLeft size={14} /> Subcategories List
           </Link>
           <button type="button" className="catalog-btn catalog-btn--primary" onClick={handleSave} disabled={isSaving} style={{ padding: '6px 12px', fontSize: '13px' }}>
-            <Plus size={14} /> {isSaving ? 'Saving...' : 'Save & Add Product'}
+            <Plus size={14} /> {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Subcategory' : 'Save & Add Product')}
           </button>
         </div>
       </section>

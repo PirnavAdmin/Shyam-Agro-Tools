@@ -139,7 +139,7 @@ const BlogForm = () => {
       }, 1000);
 
     } catch (err) {
-      setToastMessage(err.message || 'Failed to save the article. Please try again.');
+      setToastMessage(err.message || (isEditing ? 'Failed to update the article. Please try again.' : 'Failed to publish the article. Please try again.'));
       setToastType('error');
       setSaving(false);
     }
@@ -175,7 +175,7 @@ const BlogForm = () => {
             ) : (
               <Save size={14} style={{ marginRight: '4px' }} />
             )}
-            {isEditing ? 'Update Article' : 'Publish Article'}
+            {saving ? (isEditing ? 'Updating...' : 'Publishing...') : (isEditing ? 'Update Article' : 'Publish Article')}
           </button>
         </div>
       </section>

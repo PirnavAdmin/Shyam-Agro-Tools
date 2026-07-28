@@ -556,7 +556,7 @@ function AddStaff() {
           </Link>
           <button className="staff-save-btn" onClick={handleSubmit} disabled={isSaving}>
             <Save size={14} />
-            Save Profile
+            {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Profile' : 'Save Profile')}
           </button>
         </div>
       </section>

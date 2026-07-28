@@ -277,13 +277,13 @@ const BrandForm = () => {
       } else {
         await createBrand({ id: id.trim(), name: name.trim(), description: description.trim(), logo, logoFile });
       }
-      setToastMessage('Brand saved successfully!');
+      setToastMessage(isEditing ? 'Brand updated successfully!' : 'Brand saved successfully!');
       setToastType('success');
       setTimeout(() => {
         navigate('/admin/brands/list');
       }, 1000);
     } catch (err) {
-      setToastMessage(err.message || 'Failed to save brand details.');
+      setToastMessage(err.message || (isEditing ? 'Failed to update brand details.' : 'Failed to save brand details.'));
       setToastType('error');
       setIsSaving(false);
     }
@@ -313,7 +313,7 @@ const BrandForm = () => {
           </Link>
           <button className="catalog-btn catalog-btn--primary" onClick={handleSubmit} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
             <Save size={14} style={{ marginRight: '4px' }} />
-            Save Brand
+            {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Brand' : 'Save Brand')}
           </button>
         </div>
       </section>
