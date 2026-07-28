@@ -848,7 +848,6 @@ const AdminReturns = () => {
                     type="text" 
                     value={pickupAgentName}
                     onChange={(e) => setPickupAgentName(e.target.value)}
-                    required
                     placeholder="e.g. Rahul Sharma"
                     className="modal-form-control"
                   />
@@ -859,7 +858,6 @@ const AdminReturns = () => {
                     type="tel" 
                     value={pickupAgentPhone}
                     onChange={(e) => setPickupAgentPhone(e.target.value)}
-                    required
                     placeholder="e.g. 9876543210"
                     className="modal-form-control"
                   />
