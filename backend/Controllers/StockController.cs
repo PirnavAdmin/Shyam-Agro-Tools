@@ -29,6 +29,7 @@ namespace ShyamAgroSuite.Api.Controllers
         {
             var query = _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.Subcategory)
                 .Where(p => p.IsActive)
                 .AsQueryable();
 
@@ -36,11 +37,11 @@ namespace ShyamAgroSuite.Api.Controllers
             var allProducts = await _context.Products.Where(p => p.IsActive).ToListAsync();
             
             int totalSkus = allProducts.Count;
-            int inStockCount = allProducts.Count(p => p.Stock > p.ReorderLevel);
-            int lowStockCount = allProducts.Count(p => p.Stock <= p.ReorderLevel && p.Stock > 0);
+            int inStockCount = allProducts.Count(p => p.Stock > (p.ReorderLevel > 0 ? p.ReorderLevel : 30));
+            int lowStockCount = allProducts.Count(p => p.Stock <= (p.ReorderLevel > 0 ? p.ReorderLevel : 30) && p.Stock > 0);
             int outOfStockCount = allProducts.Count(p => p.Stock == 0);
             
-            decimal totalInventoryValue = allProducts.Sum(p => p.Stock * p.CostPrice);
+            decimal totalInventoryValue = allProducts.Sum(p => p.Stock * p.MRP);
 
             // Apply search filters (SKU, Name, Category)
             if (!string.IsNullOrEmpty(search))
@@ -49,7 +50,8 @@ namespace ShyamAgroSuite.Api.Controllers
                 query = query.Where(p => 
                     p.SKU.ToLower().Contains(s) || 
                     p.ProductName.ToLower().Contains(s) || 
-                    (p.Category != null && p.Category.Name.ToLower().Contains(s))
+                    (p.Category != null && p.Category.Name.ToLower().Contains(s)) ||
+                    (p.Subcategory != null && p.Subcategory.Name.ToLower().Contains(s))
                 );
             }
 
@@ -65,11 +67,11 @@ namespace ShyamAgroSuite.Api.Controllers
             {
                 if (status.Equals("In Stock", StringComparison.OrdinalIgnoreCase) || status.Equals("InStock", StringComparison.OrdinalIgnoreCase))
                 {
-                    query = query.Where(p => p.Stock > p.ReorderLevel);
+                    query = query.Where(p => p.Stock > (p.ReorderLevel > 0 ? p.ReorderLevel : 30));
                 }
                 else if (status.Equals("Low Stock", StringComparison.OrdinalIgnoreCase) || status.Equals("LowStock", StringComparison.OrdinalIgnoreCase))
                 {
-                    query = query.Where(p => p.Stock <= p.ReorderLevel && p.Stock > 0);
+                    query = query.Where(p => p.Stock <= (p.ReorderLevel > 0 ? p.ReorderLevel : 30) && p.Stock > 0);
                 }
                 else if (status.Equals("Out of Stock", StringComparison.OrdinalIgnoreCase) || status.Equals("OutOfStock", StringComparison.OrdinalIgnoreCase) || status.Equals("Out", StringComparison.OrdinalIgnoreCase))
                 {
@@ -81,12 +83,13 @@ namespace ShyamAgroSuite.Api.Controllers
 
             var ledgerEntries = filteredProducts.Select(p =>
             {
+                var effectiveReorderLevel = p.ReorderLevel > 0 ? p.ReorderLevel : 30;
                 var displayStatus = "In Stock";
                 if (p.Stock == 0)
                 {
                     displayStatus = "Out of Stock";
                 }
-                else if (p.Stock <= p.ReorderLevel)
+                else if (p.Stock <= effectiveReorderLevel)
                 {
                     displayStatus = "Low Stock";
                 }
@@ -97,13 +100,14 @@ namespace ShyamAgroSuite.Api.Controllers
                     ProductName = p.ProductName,
                     SKU = p.SKU,
                     CategoryName = p.Category?.Name ?? "General",
-                    SupplierName = p.SupplierName ?? "AquaFlow Pvt Ltd",
+                    SubcategoryName = p.Subcategory?.Name ?? "General",
+                    SupplierName = string.IsNullOrWhiteSpace(p.Manufacturer) ? (p.SupplierName ?? "AquaFlow Pvt Ltd") : p.Manufacturer,
                     CurrentStock = p.Stock,
-                    ReorderLevel = p.ReorderLevel,
+                    ReorderLevel = effectiveReorderLevel,
                     Status = displayStatus,
                     Trend30Day = p.Trend30Day ?? "+10%",
-                    CostPrice = $"₹{p.CostPrice:N0}",
-                    SellingPrice = $"₹{(p.SellingPrice ?? p.MRP):N0}",
+                    CostPrice = $"₹{p.MRP:N0}",
+                    SellingPrice = $"₹{(p.SellingPrice.HasValue && p.SellingPrice > 0 ? p.SellingPrice.Value : p.MRP):N0}",
                     LastUpdated = p.LastUpdated.ToString("yyyy-MM-dd")
                 };
             }).ToList();

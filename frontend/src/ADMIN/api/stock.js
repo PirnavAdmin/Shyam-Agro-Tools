@@ -15,8 +15,22 @@ const api = axios.create({
 
 export const mapStockItemFromApi = (raw = {}) => {
   const currentStock = Number(raw.currentStock ?? raw.stockQuantity ?? raw.stock ?? 0);
-  const reorderLevel = Number(raw.reorderLevel ?? 0);
+  const rawReorder = Number(raw.reorderLevel ?? raw.ReorderLevel ?? 0);
+  const reorderLevel = rawReorder > 0 ? rawReorder : 30;
   
+  // Parse price fields (backend passes costPrice as string formatted ₹1,017 or raw MRP/SellingPrice)
+  const parseAmount = (val) => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const clean = val.replace(/[^0-9.]/g, '');
+      return parseFloat(clean) || 0;
+    }
+    return 0;
+  };
+
+  const costPrice = parseAmount(raw.costPrice ?? raw.mrp ?? raw.MRP ?? 0);
+  const sellingPrice = parseAmount(raw.sellingPrice ?? raw.SellingPrice ?? raw.price ?? raw.costPrice ?? 0);
+
   // Determine status
   let status = raw.status || raw.stockStatus;
   if (!status) {
@@ -31,17 +45,17 @@ export const mapStockItemFromApi = (raw = {}) => {
 
   return {
     id: raw.id ?? raw.productId ?? '',
-    sku: raw.sku || '',
+    sku: raw.sku || raw.SKU || '',
     name: raw.productName || raw.name || '',
     category: raw.categoryName || raw.category || 'General',
     categoryId: raw.categoryId ?? '',
     subcategory: raw.subcategoryName || raw.subcategory || 'General',
-    supplier: raw.supplierName || raw.supplier || 'Unknown',
+    supplier: raw.supplierName || raw.supplier || 'AquaFlow Pvt Ltd',
     currentStock,
     reorderLevel,
     unit: raw.stockUnit || raw.unit || 'Pcs',
-    costPrice: Number(raw.costPrice ?? raw.basePrice ?? 0),
-    sellingPrice: Number(raw.sellingPrice ?? raw.price ?? 0),
+    costPrice,
+    sellingPrice,
     status,
     lastUpdated: raw.lastUpdated ? raw.lastUpdated.slice(0, 10) : new Date().toISOString().slice(0, 10),
     trend: raw.trend || 'stable',

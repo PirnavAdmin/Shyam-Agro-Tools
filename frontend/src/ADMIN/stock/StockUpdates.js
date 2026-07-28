@@ -813,14 +813,12 @@ const StockUpdates = () => {
               <tr style={{ fontSize: '11px' }}>
                 <th style={{ padding: '8px 12px' }}>Product / SKU</th>
                 <th style={{ padding: '8px 12px' }}>Category</th>
+                <th style={{ padding: '8px 12px' }}>Subcategory</th>
                 <th style={{ padding: '8px 12px' }}>Supplier</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Current Stock</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Reorder Level</th>
-                <th style={{ padding: '8px 12px' }}>Status</th>
-                <th style={{ padding: '8px 12px' }}>30-Day Trend</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Cost Price</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Selling Price</th>
-                <th style={{ padding: '8px 12px' }}>Last Updated</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Before MRP</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Final MRP</th>
                 <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Actions</th>
               </tr>
             </thead>
@@ -843,7 +841,9 @@ const StockUpdates = () => {
                   </td>
                   <td style={{ padding: '6px 12px' }}>
                     <div className="catalog-table__title" style={{ fontSize: '12px' }}>{item.category}</div>
-                    <div className="catalog-table__muted" style={{ fontSize: '10px' }}>{item.subcategory}</div>
+                  </td>
+                  <td style={{ padding: '6px 12px' }}>
+                    <div className="catalog-table__title" style={{ fontSize: '12px' }}>{item.subcategory}</div>
                   </td>
                   <td style={{ padding: '6px 12px' }}>{item.supplier}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>
@@ -851,14 +851,9 @@ const StockUpdates = () => {
                       {item.currentStock}
                     </span>
                   </td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel}</td>
-                  <td style={{ padding: '6px 12px' }}><StockBadge status={item.status} /></td>
-                  <td style={{ padding: '6px 12px' }}><TrendIndicator trend={item.trend} change={item.change} /></td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel > 0 ? item.reorderLevel : 30}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice)}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.sellingPrice)}</td>
-                  <td style={{ padding: '6px 12px' }}>
-                    <div className="catalog-table__muted" style={{ fontSize: '11px' }}>{item.lastUpdated}</div>
-                  </td>
                   <td className="catalog-center-cell" style={{ padding: '6px 12px' }}>
                     <button
                       className="catalog-btn catalog-btn--icon stock-adjust-btn"
@@ -873,7 +868,7 @@ const StockUpdates = () => {
               ))}
               {!filtered.length && (
                 <tr>
-                  <td colSpan="11">
+                  <td colSpan="9">
                     <div className="orders-empty">No products match the current filters.</div>
                   </td>
                 </tr>
