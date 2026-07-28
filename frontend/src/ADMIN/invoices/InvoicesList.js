@@ -55,8 +55,8 @@ const InvoicesList = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchTerm]);
 
-  const handleUpdateStatus = async (id, nextStatus) => {
-    if (!window.confirm(`Are you sure you want to change this invoice's status to ${nextStatus}?`)) return;
+  const handleUpdateStatus = async (id, currentStatus, nextStatus) => {
+    if (!window.confirm(`This invoice is currently ${currentStatus.toUpperCase()}. Are you sure you want to mark it as ${nextStatus.toUpperCase()}?`)) return;
 
     try {
       const response = await fetch(`${getApiDomain()}/api/Invoices/${id}`, {
@@ -311,7 +311,7 @@ const InvoicesList = () => {
                           const nextTarget = isPaid ? 'Unpaid' : 'Paid';
                           return (
                             <button
-                              onClick={() => handleUpdateStatus(inv.id, nextTarget)}
+                              onClick={() => handleUpdateStatus(inv.id, inv.status, nextTarget)}
                               className="inv-action-btn toggle"
                               title="Toggle Status"
                             >
