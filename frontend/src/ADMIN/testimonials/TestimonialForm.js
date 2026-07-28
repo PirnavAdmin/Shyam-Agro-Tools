@@ -45,6 +45,7 @@ const TestimonialForm = () => {
 
   const [formData, setFormData] = useState(emptyForm);
   const [imagePreview, setImagePreview] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -85,7 +86,7 @@ const TestimonialForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Convert image to base64 for submission
+  // Convert image to base64 for submission & store file
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -96,6 +97,7 @@ const TestimonialForm = () => {
       return;
     }
 
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (event) => {
       if (event.target?.result) {
@@ -129,28 +131,50 @@ const TestimonialForm = () => {
     setToastMessage('');
 
     try {
-      const payload = {
-        name: formData.name.trim(),
-        role: formData.role.trim(),
-        text: formData.text.trim(),
-        imageUrl: imagePreview || 'https://randomuser.me/api/portraits/lego/1.jpg',
-        rating: existingRecord?.rating ?? 5,
-        isActive: existingRecord?.isActive ?? true,
-        sortOrder: existingRecord?.sortOrder ?? 1,
-      };
-
       const url = isEditing ? `${API_BASE}/${testimonialId}` : API_BASE;
       const method = isEditing ? 'PUT' : 'POST';
 
-      if (isEditing) {
-        payload.id = parseInt(testimonialId, 10);
-      }
+      let res;
+      if (selectedFile) {
+        const fd = new FormData();
+        fd.append('name', formData.name.trim());
+        fd.append('role', formData.role.trim());
+        fd.append('text', formData.text.trim());
+        fd.append('rating', String(existingRecord?.rating ?? 5));
+        fd.append('isActive', String(existingRecord?.isActive ?? true));
+        fd.append('sortOrder', String(existingRecord?.sortOrder ?? 1));
+        fd.append('imageFile', selectedFile);
 
-      const res = await fetch(url, {
-        method,
-        headers: getHeaders(),
-        body: JSON.stringify(payload),
-      });
+        const token = localStorage.getItem('adminToken');
+        const headers = { 'ngrok-skip-browser-warning': 'true' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        res = await fetch(url, {
+          method,
+          headers,
+          body: fd,
+        });
+      } else {
+        const payload = {
+          name: formData.name.trim(),
+          role: formData.role.trim(),
+          text: formData.text.trim(),
+          imageUrl: imagePreview || 'https://randomuser.me/api/portraits/lego/1.jpg',
+          rating: existingRecord?.rating ?? 5,
+          isActive: existingRecord?.isActive ?? true,
+          sortOrder: existingRecord?.sortOrder ?? 1,
+        };
+
+        if (isEditing) {
+          payload.id = parseInt(testimonialId, 10);
+        }
+
+        res = await fetch(url, {
+          method,
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+        });
+      }
 
       if (!res.ok) {
         const errorText = await res.text().catch(() => '');

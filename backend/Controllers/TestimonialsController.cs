@@ -108,6 +108,10 @@ namespace ShyamAgroSuite.Api.Controllers
                         return BadRequest(new { Message = "Invalid JSON data." });
                     }
                     testimonial = body;
+                    if (!string.IsNullOrEmpty(testimonial.ImageUrl) && testimonial.ImageUrl.StartsWith("data:image"))
+                    {
+                        testimonial.ImageUrl = SaveBase64Image(testimonial.ImageUrl);
+                    }
                 }
                 else
                 {
@@ -190,7 +194,9 @@ namespace ShyamAgroSuite.Api.Controllers
                     existing.Name = body.Name;
                     existing.Role = body.Role;
                     existing.Text = body.Text;
-                    existing.ImageUrl = body.ImageUrl;
+                    existing.ImageUrl = (!string.IsNullOrEmpty(body.ImageUrl) && body.ImageUrl.StartsWith("data:image"))
+                        ? SaveBase64Image(body.ImageUrl)
+                        : body.ImageUrl;
                     existing.Rating = body.Rating;
                     existing.IsActive = body.IsActive;
                     existing.SortOrder = body.SortOrder;
@@ -221,7 +227,10 @@ namespace ShyamAgroSuite.Api.Controllers
                     }
                     else if (form.TryGetValue("imageUrl", out var imgUrl))
                     {
-                        existing.ImageUrl = imgUrl.ToString();
+                        var urlStr = imgUrl.ToString();
+                        existing.ImageUrl = (!string.IsNullOrEmpty(urlStr) && urlStr.StartsWith("data:image"))
+                            ? SaveBase64Image(urlStr)
+                            : urlStr;
                     }
 
                     if (form.TryGetValue("name", out var name)) existing.Name = name.ToString();
@@ -243,6 +252,43 @@ namespace ShyamAgroSuite.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
+            }
+        }
+
+        private static string SaveBase64Image(string base64Data)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(base64Data) || !base64Data.StartsWith("data:image"))
+                    return base64Data;
+
+                var parts = base64Data.Split(',');
+                if (parts.Length < 2) return base64Data;
+
+                var header = parts[0];
+                var base64 = parts[1];
+
+                var ext = ".png";
+                if (header.Contains("jpeg") || header.Contains("jpg")) ext = ".jpg";
+                else if (header.Contains("gif")) ext = ".gif";
+                else if (header.Contains("webp")) ext = ".webp";
+
+                var bytes = Convert.FromBase64String(base64);
+                var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/testimonials");
+                if (!Directory.Exists(uploadsDir))
+                {
+                    Directory.CreateDirectory(uploadsDir);
+                }
+
+                var fileName = Guid.NewGuid().ToString() + ext;
+                var filePath = Path.Combine(uploadsDir, fileName);
+
+                System.IO.File.WriteAllBytes(filePath, bytes);
+                return "/uploads/testimonials/" + fileName;
+            }
+            catch
+            {
+                return base64Data;
             }
         }
 
