@@ -136,7 +136,7 @@ const ProductDetailsPage = () => {
   const [isImageLightboxOpen, setIsImageLightboxOpen] = useState(false);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const { addToCart, cartItems, removeFromCart } = useCart();
-  const { t, productText, productListText, productSpecLabel, productSpecValue, reviewText, categoryText } = useLanguage();
+  const { t, productText, productListText, productSpecLabel, productSpecValue, reviewText, categoryText, dynamicText } = useLanguage();
   const { showToast } = useToast();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { mappedCategories } = useCategories();
@@ -744,7 +744,7 @@ const ProductDetailsPage = () => {
                 <div className="product-service-title">
                   <Truck size={16} /> {t('estimatedDelivery')}
                 </div>
-                <p className="text-sm leading-6 text-gray-600">{product.estimatedDelivery}</p>
+                <p className="text-sm leading-6 text-gray-600">{dynamicText(product, 'estimatedDelivery') || product.estimatedDelivery}</p>
               </div>
               <div className="product-service-box">
                 <div className="product-service-title">
