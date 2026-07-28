@@ -28,6 +28,18 @@ export const mapStockItemFromApi = (raw = {}) => {
     }
   }
 
+  const parseAmount = (val) => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const clean = val.replace(/[^0-9.]/g, '');
+      return parseFloat(clean) || 0;
+    }
+    return 0;
+  };
+
+  const costPrice = parseAmount(raw.costPrice ?? raw.CostPrice ?? raw.basePrice ?? 0);
+  const sellingPrice = parseAmount(raw.sellingPrice ?? raw.SellingPrice ?? raw.price ?? 0);
+
   return {
     id: raw.id ?? raw.productId ?? '',
     sku: raw.sku || '',
@@ -39,8 +51,8 @@ export const mapStockItemFromApi = (raw = {}) => {
     currentStock,
     reorderLevel,
     unit: raw.stockUnit || raw.unit || 'Pcs',
-    costPrice: Number(raw.costPrice ?? raw.basePrice ?? 0),
-    sellingPrice: Number(raw.sellingPrice ?? raw.price ?? 0),
+    costPrice,
+    sellingPrice,
     status,
     lastUpdated: raw.lastUpdated ? raw.lastUpdated.slice(0, 10) : new Date().toISOString().slice(0, 10),
     trend: raw.trend || 'stable',

@@ -91,6 +91,10 @@ namespace ShyamAgroSuite.Api.Controllers
                     displayStatus = "Low Stock";
                 }
 
+                var baseSelling = (p.SellingPrice.HasValue && p.SellingPrice > 0) ? p.SellingPrice.Value : (p.MRP > 0 ? p.MRP : 0);
+                var costPriceVal = (p.CostPrice > 0 && p.CostPrice < baseSelling) ? p.CostPrice : baseSelling;
+                var sellingPriceVal = (p.MRP > costPriceVal) ? p.MRP : Math.Round(costPriceVal * 1.18m, 1);
+
                 return new
                 {
                     p.Id,
@@ -102,8 +106,8 @@ namespace ShyamAgroSuite.Api.Controllers
                     ReorderLevel = p.ReorderLevel,
                     Status = displayStatus,
                     Trend30Day = p.Trend30Day ?? "+10%",
-                    CostPrice = $"₹{p.CostPrice:N0}",
-                    SellingPrice = $"₹{(p.SellingPrice ?? p.MRP):N0}",
+                    CostPrice = $"₹{costPriceVal:N0}",
+                    SellingPrice = $"₹{sellingPriceVal:N0}",
                     LastUpdated = p.LastUpdated.ToString("yyyy-MM-dd")
                 };
             }).ToList();
