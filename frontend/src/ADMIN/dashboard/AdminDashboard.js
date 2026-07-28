@@ -432,7 +432,7 @@ const AdminDashboard = () => {
 
       {/* Metrics Cards */}
       <section className="metric-grid" aria-label="Performance metrics">
-        <article className="metric-card">
+        <article className="metric-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/orders/list')}>
           <div className="metric-card__top">
             <div className="metric-icon metric-icon--green">
               <ShoppingBag size={22} aria-hidden="true" />
@@ -447,7 +447,7 @@ const AdminDashboard = () => {
           <p>Excluding canceled orders</p>
         </article>
 
-        <article className="metric-card">
+        <article className="metric-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/orders/list')}>
           <div className="metric-card__top">
             <div className="metric-icon metric-icon--blue">
               <FileText size={22} aria-hidden="true" />
@@ -458,7 +458,7 @@ const AdminDashboard = () => {
           <p>Total logged purchases</p>
         </article>
 
-        <article className="metric-card">
+        <article className="metric-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/catalog/products')}>
           <div className="metric-card__top">
             <div className="metric-icon metric-icon--amber">
               <Package size={22} aria-hidden="true" />
@@ -469,7 +469,7 @@ const AdminDashboard = () => {
           <p>Across {categories.length} categories</p>
         </article>
 
-        <article className="metric-card">
+        <article className="metric-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/staff')}>
           <div className="metric-card__top">
             <div className="metric-icon metric-icon--red">
               <Shield size={22} aria-hidden="true" />
