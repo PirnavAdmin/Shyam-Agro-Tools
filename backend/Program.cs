@@ -111,6 +111,27 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// One-time cleanup: delete specific legacy supplier records by ID
+using (var cleanupScope = app.Services.CreateScope())
+{
+    var cleanupContext = cleanupScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        var legacyIds = new[] { 1, 3 };
+        var legacySuppliers = cleanupContext.Suppliers.Where(s => legacyIds.Contains(s.Id)).ToList();
+        if (legacySuppliers.Count > 0)
+        {
+            cleanupContext.Suppliers.RemoveRange(legacySuppliers);
+            cleanupContext.SaveChanges();
+            Console.WriteLine($"[Startup] Removed {legacySuppliers.Count} legacy supplier record(s): {string.Join(", ", legacySuppliers.Select(s => $"ID={s.Id} ({s.Name})"))}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Startup] Supplier cleanup skipped: {ex.Message}");
+    }
+}
+
 // Database Schema Initializer (Ensure WalletTransactions and expanded CoinsSettings exist)
 using (var scope = app.Services.CreateScope())
 {
