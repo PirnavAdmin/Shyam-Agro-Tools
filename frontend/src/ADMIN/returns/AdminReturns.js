@@ -119,6 +119,15 @@ const AdminReturns = () => {
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
+  // Normalize DB requestType to simple UI label
+  const normalizeRequestType = (rt) => {
+    if (!rt) return 'refund';
+    const v = rt.toLowerCase();
+    if (v.includes('refund')) return 'refund';
+    if (v.includes('replacement') || v.includes('exchange')) return 'replacement';
+    return v;
+  };
+
   const handleStatusSubmit = async (e) => {
     e.preventDefault();
     setModalLoading(true);
@@ -457,7 +466,7 @@ const AdminReturns = () => {
                         <span className="block text-[10px] text-slate-400">Qty: {ret.requestedQuantity}</span>
                       </td>
                       <td className="font-semibold text-slate-500">
-                        {ret.requestType === 'Refund' ? 'Refund' : 'Replacement'}
+                        {normalizeRequestType(ret.requestType) === 'refund' ? 'Return / Refund' : 'Replacement'}
                       </td>
                       <td>{getStatusBadge(ret.status)}</td>
                       <td className="text-xs text-slate-400">
@@ -673,7 +682,7 @@ const AdminReturns = () => {
                 )}
 
                 {/* 3. Issue Refund */}
-                {selectedReturn.requestType === 'Refund' && 
+                {normalizeRequestType(selectedReturn.requestType) === 'refund' && 
                   ['approved', 'pickup scheduled'].includes(normalizeStatus(selectedReturn.status)) && (
                   <button 
                     onClick={() => setActiveModal('refund')}
@@ -684,7 +693,7 @@ const AdminReturns = () => {
                 )}
 
                 {/* 4. Dispatch Replacement */}
-                {selectedReturn.requestType === 'Replacement' && 
+                {normalizeRequestType(selectedReturn.requestType) === 'replacement' && 
                   ['approved', 'pickup scheduled'].includes(normalizeStatus(selectedReturn.status)) && (
                   <button 
                     onClick={() => { 
