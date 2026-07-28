@@ -817,8 +817,8 @@ const StockUpdates = () => {
                 <th style={{ padding: '8px 12px' }}>Supplier</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Current Stock</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Reorder Level</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Before MRP</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Final MRP</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Actual Price</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Selling Price</th>
                 <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Actions</th>
               </tr>
             </thead>

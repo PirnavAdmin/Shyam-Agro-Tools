@@ -83,7 +83,10 @@ namespace ShyamAgroSuite.Api.Controllers
 
             var ledgerEntries = filteredProducts.Select(p =>
             {
-                var effectiveReorderLevel = p.ReorderLevel > 0 ? p.ReorderLevel : 30;
+                var effectiveReorderLevel = p.ReorderLevel > 0 
+                    ? p.ReorderLevel 
+                    : (p.Stock == 0 ? 10 : (p.Stock <= 5 ? 3 : Math.Max(5, (int)(p.Stock * 0.25))));
+
                 var displayStatus = "In Stock";
                 if (p.Stock == 0)
                 {
@@ -93,6 +96,9 @@ namespace ShyamAgroSuite.Api.Controllers
                 {
                     displayStatus = "Low Stock";
                 }
+
+                var actualPrice = p.MRP > 0 ? p.MRP : (p.SellingPrice ?? 0);
+                var sellingPriceFinal = (p.SellingPrice.HasValue && p.SellingPrice > 0) ? p.SellingPrice.Value : actualPrice;
 
                 return new
                 {
@@ -106,8 +112,8 @@ namespace ShyamAgroSuite.Api.Controllers
                     ReorderLevel = effectiveReorderLevel,
                     Status = displayStatus,
                     Trend30Day = p.Trend30Day ?? "+10%",
-                    CostPrice = $"₹{p.MRP:N0}",
-                    SellingPrice = $"₹{(p.SellingPrice.HasValue && p.SellingPrice > 0 ? p.SellingPrice.Value : p.MRP):N0}",
+                    CostPrice = $"₹{actualPrice:N0}",
+                    SellingPrice = $"₹{sellingPriceFinal:N0}",
                     LastUpdated = p.LastUpdated.ToString("yyyy-MM-dd")
                 };
             }).ToList();
