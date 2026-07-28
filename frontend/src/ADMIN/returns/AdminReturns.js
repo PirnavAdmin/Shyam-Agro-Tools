@@ -222,19 +222,45 @@ const AdminReturns = () => {
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
       case 'pending':
+      case 'request_submitted':
         return <span className="admin-ret-badge badge-pending">Pending</span>;
       case 'approved':
+      case 'claim_approved':
         return <span className="admin-ret-badge badge-approved">Approved</span>;
       case 'pickup scheduled':
+      case 'pickup_scheduled':
         return <span className="admin-ret-badge badge-pickup">Pickup Scheduled</span>;
       case 'refunded':
+      case 'refund_completed':
         return <span className="admin-ret-badge badge-refunded">Refunded</span>;
       case 'completed':
+      case 'replacement_completed':
         return <span className="admin-ret-badge badge-completed">Completed</span>;
       case 'rejected':
+      case 'claim_rejected':
         return <span className="admin-ret-badge badge-rejected">Rejected</span>;
       default:
         return <span className="admin-ret-badge">{status}</span>;
+    }
+  };
+
+  // Normalize raw DB status values to simple UI status keys
+  const normalizeStatus = (status) => {
+    if (!status) return 'pending';
+    switch (status.toLowerCase()) {
+      case 'request_submitted':
+      case 'pending': return 'pending';
+      case 'approved':
+      case 'claim_approved': return 'approved';
+      case 'pickup_scheduled':
+      case 'pickup scheduled': return 'pickup scheduled';
+      case 'refunded':
+      case 'refund_completed': return 'refunded';
+      case 'completed':
+      case 'replacement_completed': return 'completed';
+      case 'rejected':
+      case 'claim_rejected': return 'rejected';
+      default: return status.toLowerCase();
     }
   };
 
@@ -472,7 +498,7 @@ const AdminReturns = () => {
               </div>
 
               {/* Status Timeline */}
-              {selectedReturn.status?.toLowerCase() === 'rejected' ? (
+              {normalizeStatus(selectedReturn.status) === 'rejected' ? (
                 <div className="bg-red-50 border border-red-100 p-4 rounded-xl text-xs space-y-1">
                   <h4 className="font-bold text-red-800 flex items-center gap-1.5">
                     <XCircle size={14} /> Request Rejected
@@ -496,18 +522,18 @@ const AdminReturns = () => {
                     </div>
 
                     {/* Node 2 */}
-                    <div className={`v-step ${['approved', 'pickup scheduled', 'refunded', 'completed'].includes(selectedReturn.status?.toLowerCase()) ? 'active' : ''}`}>
+                    <div className={`v-step ${['approved', 'pickup scheduled', 'refunded', 'completed'].includes(normalizeStatus(selectedReturn.status)) ? 'active' : ''}`}>
                       <div className="v-circle"></div>
                       <div className="v-content">
                         <strong>Claim Approved</strong>
-                        {selectedReturn.remarks && selectedReturn.status !== 'Pending' && (
+                        {selectedReturn.remarks && normalizeStatus(selectedReturn.status) !== 'pending' && (
                           <span className="block text-[10px] text-slate-500 italic mt-1">"{selectedReturn.remarks}"</span>
                         )}
                       </div>
                     </div>
 
                     {/* Node 3 */}
-                    <div className={`v-step ${['pickup scheduled', 'refunded', 'completed'].includes(selectedReturn.status?.toLowerCase()) ? 'active' : ''}`}>
+                    <div className={`v-step ${['pickup scheduled', 'refunded', 'completed'].includes(normalizeStatus(selectedReturn.status)) ? 'active' : ''}`}>
                       <div className="v-circle"></div>
                       <div className="v-content">
                         <strong>Pickup Scheduled</strong>
@@ -521,7 +547,7 @@ const AdminReturns = () => {
                     </div>
 
                     {/* Node 4 */}
-                    <div className={`v-step ${['refunded', 'completed'].includes(selectedReturn.status?.toLowerCase()) ? 'active' : ''}`}>
+                    <div className={`v-step ${['refunded', 'completed'].includes(normalizeStatus(selectedReturn.status)) ? 'active' : ''}`}>
                       <div className="v-circle"></div>
                       <div className="v-content">
                         <strong>Resolution Finalized</strong>
@@ -550,8 +576,8 @@ const AdminReturns = () => {
               <div className="pt-4 border-t border-slate-100 space-y-2">
                 <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-3">Management Controls</h4>
                 
-                {/* 1. Review status (Approve/Reject) */}
-                {selectedReturn.status?.toLowerCase() === 'pending' && (
+                {/* 1. Authorize/Reject — for any pending/submitted claim */}
+                {['pending', 'request_submitted'].includes(normalizeStatus(selectedReturn.status)) && (
                   <button 
                     onClick={() => { setActiveModal('status'); setStatusUpdateVal('Approved'); }}
                     className="w-full flex items-center justify-center gap-2 bg-slate-800 text-white font-bold text-xs py-2.5 rounded-lg hover:bg-slate-900 transition"
@@ -560,8 +586,8 @@ const AdminReturns = () => {
                   </button>
                 )}
 
-                {/* 2. Schedule Pickup */}
-                {selectedReturn.status?.toLowerCase() === 'approved' && (
+                {/* 2. Schedule Pickup — once approved */}
+                {normalizeStatus(selectedReturn.status) === 'approved' && (
                   <button 
                     onClick={() => { setActiveModal('pickup'); setPickupDate(new Date().toISOString().slice(0, 16)); }}
                     className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-lg hover:bg-indigo-700 transition"
@@ -572,7 +598,7 @@ const AdminReturns = () => {
 
                 {/* 3. Issue Refund */}
                 {selectedReturn.requestType === 'Refund' && 
-                  ['approved', 'pickup scheduled'].includes(selectedReturn.status?.toLowerCase()) && (
+                  ['approved', 'pickup scheduled'].includes(normalizeStatus(selectedReturn.status)) && (
                   <button 
                     onClick={() => setActiveModal('refund')}
                     className="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white font-bold text-xs py-2.5 rounded-lg hover:bg-emerald-700 transition"
@@ -583,7 +609,7 @@ const AdminReturns = () => {
 
                 {/* 4. Dispatch Replacement */}
                 {selectedReturn.requestType === 'Replacement' && 
-                  ['approved', 'pickup scheduled'].includes(selectedReturn.status?.toLowerCase()) && (
+                  ['approved', 'pickup scheduled'].includes(normalizeStatus(selectedReturn.status)) && (
                   <button 
                     onClick={() => { 
                       setActiveModal('replacement'); 
@@ -592,6 +618,16 @@ const AdminReturns = () => {
                     className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold text-xs py-2.5 rounded-lg hover:bg-blue-700 transition"
                   >
                     <RefreshCw size={14} /> Dispatch Replacement Order
+                  </button>
+                )}
+
+                {/* 5. Admin Override — force change status at any point */}
+                {!['pending', 'request_submitted'].includes(normalizeStatus(selectedReturn.status)) && (
+                  <button 
+                    onClick={() => { setActiveModal('status'); setStatusUpdateVal('Approved'); }}
+                    className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white font-bold text-xs py-2.5 rounded-lg hover:bg-orange-600 transition"
+                  >
+                    <RefreshCw size={14} /> Override Status
                   </button>
                 )}
               </div>
