@@ -111,19 +111,58 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// One-time cleanup: delete specific legacy supplier records by ID
+// One-time cleanup: delete specific legacy supplier records by ID + fix NULL values
 using (var cleanupScope = app.Services.CreateScope())
 {
     var cleanupContext = cleanupScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     try
     {
-        var legacyIds = new[] { 1, 3 };
-        var legacySuppliers = cleanupContext.Suppliers.Where(s => legacyIds.Contains(s.Id)).ToList();
-        if (legacySuppliers.Count > 0)
+        var conn = cleanupContext.Database.GetDbConnection();
+        if (conn.State != System.Data.ConnectionState.Open)
+            conn.Open();
+
+        // 1. Delete legacy records with IDs 1 and 3
+        using (var cmd = conn.CreateCommand())
         {
-            cleanupContext.Suppliers.RemoveRange(legacySuppliers);
-            cleanupContext.SaveChanges();
-            Console.WriteLine($"[Startup] Removed {legacySuppliers.Count} legacy supplier record(s): {string.Join(", ", legacySuppliers.Select(s => $"ID={s.Id} ({s.Name})"))}");
+            cmd.CommandText = "DELETE FROM Suppliers WHERE Id IN (1, 3)";
+            int deleted = cmd.ExecuteNonQuery();
+            if (deleted > 0)
+                Console.WriteLine($"[Startup] Removed {deleted} legacy supplier record(s).");
+        }
+
+        // 2. Fix NULL values - replace with safe defaults
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = @"
+                UPDATE Suppliers SET
+                    Gstin          = COALESCE(Gstin, ''),
+                    ProductCategory = COALESCE(NULLIF(TRIM(ProductCategory), ''), 'General'),
+                    TrackingId     = COALESCE(TrackingId, CONCAT('SEL', FLOOR(100000 + RAND() * 899999))),
+                    City           = COALESCE(City, ''),
+                    LeadTime       = COALESCE(NULLIF(TRIM(LeadTime), ''), '4-6 days'),
+                    ProductLines   = COALESCE(ProductLines, ''),
+                    CommercialTerms = COALESCE(NULLIF(TRIM(CommercialTerms), ''), 'Net 30')
+                WHERE
+                    Gstin IS NULL
+                    OR ProductCategory IS NULL OR TRIM(ProductCategory) = ''
+                    OR TrackingId IS NULL
+                    OR City IS NULL
+                    OR LeadTime IS NULL OR TRIM(LeadTime) = ''
+                    OR ProductLines IS NULL
+                    OR CommercialTerms IS NULL OR TRIM(CommercialTerms) = '';
+            ";
+            int fixed1 = cmd.ExecuteNonQuery();
+            if (fixed1 > 0)
+                Console.WriteLine($"[Startup] Fixed NULL values in {fixed1} Suppliers row(s).");
+        }
+
+        // 3. Fix PerformanceRating = 0 -> set to 4.5
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "UPDATE Suppliers SET PerformanceRating = 4.5 WHERE PerformanceRating <= 0 OR PerformanceRating IS NULL";
+            int fixed2 = cmd.ExecuteNonQuery();
+            if (fixed2 > 0)
+                Console.WriteLine($"[Startup] Fixed PerformanceRating in {fixed2} Suppliers row(s).");
         }
     }
     catch (Exception ex)
