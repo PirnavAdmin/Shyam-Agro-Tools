@@ -59,7 +59,12 @@ const getStoredProfileImage = (source = {}) => {
   const ownerKey = getProfileOwnerKey(source || {});
   if (!ownerKey) return '';
   try {
-    return localStorage.getItem(`${PROFILE_IMAGE_STORAGE_PREFIX}${ownerKey}`) || '';
+    const val = localStorage.getItem(`${PROFILE_IMAGE_STORAGE_PREFIX}${ownerKey}`) || '';
+    if (val.startsWith('blob:')) {
+      localStorage.removeItem(`${PROFILE_IMAGE_STORAGE_PREFIX}${ownerKey}`);
+      return '';
+    }
+    return val;
   } catch {
     return '';
   }
