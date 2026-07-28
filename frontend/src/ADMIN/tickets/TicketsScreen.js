@@ -543,7 +543,7 @@ const TicketsScreen = () => {
                     </div>
 
                     <button type="submit" className="save-action-btn" disabled={saving}>
-                      {saving ? 'Saving changes...' : 'Save Ticket Config'}
+                      {saving ? 'Updating changes...' : 'Update Ticket Config'}
                     </button>
                   </form>
                 </div>
