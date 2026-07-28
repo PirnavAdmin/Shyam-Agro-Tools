@@ -14,7 +14,6 @@ import {
   getUserProfile,
   normalizeProfileImageUrl,
   updateUserProfile,
-  uploadUserProfileImage,
   withImageCacheBust,
 } from '../../services/userProfileService';
 import { getWallet } from '../../services/walletService';
@@ -101,6 +100,51 @@ const readFileAsDataUrl = (file) =>
     reader.onerror = () => reject(reader.error || new Error('Unable to read profile image.'));
     reader.readAsDataURL(file);
   });
+
+const compressImageToDataUrl = (file, maxWidth = 300, maxHeight = 300, quality = 0.7) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target.result);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => {
+        resolve(event.target.result);
+      };
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
 
 const getAccountFieldsFromUser = (source = {}, fallback = {}) => ({
   name: source.name || source.fullName || source.FullName || fallback.name || '',
@@ -530,10 +574,10 @@ const Header = ({ onLoginClick }) => {
       }
       if (profileImageFile) {
         try {
-          uploadedImageUrl = await uploadUserProfileImage(currentPhone, profileImageFile);
+          uploadedImageUrl = await compressImageToDataUrl(profileImageFile);
           if (uploadedImageUrl) profileImageUrl = uploadedImageUrl;
         } catch (uploadError) {
-          console.warn('Profile image upload did not return a usable URL. Keeping local preview.', uploadError);
+          console.warn('Profile image conversion failed. Keeping local preview.', uploadError);
           profileImageUrl = localPreviewImage || profileImageUrl;
         }
       }
