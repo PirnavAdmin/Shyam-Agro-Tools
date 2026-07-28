@@ -85,7 +85,16 @@ const AdminReturns = () => {
         page: currentPage,
         pageSize: pageSize
       });
-      setReturnsList(data.returns || []);
+      // Backend returns { items: [...], totalCount } — map submittedAt -> createdAt
+      const rawList = data.returns || data.items || [];
+      const normalized = rawList.map(r => ({
+        ...r,
+        createdAt: r.createdAt || r.submittedAt || r.SubmittedAt || null,
+        requestType: r.requestType || r.RequestType || 'Replacement',
+        customerName: r.customerName || r.PickupName || r.pickupName || '',
+        status: r.status || r.Status || 'REQUEST_SUBMITTED',
+      }));
+      setReturnsList(normalized);
       setTotalCount(data.totalCount || 0);
     } catch (err) {
       console.error("Failed to load admin returns:", err);
@@ -115,45 +124,68 @@ const AdminReturns = () => {
     setModalLoading(true);
     setModalError('');
     try {
+      // Map UI values to backend DB enum values
+      const dbStatus = statusUpdateVal === 'Approved' ? 'CLAIM_APPROVED'
+        : statusUpdateVal === 'Rejected' ? 'REJECTED'
+        : statusUpdateVal;
       const body = {
-        status: statusUpdateVal,
+        status: dbStatus,
         remarks: statusRemarks,
-        rejectionReason: statusUpdateVal === 'Rejected' ? rejectionReason : null,
-        title: `Claim ${statusUpdateVal}`,
-        description: `Your return claim has been ${statusUpdateVal.toLowerCase()} by an administrator.`
+        rejectionReason: dbStatus === 'REJECTED' ? rejectionReason : null,
+        title: GetStageTitle(dbStatus),
+        description: `Return claim has been ${dbStatus === 'CLAIM_APPROVED' ? 'approved' : 'rejected'} by an administrator.`
       };
       await updateReturnStatus(selectedReturn.id, body);
-      
       setModalSuccess(`Claim successfully ${statusUpdateVal.toLowerCase()}!`);
       setTimeout(async () => {
         setActiveModal(null);
         setModalError('');
         setModalSuccess('');
-        // Re-fetch fresh data and sync selectedReturn
-        setLoading(true);
-        try {
-          const data = await getAdminReturns({
-            search: searchQuery,
-            status: statusFilter,
-            requestType: typeFilter,
-            page: currentPage,
-            pageSize: pageSize
-          });
-          const freshList = data.returns || [];
-          setReturnsList(freshList);
-          setTotalCount(data.totalCount || 0);
-          const refreshed = freshList.find(r => r.id === selectedReturn.id);
-          if (refreshed) setSelectedReturn(refreshed);
-        } catch (err) {
-          console.error('Refresh failed:', err);
-        } finally {
-          setLoading(false);
-        }
+        await refreshData();
       }, 1200);
     } catch (err) {
-      setModalError('Failed to update claim status.');
+      setModalError('Failed to update claim status. The claim may already be in a final state.');
     } finally {
       setModalLoading(false);
+    }
+  };
+
+  // Helper to map DB status to title
+  const GetStageTitle = (status) => {
+    const map = {
+      CLAIM_APPROVED: 'Claim Approved', REJECTED: 'Request Rejected',
+      PICKUP_SCHEDULED: 'Pickup Scheduled', REFUND_COMPLETED: 'Refund Completed',
+      REPLACEMENT_SHIPPED: 'Replacement Shipped', REPLACEMENT_DELIVERED: 'Replacement Delivered'
+    };
+    return map[status] || status;
+  };
+
+  // Shared re-fetch helper that normalizes data and syncs selectedReturn
+  const refreshData = async () => {
+    setLoading(true);
+    try {
+      const data = await getAdminReturns({
+        search: searchQuery, status: statusFilter, requestType: typeFilter,
+        page: currentPage, pageSize: pageSize
+      });
+      const rawList = data.returns || data.items || [];
+      const freshList = rawList.map(r => ({
+        ...r,
+        createdAt: r.createdAt || r.submittedAt || r.SubmittedAt || null,
+        requestType: r.requestType || r.RequestType || 'Replacement',
+        customerName: r.customerName || r.PickupName || r.pickupName || '',
+        status: r.status || r.Status || 'REQUEST_SUBMITTED',
+      }));
+      setReturnsList(freshList);
+      setTotalCount(data.totalCount || 0);
+      if (selectedReturn) {
+        const refreshed = freshList.find(r => r.id === selectedReturn.id);
+        if (refreshed) setSelectedReturn(refreshed);
+      }
+    } catch (err) {
+      console.error('Refresh failed:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -162,6 +194,13 @@ const AdminReturns = () => {
     setModalLoading(true);
     setModalError('');
     try {
+      // If status is CLAIM_APPROVED, backend pickup endpoint expects REQUEST_SUBMITTED or UNDER_REVIEW
+      // So first update status to UNDER_REVIEW if needed, then schedule pickup
+      const currentNorm = normalizeStatus(selectedReturn.status);
+      if (currentNorm === 'approved') {
+        // Move to UNDER_REVIEW so pickup endpoint can transition to PICKUP_SCHEDULED
+        await updateReturnStatus(selectedReturn.id, { status: 'UNDER_REVIEW', remarks: 'Proceeding to pickup scheduling.' });
+      }
       const body = {
         pickupDate: new Date(pickupDate).toISOString(),
         pickupAgentName,
@@ -170,21 +209,12 @@ const AdminReturns = () => {
         remarks: pickupRemarks
       };
       await updateReturnPickup(selectedReturn.id, body);
-      
       setModalSuccess('Pickup scheduled successfully!');
       setTimeout(async () => {
         setActiveModal(null);
         setModalError('');
         setModalSuccess('');
-        setLoading(true);
-        try {
-          const data = await getAdminReturns({ search: searchQuery, status: statusFilter, requestType: typeFilter, page: currentPage, pageSize });
-          const freshList = data.returns || [];
-          setReturnsList(freshList);
-          setTotalCount(data.totalCount || 0);
-          const refreshed = freshList.find(r => r.id === selectedReturn.id);
-          if (refreshed) setSelectedReturn(refreshed);
-        } catch (err) { console.error(err); } finally { setLoading(false); }
+        await refreshData();
       }, 1200);
     } catch (err) {
       setModalError('Failed to schedule pickup.');
@@ -202,25 +232,16 @@ const AdminReturns = () => {
         approvedRefundAmount: Number(approvedRefundAmount),
         refundMethod,
         refundTransactionId,
-        refundStatus,
+        refundStatus: 'REFUND_COMPLETED', // DB enum value
         remarks: refundRemarks
       };
       await updateReturnRefund(selectedReturn.id, body);
-      
       setModalSuccess('Refund executed successfully!');
       setTimeout(async () => {
         setActiveModal(null);
         setModalError('');
         setModalSuccess('');
-        setLoading(true);
-        try {
-          const data = await getAdminReturns({ search: searchQuery, status: statusFilter, requestType: typeFilter, page: currentPage, pageSize });
-          const freshList = data.returns || [];
-          setReturnsList(freshList);
-          setTotalCount(data.totalCount || 0);
-          const refreshed = freshList.find(r => r.id === selectedReturn.id);
-          if (refreshed) setSelectedReturn(refreshed);
-        } catch (err) { console.error(err); } finally { setLoading(false); }
+        await refreshData();
       }, 1200);
     } catch (err) {
       setModalError('Failed to execute refund.');
@@ -239,26 +260,17 @@ const AdminReturns = () => {
         replacementOrderNumber,
         trackingNumber: replacementTrackingNumber,
         carrierName: replacementCarrierName,
-        replacementStatus,
+        replacementStatus: 'REPLACEMENT_SHIPPED', // DB enum value
         estimatedDeliveryDate: replacementEstDelivery ? new Date(replacementEstDelivery).toISOString() : null,
         remarks: replacementRemarks
       };
       await updateReturnReplacement(selectedReturn.id, body);
-      
       setModalSuccess('Replacement dispatched successfully!');
       setTimeout(async () => {
         setActiveModal(null);
         setModalError('');
         setModalSuccess('');
-        setLoading(true);
-        try {
-          const data = await getAdminReturns({ search: searchQuery, status: statusFilter, requestType: typeFilter, page: currentPage, pageSize });
-          const freshList = data.returns || [];
-          setReturnsList(freshList);
-          setTotalCount(data.totalCount || 0);
-          const refreshed = freshList.find(r => r.id === selectedReturn.id);
-          if (refreshed) setSelectedReturn(refreshed);
-        } catch (err) { console.error(err); } finally { setLoading(false); }
+        await refreshData();
       }, 1200);
     } catch (err) {
       setModalError('Failed to dispatch replacement.');
@@ -310,13 +322,18 @@ const AdminReturns = () => {
       case 'request_submitted':
       case 'pending': return 'pending';
       case 'approved':
-      case 'claim_approved': return 'approved';
+      case 'claim_approved':
+      case 'under_review': return 'approved';
       case 'pickup_scheduled':
-      case 'pickup scheduled': return 'pickup scheduled';
+      case 'pickup scheduled':
+      case 'product_picked_up': return 'pickup scheduled';
       case 'refunded':
+      case 'refund_initiated':
       case 'refund_completed': return 'refunded';
       case 'completed':
-      case 'replacement_completed': return 'completed';
+      case 'replacement_approved':
+      case 'replacement_shipped':
+      case 'replacement_delivered': return 'completed';
       case 'rejected':
       case 'claim_rejected': return 'rejected';
       default: return status.toLowerCase();
