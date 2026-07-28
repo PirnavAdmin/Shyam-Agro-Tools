@@ -39,7 +39,13 @@ const NewSuppliersList = () => {
   const loadRegistrations = async () => {
     try {
       const data = await fetchSuppliers();
-      const tickets = (data || []).filter(s => s.status === 'Pending' || s.status === 'Approved' || s.status === 'Rejected');
+      // Include all tickets - Pending, Approved/Verified, and Rejected
+      const tickets = (data || []).filter(s =>
+        s.status === 'Pending' ||
+        s.status === 'Approved' ||
+        s.status === 'Verified' ||
+        s.status === 'Rejected'
+      );
       setRegistrations(tickets);
     } catch (err) {
       console.error('Failed to load registrations from API:', err);
@@ -94,7 +100,7 @@ const NewSuppliersList = () => {
     return registrations.reduce(
       (acc, reg) => ({
         pending: acc.pending + (reg.status === 'Pending' ? 1 : 0),
-        approved: acc.approved + (reg.status === 'Approved' ? 1 : 0),
+        approved: acc.approved + (reg.status === 'Approved' || reg.status === 'Verified' ? 1 : 0),
         rejected: acc.rejected + (reg.status === 'Rejected' ? 1 : 0)
       }),
       { pending: 0, approved: 0, rejected: 0 }
@@ -233,22 +239,26 @@ const NewSuppliersList = () => {
                   </td>
                   <td style={{ padding: '8px 12px' }}>
                     <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: 600, color: '#3b82f6' }}>
-                      {reg.name}
+                      {reg.contactPerson || reg.name}
                     </div>
                     <div className="supplier-contact-line" style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
-                      <Phone size={10} /> {reg.mobile}
+                      <Phone size={10} /> {reg.phone || reg.mobile}
                     </div>
                     <div className="supplier-contact-line" style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#64748b' }}>
                       <Mail size={10} /> {reg.email}
                     </div>
                   </td>
                   <td style={{ padding: '8px 12px' }}>
-                    <span className="catalog-badge" style={{ fontSize: '10px' }}>
-                      {categoryLabels[reg.category] || reg.category}
-                    </span>
+                    {reg.category ? (
+                      <span className="catalog-badge" style={{ fontSize: '10px' }}>
+                        {reg.category}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#94a3b8', fontSize: '10px' }}>—</span>
+                    )}
                   </td>
                   <td style={{ padding: '8px 12px', fontFamily: 'monospace', fontWeight: 500 }}>
-                    {reg.gstin}
+                    {reg.gstin || <span style={{ color: '#94a3b8', fontSize: '10px' }}>—</span>}
                   </td>
                   <td style={{ padding: '8px 12px', color: '#475569' }}>
                     {new Date(reg.submittedAt).toLocaleDateString()}
