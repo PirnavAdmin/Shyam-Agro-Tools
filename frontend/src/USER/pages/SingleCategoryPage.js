@@ -88,10 +88,7 @@ const SingleCategoryPage = () => {
       setProductError('');
 
       try {
-        const productData = selectedSubcategory === 'all'
-          ? await getProductsByCategory(currentCategory.id)
-          : await getProductsBySubcategory(selectedSubcategory);
-
+        const productData = await getProductsByCategory(currentCategory.id);
         if (isMounted) setCategoryProducts(productData);
       } catch (error) {
         console.error('Unable to load products.', error);
@@ -109,7 +106,7 @@ const SingleCategoryPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [currentCategory?.id, selectedSubcategory]);
+  }, [currentCategory?.id]);
 
   const stockCounts = useMemo(
     () => ({

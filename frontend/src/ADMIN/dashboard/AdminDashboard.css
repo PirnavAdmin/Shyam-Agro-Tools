@@ -587,6 +587,21 @@
   background: #e0f2fe;
 }
 
+.status-tag--processing {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+
+.status-tag--packed {
+  color: #065f46;
+  background: #d1fae5;
+}
+
+.status-tag--dispatched {
+  color: #3730a3;
+  background: #e0e7ff;
+}
+
 .status-tag--on-hold {
   color: #92400e;
   background: #fef3c7;

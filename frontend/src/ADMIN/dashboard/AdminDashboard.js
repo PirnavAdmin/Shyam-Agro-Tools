@@ -34,7 +34,16 @@ import { fetchSuppliers } from '../suppliers/suppliersApi';
 import './AdminDashboard.css';
 
 const numberFormatter = new Intl.NumberFormat('en-IN');
-const formatCurrency = (value) => `INR ${numberFormatter.format(value)}`;
+const formatCurrency = (value) => {
+  if (value === undefined || value === null) return 'INR 0';
+  let numericValue = value;
+  if (typeof value === 'string') {
+    const cleanStr = value.replace(/[^0-9.-]+/g, '');
+    numericValue = cleanStr ? parseFloat(cleanStr) : 0;
+  }
+  const num = Number(numericValue);
+  return `INR ${isNaN(num) ? '0' : numberFormatter.format(num)}`;
+};
 
 // Fallback dataset for a populated dashboard view when database is empty
 const MOCK_FALLBACK = {
@@ -76,9 +85,23 @@ const statusIconMap = {
   'On Hold': Clock3,
   Completed: CheckCircle2,
   Canceled: XCircle,
+  Cancelled: XCircle,
+  Packed: Package,
+  Dispatched: Truck,
 };
 
 const statusClassName = (status) => (status || 'Pending').toLowerCase().replace(/\s+/g, '-');
+
+const mapStatus = (status) => {
+  if (!status) return 'Pending';
+  const s = status.toUpperCase();
+  if (s === 'PENDING') return 'Pending';
+  if (s === 'PROCESSING' || s === 'PACKED') return 'Processing';
+  if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
+  if (s === 'DELIVERED' || s === 'COMPLETED') return 'Completed';
+  if (s === 'CANCELLED' || s === 'CANCELED') return 'Canceled';
+  return status;
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -100,7 +123,11 @@ const AdminDashboard = () => {
         fetchSuppliers().catch(() => [])
       ]);
 
-      setOrders(ordersData || []);
+      const normalizedOrders = (ordersData || []).map(o => ({
+        ...o,
+        status: mapStatus(o.fulfillment || o.status)
+      }));
+      setOrders(normalizedOrders);
       setProducts(productsData || []);
       setCategories(categoriesData || []);
       setSuppliers(suppliersData || []);
@@ -148,7 +175,10 @@ const AdminDashboard = () => {
   const metrics = useMemo(() => {
     const totalSalesVal = orders
       .filter(o => o.status !== 'Canceled')
-      .reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+      .reduce((sum, o) => {
+        const cleanAmount = o.totalAmount ? Number(String(o.totalAmount).replace(/[^0-9.-]+/g, "")) : 0;
+        return sum + cleanAmount;
+      }, 0);
 
     const activeOrdersCount = orders.filter(o => o.status === 'Processing' || o.status === 'Pending' || o.status === 'On Hold').length;
     const lowStockCount = products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock').length;
@@ -355,7 +385,7 @@ const AdminDashboard = () => {
 
       {/* Operations Quick Stats */}
       <section className="operations-grid" aria-label="Operations snapshot">
-        <div className="operation-tile">
+        <div className="operation-tile" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/orders/list')}>
           <div className="tile-icon tile-icon--blue">
             <Truck size={20} aria-hidden="true" />
           </div>
@@ -377,7 +407,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="operation-tile">
+        <div className="operation-tile" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/suppliers/new')}>
           <div className="tile-icon tile-icon--red">
             <Users size={20} aria-hidden="true" />
           </div>
@@ -388,7 +418,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="operation-tile">
+        <div className="operation-tile" style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/reports')}>
           <div className="tile-icon tile-icon--green">
             <CheckCircle2 size={20} aria-hidden="true" />
           </div>
@@ -653,11 +683,12 @@ const AdminDashboard = () => {
               {orders.length > 0 ? (
                 orders.slice(0, 5).map((order) => {
                   const StatusIcon = statusIconMap[order.status] || Clock3;
-                  const dateStr = order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+                  const rawDate = order.dateBooked || order.orderDate || order.date;
+                  const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
                   const customerInitials = order.customerName ? order.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'AG';
 
                   return (
-                    <tr key={order.id || order.orderId} style={{ cursor: 'pointer' }} onClick={() => navigate(`/admin/orders/details/${order.id || order.orderId}`)}>
+                    <tr key={order.id || order.orderId} style={{ cursor: 'pointer' }} onClick={() => navigate('/admin/orders/list', { state: { selectedOrderId: order.id || order.orderId } })}>
                       <td className="order-id">{order.id || order.orderId}</td>
                       <td>
                         <span className={`status-tag status-tag--${statusClassName(order.status)}`}>

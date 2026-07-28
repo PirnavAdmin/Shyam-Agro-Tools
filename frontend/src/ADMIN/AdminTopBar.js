@@ -10,6 +10,15 @@ import NotificationsDropdown from './components/NotificationsDropdown';
 import { getApiDomain } from '../utils/apiConfig';
 import './AdminTopBar.css';
 
+const maskEmail = (email) => {
+  if (!email || !email.includes('@')) return email;
+  const [username, domain] = email.split('@');
+  if (username.length <= 6) {
+    return `${username.slice(0, Math.ceil(username.length / 2))}***@${domain}`;
+  }
+  return `${username.slice(0, 6)}***@${domain}`;
+};
+
 const AdminTopBar = () => {
   const navigate = useNavigate();
   
@@ -111,7 +120,7 @@ const AdminTopBar = () => {
             </div>
             <div className="user-text">
               <span className="user-name">{adminName}</span>
-              <span className="user-email">{adminEmail}</span>
+              <span className="user-email">{maskEmail(adminEmail)}</span>
             </div>
             <ChevronDown size={12} className={`chevron-arrow ${isProfileOpen ? 'rotate' : ''} text-gray-500`} />
           </div>

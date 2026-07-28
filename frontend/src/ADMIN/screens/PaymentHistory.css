@@ -443,8 +443,12 @@
 }
 
 .file-upload-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border: 2px dashed #cbd5e1;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px;
   text-align: center;
   cursor: pointer;
@@ -458,8 +462,19 @@
 }
 
 .file-upload-trigger svg {
-  color: #64748b;
+  color: #059669;
+  background-color: rgba(5, 150, 105, 0.08);
+  padding: 10px;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
   margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.file-upload-trigger:hover svg {
+  transform: translateY(-3px);
+  background-color: rgba(5, 150, 105, 0.16);
 }
 
 /* Simulator Styles */

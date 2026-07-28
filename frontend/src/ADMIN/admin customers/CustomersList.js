@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Eye, Plus, X } from 'lucide-react';
 import { getApiDomain } from '../../utils/apiConfig';
-import { OutlookDeleteButton, Pagination } from '../components/ActionButtons';
+import { OutlookDeleteButton, AnimatedViewButton, Pagination } from '../components/ActionButtons';
 
 const CustomersList = () => {
   const navigate = useNavigate();
@@ -257,10 +257,8 @@ const CustomersList = () => {
                   <td className="px-4 py-2 text-center font-semibold text-slate-700">{orderCount}</td>
                   <td className="px-4 py-2 text-right font-bold text-slate-800">₹{totalSpent.toLocaleString('en-IN')}</td>
                   <td className="px-4 py-2 text-right">
-                    <div className="flex justify-end gap-2" onClick={e => e.stopPropagation()}>
-                      <Link to={`/admin/customers/customer?id=${cust.id}`} className="p-1 hover:bg-slate-100 rounded text-slate-600 hover:text-slate-800 transition-colors" title="View Profile">
-                        <Eye size={14} />
-                      </Link>
+                    <div className="flex justify-end gap-2 items-center" onClick={e => e.stopPropagation()}>
+                      <AnimatedViewButton to={`/admin/customers/customer?id=${cust.id}`} title="View Profile" />
                       <OutlookDeleteButton onClick={() => handleDelete(cust.id)} title="Delete Customer" />
                     </div>
                   </td>

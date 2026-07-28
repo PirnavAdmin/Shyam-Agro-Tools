@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Search,
   Eye,
@@ -29,16 +30,61 @@ export const statusMeta = {
   Processing: { icon: Clock3, className: 'status-pill processing' },
   Dispatched: { icon: Truck, className: 'status-pill dispatched' },
   Cancelled: { icon: AlertCircle, className: 'status-pill cancelled' },
-  Packed: { icon: Package, className: 'status-pill packed' }
+  Packed: { icon: Package, className: 'status-pill packed' },
+  Pending: { icon: Clock3, className: 'status-pill pending' }
 };
 
 export const OrderStatusBadge = ({ status }) => {
-  const meta = statusMeta[status] || statusMeta.Processing;
+  const meta = statusMeta[status] || statusMeta.Pending;
   const Icon = meta.icon;
   return (
     <span className={meta.className}>
       <Icon size={12} style={{ marginRight: '4px' }} />
       {status}
+    </span>
+  );
+};
+
+export const PaymentStatusBadge = ({ paymentStatus }) => {
+  let icon = AlertCircle;
+  let color = '#b91c1c'; // Red for Unpaid/Failed
+  let bg = '#fef2f2';
+  let text = paymentStatus || 'Unpaid';
+
+  if (paymentStatus === 'Verified Paid' || paymentStatus === 'Paid' || paymentStatus === 'Success') {
+    icon = ShieldCheck;
+    color = '#059669'; // Green for Paid
+    bg = '#ecfdf5';
+    text = 'Verified Paid';
+  } else if (paymentStatus === 'Pending Verification' || paymentStatus === 'PendingVerification') {
+    icon = Clock3;
+    color = '#d97706'; // Orange for Pending Verification
+    bg = '#fffbeb';
+    text = 'Pending Verification';
+  } else if (paymentStatus === 'Pending' || paymentStatus === 'Unpaid') {
+    icon = Clock3;
+    color = '#d97706'; // Orange/Yellow for Pending
+    bg = '#fffbeb';
+    text = 'Pending';
+  }
+
+  const IconComponent = icon;
+
+  return (
+    <span style={{ 
+      display: 'inline-flex', 
+      alignItems: 'center', 
+      gap: '4px', 
+      fontSize: '11px', 
+      fontWeight: 700, 
+      color: color,
+      backgroundColor: bg,
+      padding: '4px 10px',
+      borderRadius: '9999px',
+      textTransform: 'uppercase'
+    }}>
+      <IconComponent size={12} />
+      {text}
     </span>
   );
 };
@@ -66,7 +112,12 @@ export const mapStatus = (status) => {
 // Helper to normalise order details
 const normaliseOrder = (o) => {
   const totalVal = parseAmount(o.finalAmount || o.totalAmount || o.total);
-  const statusMapped = mapStatus(o.fulfillment || o.status);
+  let statusMapped = mapStatus(o.fulfillment || o.status);
+
+  // Confirmed orders: if payment is completed/verified, status should be confirmed (Processing)
+  if (statusMapped === 'Pending' && (o.paymentStatus === 'Paid' || o.paymentStatus === 'Verified Paid' || o.paymentStatus === 'Success')) {
+    statusMapped = 'Processing';
+  }
   
   return {
     id: o.id || o.orderId || '',
@@ -207,6 +258,7 @@ const printInvoice = (order) => {
 };
 
 const OrdersLedger = () => {
+  const location = useLocation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -219,6 +271,16 @@ const OrdersLedger = () => {
 
   // Selected order details popup modal state
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // Handle auto-opening order detail modal if passed via navigation state
+  useEffect(() => {
+    if (location.state?.selectedOrderId && orders.length > 0) {
+      const matched = orders.find(o => String(o.id || o.orderId) === String(location.state.selectedOrderId));
+      if (matched) {
+        setSelectedOrder(matched);
+      }
+    }
+  }, [location.state, orders]);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -514,11 +576,8 @@ const OrdersLedger = () => {
                   </div>
                 </td>
                 <td>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 600, color: '#059669' }}>
-                    <ShieldCheck size={14} />
-                    Verified Paid
-                  </span>
-                  <div style={{ fontSize: '10px', color: '#64748b' }}>{order.payMethod}</div>
+                  <PaymentStatusBadge paymentStatus={order.paymentStatus} />
+                  <div style={{ fontSize: '10px', color: '#64748b', marginTop: '4px' }}>{order.payMethod}</div>
                 </td>
                 <td style={{ fontWeight: 700, color: '#0f172a' }}>{formatCurrency(order.total)}</td>
                 <td>

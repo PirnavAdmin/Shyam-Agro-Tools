@@ -1928,6 +1928,10 @@ img.app-line-thumb,
   max-width: 100%;
 }
 
+.max-w-md {
+  max-width: 28rem;
+}
+
 .max-w-sm {
   max-width: 24rem;
 }
@@ -2328,8 +2332,16 @@ img.app-line-thumb,
   border-bottom-width: 1px;
 }
 
+.border-b-2 {
+  border-bottom-width: 2px;
+}
+
 .border-l {
   border-left-width: 1px;
+}
+
+.border-l-0 {
+  border-left-width: 0px;
 }
 
 .border-l-2 {
@@ -2354,6 +2366,11 @@ img.app-line-thumb,
 
 .border-none {
   border-style: none;
+}
+
+.border-\[\#28a745\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(40 167 69 / var(--tw-border-opacity));
 }
 
 .border-\[\#58B82E\] {
@@ -2512,6 +2529,10 @@ img.app-line-thumb,
   border-color: rgb(226 232 240 / 0.6);
 }
 
+.border-transparent {
+  border-color: transparent;
+}
+
 .border-white {
   --tw-border-opacity: 1;
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
@@ -2634,6 +2655,10 @@ img.app-line-thumb,
 .bg-emerald-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(236 253 245 / var(--tw-bg-opacity));
+}
+
+.bg-emerald-50\/30 {
+  background-color: rgb(236 253 245 / 0.3);
 }
 
 .bg-emerald-50\/40 {
@@ -3117,6 +3142,10 @@ img.app-line-thumb,
   padding-bottom: 1.25rem;
 }
 
+.pl-0 {
+  padding-left: 0px;
+}
+
 .pl-10 {
   padding-left: 2.5rem;
 }
@@ -3378,6 +3407,11 @@ img.app-line-thumb,
   color: rgb(19 77 73 / var(--tw-text-opacity));
 }
 
+.text-\[\#28a745\] {
+  --tw-text-opacity: 1;
+  color: rgb(40 167 69 / var(--tw-text-opacity));
+}
+
 .text-\[\#58B82E\] {
   --tw-text-opacity: 1;
   color: rgb(88 184 46 / var(--tw-text-opacity));
@@ -3480,6 +3514,11 @@ img.app-line-thumb,
 .text-gray-700 {
   --tw-text-opacity: 1;
   color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity));
 }
 
 .text-green-500 {
@@ -5185,6 +5224,11 @@ section + .brand-slider-section {
   color: rgb(6 95 70 / var(--tw-text-opacity));
 }
 
+.hover\:text-gray-600:hover {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
 .hover\:text-primary:hover {
   --tw-text-opacity: 1;
   color: rgb(109 189 47 / var(--tw-text-opacity));
@@ -5208,11 +5252,6 @@ section + .brand-slider-section {
 .hover\:text-slate-600:hover {
   --tw-text-opacity: 1;
   color: rgb(71 85 105 / var(--tw-text-opacity));
-}
-
-.hover\:text-slate-800:hover {
-  --tw-text-opacity: 1;
-  color: rgb(30 41 59 / var(--tw-text-opacity));
 }
 
 .hover\:text-white:hover {

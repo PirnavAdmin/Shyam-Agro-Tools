@@ -2104,6 +2104,30 @@
   height: 18px;
 }
 
+.animated-view-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #64748b;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.animated-view-btn:hover {
+  color: #059669 !important;
+  background-color: #ecfdf5 !important;
+}
+
+.animated-view-svg {
+  width: 18px;
+  height: 18px;
+}
+
 .animated-edit-btn:hover .animated-edit-svg {
   animation: edit-wiggle 0.3s ease-in-out;
 }

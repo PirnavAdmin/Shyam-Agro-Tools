@@ -927,6 +927,22 @@
   background: rgba(88, 184, 46, 0.02);
 }
 
+.file-upload-dropzone svg {
+  color: var(--primary-color, #58B82E);
+  background-color: rgba(88, 184, 46, 0.08);
+  padding: 10px;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+}
+
+.file-upload-dropzone:hover svg {
+  transform: translateY(-3px);
+  background-color: rgba(88, 184, 46, 0.16);
+}
+
 .file-upload-dropzone span {
   font-size: 0.82rem;
   font-weight: 700;

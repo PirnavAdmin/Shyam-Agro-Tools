@@ -72,6 +72,45 @@ export const AnimatedEditButton = ({ onClick, to, title = "Edit", className = ""
   );
 };
 
+export const AnimatedViewButton = ({ onClick, to, title = "View", className = "" }) => {
+  const content = (
+    <svg className="animated-view-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8-11-8-11-8Z" 
+        stroke="currentColor" 
+        strokeWidth="1.8" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+      />
+      <circle 
+        cx="12" 
+        cy="12" 
+        r="3" 
+        stroke="currentColor" 
+        strokeWidth="1.8" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+      />
+    </svg>
+  );
+
+  const btnClass = `animated-view-btn ${className}`;
+
+  if (to) {
+    return (
+      <Link to={to} className={btnClass} title={title} onClick={(e) => e.stopPropagation()}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={(e) => { e.stopPropagation(); onClick(e); }} className={btnClass} title={title}>
+      {content}
+    </button>
+  );
+};
+
 export const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
   if (totalPages <= 1) return null;
 

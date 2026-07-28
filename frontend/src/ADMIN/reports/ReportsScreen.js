@@ -80,6 +80,17 @@ const ReportsScreen = () => {
         })
       ]);
 
+      const mapStatusLocal = (status) => {
+        if (!status) return 'Pending';
+        const s = status.toUpperCase();
+        if (s === 'PENDING') return 'Pending';
+        if (s === 'PROCESSING' || s === 'PACKED') return 'Processing';
+        if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
+        if (s === 'DELIVERED' || s === 'COMPLETED') return 'Completed';
+        if (s === 'CANCELLED' || s === 'CANCELED') return 'Cancelled';
+        return status;
+      };
+
       if (reportsOrdersData) {
         setOrdersReport(reportsOrdersData);
         const mappedOrders = (reportsOrdersData.detailedOrdersLedger || []).map(o => {
@@ -96,13 +107,17 @@ const ReportsScreen = () => {
             totalAmount: amount,
             total: amount,
             paymentStatus: o.paymentStatus === 'PendingVerification' ? 'Pending Verification' : o.paymentStatus,
-            status: o.fulfillmentStatus || 'Pending'
+            status: mapStatusLocal(o.fulfillmentStatus || o.fulfillment || o.status)
           };
         });
         setOrders(mappedOrders);
       } else {
         const legacyOrders = await getOrders().catch(() => []);
-        setOrders(legacyOrders);
+        const mappedOrders = legacyOrders.map(o => ({
+          ...o,
+          status: mapStatusLocal(o.fulfillment || o.status)
+        }));
+        setOrders(mappedOrders);
       }
 
       if (reportsCatalogData) {
