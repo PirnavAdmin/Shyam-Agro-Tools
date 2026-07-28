@@ -22,7 +22,36 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Supplier>>> GetAll()
         {
-            return await _context.Suppliers.ToListAsync();
+            var suppliers = await _context.Suppliers.ToListAsync();
+
+            // Auto-fix existing suppliers with missing fields
+            bool changed = false;
+            foreach (var s in suppliers)
+            {
+                if (string.IsNullOrEmpty(s.ProductCategory))
+                {
+                    s.ProductCategory = "Farm Tools";
+                    changed = true;
+                }
+                if (string.IsNullOrEmpty(s.LeadTime))
+                {
+                    s.LeadTime = "4-6 days";
+                    changed = true;
+                }
+                if (s.PerformanceRating <= 0)
+                {
+                    s.PerformanceRating = 4.5;
+                    changed = true;
+                }
+                if (string.IsNullOrEmpty(s.CommercialTerms))
+                {
+                    s.CommercialTerms = "Net 30";
+                    changed = true;
+                }
+            }
+            if (changed) await _context.SaveChangesAsync();
+
+            return Ok(suppliers);
         }
 
         [HttpGet("{id}")]

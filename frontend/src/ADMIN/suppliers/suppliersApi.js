@@ -49,13 +49,19 @@ export const mapSupplierFromApi = (raw = {}) => {
   const lastSupplyRaw = raw.lastSupply || raw.LastSupply || raw.lastSupplyDate || raw.LastSupplyDate || '';
   const lastSupply = lastSupplyRaw ? String(lastSupplyRaw).slice(0, 10) : new Date().toISOString().slice(0, 10);
 
+  // Normalize status: backend 'Approved' => UI 'Verified'
+  const rawStatus = raw.status || raw.Status || 'Pending';
+  const normalizedStatus = rawStatus === 'Approved' ? 'Verified' :
+                           rawStatus === 'Active' ? 'Verified' :
+                           rawStatus;
+
   return {
     id: String(raw.id ?? raw.Id ?? ''),
     name: raw.name || raw.Name || raw.businessName || raw.BusinessName || '',
     businessName: raw.businessName || raw.BusinessName || raw.name || raw.Name || '',
     contactPerson,
     category,
-    status: raw.status || raw.Status || 'Pending',
+    status: normalizedStatus,
     email: raw.email || raw.Email || '',
     phone: raw.phone || raw.Phone || raw.mobile || raw.Mobile || '',
     mobile: raw.mobile || raw.Mobile || raw.phone || raw.Phone || '',
