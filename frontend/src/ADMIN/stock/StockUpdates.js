@@ -800,8 +800,6 @@ const StockUpdates = () => {
                 <th style={{ padding: '8px 12px' }}>Supplier</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Current Stock</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Reorder Level</th>
-                <th style={{ padding: '8px 12px' }}>Status</th>
-                <th style={{ padding: '8px 12px' }}>30-Day Trend</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Cost Price</th>
                 <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Selling Price</th>
                 <th style={{ padding: '8px 12px' }}>Last Updated</th>
@@ -836,8 +834,6 @@ const StockUpdates = () => {
                     </span>
                   </td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel}</td>
-                  <td style={{ padding: '6px 12px' }}><StockBadge status={item.status} /></td>
-                  <td style={{ padding: '6px 12px' }}><TrendIndicator trend={item.trend} change={item.change} /></td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice)}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.sellingPrice)}</td>
                   <td style={{ padding: '6px 12px' }}>
@@ -857,7 +853,7 @@ const StockUpdates = () => {
               ))}
               {!filtered.length && (
                 <tr>
-                  <td colSpan="11">
+                  <td colSpan="9">
                     <div className="orders-empty">No products match the current filters.</div>
                   </td>
                 </tr>
