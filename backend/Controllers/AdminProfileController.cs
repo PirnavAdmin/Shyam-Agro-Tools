@@ -49,7 +49,7 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             // Default fallback admin email
-            return "vineethavinni70@gmail.com";
+            return "shyam@shyamagrotools.com";
         }
 
         // GET: api/AdminProfile

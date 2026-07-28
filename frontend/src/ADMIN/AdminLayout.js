@@ -16,7 +16,7 @@ const AdminLayout = () => {
 
   const userEmail = localStorage.getItem('adminEmail') || '';
   let userRole = (localStorage.getItem('adminRole') || 'super admin').toLowerCase();
-  if (userEmail.toLowerCase().trim() === 'vineethavinni70@gmail.com') {
+  if (userEmail.toLowerCase().trim() === 'shyam@shyamagrotools.com') {
     userRole = 'super admin';
   }
   

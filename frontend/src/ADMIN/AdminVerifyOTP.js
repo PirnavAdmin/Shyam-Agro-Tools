@@ -172,7 +172,7 @@ const AdminVerifyOTP = () => {
     let permissionsList = ["dashboard", "catalog", "customers", "orders", "stockupdates", "marketing", "brands", "blogs", "settings", "suppliers", "coins converter", "invoices", "staff"];
 
     // Override role and permissions based on login email
-    if (email.toLowerCase().trim() === 'vineethavinni70@gmail.com') {
+    if (email.toLowerCase().trim() === 'shyam@shyamagrotools.com') {
       registeredRole = 'super admin';
       permissionsList = ["dashboard", "catalog", "customers", "orders", "stockupdates", "marketing", "brands", "blogs", "settings", "suppliers", "coins converter", "invoices", "call history", "staff"];
     } else if (location.state?.localStaff) {

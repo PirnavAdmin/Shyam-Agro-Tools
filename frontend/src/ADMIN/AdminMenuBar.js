@@ -30,7 +30,7 @@ const AdminMenuBar = ({ expanded = false }) => {
   useEffect(() => {
     const email = localStorage.getItem('adminEmail') || '';
     let role = (localStorage.getItem('adminRole') || 'super admin').toLowerCase();
-    if (email.toLowerCase().trim() === 'vineethavinni70@gmail.com') {
+    if (email.toLowerCase().trim() === 'shyam@shyamagrotools.com') {
       role = 'super admin';
     }
     setUserRole(role);
