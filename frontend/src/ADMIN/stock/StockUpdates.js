@@ -513,6 +513,7 @@ const StockUpdates = () => {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
+  const [subcategoryFilter, setSubcategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [adjustingItem, setAdjustingItem] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -576,10 +577,11 @@ const StockUpdates = () => {
     return items.filter(i => {
       const matchSearch = !q || [i.sku, i.name, i.category, i.supplier].join(' ').toLowerCase().includes(q);
       const matchCat = categoryFilter === 'All' || i.category === categoryFilter;
+      const matchSubcat = subcategoryFilter === 'All' || i.subcategory === subcategoryFilter;
       const matchStatus = statusFilter === 'All' || i.status === statusFilter;
-      return matchSearch && matchCat && matchStatus;
+      return matchSearch && matchCat && matchSubcat && matchStatus;
     });
-  }, [items, search, categoryFilter, statusFilter]);
+  }, [items, search, categoryFilter, subcategoryFilter, statusFilter]);
 
   // Extract unique categories from actual items dynamically for the filter dropdown
   const filterCategories = useMemo(() => {
@@ -587,10 +589,22 @@ const StockUpdates = () => {
     return ['All', ...Array.from(list)];
   }, [items]);
 
+  // Extract unique subcategories, optionally filtered by selected category
+  const filterSubcategories = useMemo(() => {
+    const relevant = categoryFilter === 'All' ? items : items.filter(i => i.category === categoryFilter);
+    const list = new Set(relevant.map(i => i.subcategory).filter(Boolean));
+    return ['All', ...Array.from(list)];
+  }, [items, categoryFilter]);
+
   // Reset page when filter/search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, categoryFilter, statusFilter]);
+  }, [search, categoryFilter, subcategoryFilter, statusFilter]);
+
+  // Reset subcategory filter when category filter changes
+  useEffect(() => {
+    setSubcategoryFilter('All');
+  }, [categoryFilter]);
 
   const handleSaveAdjust = async (item, adjustmentData) => {
     setLoading(true);
@@ -796,6 +810,12 @@ const StockUpdates = () => {
               <Filter size={15} />
               <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
                 {filterCategories.map(c => <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>)}
+              </select>
+            </label>
+            <label className="catalog-filter">
+              <Package size={15} />
+              <select value={subcategoryFilter} onChange={(e) => setSubcategoryFilter(e.target.value)}>
+                {filterSubcategories.map(sc => <option key={sc} value={sc}>{sc === 'All' ? 'All Subcategories' : sc}</option>)}
               </select>
             </label>
             <label className="catalog-filter">
