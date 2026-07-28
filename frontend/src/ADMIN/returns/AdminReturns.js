@@ -102,6 +102,14 @@ const AdminReturns = () => {
     setReplacementOrderId(Math.floor(100000 + Math.random() * 900000));
   };
 
+  // Safe date formatter — prevents "Invalid Date"
+  const formatDate = (raw) => {
+    if (!raw) return 'N/A';
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return 'N/A';
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
   const handleStatusSubmit = async (e) => {
     e.preventDefault();
     setModalLoading(true);
@@ -117,10 +125,31 @@ const AdminReturns = () => {
       await updateReturnStatus(selectedReturn.id, body);
       
       setModalSuccess(`Claim successfully ${statusUpdateVal.toLowerCase()}!`);
-      setTimeout(() => {
-        closeModals();
-        loadReturnsData();
-      }, 1500);
+      setTimeout(async () => {
+        setActiveModal(null);
+        setModalError('');
+        setModalSuccess('');
+        // Re-fetch fresh data and sync selectedReturn
+        setLoading(true);
+        try {
+          const data = await getAdminReturns({
+            search: searchQuery,
+            status: statusFilter,
+            requestType: typeFilter,
+            page: currentPage,
+            pageSize: pageSize
+          });
+          const freshList = data.returns || [];
+          setReturnsList(freshList);
+          setTotalCount(data.totalCount || 0);
+          const refreshed = freshList.find(r => r.id === selectedReturn.id);
+          if (refreshed) setSelectedReturn(refreshed);
+        } catch (err) {
+          console.error('Refresh failed:', err);
+        } finally {
+          setLoading(false);
+        }
+      }, 1200);
     } catch (err) {
       setModalError('Failed to update claim status.');
     } finally {
@@ -143,10 +172,20 @@ const AdminReturns = () => {
       await updateReturnPickup(selectedReturn.id, body);
       
       setModalSuccess('Pickup scheduled successfully!');
-      setTimeout(() => {
-        closeModals();
-        loadReturnsData();
-      }, 1500);
+      setTimeout(async () => {
+        setActiveModal(null);
+        setModalError('');
+        setModalSuccess('');
+        setLoading(true);
+        try {
+          const data = await getAdminReturns({ search: searchQuery, status: statusFilter, requestType: typeFilter, page: currentPage, pageSize });
+          const freshList = data.returns || [];
+          setReturnsList(freshList);
+          setTotalCount(data.totalCount || 0);
+          const refreshed = freshList.find(r => r.id === selectedReturn.id);
+          if (refreshed) setSelectedReturn(refreshed);
+        } catch (err) { console.error(err); } finally { setLoading(false); }
+      }, 1200);
     } catch (err) {
       setModalError('Failed to schedule pickup.');
     } finally {
@@ -169,10 +208,20 @@ const AdminReturns = () => {
       await updateReturnRefund(selectedReturn.id, body);
       
       setModalSuccess('Refund executed successfully!');
-      setTimeout(() => {
-        closeModals();
-        loadReturnsData();
-      }, 1500);
+      setTimeout(async () => {
+        setActiveModal(null);
+        setModalError('');
+        setModalSuccess('');
+        setLoading(true);
+        try {
+          const data = await getAdminReturns({ search: searchQuery, status: statusFilter, requestType: typeFilter, page: currentPage, pageSize });
+          const freshList = data.returns || [];
+          setReturnsList(freshList);
+          setTotalCount(data.totalCount || 0);
+          const refreshed = freshList.find(r => r.id === selectedReturn.id);
+          if (refreshed) setSelectedReturn(refreshed);
+        } catch (err) { console.error(err); } finally { setLoading(false); }
+      }, 1200);
     } catch (err) {
       setModalError('Failed to execute refund.');
     } finally {
@@ -197,10 +246,20 @@ const AdminReturns = () => {
       await updateReturnReplacement(selectedReturn.id, body);
       
       setModalSuccess('Replacement dispatched successfully!');
-      setTimeout(() => {
-        closeModals();
-        loadReturnsData();
-      }, 1500);
+      setTimeout(async () => {
+        setActiveModal(null);
+        setModalError('');
+        setModalSuccess('');
+        setLoading(true);
+        try {
+          const data = await getAdminReturns({ search: searchQuery, status: statusFilter, requestType: typeFilter, page: currentPage, pageSize });
+          const freshList = data.returns || [];
+          setReturnsList(freshList);
+          setTotalCount(data.totalCount || 0);
+          const refreshed = freshList.find(r => r.id === selectedReturn.id);
+          if (refreshed) setSelectedReturn(refreshed);
+        } catch (err) { console.error(err); } finally { setLoading(false); }
+      }, 1200);
     } catch (err) {
       setModalError('Failed to dispatch replacement.');
     } finally {
@@ -385,7 +444,7 @@ const AdminReturns = () => {
                       </td>
                       <td>{getStatusBadge(ret.status)}</td>
                       <td className="text-xs text-slate-400">
-                        {new Date(ret.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                        {formatDate(ret.createdAt)}
                       </td>
                       <td className="text-center">
                         <button 
@@ -517,7 +576,7 @@ const AdminReturns = () => {
                       <div className="v-circle"><CheckCircle size={10} /></div>
                       <div className="v-content">
                         <strong>Claim Filed</strong>
-                        <span className="block text-[10px] text-slate-400">{new Date(selectedReturn.createdAt).toLocaleDateString()}</span>
+                        <span className="block text-[10px] text-slate-400">{formatDate(selectedReturn.createdAt)}</span>
                       </div>
                     </div>
 
@@ -540,7 +599,7 @@ const AdminReturns = () => {
                         {selectedReturn.pickupDetails && (
                           <div className="bg-slate-50 p-2 rounded border border-slate-100 mt-1 space-y-0.5 text-[10px]">
                             <p><strong>Agent:</strong> {selectedReturn.pickupDetails.pickupAgentName} ({selectedReturn.pickupDetails.pickupAgentPhone})</p>
-                            <p><strong>Date:</strong> {new Date(selectedReturn.pickupDetails.pickupDate).toLocaleDateString()}</p>
+                            <p><strong>Date:</strong> {formatDate(selectedReturn.pickupDetails.pickupDate)}</p>
                           </div>
                         )}
                       </div>
