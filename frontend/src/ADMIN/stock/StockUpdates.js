@@ -537,13 +537,11 @@ const StockUpdates = () => {
       const data = await getStockLedger();
       if (data && data.length > 0) {
         setItems(data);
-        saveLocalStock(data);
       } else {
-        setItems(getLocalStock());
+        setItems([]);
       }
     } catch (err) {
-      console.warn("Failed to fetch stock ledger from API, using localStorage:", err);
-      setItems(getLocalStock());
+      console.warn("Failed to fetch stock ledger from API:", err);
     } finally {
       setLoading(false);
     }
