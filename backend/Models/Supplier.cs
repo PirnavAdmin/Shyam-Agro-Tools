@@ -10,15 +10,21 @@ namespace ShyamAgroSuite.Api.Models
         public string Phone { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
         public int ProductCount { get; set; } = 0;
-        public double PerformanceRating { get; set; } = 5.0; // scale 1.0 - 5.0
-        public string CommercialTerms { get; set; } = "Net 30"; // e.g. "Net 30", "COD", "Net 45"
+        public double PerformanceRating { get; set; } = 4.5;
+        public string CommercialTerms { get; set; } = "Net 30";
         public bool IsActive { get; set; } = true;
+        public string LeadTime { get; set; } = "4-6 days";
+        public string ProductLines { get; set; } = string.Empty;
+        public int ActivePo { get; set; } = 0;
+        public double MonthlySpend { get; set; } = 0;
+        public DateTime? LastSupply { get; set; }
 
         // Seller Registration fields
         public string? Gstin { get; set; }
         public string? ProductCategory { get; set; }
         public string? TrackingId { get; set; }
-        public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected
+        public string Status { get; set; } = "Pending";
     }
 }

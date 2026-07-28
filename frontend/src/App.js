@@ -234,6 +234,7 @@ function App() {
                       <Route path="suppliers" element={<SuppliersList />} />
                       <Route path="suppliers/list" element={<SuppliersList />} />
                       <Route path="suppliers/add" element={<SuppliersForm />} />
+                      <Route path="suppliers/edit/:id" element={<SuppliersForm />} />
                       <Route path="suppliers/new" element={<NewSuppliersList />} />
 
                       {/* Coins Converter Routes */}

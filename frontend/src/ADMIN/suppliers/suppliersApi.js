@@ -36,27 +36,42 @@ const unwrapItem = (response) => {
 
 // Mapper: Standardize backend data structures for suppliers components
 export const mapSupplierFromApi = (raw = {}) => {
+  // Support both camelCase (client) and PascalCase (ASP.NET) field names
+  const category = raw.category || raw.Category || raw.productCategory || raw.ProductCategory || '';
+  const contactPerson = raw.contactPerson || raw.ContactPerson || raw.name || raw.Name || '';
+  const rating = Number(raw.rating ?? raw.Rating ?? raw.performanceRating ?? raw.PerformanceRating ?? 4.5);
+  const terms = raw.paymentTerms || raw.terms || raw.commercialTerms || raw.CommercialTerms || 'Net 15';
+  const city = raw.city || raw.City || '';
+  const leadTime = raw.leadTime || raw.LeadTime || '4-6 days';
+  const products = raw.productLines || raw.ProductLines || raw.products || raw.Products || '';
+  const activePo = Number(raw.activePo ?? raw.ActivePo ?? 0);
+  const monthlySpend = Number(raw.monthlySpend ?? raw.MonthlySpend ?? 0);
+  const lastSupplyRaw = raw.lastSupply || raw.LastSupply || raw.lastSupplyDate || raw.LastSupplyDate || '';
+  const lastSupply = lastSupplyRaw ? String(lastSupplyRaw).slice(0, 10) : new Date().toISOString().slice(0, 10);
+
   return {
-    id: String(raw.id ?? ''),
-    name: raw.name || raw.businessName || '',
-    businessName: raw.businessName || raw.name || '',
-    contactPerson: raw.contactPerson || raw.name || '',
-    category: raw.category || '',
-    status: raw.status || 'Pending',
-    email: raw.email || '',
-    phone: raw.phone || raw.mobile || '',
-    mobile: raw.mobile || raw.phone || '',
-    city: raw.city || '',
-    address: raw.address || '',
-    gstin: raw.gstin || '',
-    leadTime: raw.leadTime || '4-6 days',
-    rating: Number(raw.rating ?? 4.5),
-    activePo: Number(raw.activePo ?? 0),
-    monthlySpend: Number(raw.monthlySpend ?? 0),
-    lastSupply: raw.lastSupply || new Date().toISOString().slice(0, 10),
-    terms: raw.paymentTerms || raw.terms || 'Net 15',
-    products: raw.productLines || raw.products || '',
-    submittedAt: raw.submittedAt || raw.createdAt || new Date().toISOString()
+    id: String(raw.id ?? raw.Id ?? ''),
+    name: raw.name || raw.Name || raw.businessName || raw.BusinessName || '',
+    businessName: raw.businessName || raw.BusinessName || raw.name || raw.Name || '',
+    contactPerson,
+    category,
+    status: raw.status || raw.Status || 'Pending',
+    email: raw.email || raw.Email || '',
+    phone: raw.phone || raw.Phone || raw.mobile || raw.Mobile || '',
+    mobile: raw.mobile || raw.Mobile || raw.phone || raw.Phone || '',
+    city,
+    address: raw.address || raw.Address || '',
+    gstin: raw.gstin || raw.Gstin || '',
+    leadTime,
+    rating,
+    activePo,
+    monthlySpend,
+    lastSupply,
+    terms,
+    paymentTerms: terms,
+    products,
+    productLines: products,
+    submittedAt: raw.submittedAt || raw.SubmittedAt || raw.createdAt || raw.CreatedAt || new Date().toISOString()
   };
 };
 
@@ -87,18 +102,17 @@ export const createSupplier = async (supplierData) => {
   const payload = {
     name: supplierData.name || supplierData.businessName || '',
     contactPerson: supplierData.contactPerson || '',
-    category: supplierData.category || '',
+    productCategory: supplierData.category || supplierData.productCategory || '',
     status: supplierData.status || 'Pending',
     email: supplierData.email || '',
     phone: supplierData.phone || supplierData.mobile || '',
     city: supplierData.city || '',
     address: supplierData.address || '',
     gstin: supplierData.gstin || '',
-    leadTime: supplierData.leadTime || '',
-    paymentTerms: supplierData.paymentTerms || supplierData.terms || 'Net 15',
+    leadTime: supplierData.leadTime || '4-6 days',
+    commercialTerms: supplierData.paymentTerms || supplierData.terms || 'Net 15',
     productLines: supplierData.productLines || supplierData.products || '',
-    notes: supplierData.notes || '',
-    rating: Number(supplierData.rating ?? 4.5),
+    performanceRating: Number(supplierData.rating ?? 4.5),
     activePo: Number(supplierData.activePo ?? 0),
     monthlySpend: Number(supplierData.monthlySpend ?? 0)
   };
@@ -110,21 +124,20 @@ export const createSupplier = async (supplierData) => {
 // PUT /api/Suppliers/{id}
 export const updateSupplier = async (id, supplierData) => {
   const payload = {
-    id: id,
+    id: parseInt(id, 10),
     name: supplierData.name || supplierData.businessName || '',
     contactPerson: supplierData.contactPerson || '',
-    category: supplierData.category || '',
+    productCategory: supplierData.category || supplierData.productCategory || '',
     status: supplierData.status || 'Pending',
     email: supplierData.email || '',
     phone: supplierData.phone || supplierData.mobile || '',
     city: supplierData.city || '',
     address: supplierData.address || '',
     gstin: supplierData.gstin || '',
-    leadTime: supplierData.leadTime || '',
-    paymentTerms: supplierData.paymentTerms || supplierData.terms || 'Net 15',
+    leadTime: supplierData.leadTime || '4-6 days',
+    commercialTerms: supplierData.paymentTerms || supplierData.terms || 'Net 15',
     productLines: supplierData.productLines || supplierData.products || '',
-    notes: supplierData.notes || '',
-    rating: Number(supplierData.rating ?? 4.5),
+    performanceRating: Number(supplierData.rating ?? 4.5),
     activePo: Number(supplierData.activePo ?? 0),
     monthlySpend: Number(supplierData.monthlySpend ?? 0)
   };

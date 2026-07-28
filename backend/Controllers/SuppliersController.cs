@@ -186,10 +186,16 @@ namespace ShyamAgroSuite.Api.Controllers
             supplier.Phone = updateData.Phone;
             supplier.Email = updateData.Email;
             supplier.Address = updateData.Address;
+            supplier.City = updateData.City;
             supplier.ProductCount = updateData.ProductCount;
             supplier.PerformanceRating = updateData.PerformanceRating;
             supplier.CommercialTerms = updateData.CommercialTerms;
             supplier.IsActive = updateData.IsActive;
+            supplier.LeadTime = updateData.LeadTime;
+            supplier.ProductLines = updateData.ProductLines;
+            supplier.ActivePo = updateData.ActivePo;
+            supplier.MonthlySpend = updateData.MonthlySpend;
+            if (updateData.LastSupply.HasValue) supplier.LastSupply = updateData.LastSupply;
 
             // If updated by form, let them sync gstin/category
             if (!string.IsNullOrEmpty(updateData.Gstin)) supplier.Gstin = updateData.Gstin;
