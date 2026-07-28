@@ -55,9 +55,8 @@ const InvoicesList = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchTerm]);
 
-  const handleUpdateStatus = async (id, currentStatus) => {
-    const newStatus = currentStatus === 'Paid' ? 'Unpaid' : 'Paid';
-    if (!window.confirm(`Are you sure you want to mark this invoice as ${newStatus}?`)) return;
+  const handleUpdateStatus = async (id, nextStatus) => {
+    if (!window.confirm(`Are you sure you want to change this invoice's status to ${nextStatus}?`)) return;
 
     try {
       const response = await fetch(`${getApiDomain()}/api/Invoices/${id}`, {
@@ -66,7 +65,7 @@ const InvoicesList = () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: nextStatus })
       });
       if (!response.ok) throw new Error('Failed to update invoice status.');
       fetchInvoices(searchTerm);
@@ -307,15 +306,19 @@ const InvoicesList = () => {
                         >
                           <Printer size={14} /> Print
                         </button>
-                        {inv.status !== 'Cancelled' && (
-                          <button
-                            onClick={() => handleUpdateStatus(inv.id, inv.status)}
-                            className="inv-action-btn toggle"
-                            title="Toggle Status"
-                          >
-                            <CheckCircle2 size={14} /> Mark {inv.status === 'Paid' ? 'Unpaid' : 'Paid'}
-                          </button>
-                        )}
+                        {inv.status?.toLowerCase() !== 'cancelled' && (() => {
+                          const isPaid = inv.status?.toLowerCase() === 'paid';
+                          const nextTarget = isPaid ? 'Unpaid' : 'Paid';
+                          return (
+                            <button
+                              onClick={() => handleUpdateStatus(inv.id, nextTarget)}
+                              className="inv-action-btn toggle"
+                              title="Toggle Status"
+                            >
+                              <CheckCircle2 size={14} /> Mark as {nextTarget}
+                            </button>
+                          );
+                        })()}
                         {inv.status !== 'Cancelled' && (
                           <button
                             onClick={() => handleDeleteInvoice(inv.id)}
