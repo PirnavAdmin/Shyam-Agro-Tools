@@ -776,7 +776,6 @@ const AdminReturns = () => {
                     rows="3"
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    required
                     placeholder="Enter the reason why this claim is being denied..."
                     className="modal-form-control"
                   />
