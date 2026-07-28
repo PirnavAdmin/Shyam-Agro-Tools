@@ -20,6 +20,17 @@ const getHeaders = () => {
   return headers;
 };
 
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  if (url.includes('/uploads/')) {
+    const uploadPath = url.slice(url.indexOf('/uploads/'));
+    return `${getApiDomain()}${uploadPath}`;
+  }
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${getApiDomain()}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const TestimonialsList = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -148,7 +159,7 @@ const TestimonialsList = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         {(t.imageUrl || t.image) ? (
                           <img
-                            src={t.imageUrl || t.image}
+                            src={resolveImageUrl(t.imageUrl || t.image)}
                             alt={t.name}
                             style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '50%', border: '1px solid #e2e8f0', flexShrink: 0 }}
                             onError={(e) => { e.target.style.display = 'none'; }}

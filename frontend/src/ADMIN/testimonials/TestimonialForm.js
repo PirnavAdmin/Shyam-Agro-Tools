@@ -26,6 +26,17 @@ const emptyForm = {
   text: '',
 };
 
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  if (url.includes('/uploads/')) {
+    const uploadPath = url.slice(url.indexOf('/uploads/'));
+    return `${getApiDomain()}${uploadPath}`;
+  }
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${getApiDomain()}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const TestimonialForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -86,8 +97,10 @@ const TestimonialForm = () => {
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setImagePreview(event.target.result);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -201,8 +214,12 @@ const TestimonialForm = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   {imagePreview ? (
                     <img
-                      src={imagePreview}
+                      src={resolveImageUrl(imagePreview)}
                       alt="Preview"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'Client') + '&background=e2e8f0&color=64748b';
+                      }}
                       style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #22c55e' }}
                     />
                   ) : (
