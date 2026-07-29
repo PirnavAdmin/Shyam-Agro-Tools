@@ -738,7 +738,9 @@ const AdminDashboard = () => {
                       </td>
                       <td>
                         {(() => {
-                          const ps = order.paymentStatus || 'Pending';
+                          const isCancelled = order.status === 'Cancelled' || order.status === 'Canceled';
+                          const rawPs = order.paymentStatus || 'Pending';
+                          const ps = isCancelled && (rawPs === 'Pending' || rawPs === 'Unpaid') ? 'Payment Not Applicable' : rawPs;
                           let bg = '#fee2e2', color = '#b91c1c';
                           if (ps === 'Verified Paid' || ps === 'Paid') { bg = '#dcfce7'; color = '#15803d'; }
                           else if (ps === 'Pending Verification' || ps === 'Pending') { bg = '#fff7df'; color = '#b45309'; }
