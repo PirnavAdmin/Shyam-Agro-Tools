@@ -57,12 +57,20 @@
 
 .catalog-header__actions,
 .catalog-actions,
-.catalog-filterbar,
-.catalog-inline-actions {
+.catalog-filterbar {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.catalog-inline-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  vertical-align: middle;
 }
 
 .catalog-card {
@@ -2048,17 +2056,27 @@
 }
 
 /* Outlook Animated Delete and Edit Buttons styling */
-.outlook-delete-btn {
+.outlook-delete-btn,
+.animated-edit-btn,
+.animated-view-btn {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
   color: #64748b;
   transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  box-sizing: border-box;
+  vertical-align: middle;
 }
 
 .outlook-delete-btn:hover {
@@ -2066,9 +2084,23 @@
   background-color: #fee2e2 !important;
 }
 
-.outlook-trash-svg {
+.animated-edit-btn:hover {
+  color: #2563eb !important;
+  background-color: #dbeafe !important;
+}
+
+.animated-view-btn:hover {
+  color: #059669 !important;
+  background-color: #ecfdf5 !important;
+}
+
+.outlook-trash-svg,
+.animated-edit-svg,
+.animated-view-svg {
   width: 18px;
   height: 18px;
+  display: block;
+  margin: auto;
 }
 
 .outlook-trash-svg .trash-lid {
@@ -2078,54 +2110,6 @@
 
 .outlook-delete-btn:hover .outlook-trash-svg .trash-lid {
   transform: translateY(-2.5px) rotate(-15deg);
-}
-
-.animated-edit-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  color: #64748b;
-  transition: all 0.2s ease-in-out;
-  text-decoration: none;
-}
-
-.animated-edit-btn:hover {
-  color: #2563eb !important;
-  background-color: #dbeafe !important;
-}
-
-.animated-edit-svg {
-  width: 18px;
-  height: 18px;
-}
-
-.animated-view-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  color: #64748b;
-  transition: all 0.2s ease-in-out;
-  text-decoration: none;
-}
-
-.animated-view-btn:hover {
-  color: #059669 !important;
-  background-color: #ecfdf5 !important;
-}
-
-.animated-view-svg {
-  width: 18px;
-  height: 18px;
 }
 
 .animated-edit-btn:hover .animated-edit-svg {

@@ -214,8 +214,8 @@ const CategoriesList = () => {
                       {category.status}
                     </button>
                   </td>
-                  <td style={{ padding: '10px 16px' }}>
-                    <div className="catalog-inline-actions" style={{ justifyContent: 'center', gap: '8px' }}>
+                  <td className="catalog-center-cell" style={{ padding: '10px 16px' }}>
+                    <div className="catalog-inline-actions">
                       <AnimatedEditButton
                         to={`/admin/catalog/category?id=${category.id}`}
                         title="Edit category"

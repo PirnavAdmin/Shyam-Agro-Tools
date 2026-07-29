@@ -231,8 +231,8 @@ const SubcategoriesList = () => {
                       {subcategory.status}
                     </button>
                   </td>
-                  <td style={{ padding: '10px 16px' }}>
-                    <div className="catalog-inline-actions" style={{ justifyContent: 'center', gap: '8px' }}>
+                  <td className="catalog-center-cell" style={{ padding: '10px 16px' }}>
+                    <div className="catalog-inline-actions">
                       <AnimatedEditButton
                         to={`/admin/catalog/subcategory?id=${subcategory.id}`}
                         title="Edit subcategory"

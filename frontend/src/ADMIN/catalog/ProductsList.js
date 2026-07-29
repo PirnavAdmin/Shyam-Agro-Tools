@@ -266,7 +266,7 @@ const ProductsList = () => {
                       {product.status}
                     </span>
                   </td>
-                  <td style={{ padding: '5px 8px' }}>
+                  <td className="catalog-center-cell" style={{ padding: '5px 8px' }}>
                     <div className="catalog-inline-actions">
                       <AnimatedEditButton
                         to={`/admin/catalog/products-form?id=${product.id}`}
