@@ -495,7 +495,15 @@ const AdminDashboard = () => {
               <span className="section-kicker">Income overview</span>
               <h2>Revenue Distribution</h2>
             </div>
-            <span className="panel-badge">Sales Value</span>
+            <button
+              type="button"
+              className="panel-badge panel-badge--interactive"
+              onClick={() => navigate('/admin/reports')}
+              title="Click to view detailed sales revenue report"
+            >
+              <TrendingUp size={14} aria-hidden="true" />
+              Sales Value
+            </button>
           </div>
 
           <div className="chart-shell">
