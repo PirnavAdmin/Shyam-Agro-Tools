@@ -646,6 +646,11 @@
   background: #dbeafe;
 }
 
+.status-tag--confirmed {
+  color: #047857;
+  background: #d1fae5;
+}
+
 .status-tag--packed {
   color: #065f46;
   background: #d1fae5;
