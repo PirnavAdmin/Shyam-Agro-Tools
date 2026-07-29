@@ -71,7 +71,7 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             string username = admin.Email.Contains("@") ? admin.Email.Split('@')[0] : admin.Email;
-            string roleLabel = admin.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) ? "SUPER ADMINISTRATOR" : "ADMINISTRATOR";
+            string roleLabel = "ADMINISTRATOR";
             string systemAccess = admin.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) 
                 ? "Full System Access Granted (All Screens)" 
                 : "Standard System Access (Limited Screens)";
@@ -135,7 +135,7 @@ namespace ShyamAgroSuite.Api.Controllers
             await _context.SaveChangesAsync();
 
             string username = admin.Email.Contains("@") ? admin.Email.Split('@')[0] : admin.Email;
-            string roleLabel = admin.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) ? "SUPER ADMINISTRATOR" : "ADMINISTRATOR";
+            string roleLabel = "ADMINISTRATOR";
             string systemAccess = admin.Role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) 
                 ? "Full System Access Granted (All Screens)" 
                 : "Standard System Access (Limited Screens)";

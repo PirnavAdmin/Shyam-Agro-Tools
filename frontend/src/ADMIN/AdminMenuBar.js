@@ -9,7 +9,7 @@ import './AdminMenuBar.css';
 
 const AdminMenuBar = ({ expanded = false }) => {
   const location = useLocation();
-  const [userRole, setUserRole] = useState('super admin');
+  const [userRole, setUserRole] = useState('admin');
   const [userPermissions, setUserPermissions] = useState([]);
 
   const [openDropdowns, setOpenDropdowns] = useState({
@@ -29,6 +29,10 @@ const AdminMenuBar = ({ expanded = false }) => {
 
   useEffect(() => {
     let role = (localStorage.getItem('adminRole') || 'admin').toLowerCase();
+    if (role === 'super admin' || role === 'superadmin') {
+      role = 'admin';
+      localStorage.setItem('adminRole', 'admin');
+    }
     setUserRole(role);
 
     try {
@@ -106,11 +110,14 @@ const AdminMenuBar = ({ expanded = false }) => {
 
   const getRoleLabel = (role) => {
     switch (role?.toLowerCase()) {
-      case 'super admin': return 'SUPER ADMIN';
-      case 'admin': return 'ADMIN';
+      case 'super admin':
+      case 'superadmin':
+      case 'admin':
+      case 'administrator':
+        return 'ADMIN';
       case 'manager': return 'MANAGER';
       case 'staff': return 'STAFF';
-      default: return 'USER';
+      default: return 'ADMIN';
     }
   };
 
