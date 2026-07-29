@@ -260,26 +260,33 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // ── Helper ────────────────────────────────────────────────────────────────
         /// <summary>
-        /// Replaces any null / empty fields in a Supplier with safe default values.
+        /// Replaces any null / empty fields in a Supplier with meaningful default values.
         /// Returns true if any field was changed (so the caller can decide to SaveChanges).
         /// </summary>
         private static bool FixSupplierNulls(Supplier s)
         {
             bool changed = false;
 
-            if (string.IsNullOrWhiteSpace(s.Gstin))          { s.Gstin = "";            changed = true; }
+            // Registration fields – use meaningful placeholders
+            if (string.IsNullOrWhiteSpace(s.Gstin))           { s.Gstin = "N/A";              changed = true; }
             if (string.IsNullOrWhiteSpace(s.ProductCategory)) { s.ProductCategory = "General"; changed = true; }
-            if (string.IsNullOrWhiteSpace(s.TrackingId))     { s.TrackingId = "";       changed = true; }
-            if (string.IsNullOrWhiteSpace(s.LeadTime))       { s.LeadTime = "4-6 days"; changed = true; }
-            if (string.IsNullOrWhiteSpace(s.CommercialTerms)){ s.CommercialTerms = "Net 30"; changed = true; }
-            if (string.IsNullOrWhiteSpace(s.City))           { s.City = "";             changed = true; }
-            if (string.IsNullOrWhiteSpace(s.ProductLines))   { s.ProductLines = "";     changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Name))           { s.Name = "Unknown";      changed = true; }
-            if (string.IsNullOrWhiteSpace(s.ContactPerson))  { s.ContactPerson = "";    changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Phone))          { s.Phone = "";            changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Email))          { s.Email = "";            changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Address))        { s.Address = "";          changed = true; }
-            if (s.PerformanceRating <= 0)                    { s.PerformanceRating = 4.5; changed = true; }
+            if (string.IsNullOrWhiteSpace(s.TrackingId))      { s.TrackingId = $"SUP-{s.Id:D6}"; changed = true; }
+
+            // Operational fields
+            if (string.IsNullOrWhiteSpace(s.LeadTime))        { s.LeadTime = "4-6 days";      changed = true; }
+            if (string.IsNullOrWhiteSpace(s.CommercialTerms)) { s.CommercialTerms = "Net 30";  changed = true; }
+            if (string.IsNullOrWhiteSpace(s.City))            { s.City = "Not specified";      changed = true; }
+            if (string.IsNullOrWhiteSpace(s.ProductLines))    { s.ProductLines = "General";    changed = true; }
+
+            // Contact fields
+            if (string.IsNullOrWhiteSpace(s.Name))            { s.Name = "Unknown Supplier";   changed = true; }
+            if (string.IsNullOrWhiteSpace(s.ContactPerson))   { s.ContactPerson = "Not provided"; changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Phone))           { s.Phone = "Not provided";      changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Email))           { s.Email = "Not provided";      changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Address))         { s.Address = "Not specified";   changed = true; }
+
+            // Numeric fields
+            if (s.PerformanceRating <= 0) { s.PerformanceRating = 4.5; changed = true; }
 
             return changed;
         }
