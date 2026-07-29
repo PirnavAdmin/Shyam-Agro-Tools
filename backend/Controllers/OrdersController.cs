@@ -73,11 +73,16 @@ namespace ShyamAgroSuite.Api.Controllers
             // 1. Calculate dashboard metrics from the database (all orders)
             var allOrders = await _context.Orders.ToListAsync();
 
-            // Auto-advance non-cancelled orders with verified payment to Processing if still Pending/Placed, and mark cancelled orders as Cancelled
+            // Auto-correct any status inconsistencies in database
             bool statusAutoUpdated = false;
             foreach (var o in allOrders)
             {
                 bool isCancelled = o.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Canceled", StringComparison.OrdinalIgnoreCase);
+                bool isPaid = o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) ||
+                              o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) ||
+                              o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
+                              o.PaymentStatus.Equals("Paid Verified", StringComparison.OrdinalIgnoreCase);
+
                 if (isCancelled)
                 {
                     if (!o.PaymentStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
@@ -86,25 +91,39 @@ namespace ShyamAgroSuite.Api.Controllers
                         statusAutoUpdated = true;
                     }
                 }
-                else
+                else if (o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || 
+                         o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase) || 
+                         o.Status.Equals("Dispatched", StringComparison.OrdinalIgnoreCase) || 
+                         o.Status.Equals("Shipped", StringComparison.OrdinalIgnoreCase) || 
+                         o.Status.Equals("Packed", StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isPaid = o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) ||
-                                  o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) ||
-                                  o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
-                                  o.PaymentStatus.Equals("Paid Verified", StringComparison.OrdinalIgnoreCase);
-
-                    if (isPaid && (o.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Placed", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(o.Status)))
+                    if (!isPaid)
+                    {
+                        o.PaymentStatus = "Paid";
+                        statusAutoUpdated = true;
+                    }
+                }
+                else if (isPaid)
+                {
+                    if (o.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Placed", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(o.Status))
                     {
                         o.Status = "Processing";
                         statusAutoUpdated = true;
 
-                        // Sync order_success table if present
                         var os = await _context.OrderSuccesses.FirstOrDefaultAsync(x => x.OrderId == o.OrderNumber || x.OrderId == o.Id.ToString());
                         if (os != null && (os.OrderStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase) || os.OrderStatus.Equals("Placed", StringComparison.OrdinalIgnoreCase)))
                         {
                             os.OrderStatus = "Processing";
                             statusAutoUpdated = true;
                         }
+                    }
+                }
+                else
+                {
+                    if (o.Status.Equals("Processing", StringComparison.OrdinalIgnoreCase))
+                    {
+                        o.Status = "Pending";
+                        statusAutoUpdated = true;
                     }
                 }
             }
@@ -194,7 +213,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 {
                     displayPaymentStatus = "Cancelled";
                 }
-                else if (o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase))
+                else if (o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
                 {
                     displayPaymentStatus = "Verified Paid";
                 }
@@ -210,9 +229,19 @@ namespace ShyamAgroSuite.Api.Controllers
                 }
 
                 var displayFulfillment = o.Status.ToUpper();
-                if (displayPaymentStatus == "Verified Paid" && (displayFulfillment == "PENDING" || displayFulfillment == "PLACED" || string.IsNullOrWhiteSpace(displayFulfillment)))
+                if (displayPaymentStatus == "Pending Verification" || displayPaymentStatus == "Pending")
                 {
-                    displayFulfillment = "PROCESSING";
+                    if (displayFulfillment == "PROCESSING" || displayFulfillment == "PLACED")
+                    {
+                        displayFulfillment = "PENDING";
+                    }
+                }
+                else if (displayPaymentStatus == "Verified Paid")
+                {
+                    if (displayFulfillment == "PENDING" || displayFulfillment == "PLACED" || string.IsNullOrWhiteSpace(displayFulfillment))
+                    {
+                        displayFulfillment = "PROCESSING";
+                    }
                 }
 
                 return new

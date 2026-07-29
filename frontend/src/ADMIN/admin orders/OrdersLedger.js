@@ -105,17 +105,18 @@ export const parseAmount = (val) => {
 
 // Helper to map status
 export const mapStatus = (status, paymentStatus) => {
-  if (!status) return 'Processing';
+  if (!status) return 'Pending';
   const s = status.toUpperCase();
   const ps = (paymentStatus || '').toUpperCase();
   const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED';
+  const isPendingPay = ps === 'PENDING' || ps === 'PENDING VERIFICATION' || ps === 'PENDINGVERIFICATION' || ps === 'UNPAID';
 
-  if (s === 'PENDING' || s === 'PLACED') return isPaid ? 'Processing' : 'Pending';
-  if (s === 'PROCESSING') return 'Processing';
-  if (s === 'PACKED') return 'Packed';
-  if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
-  if (s === 'COMPLETED' || s === 'DELIVERED') return 'Completed';
   if (s === 'CANCELLED' || s === 'CANCELED') return 'Cancelled';
+  if (s === 'COMPLETED' || s === 'DELIVERED') return 'Completed';
+  if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
+  if (s === 'PACKED') return 'Packed';
+  if (s === 'PROCESSING') return isPendingPay ? 'Pending' : 'Processing';
+  if (s === 'PENDING' || s === 'PLACED') return isPaid ? 'Processing' : 'Pending';
   return status;
 };
 
@@ -124,15 +125,11 @@ const normaliseOrder = (o) => {
   const totalVal = parseAmount(o.finalAmount || o.totalAmount || o.total);
   let statusMapped = mapStatus(o.fulfillment || o.status, o.paymentStatus);
 
-  // Confirmed orders: if payment is completed/verified, status should be confirmed (Processing)
-  const isPaid = o.paymentStatus === 'Paid' || o.paymentStatus === 'Verified Paid' || o.paymentStatus === 'Success' || o.paymentStatus === 'Paid Verified';
-  if ((statusMapped === 'Pending' || statusMapped === 'Placed') && isPaid) {
-    statusMapped = 'Processing';
-  }
-
   let payStatus = o.paymentStatus || 'Pending';
   if (statusMapped === 'Cancelled' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELLED' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELED') {
     payStatus = 'Cancelled';
+  } else if (statusMapped === 'Completed' || (o.fulfillment || o.status || '').toUpperCase() === 'COMPLETED' || (o.fulfillment || o.status || '').toUpperCase() === 'DELIVERED') {
+    payStatus = 'Verified Paid';
   }
   
   return {
