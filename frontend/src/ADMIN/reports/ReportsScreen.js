@@ -558,7 +558,7 @@ const ReportsScreen = () => {
                 <div className="reports-stat-card">
                   <div className="stat-icon revenue"><DollarSign size={20} /></div>
                   <div className="stat-details">
-                    <span>Total Sales Revenue</span>
+                    <span>Total Revenue</span>
                     <strong>{displayStats.revenue}</strong>
                   </div>
                 </div>

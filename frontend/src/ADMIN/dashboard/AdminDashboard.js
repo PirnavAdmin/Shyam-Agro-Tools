@@ -329,7 +329,7 @@ const AdminDashboard = () => {
       ['Export Date', new Date().toLocaleDateString(), ''],
       [],
       ['Core Metrics', 'Value', 'Context'],
-      ['Total Sales Revenue', formatCurrency(metrics.totalSales), 'All non-canceled orders'],
+      ['Total Revenue', formatCurrency(metrics.totalSales), 'All non-canceled orders'],
       ['Total Orders Recorded', metrics.totalOrders, ''],
       ['Catalog Product Count', metrics.productsCount, ''],
       ['Registered Supplier Count', metrics.suppliersCount, ''],
