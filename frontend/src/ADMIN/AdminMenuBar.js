@@ -125,7 +125,7 @@ const AdminMenuBar = ({ expanded = false }) => {
           onError={(e) => { e.target.style.display = 'none'; }}
         />
         <div className={`sidebar-brand-info ${expanded ? 'visible' : 'hidden'}`}>
-          <h2 className="stroyka-brand">SHYAM AGRO</h2>
+          <h2 className="stroyka-brand">Shyam Agro Tools</h2>
           <span className={`admin-badge role-${userRole.replace(' ', '-')}`}>
             {getRoleLabel(userRole)}
           </span>

@@ -86,18 +86,12 @@ const AdminTopBar = () => {
 
   return (
     <div className="stroyka-topbar">
-      {/* Left: Project Brand */}
+      {/* Left: Control Panel Context */}
       <div className="topbar-left">
         <div className="topbar-brand">
-          <img
-            src="/logo.png"
-            alt="SAT Logo"
-            className="topbar-brand-logo"
-          />
-          <div className="topbar-brand-text">
-            <span className="topbar-brand-name">Shyam Agro Tools</span>
-            <span className="topbar-brand-sub">Admin Control Panel</span>
-          </div>
+          <span className="topbar-brand-sub" style={{ fontSize: '12px', fontWeight: 700, color: '#475569', letterSpacing: '0.5px' }}>
+            Admin Control Panel
+          </span>
         </div>
       </div>
 
