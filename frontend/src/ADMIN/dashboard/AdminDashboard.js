@@ -186,7 +186,7 @@ const AdminDashboard = () => {
         return sum + cleanAmount;
       }, 0);
 
-    const activeOrdersCount = orders.filter(o => o.status !== 'Completed' && o.status !== 'Canceled').length;
+    const activeOrdersCount = orders.filter(o => o.status === 'Processing' || o.status === 'Packed' || o.status === 'Dispatched').length;
     const lowStockCount = products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock').length;
     const pendingSuppliersCount = suppliers.filter(s => s.status === 'Pending').length;
 
