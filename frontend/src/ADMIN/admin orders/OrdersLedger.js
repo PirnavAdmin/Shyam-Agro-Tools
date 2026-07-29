@@ -126,6 +126,24 @@ export const mapStatus = (status, paymentStatus) => {
   return status;
 };
 
+export const normalizePaymentMethod = (pm) => {
+  if (!pm) return 'Cash on Delivery';
+  const clean = String(pm).trim().toUpperCase();
+  if (clean === 'CASH' || clean === 'CASHONDELIVERY' || clean === 'CASH ON DELIVERY' || clean === 'COD') {
+    return 'Cash on Delivery';
+  }
+  if (clean === 'UPI' || clean === 'QRPAYMENT' || clean === 'UPI / BANK TRANSFER' || clean === 'BANK TRANSFER') {
+    return 'UPI / Bank Transfer';
+  }
+  if (clean === 'CARD' || clean === 'CREDIT CARD' || clean === 'DEBIT CARD') {
+    return 'Card';
+  }
+  if (clean === 'NETBANKING' || clean === 'NET BANKING') {
+    return 'Net Banking';
+  }
+  return pm;
+};
+
 // Helper to normalise order details
 const normaliseOrder = (o) => {
   const totalVal = parseAmount(o.finalAmount || o.totalAmount || o.total);
@@ -154,7 +172,7 @@ const normaliseOrder = (o) => {
     paid: o.paidAmount !== undefined ? parseAmount(o.paidAmount) : (o.paymentStatus === 'Paid' ? totalVal : 0),
     status: statusMapped,
     paymentStatus: payStatus,
-    payMethod: o.paymentMethod || o.payMethod || '',
+    payMethod: normalizePaymentMethod(o.paymentMethod || o.payMethod),
     utr: o.utr || '',
     logistics: o.carrierName || o.logisticsPartner || o.logistics || '',
     trackingNo: o.trackingNumber || o.trackingNo || '',

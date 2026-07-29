@@ -237,7 +237,16 @@ namespace ShyamAgroSuite.Api.Controllers
                 }
 
                 var displayPaymentMethod = o.PaymentMethod;
-                if (o.PaymentMethod.Equals("QRPayment", StringComparison.OrdinalIgnoreCase) || o.PaymentMethod.Equals("UPI", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(o.PaymentMethod, "Cash", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(o.PaymentMethod, "CashOnDelivery", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(o.PaymentMethod, "Cash on Delivery", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(o.PaymentMethod, "COD", StringComparison.OrdinalIgnoreCase))
+                {
+                    displayPaymentMethod = "Cash on Delivery";
+                }
+                else if (string.Equals(o.PaymentMethod, "QRPayment", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(o.PaymentMethod, "UPI", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(o.PaymentMethod, "Bank Transfer", StringComparison.OrdinalIgnoreCase))
                 {
                     displayPaymentMethod = "UPI / Bank Transfer";
                 }
