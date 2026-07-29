@@ -10,7 +10,7 @@ const ADMIN_AUTH_API = `${getApiDomain()}/api/Auth`;
 const HEADERS      = { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' };
 const REQUEST_TIMEOUT = 20000;
 const OTP_TIMEOUT  = 120; // seconds admin has to enter OTP
-const RESEND_WAIT  = 60;  // seconds before they can resend
+const RESEND_WAIT  = 120; // seconds before they can resend (synchronized with OTP expiration timer)
 
 const getApiErrorMessage = (err, fallback) => {
   if (err.code === 'ECONNABORTED') {
