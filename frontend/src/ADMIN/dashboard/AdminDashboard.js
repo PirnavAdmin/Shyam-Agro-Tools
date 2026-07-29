@@ -737,16 +737,20 @@ const AdminDashboard = () => {
                         </div>
                       </td>
                       <td>
-                        <span style={{
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          backgroundColor: order.paymentStatus === 'Paid' ? '#dcfce7' : order.paymentStatus === 'Pending Verification' ? '#fff7df' : '#fee2e2',
-                          color: order.paymentStatus === 'Paid' ? '#15803d' : order.paymentStatus === 'Pending Verification' ? '#b45309' : '#b91c1c'
-                        }}>
-                          {order.paymentStatus || 'Unpaid'}
-                        </span>
+                        {(() => {
+                          const ps = order.paymentStatus || 'Pending';
+                          let bg = '#fee2e2', color = '#b91c1c';
+                          if (ps === 'Verified Paid' || ps === 'Paid') { bg = '#dcfce7'; color = '#15803d'; }
+                          else if (ps === 'Pending Verification' || ps === 'Pending') { bg = '#fff7df'; color = '#b45309'; }
+                          else if (ps === 'Refunded') { bg = '#e0e7ff'; color = '#3730a3'; }
+                          else if (ps === 'Payment Not Applicable') { bg = '#f1f5f9'; color = '#64748b'; }
+                          else if (ps === 'Cancelled') { bg = '#fee2e2'; color = '#b91c1c'; }
+                          return (
+                            <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '4px', backgroundColor: bg, color }}>
+                              {ps}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td>{dateStr}</td>
                       <td className="amount-cell">{formatCurrency(order.totalAmount)}</td>
