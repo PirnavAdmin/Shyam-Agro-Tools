@@ -358,7 +358,10 @@ const AdminDashboard = () => {
       ['Canceled', orders.filter(o => o.status === 'Canceled' || o.status === 'Cancelled').length, ''],
       [],
       ['Products by Category', 'Products Count', 'Share'],
-      ...categorySeriesData.map(c => [c.name, c.value, ''])
+      ...categorySeriesData.map(c => {
+        const pct = metrics.productsCount > 0 ? ((c.value / metrics.productsCount) * 100).toFixed(1) : '0.0';
+        return [c.name, c.value, `${pct}%`];
+      })
     ];
 
     const blob = new Blob([buildCsv(rows)], { type: 'text/csv;charset=utf-8;' });
@@ -636,7 +639,7 @@ const AdminDashboard = () => {
 
             <div className="traffic-list">
               {categorySeriesData.slice(0, 5).map((category, idx) => {
-                const percentage = metrics.productsCount > 0 ? Math.round((category.value / metrics.productsCount) * 100) : 0;
+                const percentage = metrics.productsCount > 0 ? ((category.value / metrics.productsCount) * 100).toFixed(1) : '0.0';
                 return (
                   <div className="traffic-row" key={idx}>
                     <div className="traffic-source">
