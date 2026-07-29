@@ -755,7 +755,12 @@ namespace ShyamAgroSuite.Api.Controllers
             order.GstAmount = Math.Round(taxableAmount * (settings.GstPercentage / 100.0m), 2);
             order.FinalAmount = taxableAmount + order.ShippingFee + order.GstAmount;
 
-            order.OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{new Random().Next(10000, 99999)}";
+            string genOrderNum;
+            do
+            {
+                genOrderNum = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{new Random().Next(100000, 999999)}";
+            } while (await _context.Orders.AnyAsync(o => o.OrderNumber == genOrderNum));
+            order.OrderNumber = genOrderNum;
             order.OrderDate = DateTime.UtcNow;
             order.Status = "Pending";
 
