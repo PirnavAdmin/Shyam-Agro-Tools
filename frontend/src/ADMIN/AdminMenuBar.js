@@ -28,19 +28,14 @@ const AdminMenuBar = ({ expanded = false }) => {
   });
 
   useEffect(() => {
-    const email = localStorage.getItem('adminEmail') || '';
-    let role = (localStorage.getItem('adminRole') || 'super admin').toLowerCase();
-    if (email.toLowerCase().trim() === 'shyam@shyamagrotools.com') {
-      role = 'super admin';
-    }
+    let role = (localStorage.getItem('adminRole') || 'admin').toLowerCase();
     setUserRole(role);
 
     try {
       const perms = localStorage.getItem('adminPermissions');
       if (perms) {
         setUserPermissions(JSON.parse(perms));
-      } else if (role === 'super admin') {
-        // Fallback permissions for super admin
+      } else {
         setUserPermissions(["dashboard", "catalog", "customers", "orders", "tickets", "reports", "stockupdates", "marketing", "brands", "blogs", "settings", "suppliers", "coins converter", "invoices", "call history", "staff"]);
       }
     } catch (e) {

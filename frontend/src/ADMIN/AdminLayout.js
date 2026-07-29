@@ -14,11 +14,7 @@ const AdminLayout = () => {
 
   const [globalToast, setGlobalToast] = useState(null);
 
-  const userEmail = localStorage.getItem('adminEmail') || '';
-  let userRole = (localStorage.getItem('adminRole') || 'super admin').toLowerCase();
-  if (userEmail.toLowerCase().trim() === 'shyam@shyamagrotools.com') {
-    userRole = 'super admin';
-  }
+  let userRole = (localStorage.getItem('adminRole') || 'admin').toLowerCase();
   
   // Load custom permissions from localStorage
   let userPermissions = [];
@@ -26,7 +22,7 @@ const AdminLayout = () => {
     const raw = localStorage.getItem('adminPermissions');
     if (raw) {
       userPermissions = JSON.parse(raw);
-    } else if (userRole === 'super admin') {
+    } else {
       userPermissions = ["dashboard", "catalog", "customers", "orders", "tickets", "reports", "stockupdates", "marketing", "brands", "blogs", "settings", "suppliers", "coins converter", "invoices", "call history", "staff"];
     }
   } catch (e) {}

@@ -8,19 +8,16 @@ const AdminProfile = () => {
   const [user, setUser] = useState({
     name: 'Admin User',
     email: 'admin@shyamagro.com',
-    role: 'super admin',
+    role: 'admin',
     mobile: '9876543210',
-    employeeId: 'SA001',
+    employeeId: 'AD001',
     permissions: []
   });
 
   useEffect(() => {
     const storedName = localStorage.getItem('adminName') || 'Admin User';
     const storedEmail = localStorage.getItem('adminEmail') || 'admin@shyamagro.com';
-    let storedRole = localStorage.getItem('adminRole') || 'super admin';
-    if (storedEmail.toLowerCase().trim() === 'shyam@shyamagrotools.com') {
-      storedRole = 'super admin';
-    }
+    let storedRole = localStorage.getItem('adminRole') || 'admin';
     const storedPerms = localStorage.getItem('adminPermissions');
     
     // Attempt to match from local staff list to pull phone/employeeId if available
@@ -32,18 +29,22 @@ const AdminProfile = () => {
       email: storedEmail,
       role: storedRole,
       mobile: matched?.mobile || '9876543210',
-      employeeId: matched?.employeeId || (storedRole === 'super admin' ? 'SA001' : 'AD001'),
+      employeeId: matched?.employeeId || 'AD001',
       permissions: storedPerms ? JSON.parse(storedPerms) : (matched?.permissions || [])
     });
   }, []);
 
   const getRoleLabel = (role) => {
     switch (role?.toLowerCase()) {
-      case 'super admin': return 'Super Administrator';
-      case 'admin': return 'Administrator';
+      case 'super admin':
+      case 'superadmin':
+        return 'Super Administrator';
+      case 'admin':
+      case 'administrator':
+        return 'Admin';
       case 'manager': return 'Operations Manager';
       case 'staff': return 'Staff Member';
-      default: return 'User';
+      default: return 'Admin';
     }
   };
 

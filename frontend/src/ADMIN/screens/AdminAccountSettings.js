@@ -25,7 +25,7 @@ const AdminAccountSettings = () => {
   useEffect(() => {
     const storedName = localStorage.getItem('adminName') || 'Admin User';
     const storedEmail = localStorage.getItem('adminEmail') || 'admin@shyamagro.com';
-    const storedRole = localStorage.getItem('adminRole') || 'super admin';
+    const storedRole = localStorage.getItem('adminRole') || 'admin';
     
     const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
     const matched = localAccounts.find(acc => acc.email.toLowerCase() === storedEmail.toLowerCase());
@@ -35,7 +35,7 @@ const AdminAccountSettings = () => {
       name: storedName,
       email: storedEmail,
       mobile: matched?.mobile || '9876543210',
-      employeeId: matched?.employeeId || (storedRole === 'super admin' ? 'SA001' : 'AD001')
+      employeeId: matched?.employeeId || 'AD001'
     }));
   }, []);
 
@@ -73,7 +73,7 @@ const AdminAccountSettings = () => {
     }
 
     // Role cannot be edited by the user themselves in self settings
-    const role = localStorage.getItem('adminRole') || 'super admin';
+    const role = localStorage.getItem('adminRole') || 'admin';
 
     setIsSaving(true);
     try {
