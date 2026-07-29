@@ -81,7 +81,8 @@ const buildCsv = (rows) =>
 
 const statusIconMap = {
   Pending: Clock3,
-  Processing: Clock3,
+  Processing: CheckCircle2,
+  Confirmed: CheckCircle2,
   'On Hold': Clock3,
   Completed: CheckCircle2,
   Canceled: XCircle,

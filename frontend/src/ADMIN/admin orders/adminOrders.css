@@ -263,7 +263,8 @@
   text-transform: uppercase;
 }
 
-.status-pill.processing { background: #fffbeb; color: #b45309; }
+.status-pill.processing { background: #eff6ff; color: #1d4ed8; }
+.status-pill.confirmed { background: #eff6ff; color: #1d4ed8; }
 .status-pill.dispatched { background: #e0e7ff; color: #4338ca; }
 .status-pill.completed { background: #ecfdf5; color: #047857; }
 .status-pill.cancelled { background: #fef2f2; color: #b91c1c; }

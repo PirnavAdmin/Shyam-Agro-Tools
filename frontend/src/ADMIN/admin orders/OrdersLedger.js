@@ -27,7 +27,8 @@ export const formatCurrency = (amount) => `INR ${Number(amount || 0).toLocaleStr
 
 export const statusMeta = {
   Completed: { icon: CheckCircle2, className: 'status-pill completed' },
-  Processing: { icon: Clock3, className: 'status-pill processing' },
+  Processing: { icon: CheckCircle2, className: 'status-pill processing' },
+  Confirmed: { icon: CheckCircle2, className: 'status-pill confirmed' },
   Dispatched: { icon: Truck, className: 'status-pill dispatched' },
   Cancelled: { icon: AlertCircle, className: 'status-pill cancelled' },
   Packed: { icon: Package, className: 'status-pill packed' },
