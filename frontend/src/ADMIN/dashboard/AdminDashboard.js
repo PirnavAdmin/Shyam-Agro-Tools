@@ -92,10 +92,15 @@ const statusIconMap = {
 
 const statusClassName = (status) => (status || 'Pending').toLowerCase().replace(/\s+/g, '-');
 
-const mapStatus = (status) => {
+const mapStatus = (status, paymentStatus) => {
   if (!status) return 'Pending';
   const s = status.toUpperCase();
-  if (s === 'PENDING') return 'Pending';
+  const ps = (paymentStatus || '').toUpperCase();
+  const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED';
+
+  if (s === 'PENDING' || s === 'PLACED') {
+    return isPaid ? 'Processing' : 'Pending';
+  }
   if (s === 'PROCESSING' || s === 'PACKED') return 'Processing';
   if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
   if (s === 'DELIVERED' || s === 'COMPLETED') return 'Completed';
@@ -125,7 +130,7 @@ const AdminDashboard = () => {
 
       const normalizedOrders = (ordersData || []).map(o => ({
         ...o,
-        status: mapStatus(o.fulfillment || o.status)
+        status: mapStatus(o.fulfillment || o.status, o.paymentStatus)
       }));
       setOrders(normalizedOrders);
       setProducts(productsData || []);

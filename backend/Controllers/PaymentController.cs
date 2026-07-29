@@ -702,7 +702,7 @@ namespace ShyamAgroSuite.Api.Controllers
             if (orderSuccess != null)
             {
                 orderSuccess.PaymentStatus = mappedStatus == "Approved" ? "Success" : "Failed";
-                orderSuccess.OrderStatus = mappedStatus == "Approved" ? "Placed" : "Failed";
+                orderSuccess.OrderStatus = mappedStatus == "Approved" ? "Processing" : "Failed";
             }
 
             if (int.TryParse(verification.OrderId, out int numericOrderId))
@@ -710,7 +710,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 var dbOrder = await _context.Orders.FindAsync(numericOrderId);
                 if (dbOrder != null)
                 {
-                    dbOrder.Status = mappedStatus == "Approved" ? "Success" : "Failed";
+                    dbOrder.Status = mappedStatus == "Approved" ? "Processing" : "Failed";
                     dbOrder.PaymentStatus = mappedStatus == "Approved" ? "Success" : "Failed";
                 }
             }
@@ -719,7 +719,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 var dbOrder = await _context.Orders.FirstOrDefaultAsync(o => o.OrderNumber == verification.OrderId || o.OrderNumber.Contains(verification.OrderId));
                 if (dbOrder != null)
                 {
-                    dbOrder.Status = mappedStatus == "Approved" ? "Success" : "Failed";
+                    dbOrder.Status = mappedStatus == "Approved" ? "Processing" : "Failed";
                     dbOrder.PaymentStatus = mappedStatus == "Approved" ? "Success" : "Failed";
                 }
             }
@@ -961,7 +961,7 @@ namespace ShyamAgroSuite.Api.Controllers
             if (orderSuccess != null)
             {
                 orderSuccess.PaymentStatus = "Success";
-                orderSuccess.OrderStatus = "Placed";
+                orderSuccess.OrderStatus = "Processing";
             }
 
             if (int.TryParse(match.OrderId, out int numericOrderId))
@@ -969,7 +969,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 var dbOrder = await _context.Orders.FindAsync(numericOrderId);
                 if (dbOrder != null)
                 {
-                    dbOrder.Status = "Success";
+                    dbOrder.Status = "Processing";
                     dbOrder.PaymentStatus = "Success";
                 }
             }
@@ -978,7 +978,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 var dbOrder = await _context.Orders.FirstOrDefaultAsync(o => o.OrderNumber == match.OrderId || o.OrderNumber.Contains(match.OrderId));
                 if (dbOrder != null)
                 {
-                    dbOrder.Status = "Success";
+                    dbOrder.Status = "Processing";
                     dbOrder.PaymentStatus = "Success";
                 }
             }

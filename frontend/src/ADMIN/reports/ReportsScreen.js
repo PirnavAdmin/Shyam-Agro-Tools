@@ -80,10 +80,13 @@ const ReportsScreen = () => {
         })
       ]);
 
-      const mapStatusLocal = (status) => {
+      const mapStatusLocal = (status, paymentStatus) => {
         if (!status) return 'Pending';
         const s = status.toUpperCase();
-        if (s === 'PENDING') return 'Pending';
+        const ps = (paymentStatus || '').toUpperCase();
+        const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED';
+
+        if (s === 'PENDING' || s === 'PLACED') return isPaid ? 'Processing' : 'Pending';
         if (s === 'PROCESSING' || s === 'PACKED') return 'Processing';
         if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
         if (s === 'DELIVERED' || s === 'COMPLETED') return 'Completed';
@@ -96,6 +99,7 @@ const ReportsScreen = () => {
         const mappedOrders = (reportsOrdersData.detailedOrdersLedger || []).map(o => {
           const amount = o.totalAmount ? Number(String(o.totalAmount).replace(/[^0-9.-]+/g, "")) : 0;
           const itemsCount = o.itemsCount ? parseInt(o.itemsCount, 10) : 0;
+          const payStat = o.paymentStatus === 'PendingVerification' ? 'Pending Verification' : o.paymentStatus;
           return {
             id: o.orderId,
             orderId: o.orderId,
@@ -106,8 +110,8 @@ const ReportsScreen = () => {
             items: Array(itemsCount).fill({}),
             totalAmount: amount,
             total: amount,
-            paymentStatus: o.paymentStatus === 'PendingVerification' ? 'Pending Verification' : o.paymentStatus,
-            status: mapStatusLocal(o.fulfillmentStatus || o.fulfillment || o.status)
+            paymentStatus: payStat,
+            status: mapStatusLocal(o.fulfillmentStatus || o.fulfillment || o.status, payStat)
           };
         });
         setOrders(mappedOrders);
@@ -115,7 +119,7 @@ const ReportsScreen = () => {
         const legacyOrders = await getOrders().catch(() => []);
         const mappedOrders = legacyOrders.map(o => ({
           ...o,
-          status: mapStatusLocal(o.fulfillment || o.status)
+          status: mapStatusLocal(o.fulfillment || o.status, o.paymentStatus)
         }));
         setOrders(mappedOrders);
       }
