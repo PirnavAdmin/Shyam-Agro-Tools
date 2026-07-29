@@ -47,26 +47,31 @@ export const OrderStatusBadge = ({ status }) => {
 };
 
 export const PaymentStatusBadge = ({ paymentStatus }) => {
-  let icon = AlertCircle;
-  let color = '#b91c1c'; // Red for Unpaid/Failed
-  let bg = '#fef2f2';
-  let text = paymentStatus || 'Unpaid';
+  let icon = Clock3;
+  let color = '#d97706';
+  let bg = '#fffbeb';
+  let text = paymentStatus || 'Pending';
 
   if (paymentStatus === 'Verified Paid' || paymentStatus === 'Paid' || paymentStatus === 'Success') {
     icon = ShieldCheck;
     color = '#059669'; // Green for Paid
     bg = '#ecfdf5';
     text = 'Verified Paid';
+  } else if (paymentStatus === 'Refunded') {
+    icon = AlertCircle;
+    color = '#7e22ce'; // Purple for Refunded
+    bg = '#f3e8ff';
+    text = 'Refunded';
+  } else if (paymentStatus === 'Payment Not Applicable' || paymentStatus === 'N/A' || paymentStatus === 'Cancelled' || paymentStatus === 'Canceled') {
+    icon = AlertCircle;
+    color = '#64748b'; // Slate gray for Payment Not Applicable
+    bg = '#f1f5f9';
+    text = 'Payment Not Applicable';
   } else if (paymentStatus === 'Pending Verification' || paymentStatus === 'PendingVerification') {
     icon = Clock3;
     color = '#d97706'; // Orange for Pending Verification
     bg = '#fffbeb';
     text = 'Pending Verification';
-  } else if (paymentStatus === 'Cancelled' || paymentStatus === 'Canceled') {
-    icon = AlertCircle;
-    color = '#b91c1c'; // Red for Cancelled
-    bg = '#fef2f2';
-    text = 'Cancelled';
   } else if (paymentStatus === 'Pending' || paymentStatus === 'Unpaid') {
     icon = Clock3;
     color = '#d97706'; // Orange/Yellow for Pending
@@ -126,8 +131,11 @@ const normaliseOrder = (o) => {
   let statusMapped = mapStatus(o.fulfillment || o.status, o.paymentStatus);
 
   let payStatus = o.paymentStatus || 'Pending';
-  if (statusMapped === 'Cancelled' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELLED' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELED') {
-    payStatus = 'Cancelled';
+  const isCancelled = statusMapped === 'Cancelled' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELLED' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELED';
+  const isPaid = (o.paymentStatus || '').toUpperCase() === 'PAID' || (o.paymentStatus || '').toUpperCase() === 'VERIFIED PAID' || (o.paymentStatus || '').toUpperCase() === 'REFUNDED';
+
+  if (isCancelled) {
+    payStatus = isPaid ? 'Refunded' : 'Payment Not Applicable';
   } else if (statusMapped === 'Completed' || (o.fulfillment || o.status || '').toUpperCase() === 'COMPLETED' || (o.fulfillment || o.status || '').toUpperCase() === 'DELIVERED') {
     payStatus = 'Verified Paid';
   }

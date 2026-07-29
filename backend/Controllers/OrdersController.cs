@@ -81,13 +81,15 @@ namespace ShyamAgroSuite.Api.Controllers
                 bool isPaid = o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) ||
                               o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) ||
                               o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
-                              o.PaymentStatus.Equals("Paid Verified", StringComparison.OrdinalIgnoreCase);
+                              o.PaymentStatus.Equals("Paid Verified", StringComparison.OrdinalIgnoreCase) ||
+                              o.PaymentStatus.Equals("Refunded", StringComparison.OrdinalIgnoreCase);
 
                 if (isCancelled)
                 {
-                    if (!o.PaymentStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+                    var targetPayStatus = isPaid ? "Refunded" : "Payment Not Applicable";
+                    if (o.PaymentStatus != targetPayStatus)
                     {
-                        o.PaymentStatus = "Cancelled";
+                        o.PaymentStatus = targetPayStatus;
                         statusAutoUpdated = true;
                     }
                 }
@@ -209,9 +211,21 @@ namespace ShyamAgroSuite.Api.Controllers
                     : $"INV-{cleanOrderNum}";
 
                 var displayPaymentStatus = "Pending";
-                if (o.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Canceled", StringComparison.OrdinalIgnoreCase))
+                if (o.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Canceled", StringComparison.OrdinalIgnoreCase))
                 {
-                    displayPaymentStatus = "Cancelled";
+                    bool wasPaid = o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) ||
+                                   o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) ||
+                                   o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
+                                   o.PaymentStatus.Equals("Refunded", StringComparison.OrdinalIgnoreCase);
+                    displayPaymentStatus = wasPaid ? "Refunded" : "Payment Not Applicable";
+                }
+                else if (o.PaymentStatus.Equals("Refunded", StringComparison.OrdinalIgnoreCase))
+                {
+                    displayPaymentStatus = "Refunded";
+                }
+                else if (o.PaymentStatus.Equals("Payment Not Applicable", StringComparison.OrdinalIgnoreCase))
+                {
+                    displayPaymentStatus = "Payment Not Applicable";
                 }
                 else if (o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
                 {
