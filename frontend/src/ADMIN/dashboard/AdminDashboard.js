@@ -130,17 +130,19 @@ const PaymentStatusBadge = ({ paymentStatus, isCancelled }) => {
     <span style={{
       display: 'inline-flex',
       alignItems: 'center',
-      gap: '5px',
+      gap: '6px',
       fontSize: '11px',
-      fontWeight: '600',
-      padding: '3px 8px',
+      fontWeight: '700',
+      padding: '4px 8px',
       borderRadius: '4px',
       backgroundColor: bg,
       color: color,
-      whiteSpace: 'nowrap'
+      whiteSpace: 'nowrap',
+      textTransform: 'uppercase',
+      letterSpacing: '0.02em'
     }}>
       <Icon size={12} aria-hidden="true" />
-      {ps}
+      <span>{ps}</span>
     </span>
   );
 };
@@ -785,7 +787,9 @@ const AdminDashboard = () => {
                       <td>
                         <span className={`status-tag status-tag--${statusClassName(order.status)}`}>
                           <StatusIcon size={13} aria-hidden="true" />
-                          {order.status}
+                          <span style={{ fontWeight: '700', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                            {order.status || 'Pending'}
+                          </span>
                         </span>
                       </td>
                       <td>
