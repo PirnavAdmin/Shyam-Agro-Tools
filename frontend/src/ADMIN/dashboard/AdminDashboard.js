@@ -254,13 +254,23 @@ const AdminDashboard = () => {
       .filter(item => item.value > 0);
   }, [orders]);
 
+  const formatTitleCase = (str) => {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(w => (w === '&' || w === 'and' || w === 'of') ? w : w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  };
+
   const categorySeriesData = useMemo(() => {
     if (categories.length === 0 || products.length === 0) return MOCK_FALLBACK.categorySeries;
 
     const counts = {};
     products.forEach(p => {
       const cat = categories.find(c => String(c.id) === String(p.categoryId));
-      const catName = cat ? cat.name : 'Other';
+      const rawName = cat ? cat.name : 'Other';
+      const catName = formatTitleCase(rawName);
       counts[catName] = (counts[catName] || 0) + 1;
     });
 
