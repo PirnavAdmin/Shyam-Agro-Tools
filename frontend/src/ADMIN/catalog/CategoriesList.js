@@ -6,6 +6,15 @@ import { OutlookDeleteButton, AnimatedEditButton, Pagination } from '../componen
 import './adminModule.css';
 
 const CategoriesList = () => {
+  const formatTitleCase = (str) => {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(w => (w === '&' || w === 'and' || w === 'of') ? w : w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  };
+
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -184,7 +193,7 @@ const CategoriesList = () => {
                     {filteredCategories.indexOf(category) + 1}
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#1e293b' }}>
-                    {category.name}
+                    {formatTitleCase(category.name)}
                   </td>
                   <td className="catalog-path" style={{ padding: '10px 16px', color: '#2563eb' }}>
                     {category.slug}
