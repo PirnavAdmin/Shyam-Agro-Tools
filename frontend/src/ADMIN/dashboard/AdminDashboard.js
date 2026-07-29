@@ -26,7 +26,8 @@ import {
   Shield,
   FileText,
   Boxes,
-  RefreshCw
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import { getOrders } from '../api/orders';
 import { fetchProducts, fetchCategories } from '../catalog/productsApi';
@@ -694,7 +695,8 @@ const AdminDashboard = () => {
             <span className="section-kicker">Fulfillment Pipeline</span>
             <h2>Recent Orders</h2>
           </div>
-          <button type="button" className="catalog-btn" onClick={() => navigate('/admin/orders/list')} style={{ padding: '4px 10px', fontSize: '12px', minHeight: 'auto' }}>
+          <button type="button" className="view-all-orders-btn" onClick={() => navigate('/admin/orders/list')}>
+            <ExternalLink size={14} aria-hidden="true" />
             View All Orders
           </button>
         </div>
