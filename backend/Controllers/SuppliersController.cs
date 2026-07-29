@@ -24,30 +24,11 @@ namespace ShyamAgroSuite.Api.Controllers
         {
             var suppliers = await _context.Suppliers.ToListAsync();
 
-            // Auto-fix existing suppliers with missing fields
+            // Auto-fix all null/empty fields so API never returns null
             bool changed = false;
             foreach (var s in suppliers)
             {
-                if (string.IsNullOrEmpty(s.ProductCategory))
-                {
-                    s.ProductCategory = "Farm Tools";
-                    changed = true;
-                }
-                if (string.IsNullOrEmpty(s.LeadTime))
-                {
-                    s.LeadTime = "4-6 days";
-                    changed = true;
-                }
-                if (s.PerformanceRating <= 0)
-                {
-                    s.PerformanceRating = 4.5;
-                    changed = true;
-                }
-                if (string.IsNullOrEmpty(s.CommercialTerms))
-                {
-                    s.CommercialTerms = "Net 30";
-                    changed = true;
-                }
+                changed |= FixSupplierNulls(s);
             }
             if (changed) await _context.SaveChangesAsync();
 
@@ -62,7 +43,12 @@ namespace ShyamAgroSuite.Api.Controllers
             {
                 return NotFound(new { Message = "Supplier not found." });
             }
+            if (FixSupplierNulls(supplier))
+            {
+                await _context.SaveChangesAsync();
+            }
             return Ok(supplier);
+
         }
 
         [HttpPost]
@@ -270,6 +256,32 @@ namespace ShyamAgroSuite.Api.Controllers
 
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        // ── Helper ────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Replaces any null / empty fields in a Supplier with safe default values.
+        /// Returns true if any field was changed (so the caller can decide to SaveChanges).
+        /// </summary>
+        private static bool FixSupplierNulls(Supplier s)
+        {
+            bool changed = false;
+
+            if (string.IsNullOrWhiteSpace(s.Gstin))          { s.Gstin = "";            changed = true; }
+            if (string.IsNullOrWhiteSpace(s.ProductCategory)) { s.ProductCategory = "General"; changed = true; }
+            if (string.IsNullOrWhiteSpace(s.TrackingId))     { s.TrackingId = "";       changed = true; }
+            if (string.IsNullOrWhiteSpace(s.LeadTime))       { s.LeadTime = "4-6 days"; changed = true; }
+            if (string.IsNullOrWhiteSpace(s.CommercialTerms)){ s.CommercialTerms = "Net 30"; changed = true; }
+            if (string.IsNullOrWhiteSpace(s.City))           { s.City = "";             changed = true; }
+            if (string.IsNullOrWhiteSpace(s.ProductLines))   { s.ProductLines = "";     changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Name))           { s.Name = "Unknown";      changed = true; }
+            if (string.IsNullOrWhiteSpace(s.ContactPerson))  { s.ContactPerson = "";    changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Phone))          { s.Phone = "";            changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Email))          { s.Email = "";            changed = true; }
+            if (string.IsNullOrWhiteSpace(s.Address))        { s.Address = "";          changed = true; }
+            if (s.PerformanceRating <= 0)                    { s.PerformanceRating = 4.5; changed = true; }
+
+            return changed;
         }
     }
 }

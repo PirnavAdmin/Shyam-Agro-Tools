@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShyamAgroSuite.Api.Data;
 
@@ -11,9 +12,11 @@ using ShyamAgroSuite.Api.Data;
 namespace ShyamAgroSuite.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260729041650_MakeSupplierFieldsNonNullable")]
+    partial class MakeSupplierFieldsNonNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

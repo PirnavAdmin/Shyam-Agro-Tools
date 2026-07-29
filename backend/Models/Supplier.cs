@@ -22,9 +22,9 @@ namespace ShyamAgroSuite.Api.Models
         public DateTime? LastSupply { get; set; }
 
         // Seller Registration fields
-        public string? Gstin { get; set; }
-        public string? ProductCategory { get; set; }
-        public string? TrackingId { get; set; }
+        public string Gstin { get; set; } = string.Empty;
+        public string ProductCategory { get; set; } = "General";
+        public string TrackingId { get; set; } = string.Empty;
         public string Status { get; set; } = "Pending";
     }
 }
