@@ -27,7 +27,9 @@ import {
   FileText,
   Boxes,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 import { getOrders } from '../api/orders';
 import { fetchProducts, fetchCategories } from '../catalog/productsApi';
@@ -92,20 +94,75 @@ const statusIconMap = {
   Dispatched: Truck,
 };
 
-const statusClassName = (status) => (status || 'Pending').toLowerCase().replace(/\s+/g, '-');
+const PaymentStatusBadge = ({ paymentStatus, isCancelled }) => {
+  const rawPs = paymentStatus || 'Pending';
+  const ps = isCancelled && (rawPs === 'Pending' || rawPs === 'Unpaid') ? 'Payment Not Applicable' : rawPs;
+
+  let Icon = Clock3;
+  let bg = '#fff7df';
+  let color = '#b45309';
+
+  const normalizedPs = ps.toUpperCase();
+
+  if (normalizedPs === 'VERIFIED PAID' || normalizedPs === 'PAID' || normalizedPs === 'SUCCESS' || normalizedPs === 'PAID VERIFIED') {
+    Icon = ShieldCheck;
+    bg = '#dcfce7';
+    color = '#15803d';
+  } else if (normalizedPs === 'PENDING VERIFICATION' || normalizedPs === 'PENDINGVERIFICATION' || normalizedPs === 'PENDING') {
+    Icon = Clock3;
+    bg = '#fff7df';
+    color = '#b45309';
+  } else if (normalizedPs === 'REFUNDED') {
+    Icon = AlertCircle;
+    bg = '#e0e7ff';
+    color = '#3730a3';
+  } else if (normalizedPs === 'PAYMENT NOT APPLICABLE' || normalizedPs === 'N/A') {
+    Icon = AlertCircle;
+    bg = '#f1f5f9';
+    color = '#64748b';
+  } else if (normalizedPs === 'CANCELLED' || normalizedPs === 'CANCELED') {
+    Icon = XCircle;
+    bg = '#fee2e2';
+    color = '#b91c1c';
+  }
+
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '5px',
+      fontSize: '11px',
+      fontWeight: '600',
+      padding: '3px 8px',
+      borderRadius: '4px',
+      backgroundColor: bg,
+      color: color,
+      whiteSpace: 'nowrap'
+    }}>
+      <Icon size={12} aria-hidden="true" />
+      {ps}
+    </span>
+  );
+};
+
+const statusClassName = (status) => {
+  const s = (status || 'Pending').toLowerCase().replace(/\s+/g, '-');
+  if (s === 'cancelled') return 'canceled';
+  return s;
+};
 
 const mapStatus = (status, paymentStatus) => {
   if (!status) return 'Pending';
   const s = status.toUpperCase();
   const ps = (paymentStatus || '').toUpperCase();
-  const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED';
+  const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED' || ps === 'VERIFIED';
   const isPendingPay = ps === 'PENDING' || ps === 'PENDING VERIFICATION' || ps === 'PENDINGVERIFICATION' || ps === 'UNPAID';
 
   if (s === 'CANCELLED' || s === 'CANCELED') return 'Canceled';
   if (s === 'COMPLETED' || s === 'DELIVERED') return 'Completed';
   if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
   if (s === 'PACKED') return 'Packed';
-  if (s === 'PROCESSING') return isPendingPay ? 'Pending' : 'Processing';
+  if (s === 'PROCESSING' || s === 'CONFIRMED') return isPendingPay ? 'Pending' : 'Processing';
   if (s === 'PENDING' || s === 'PLACED') return isPaid ? 'Processing' : 'Pending';
   return status;
 };
@@ -737,22 +794,7 @@ const AdminDashboard = () => {
                         </div>
                       </td>
                       <td>
-                        {(() => {
-                          const isCancelled = order.status === 'Cancelled' || order.status === 'Canceled';
-                          const rawPs = order.paymentStatus || 'Pending';
-                          const ps = isCancelled && (rawPs === 'Pending' || rawPs === 'Unpaid') ? 'Payment Not Applicable' : rawPs;
-                          let bg = '#fee2e2', color = '#b91c1c';
-                          if (ps === 'Verified Paid' || ps === 'Paid') { bg = '#dcfce7'; color = '#15803d'; }
-                          else if (ps === 'Pending Verification' || ps === 'Pending') { bg = '#fff7df'; color = '#b45309'; }
-                          else if (ps === 'Refunded') { bg = '#e0e7ff'; color = '#3730a3'; }
-                          else if (ps === 'Payment Not Applicable') { bg = '#f1f5f9'; color = '#64748b'; }
-                          else if (ps === 'Cancelled') { bg = '#fee2e2'; color = '#b91c1c'; }
-                          return (
-                            <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '4px', backgroundColor: bg, color }}>
-                              {ps}
-                            </span>
-                          );
-                        })()}
+                        <PaymentStatusBadge paymentStatus={order.paymentStatus} isCancelled={order.status === 'Cancelled' || order.status === 'Canceled'} />
                       </td>
                       <td>{dateStr}</td>
                       <td className="amount-cell">{formatCurrency(order.totalAmount)}</td>

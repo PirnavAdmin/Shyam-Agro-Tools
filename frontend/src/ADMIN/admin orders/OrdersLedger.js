@@ -113,14 +113,14 @@ export const mapStatus = (status, paymentStatus) => {
   if (!status) return 'Pending';
   const s = status.toUpperCase();
   const ps = (paymentStatus || '').toUpperCase();
-  const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED';
+  const isPaid = ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'SUCCESS' || ps === 'PAID VERIFIED' || ps === 'VERIFIED';
   const isPendingPay = ps === 'PENDING' || ps === 'PENDING VERIFICATION' || ps === 'PENDINGVERIFICATION' || ps === 'UNPAID';
 
   if (s === 'CANCELLED' || s === 'CANCELED') return 'Cancelled';
   if (s === 'COMPLETED' || s === 'DELIVERED') return 'Completed';
   if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
   if (s === 'PACKED') return 'Packed';
-  if (s === 'PROCESSING') return isPendingPay ? 'Pending' : 'Processing';
+  if (s === 'PROCESSING' || s === 'CONFIRMED') return isPendingPay ? 'Pending' : 'Processing';
   if (s === 'PENDING' || s === 'PLACED') return isPaid ? 'Processing' : 'Pending';
   return status;
 };
