@@ -62,6 +62,11 @@ export const PaymentStatusBadge = ({ paymentStatus }) => {
     color = '#d97706'; // Orange for Pending Verification
     bg = '#fffbeb';
     text = 'Pending Verification';
+  } else if (paymentStatus === 'Cancelled' || paymentStatus === 'Canceled') {
+    icon = AlertCircle;
+    color = '#b91c1c'; // Red for Cancelled
+    bg = '#fef2f2';
+    text = 'Cancelled';
   } else if (paymentStatus === 'Pending' || paymentStatus === 'Unpaid') {
     icon = Clock3;
     color = '#d97706'; // Orange/Yellow for Pending
@@ -124,6 +129,11 @@ const normaliseOrder = (o) => {
   if ((statusMapped === 'Pending' || statusMapped === 'Placed') && isPaid) {
     statusMapped = 'Processing';
   }
+
+  let payStatus = o.paymentStatus || 'Pending';
+  if (statusMapped === 'Cancelled' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELLED' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELED') {
+    payStatus = 'Cancelled';
+  }
   
   return {
     id: o.id || o.orderId || '',
@@ -137,7 +147,7 @@ const normaliseOrder = (o) => {
     total: totalVal,
     paid: o.paidAmount !== undefined ? parseAmount(o.paidAmount) : (o.paymentStatus === 'Paid' ? totalVal : 0),
     status: statusMapped,
-    paymentStatus: o.paymentStatus || 'Pending',
+    paymentStatus: payStatus,
     payMethod: o.paymentMethod || o.payMethod || '',
     utr: o.utr || '',
     logistics: o.carrierName || o.logisticsPartner || o.logistics || '',
