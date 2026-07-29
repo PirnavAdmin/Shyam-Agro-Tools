@@ -73,7 +73,7 @@ namespace ShyamAgroSuite.Api.Controllers
             // 1. Calculate dashboard metrics from the database (all orders)
             var allOrders = await _context.Orders.ToListAsync();
 
-            // Auto-advance orders with verified payment to Processing if still Pending/Placed
+            // Auto-advance non-cancelled orders with verified payment to Processing
             bool statusAutoUpdated = false;
             foreach (var o in allOrders)
             {
@@ -82,16 +82,20 @@ namespace ShyamAgroSuite.Api.Controllers
                               o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
                               o.PaymentStatus.Equals("Paid Verified", StringComparison.OrdinalIgnoreCase);
 
-                if (isPaid && (o.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Placed", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(o.Status)))
+                if (isPaid && !o.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
                 {
-                    o.Status = "Processing";
-                    statusAutoUpdated = true;
+                    if (!o.Status.Equals("Processing", StringComparison.OrdinalIgnoreCase))
+                    {
+                        o.Status = "Processing";
+                        statusAutoUpdated = true;
+                    }
 
                     // Sync order_success table if present
                     var os = await _context.OrderSuccesses.FirstOrDefaultAsync(x => x.OrderId == o.OrderNumber || x.OrderId == o.Id.ToString());
-                    if (os != null)
+                    if (os != null && !os.OrderStatus.Equals("Processing", StringComparison.OrdinalIgnoreCase) && !os.OrderStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
                     {
                         os.OrderStatus = "Processing";
+                        statusAutoUpdated = true;
                     }
                 }
             }
@@ -193,7 +197,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 }
 
                 var displayFulfillment = o.Status.ToUpper();
-                if (displayPaymentStatus == "Verified Paid" && (displayFulfillment == "PENDING" || displayFulfillment == "PLACED"))
+                if (displayPaymentStatus == "Verified Paid" && displayFulfillment != "CANCELLED")
                 {
                     displayFulfillment = "PROCESSING";
                 }
