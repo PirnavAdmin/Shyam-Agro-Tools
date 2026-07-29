@@ -186,7 +186,7 @@ const AdminDashboard = () => {
         return sum + cleanAmount;
       }, 0);
 
-    const activeOrdersCount = orders.filter(o => o.status === 'Processing' || o.status === 'Pending' || o.status === 'On Hold').length;
+    const activeOrdersCount = orders.filter(o => o.status !== 'Completed' && o.status !== 'Canceled').length;
     const lowStockCount = products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock').length;
     const pendingSuppliersCount = suppliers.filter(s => s.status === 'Pending').length;
 
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
         { name: 'Pending', value: 2, color: '#f59e0b' }
       ];
     }
-    const counts = { Completed: 0, Processing: 0, Pending: 0, 'On Hold': 0, Canceled: 0 };
+    const counts = { Completed: 0, Processing: 0, Dispatched: 0, Packed: 0, Pending: 0, 'On Hold': 0, Canceled: 0 };
     orders.forEach(o => {
       const status = o.status || 'Pending';
       if (counts[status] !== undefined) {
@@ -248,7 +248,7 @@ const AdminDashboard = () => {
       }
     });
 
-    const colors = { Completed: '#10b981', Processing: '#2563eb', Pending: '#f59e0b', 'On Hold': '#8b5cf6', Canceled: '#ef4444' };
+    const colors = { Completed: '#10b981', Processing: '#2563eb', Dispatched: '#0284c7', Packed: '#8b5cf6', Pending: '#f59e0b', 'On Hold': '#6b7280', Canceled: '#ef4444' };
     return Object.entries(counts)
       .map(([name, value]) => ({ name, value, color: colors[name] }))
       .filter(item => item.value > 0);
