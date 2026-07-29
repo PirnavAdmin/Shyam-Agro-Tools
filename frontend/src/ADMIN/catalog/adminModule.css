@@ -481,8 +481,10 @@
   white-space: nowrap;
 }
 
+.catalog-table th.catalog-center-cell,
+.catalog-table td.catalog-center-cell,
 .catalog-center-cell {
-  text-align: center;
+  text-align: center !important;
 }
 
 .catalog-badge {
