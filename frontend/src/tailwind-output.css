@@ -1864,10 +1864,6 @@ img.app-line-thumb,
   min-width: 2.5rem;
 }
 
-.min-w-\[120px\] {
-  min-width: 120px;
-}
-
 .min-w-\[200px\] {
   min-width: 200px;
 }
@@ -2736,6 +2732,11 @@ img.app-line-thumb,
   background-color: rgb(247 247 247 / var(--tw-bg-opacity));
 }
 
+.bg-orange-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 115 22 / var(--tw-bg-opacity));
+}
+
 .bg-primary {
   --tw-bg-opacity: 1;
   background-color: rgb(109 189 47 / var(--tw-bg-opacity));
@@ -2833,11 +2834,6 @@ img.app-line-thumb,
 
 .bg-white\/90 {
   background-color: rgb(255 255 255 / 0.9);
-}
-
-.bg-orange-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(249 115 22 / var(--tw-bg-opacity));
 }
 
 .bg-gradient-to-b {
@@ -5135,6 +5131,11 @@ section + .brand-slider-section {
   background-color: rgb(247 247 247 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-orange-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(234 88 12 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-primary:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(109 189 47 / var(--tw-bg-opacity));
@@ -5197,11 +5198,6 @@ section + .brand-slider-section {
 
 .hover\:bg-white\/80:hover {
   background-color: rgb(255 255 255 / 0.8);
-}
-
-.hover\:bg-orange-600:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(234 88 12 / var(--tw-bg-opacity));
 }
 
 .hover\:text-\[\#58B82E\]:hover {
