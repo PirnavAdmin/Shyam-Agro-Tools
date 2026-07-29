@@ -690,15 +690,15 @@ const AdminDashboard = () => {
 
       {/* Recent Orders table */}
       <section className="dashboard-panel orders-panel">
-        <div className="panel-header">
-          <div>
-            <span className="section-kicker">Fulfillment Pipeline</span>
-            <h2>Recent Orders</h2>
+        <div className="panel-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '4px' }}>
+          <span className="section-kicker">Fulfillment Pipeline</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+            <h2 style={{ margin: 0 }}>Recent Orders</h2>
+            <button type="button" className="view-all-orders-btn" onClick={() => navigate('/admin/orders/list')}>
+              <ExternalLink size={14} aria-hidden="true" />
+              View All Orders
+            </button>
           </div>
-          <button type="button" className="view-all-orders-btn" onClick={() => navigate('/admin/orders/list')}>
-            <ExternalLink size={14} aria-hidden="true" />
-            View All Orders
-          </button>
         </div>
 
         <div className="table-responsive">
