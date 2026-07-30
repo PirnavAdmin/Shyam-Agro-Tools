@@ -215,7 +215,7 @@ const BannersList = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {['All', 'Hero', 'Promo', 'Category', 'Trust'].map(type => (
+          {['All', 'Hero', 'Promo', 'Trust'].map(type => (
             <button
               key={type}
               type="button"
@@ -376,7 +376,6 @@ const BannersList = () => {
                 >
                   <option value="Hero">Hero Carousel Banner (Homepage Slider)</option>
                   <option value="Promo">Promotional Banner (Offer Sections)</option>
-                  <option value="Category">Category Header Banner</option>
                   <option value="Trust">Trust & Rating Banner (Customer Testimonial Slider)</option>
                 </select>
               </div>
