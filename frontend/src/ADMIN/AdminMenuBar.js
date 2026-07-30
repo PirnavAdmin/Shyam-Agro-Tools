@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, Box, Users, ShoppingCart, Target, 
   FolderOpen, BarChart2, Settings, ChevronRight, ChevronDown, FileText, Boxes,
@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import './AdminMenuBar.css';
 
-const AdminMenuBar = ({ expanded = false }) => {
+const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [userRole, setUserRole] = useState('admin');
   const [userPermissions, setUserPermissions] = useState([]);
 
@@ -73,8 +74,12 @@ const AdminMenuBar = ({ expanded = false }) => {
     });
   }, [location.pathname, expanded]);
 
-  const toggleDropdown = (menu) => {
-    if (!expanded) return;
+  const toggleDropdown = (menu, defaultRoute) => {
+    if (!expanded) {
+      if (onToggleSidebar) onToggleSidebar();
+      if (defaultRoute) navigate(defaultRoute);
+      return;
+    }
     setOpenDropdowns(prev => ({ ...prev, [menu]: !prev[menu] }));
   };
 
@@ -86,12 +91,10 @@ const AdminMenuBar = ({ expanded = false }) => {
 
     if (userRole === 'super admin') return true;
 
-    // Check custom permissions first if they are explicitly stored (e.g. for locally configured staff)
     if (userPermissions.length > 0) {
       return userPermissions.includes(moduleName);
     }
 
-    // Role-based defaults fallback
     if (userRole === 'admin') {
       const allowed = ["dashboard", "catalog", "customers", "orders", "stockupdates", "marketing", "brands", "blogs", "settings", "suppliers", "coins converter", "invoices", "staff"];
       return allowed.includes(moduleName);
@@ -106,19 +109,6 @@ const AdminMenuBar = ({ expanded = false }) => {
     }
 
     return false;
-  };
-
-  const getRoleLabel = (role) => {
-    switch (role?.toLowerCase()) {
-      case 'super admin':
-      case 'superadmin':
-      case 'admin':
-      case 'administrator':
-        return 'ADMIN';
-      case 'manager': return 'MANAGER';
-      case 'staff': return 'STAFF';
-      default: return 'ADMIN';
-    }
   };
 
   return (
@@ -168,9 +158,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('catalog') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('catalog')}
+                  onClick={() => toggleDropdown('catalog', '/admin/catalog/categories')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/catalog') ? 'active-parent' : ''}`}
                   data-tooltip="Catalog"
+                  title={!expanded ? "Catalog" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Box size={18} className="nav-icon" /></div>
@@ -196,9 +187,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('customers') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('customers')}
+                  onClick={() => toggleDropdown('customers', '/admin/customers/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/customers') || location.pathname.includes('/admin/users') ? 'active-parent' : ''}`}
                   data-tooltip="Customers"
+                  title={!expanded ? "Customers" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Users size={18} className="nav-icon" /></div>
@@ -223,6 +215,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/reports"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Reports"
+                  title={!expanded ? "Reports" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><BarChart2 size={18} className="nav-icon" /></div>
@@ -239,6 +232,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/tickets"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Tickets"
+                  title={!expanded ? "Tickets" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Ticket size={18} className="nav-icon" /></div>
@@ -252,9 +246,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('orders') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('orders')}
+                  onClick={() => toggleDropdown('orders', '/admin/orders/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/orders') || location.pathname.includes('/admin/returns') ? 'active-parent' : ''}`}
                   data-tooltip="Orders"
+                  title={!expanded ? "Orders" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><ShoppingCart size={18} className="nav-icon" /></div>
@@ -278,9 +273,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('invoices') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('invoices')}
+                  onClick={() => toggleDropdown('invoices', '/admin/invoice')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/invoice') ? 'active-parent' : ''}`}
                   data-tooltip="Invoices"
+                  title={!expanded ? "Invoices" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><FileSpreadsheet size={18} className="nav-icon" /></div>
@@ -305,6 +301,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/call-history"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Call History"
+                  title={!expanded ? "Call History" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><PhoneCall size={18} className="nav-icon" /></div>
@@ -321,6 +318,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/stock-updates"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Stock Updates"
+                  title={!expanded ? "Stock Updates" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Boxes size={18} className="nav-icon" /></div>
@@ -334,9 +332,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('marketing') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('marketing')}
+                  onClick={() => toggleDropdown('marketing', '/admin/marketing/banners')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/marketing') ? 'active-parent' : ''}`}
                   data-tooltip="Marketing"
+                  title={!expanded ? "Marketing" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Target size={18} className="nav-icon" /></div>
@@ -359,9 +358,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('brands') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('brands')}
+                  onClick={() => toggleDropdown('brands', '/admin/brands/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/brands') ? 'active-parent' : ''}`}
                   data-tooltip="Brands"
+                  title={!expanded ? "Brands" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Box size={18} className="nav-icon" /></div>
@@ -380,9 +380,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('blogs') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('blogs')}
+                  onClick={() => toggleDropdown('blogs', '/admin/blogs/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/blogs') ? 'active-parent' : ''}`}
                   data-tooltip="Blogs"
+                  title={!expanded ? "Blogs" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><FileText size={18} className="nav-icon" /></div>
@@ -404,9 +405,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('testimonials') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('testimonials')}
+                  onClick={() => toggleDropdown('testimonials', '/admin/testimonials/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/testimonials') ? 'active-parent' : ''}`}
                   data-tooltip="Testimonials"
+                  title={!expanded ? "Testimonials" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><MessageSquare size={18} className="nav-icon" /></div>
@@ -428,9 +430,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('staff') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('staff')}
+                  onClick={() => toggleDropdown('staff', '/admin/staff/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/staff') ? 'active-parent' : ''}`}
                   data-tooltip="Staff"
+                  title={!expanded ? "Staff" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Shield size={18} className="nav-icon" /></div>
@@ -452,9 +455,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('settings') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('settings')}
+                  onClick={() => toggleDropdown('settings', '/admin/settings/toc')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/settings') ? 'active-parent' : ''}`}
                   data-tooltip="Settings"
+                  title={!expanded ? "Settings" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Settings size={18} className="nav-icon" /></div>
@@ -476,9 +480,10 @@ const AdminMenuBar = ({ expanded = false }) => {
             {hasAccess('suppliers') && (
               <li>
                 <div
-                  onClick={() => toggleDropdown('suppliers')}
+                  onClick={() => toggleDropdown('suppliers', '/admin/suppliers/list')}
                   className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/suppliers') ? 'active-parent' : ''}`}
                   data-tooltip="Suppliers"
+                  title={!expanded ? "Suppliers" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><FolderOpen size={18} className="nav-icon" /></div>
@@ -504,6 +509,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/coins"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Coins Converter"
+                  title={!expanded ? "Coins Converter" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><BarChart2 size={18} className="nav-icon" /></div>
@@ -520,6 +526,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/payments"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Payment Settings"
+                  title={!expanded ? "Payment Settings" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><CreditCard size={18} className="nav-icon" /></div>
