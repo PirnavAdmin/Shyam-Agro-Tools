@@ -1,13 +1,25 @@
 /* ═══════════════════════════════════════════════
-   SHYAM AGRO TOOLS – Admin Layout
-   Hover-expand sidebar: 64px collapsed → 260px expanded
+   PIRNAV EMS DASHBOARD DESIGN SYSTEM
+   Professional Soft Mint & Forest Cyan Palette
    ═══════════════════════════════════════════════ */
 
 :root {
-  --sidebar-collapsed: 64px;
+  --sidebar-collapsed: 72px;
   --sidebar-expanded:  260px;
   --sidebar-duration:  0.28s;
-  --topbar-height:     64px;
+  --topbar-height:     70px;
+
+  /* PIRNAV EMS Color Palette */
+  --ems-bg:             #F0F8F6;
+  --ems-card-bg:        #FFFFFF;
+  --ems-input-bg:       #F2F9F7;
+  --ems-border:         #D6EAE5;
+  --ems-primary:        #005F53;
+  --ems-primary-light:  #0D9488;
+  --ems-active-pill:   #D8EFEA;
+  --ems-text-dark:      #0A3832;
+  --ems-text-body:      #1E293B;
+  --ems-text-muted:     #527870;
 }
 
 /* ── Grid Layout ── */
@@ -20,8 +32,9 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: #F0F4F9; /* Pale Blue Background */
-  font-family: 'Outfit', 'Inter', sans-serif;
+  background: var(--ems-bg);
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  color: var(--ems-text-body);
 }
 
 /* ── Fixed Sidebar ── */
@@ -39,7 +52,7 @@
 /* Expanded state */
 .admin-layout.sidebar-open .admin-sidebar-area {
   width: var(--sidebar-expanded);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+  box-shadow: 4px 0 24px rgba(0, 95, 83, 0.04);
   overflow: hidden;
 }
 
@@ -74,9 +87,9 @@
   bottom: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1.8rem 2rem;
+  padding: 1.8rem 2.2rem;
   scroll-behavior: smooth;
-  background: #F0F4F9; /* Matching Pale Blue Background */
+  background: var(--ems-bg);
   transition: left var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -88,6 +101,29 @@
 
 .admin-layout.sidebar-open .admin-main-content {
   left: var(--sidebar-expanded);
+}
+
+/* Global Card Styling for Admin Modules to match EMS */
+.admin-main-content .dashboard-card,
+.admin-main-content .catalog-container,
+.admin-main-content .customers-list-container,
+.admin-main-content .orders-list-container,
+.admin-main-content .banners-list-container,
+.admin-main-content .coupons-list-container,
+.admin-main-content .stock-updates-container,
+.admin-main-content .admin-card,
+.admin-main-content .settings-container {
+  background: var(--ems-card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--ems-border);
+  box-shadow: 0 2px 12px rgba(0, 95, 83, 0.03);
+}
+
+.admin-main-content h1,
+.admin-main-content h2,
+.admin-main-content h3 {
+  color: var(--ems-text-dark);
+  font-weight: 800;
 }
 
 /* ── Responsive ── */
@@ -130,12 +166,12 @@
   justify-content: center;
   text-align: center;
   background: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--ems-border);
   border-radius: 16px;
   padding: 48px 32px;
   max-width: 520px;
   margin: 40px auto 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .access-denied-view svg {
@@ -145,13 +181,13 @@
 .access-denied-view h2 {
   font-size: 22px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--ems-text-dark);
   margin: 0 0 10px;
 }
 
 .access-denied-view p {
   font-size: 14px;
-  color: #64748b;
+  color: var(--ems-text-muted);
   line-height: 1.5;
   margin: 0 0 24px;
 }
@@ -166,7 +202,7 @@
 }
 
 .access-denied-view button {
-  background: #3b82f6;
+  background: var(--ems-primary);
   color: white;
   border: none;
   font-size: 13px;
@@ -175,9 +211,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.15s;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 95, 83, 0.25);
 }
 
 .access-denied-view button:hover {
-  background: #2563eb;
+  background: var(--ems-primary-light);
 }

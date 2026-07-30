@@ -20,6 +20,13 @@ const maskEmail = (email) => {
   return `${username.slice(0, 6)}***@${domain}`;
 };
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  return 'Good Evening';
+};
+
 const AdminTopBar = ({ onToggleSidebar, sidebarExpanded }) => {
   const navigate = useNavigate();
   
@@ -97,10 +104,9 @@ const AdminTopBar = ({ onToggleSidebar, sidebarExpanded }) => {
         >
           <Menu size={20} />
         </button>
-        <div className="topbar-brand">
-          <span className="topbar-brand-sub" style={{ fontSize: '13px', fontWeight: 700, color: '#334155', letterSpacing: '0.5px' }}>
-            Admin Control Panel
-          </span>
+        <div className="topbar-greeting-pill">
+          <span className="greeting-flower">🪴</span>
+          <span className="greeting-text">{getGreeting()}</span>
         </div>
       </div>
 
