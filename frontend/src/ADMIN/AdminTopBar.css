@@ -8,8 +8,8 @@
   justify-content: space-between;
   align-items: center;
   height: 64px;
-  background: #EBF5F3; /* PIRNAV Soft Mint Cyan Background */
-  border-bottom: 1px solid #D6EAE5;
+  background: #F0F4F9; /* Pale Blue Background */
+  border-bottom: 1px solid #DAE5F0;
   padding: 0 20px;
   font-family: 'Outfit', 'Inter', sans-serif;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
@@ -30,18 +30,18 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid #D6EAE5;
+  border: 1px solid #CBDDF2;
   background: #FFFFFF;
-  color: #0F3D2E;
+  color: #1E293B;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .sidebar-hamburger-btn:hover {
-  background: #D8EFEA;
-  color: #0D9488;
-  border-color: #0D9488;
+  background: #DBEAFE;
+  color: #2563EB;
+  border-color: #2563EB;
   transform: scale(1.05);
 }
 
