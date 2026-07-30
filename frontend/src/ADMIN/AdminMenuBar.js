@@ -154,6 +154,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   to="/admin/dashboard"
                   className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
                   data-tooltip="Dashboard"
+                  title={!expanded ? "Dashboard" : undefined}
                 >
                   <div className="nav-left">
                     <div className="icon-box"><Home size={18} className="nav-icon" /></div>

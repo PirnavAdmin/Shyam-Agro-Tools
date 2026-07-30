@@ -8,11 +8,11 @@
   justify-content: space-between;
   align-items: center;
   height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: #EBF5F3; /* PIRNAV Soft Mint Cyan Background */
+  border-bottom: 1px solid #D6EAE5;
   padding: 0 20px;
-  font-family: 'Inter', 'Outfit', sans-serif;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+  font-family: 'Outfit', 'Inter', sans-serif;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
   overflow: visible;
 }
 

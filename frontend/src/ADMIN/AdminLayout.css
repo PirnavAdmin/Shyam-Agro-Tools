@@ -20,9 +20,8 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: #f8f9fc;
-  font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  /* Sidebar handled via position:fixed */
+  background: #EBF5F3; /* PIRNAV Soft Mint Cyan Background */
+  font-family: 'Outfit', 'Inter', sans-serif;
 }
 
 /* ── Fixed Sidebar ── */
@@ -34,13 +33,19 @@
   width: var(--sidebar-collapsed);
   z-index: 200;
   transition: width var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  overflow: visible !important;
 }
 
 /* Expanded state */
 .admin-layout.sidebar-open .admin-sidebar-area {
   width: var(--sidebar-expanded);
-  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.admin-layout.sidebar-closed .admin-sidebar-area {
+  overflow: visible !important;
 }
 
 /* ── Topbar – shifts with sidebar ── */
@@ -69,11 +74,10 @@
   bottom: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 2rem 2.2rem;
+  padding: 1.8rem 2rem;
   scroll-behavior: smooth;
-  background: #f8f9fc;
+  background: #EBF5F3; /* Matching PIRNAV Soft Mint Background */
   transition: left var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
-  /* Hide scrollbar */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
