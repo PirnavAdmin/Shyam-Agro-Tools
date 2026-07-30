@@ -218,7 +218,7 @@ namespace ShyamAgroSuite.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> CreateCategory([FromForm] CategoryUpsertRequest formRequest)
+        public async Task<ActionResult<Category>> CreateCategory()
         {
             var request = await GetCategoryRequestAsync();
             if (string.IsNullOrEmpty(request.Name))
@@ -245,7 +245,7 @@ namespace ShyamAgroSuite.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromForm] CategoryUpsertRequest formRequest)
+        public async Task<IActionResult> UpdateCategory(int id)
         {
             var request = await GetCategoryRequestAsync();
             var category = await _context.Categories.FindAsync(id);
