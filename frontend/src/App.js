@@ -88,6 +88,8 @@ import ContactCard from './ADMIN/screens/ContactCard';
 import FooterConfig from './ADMIN/screens/FooterConfig';
 import PaymentHistory from './ADMIN/screens/PaymentHistory';
 import CallHistoryScreen from './ADMIN/screens/CallHistoryScreen';
+import AdminProfile from './ADMIN/screens/AdminProfile';
+import AdminAccountSettings from './ADMIN/screens/AdminAccountSettings';
 
 // Admin Testimonials
 import TestimonialsList from './ADMIN/testimonials/TestimonialsList';
@@ -249,7 +251,9 @@ function App() {
                       <Route path="invoice" element={<InvoicesList />} />
                       <Route path="invoice/add" element={<AddInvoice />} />
 
-                      {/* Settings Routes */}
+                      {/* Settings & Profile Routes */}
+                      <Route path="profile" element={<AdminProfile />} />
+                      <Route path="account-settings" element={<AdminAccountSettings />} />
                       <Route path="settings" element={<FormSettings />} />
                       <Route path="settings/general" element={<FormSettings />} />
                       <Route path="settings/toc" element={<TableOfContent />} />
