@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import './TrustRatingSection.css';
+import { getApiDomain } from '../../utils/apiConfig';
 
-const trustSlides = [
+const API_URL = `${getApiDomain()}/api`;
+
+const resolveBannerImage = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+  const apiDomain = getApiDomain();
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${apiDomain}${cleanUrl}`;
+};
+
+const defaultTrustSlides = [
   {
     id: 1,
     image: '/hero_banner.png',
@@ -26,6 +38,29 @@ const trustSlides = [
 
 const TrustRatingSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [trustSlides, setTrustSlides] = useState(defaultTrustSlides);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTrustBanners = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/Banners?type=Trust`);
+        if (isMounted && response.data && Array.isArray(response.data) && response.data.length > 0) {
+          const apiSlides = response.data.map((b, index) => ({
+            id: b.id || index + 1,
+            image: resolveBannerImage(b.imageUrl),
+            rating: (b.title || '4.7').replace(/OUT OF 5/i, '').trim() || '4.7',
+            note: b.subtitle || 'Trusted by 10,000+ customers for reliable agro machinery and support',
+          }));
+          setTrustSlides(apiSlides);
+        }
+      } catch (err) {
+        // Fallback to default trustSlides
+      }
+    };
+    fetchTrustBanners();
+    return () => { isMounted = false; };
+  }, []);
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev === 0 ? trustSlides.length - 1 : prev - 1));
@@ -35,7 +70,7 @@ const TrustRatingSection = () => {
     setCurrentIndex((prev) => (prev === trustSlides.length - 1 ? 0 : prev + 1));
   };
 
-  const activeSlide = trustSlides[currentIndex];
+  const activeSlide = trustSlides[currentIndex] || defaultTrustSlides[0];
 
   return (
     <section className="trust-rating-section relative w-full overflow-hidden select-none bg-[#0F3D2E]">

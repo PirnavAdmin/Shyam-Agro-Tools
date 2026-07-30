@@ -139,6 +139,7 @@ const BannerForm = () => {
               <option value="Hero">Hero Carousel Banner (Homepage Slider)</option>
               <option value="Promo">Promotional Banner (Offer Sections)</option>
               <option value="Category">Category Header Banner</option>
+              <option value="Trust">Trust & Rating Banner (Customer Testimonial Slider)</option>
             </select>
           </div>
 
