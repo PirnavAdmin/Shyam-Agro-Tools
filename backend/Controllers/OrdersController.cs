@@ -227,9 +227,9 @@ namespace ShyamAgroSuite.Api.Controllers
                 {
                     displayPaymentStatus = "Payment Not Applicable";
                 }
-                else if (o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
+                else if (o.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) || o.PaymentStatus.Equals("Verified", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
                 {
-                    displayPaymentStatus = "Verified Paid";
+                    displayPaymentStatus = "Verified";
                 }
                 else if (o.PaymentStatus.Equals("PendingVerification", StringComparison.OrdinalIgnoreCase))
                 {
@@ -259,7 +259,7 @@ namespace ShyamAgroSuite.Api.Controllers
                         displayFulfillment = "PENDING";
                     }
                 }
-                else if (displayPaymentStatus == "Verified Paid")
+                else if (displayPaymentStatus == "Verified" || displayPaymentStatus == "Verified Paid")
                 {
                     if (displayFulfillment == "PENDING" || displayFulfillment == "PLACED" || string.IsNullOrWhiteSpace(displayFulfillment))
                     {

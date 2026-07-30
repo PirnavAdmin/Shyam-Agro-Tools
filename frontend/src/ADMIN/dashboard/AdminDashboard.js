@@ -96,7 +96,10 @@ const statusIconMap = {
 
 const PaymentStatusBadge = ({ paymentStatus, isCancelled }) => {
   const rawPs = paymentStatus || 'Pending';
-  const ps = isCancelled && (rawPs === 'Pending' || rawPs === 'Unpaid') ? 'Payment Not Applicable' : rawPs;
+  let ps = isCancelled && (rawPs === 'Pending' || rawPs === 'Unpaid') ? 'Payment Not Applicable' : rawPs;
+  if (ps === 'Verified Paid' || ps === 'Paid' || ps === 'Success' || ps === 'Paid Verified') {
+    ps = 'Verified';
+  }
 
   let Icon = Clock3;
   let bg = '#fff7df';
@@ -104,7 +107,7 @@ const PaymentStatusBadge = ({ paymentStatus, isCancelled }) => {
 
   const normalizedPs = ps.toUpperCase();
 
-  if (normalizedPs === 'VERIFIED PAID' || normalizedPs === 'PAID' || normalizedPs === 'SUCCESS' || normalizedPs === 'PAID VERIFIED') {
+  if (normalizedPs === 'VERIFIED' || normalizedPs === 'VERIFIED PAID' || normalizedPs === 'PAID' || normalizedPs === 'SUCCESS' || normalizedPs === 'PAID VERIFIED') {
     Icon = ShieldCheck;
     bg = '#dcfce7';
     color = '#15803d';

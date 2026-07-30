@@ -52,11 +52,11 @@ export const PaymentStatusBadge = ({ paymentStatus }) => {
   let bg = '#fffbeb';
   let text = paymentStatus || 'Pending';
 
-  if (paymentStatus === 'Verified Paid' || paymentStatus === 'Paid' || paymentStatus === 'Success') {
+  if (paymentStatus === 'Verified' || paymentStatus === 'Verified Paid' || paymentStatus === 'Paid' || paymentStatus === 'Success') {
     icon = ShieldCheck;
     color = '#059669'; // Green for Paid
     bg = '#ecfdf5';
-    text = 'Verified Paid';
+    text = 'Verified';
   } else if (paymentStatus === 'Refunded') {
     icon = AlertCircle;
     color = '#7e22ce'; // Purple for Refunded
@@ -156,7 +156,7 @@ const normaliseOrder = (o) => {
   if (isCancelled) {
     payStatus = isPaid ? 'Refunded' : 'Payment Not Applicable';
   } else if (statusMapped === 'Completed' || (o.fulfillment || o.status || '').toUpperCase() === 'COMPLETED' || (o.fulfillment || o.status || '').toUpperCase() === 'DELIVERED') {
-    payStatus = 'Verified Paid';
+    payStatus = 'Verified';
   }
   
   return {
