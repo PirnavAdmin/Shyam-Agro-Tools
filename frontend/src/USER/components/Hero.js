@@ -24,6 +24,14 @@ const defaultSlides = [
   },
 ];
 
+const resolveBannerImage = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+  const apiDomain = getApiDomain();
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${apiDomain}${cleanUrl}`;
+};
+
 const Hero = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -39,7 +47,7 @@ const Hero = () => {
         if (isMounted && response.data && Array.isArray(response.data) && response.data.length > 0) {
           const apiSlides = response.data.map((b, index) => ({
             id: b.id || index + 1,
-            image: b.imageUrl,
+            image: resolveBannerImage(b.imageUrl),
             alt: b.title ? `${b.title} - ${b.subtitle}` : 'Hero Banner',
             targetPath: b.targetUrl || '/categories',
           }));

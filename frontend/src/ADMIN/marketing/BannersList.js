@@ -8,7 +8,16 @@ import {
   deleteBanner,
   uploadBannerImage
 } from './bannersApi';
+import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
+
+const resolveBannerImage = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+  const apiDomain = getApiDomain();
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${apiDomain}${cleanUrl}`;
+};
 
 const BannersList = () => {
   const [banners, setBanners] = useState([]);
@@ -264,7 +273,7 @@ const BannersList = () => {
                   <td style={{ padding: '12px 16px' }}>
                     {banner.imageUrl ? (
                       <img
-                        src={banner.imageUrl}
+                        src={resolveBannerImage(banner.imageUrl)}
                         alt={banner.title || 'Banner Preview'}
                         style={{ width: '120px', height: '50px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }}
                       />
@@ -413,7 +422,7 @@ const BannersList = () => {
                 {formData.imageUrl && (
                   <div style={{ marginTop: '10px', textAlign: 'center' }}>
                     <img
-                      src={formData.imageUrl}
+                      src={resolveBannerImage(formData.imageUrl)}
                       alt="Preview"
                       style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                     />
