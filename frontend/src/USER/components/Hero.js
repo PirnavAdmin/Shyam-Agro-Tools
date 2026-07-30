@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
+import { getApiDomain } from '../../utils/apiConfig';
 import heroMachinery from '../../asset/hero-machinery.png';
 import heroSprayers from '../../asset/hero-sprayers.png';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = `${getApiDomain()}/api`;
 
 const defaultSlides = [
   {

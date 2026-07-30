@@ -1,41 +1,50 @@
 import axios from 'axios';
+import { getApiDomain } from '../../utils/apiConfig';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE = `${getApiDomain()}/api/Banners`;
+
+const api = axios.create({
+  baseURL: API_BASE,
+  headers: {
+    'ngrok-skip-browser-warning': 'true',
+    Accept: 'application/json',
+  },
+});
 
 export const fetchAdminBanners = async () => {
-  const response = await axios.get(`${API_URL}/Banners/admin`);
+  const response = await api.get('/admin');
   return response.data;
 };
 
 export const fetchActiveBanners = async (type = '') => {
-  const response = await axios.get(`${API_URL}/Banners${type ? `?type=${type}` : ''}`);
+  const response = await api.get(type ? `?type=${type}` : '');
   return response.data;
 };
 
 export const createBanner = async (bannerData) => {
-  const response = await axios.post(`${API_URL}/Banners`, bannerData);
+  const response = await api.post('', bannerData);
   return response.data;
 };
 
 export const updateBanner = async (id, bannerData) => {
-  const response = await axios.put(`${API_URL}/Banners/${id}`, bannerData);
+  const response = await api.put(`/${id}`, bannerData);
   return response.data;
 };
 
 export const toggleBannerActive = async (id) => {
-  const response = await axios.put(`${API_URL}/Banners/${id}/toggle`);
+  const response = await api.put(`/${id}/toggle`);
   return response.data;
 };
 
 export const deleteBanner = async (id) => {
-  const response = await axios.delete(`${API_URL}/Banners/${id}`);
+  const response = await api.delete(`/${id}`);
   return response.data;
 };
 
 export const uploadBannerImage = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await axios.post(`${API_URL}/Banners/upload-image`, formData, {
+  const response = await api.post('/upload-image', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
   return response.data;
