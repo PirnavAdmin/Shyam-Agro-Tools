@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
+  Menu,
   ChevronDown, 
   User, 
   Settings, 
@@ -19,7 +20,7 @@ const maskEmail = (email) => {
   return `${username.slice(0, 6)}***@${domain}`;
 };
 
-const AdminTopBar = () => {
+const AdminTopBar = ({ onToggleSidebar, sidebarExpanded }) => {
   const navigate = useNavigate();
   
   // Dropdown States
@@ -86,10 +87,18 @@ const AdminTopBar = () => {
 
   return (
     <div className="stroyka-topbar">
-      {/* Left: Control Panel Context */}
+      {/* Left: Control Panel Context & Sidebar Toggle */}
       <div className="topbar-left">
+        <button
+          type="button"
+          className="sidebar-hamburger-btn"
+          onClick={onToggleSidebar}
+          title={sidebarExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
+        >
+          <Menu size={20} />
+        </button>
         <div className="topbar-brand">
-          <span className="topbar-brand-sub" style={{ fontSize: '12px', fontWeight: 700, color: '#475569', letterSpacing: '0.5px' }}>
+          <span className="topbar-brand-sub" style={{ fontSize: '13px', fontWeight: 700, color: '#334155', letterSpacing: '0.5px' }}>
             Admin Control Panel
           </span>
         </div>

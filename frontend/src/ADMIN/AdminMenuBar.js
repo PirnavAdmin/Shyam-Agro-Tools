@@ -123,19 +123,21 @@ const AdminMenuBar = ({ expanded = false }) => {
 
   return (
     <div className={`stroyka-sidebar ${expanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
-      {/* Brand Header */}
-      <div className="sidebar-logo-area">
-        <img
-          src="/logo.svg"
-          alt="SAT"
-          className="sidebar-brand-logo"
-          onError={(e) => { e.target.style.display = 'none'; }}
-        />
-        <div className={`sidebar-brand-info ${expanded ? 'visible' : 'hidden'}`}>
-          <h2 className="stroyka-brand">Shyam Agro Tools</h2>
-          <span className={`admin-badge role-${userRole.replace(' ', '-')}`}>
-            {getRoleLabel(userRole)}
-          </span>
+      {/* Brand Header Card */}
+      <div className="sidebar-logo-card">
+        <div className="sidebar-brand-inner">
+          <img
+            src="/logo.png"
+            alt="PIRNAV"
+            className="sidebar-brand-logo"
+            onError={(e) => { e.target.src = '/logo.svg'; }}
+          />
+          {expanded && (
+            <div className="sidebar-brand-info">
+              <h2 className="stroyka-brand">PIRNAV</h2>
+              <span className="stroyka-brand-sub">Shyam Agro Tools</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -154,7 +156,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Dashboard"
                 >
                   <div className="nav-left">
-                    <Home size={18} className="nav-icon" />
+                    <div className="icon-box"><Home size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Dashboard</span>
                   </div>
                 </NavLink>
@@ -170,7 +172,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Catalog"
                 >
                   <div className="nav-left">
-                    <Box size={18} className="nav-icon" />
+                    <div className="icon-box"><Box size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Catalog</span>
                   </div>
                   {expanded && (openDropdowns.catalog
@@ -198,7 +200,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Customers"
                 >
                   <div className="nav-left">
-                    <Users size={18} className="nav-icon" />
+                    <div className="icon-box"><Users size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Customers</span>
                   </div>
                   {expanded && (openDropdowns.customers
@@ -222,7 +224,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Reports"
                 >
                   <div className="nav-left">
-                    <BarChart2 size={18} className="nav-icon" />
+                    <div className="icon-box"><BarChart2 size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Reports</span>
                   </div>
                 </NavLink>
@@ -238,7 +240,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Tickets"
                 >
                   <div className="nav-left">
-                    <Ticket size={18} className="nav-icon" />
+                    <div className="icon-box"><Ticket size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Tickets</span>
                   </div>
                 </NavLink>
@@ -254,7 +256,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Orders"
                 >
                   <div className="nav-left">
-                    <ShoppingCart size={18} className="nav-icon" />
+                    <div className="icon-box"><ShoppingCart size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Orders</span>
                   </div>
                   {expanded && (openDropdowns.orders
@@ -280,7 +282,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Invoices"
                 >
                   <div className="nav-left">
-                    <FileSpreadsheet size={18} className="nav-icon" />
+                    <div className="icon-box"><FileSpreadsheet size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Invoices</span>
                   </div>
                   {expanded && (openDropdowns.invoices
@@ -304,7 +306,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Call History"
                 >
                   <div className="nav-left">
-                    <PhoneCall size={18} className="nav-icon" />
+                    <div className="icon-box"><PhoneCall size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Call History</span>
                   </div>
                 </NavLink>
@@ -320,7 +322,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Stock Updates"
                 >
                   <div className="nav-left">
-                    <Boxes size={18} className="nav-icon" />
+                    <div className="icon-box"><Boxes size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Stock Updates</span>
                   </div>
                 </NavLink>
@@ -336,7 +338,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Marketing"
                 >
                   <div className="nav-left">
-                    <Target size={18} className="nav-icon" />
+                    <div className="icon-box"><Target size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Marketing</span>
                   </div>
                   {expanded && (openDropdowns.marketing
@@ -361,7 +363,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Brands"
                 >
                   <div className="nav-left">
-                    <Box size={18} className="nav-icon" />
+                    <div className="icon-box"><Box size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Brands</span>
                   </div>
                   {expanded && (openDropdowns.brands ? <ChevronDown size={15} className="nav-arrow" /> : <ChevronRight size={15} className="nav-arrow" />)}
@@ -382,7 +384,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Blogs"
                 >
                   <div className="nav-left">
-                    <FileText size={18} className="nav-icon" />
+                    <div className="icon-box"><FileText size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Blogs</span>
                   </div>
                   {expanded && (openDropdowns.blogs
@@ -406,7 +408,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Testimonials"
                 >
                   <div className="nav-left">
-                    <MessageSquare size={18} className="nav-icon" />
+                    <div className="icon-box"><MessageSquare size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Testimonials</span>
                   </div>
                   {expanded && (openDropdowns.testimonials
@@ -430,7 +432,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Staff"
                 >
                   <div className="nav-left">
-                    <Shield size={18} className="nav-icon" />
+                    <div className="icon-box"><Shield size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Staff</span>
                   </div>
                   {expanded && (openDropdowns.staff
@@ -454,7 +456,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Settings"
                 >
                   <div className="nav-left">
-                    <Settings size={18} className="nav-icon" />
+                    <div className="icon-box"><Settings size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Settings</span>
                   </div>
                   {expanded && (openDropdowns.settings
@@ -478,7 +480,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Suppliers"
                 >
                   <div className="nav-left">
-                    <FolderOpen size={18} className="nav-icon" />
+                    <div className="icon-box"><FolderOpen size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Suppliers</span>
                   </div>
                   {expanded && (openDropdowns.suppliers
@@ -503,7 +505,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Coins Converter"
                 >
                   <div className="nav-left">
-                    <BarChart2 size={18} className="nav-icon" />
+                    <div className="icon-box"><BarChart2 size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Coins Converter</span>
                   </div>
                 </NavLink>
@@ -519,7 +521,7 @@ const AdminMenuBar = ({ expanded = false }) => {
                   data-tooltip="Payment Settings"
                 >
                   <div className="nav-left">
-                    <CreditCard size={18} className="nav-icon" />
+                    <div className="icon-box"><CreditCard size={18} className="nav-icon" /></div>
                     <span className="nav-label-text">Payment Settings</span>
                   </div>
                 </NavLink>

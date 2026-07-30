@@ -8,9 +8,13 @@ import './AdminLayout.css';
 
 const AdminLayout = () => {
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const toggleSidebar = () => {
+    setSidebarExpanded(prev => !prev);
+  };
 
   const [globalToast, setGlobalToast] = useState(null);
 
@@ -118,15 +122,11 @@ const AdminLayout = () => {
         />
       )}
 
-      <aside
-        className="admin-sidebar-area"
-        onMouseEnter={() => setSidebarExpanded(true)}
-        onMouseLeave={() => setSidebarExpanded(false)}
-      >
-        <AdminMenuBar expanded={sidebarExpanded} />
+      <aside className="admin-sidebar-area">
+        <AdminMenuBar expanded={sidebarExpanded} onToggleSidebar={toggleSidebar} />
       </aside>
       <header className="admin-topbar-area">
-        <AdminTopBar />
+        <AdminTopBar onToggleSidebar={toggleSidebar} sidebarExpanded={sidebarExpanded} />
       </header>
       <main className="admin-main-content">
         {/* Manager Read-Only Warning Banner */}
