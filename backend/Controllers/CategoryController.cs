@@ -106,12 +106,24 @@ namespace ShyamAgroSuite.Api.Controllers
                 var imgUrl = GetFormValue(form, "ImageUrl");
                 if (string.IsNullOrEmpty(imgUrl)) imgUrl = GetFormValue(form, "image");
 
+                bool? isActive = null;
+                var isActiveStr = GetFormValue(form, "IsActive");
+                if (string.IsNullOrEmpty(isActiveStr)) isActiveStr = GetFormValue(form, "isActive");
+                if (string.IsNullOrEmpty(isActiveStr)) isActiveStr = GetFormValue(form, "status");
+                if (!string.IsNullOrEmpty(isActiveStr))
+                {
+                    if (bool.TryParse(isActiveStr, out var b)) isActive = b;
+                    else if (isActiveStr.Equals("Active", StringComparison.OrdinalIgnoreCase)) isActive = true;
+                    else if (isActiveStr.Equals("Inactive", StringComparison.OrdinalIgnoreCase)) isActive = false;
+                }
+
                 return new CategoryUpsertRequest
                 {
                     Name = name,
                     Description = desc,
                     ImageUrl = imgUrl,
-                    ImageFile = GetFormFile(form, "ImageFile") ?? GetFormFile(form, "image") ?? GetFormFile(form, "file")
+                    ImageFile = GetFormFile(form, "ImageFile") ?? GetFormFile(form, "image") ?? GetFormFile(form, "file"),
+                    IsActive = isActive
                 };
             }
             else
@@ -150,11 +162,21 @@ namespace ShyamAgroSuite.Api.Controllers
                         return v;
                     }
 
+                    bool? isActive = null;
+                    var isActiveVal = GetVal("IsActive", "isActive", "status");
+                    if (!string.IsNullOrEmpty(isActiveVal))
+                    {
+                        if (bool.TryParse(isActiveVal, out var b)) isActive = b;
+                        else if (isActiveVal.Equals("Active", StringComparison.OrdinalIgnoreCase)) isActive = true;
+                        else if (isActiveVal.Equals("Inactive", StringComparison.OrdinalIgnoreCase)) isActive = false;
+                    }
+
                     return new CategoryUpsertRequest
                     {
                         Name = GetVal("Name", "categoryName", "CategoryName", "category_name", "category"),
                         Description = GetVal("Description", "categoryDescription", "category_description", "description"),
-                        ImageUrl = GetVal("ImageUrl", "image")
+                        ImageUrl = GetVal("ImageUrl", "image"),
+                        IsActive = isActive
                     };
                 }
                 catch (Exception ex)
@@ -191,7 +213,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 Name = request.Name,
                 Description = request.Description,
                 ImageUrl = finalImageUrl,
-                IsActive = true
+                IsActive = request.IsActive ?? true
             };
 
             _context.Categories.Add(category);
@@ -215,6 +237,10 @@ namespace ShyamAgroSuite.Api.Controllers
 
             category.Name = request.Name;
             category.Description = request.Description;
+            if (request.IsActive.HasValue)
+            {
+                category.IsActive = request.IsActive.Value;
+            }
             if (!string.IsNullOrEmpty(finalImageUrl))
             {
                 category.ImageUrl = finalImageUrl;

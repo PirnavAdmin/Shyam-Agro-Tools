@@ -61,7 +61,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 CategoryId = request.CategoryId,
                 Name = request.Name,
                 Description = request.Description,
-                IsActive = true
+                IsActive = request.IsActive ?? true
             };
 
             _context.Subcategories.Add(subcategory);
@@ -88,6 +88,10 @@ namespace ShyamAgroSuite.Api.Controllers
             subcategory.CategoryId = request.CategoryId;
             subcategory.Name = request.Name;
             subcategory.Description = request.Description;
+            if (request.IsActive.HasValue)
+            {
+                subcategory.IsActive = request.IsActive.Value;
+            }
 
             await _context.SaveChangesAsync();
             return NoContent();
