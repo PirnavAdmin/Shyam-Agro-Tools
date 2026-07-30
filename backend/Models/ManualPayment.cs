@@ -36,6 +36,17 @@ namespace ShyamAgroSuite.Api.Models
 
         public string VerificationStatus { get; set; } = "Pending"; // Pending, Approved, Rejected
 
+        /// <summary>
+        /// True only when the UTR has been matched against a real bank SMS via ReconcileSms.
+        /// UpdateManualStatus will not allow "Approved" unless this is true.
+        /// </summary>
+        public bool SmsVerified { get; set; } = false;
+
+        /// <summary>
+        /// The UTR extracted from the bank SMS that was matched to this payment.
+        /// </summary>
+        public string? VerifiedUtr { get; set; }
+
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
     }
 }

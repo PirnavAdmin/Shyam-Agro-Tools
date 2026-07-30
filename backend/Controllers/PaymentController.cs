@@ -695,6 +695,23 @@ namespace ShyamAgroSuite.Api.Controllers
                 mappedStatus = "Rejected";
             }
 
+            // ── UTR Validation Gate ──────────────────────────────────────────────
+            // Approval is only permitted after the UTR has been confirmed via a
+            // real bank SMS through the ReconcileSms endpoint. Direct force-approve
+            // without SMS verification is blocked to prevent fraudulent approvals.
+            if (mappedStatus == "Approved" && !verification.SmsVerified)
+            {
+                return UnprocessableEntity(new
+                {
+                    Success = false,
+                    Message = "Cannot approve: UTR not verified against bank records. " +
+                              "Please paste the bank credit SMS in the Auto-Verification Sandbox first. " +
+                              $"Expected UTR: {verification.UtrNumber}",
+                    UtrNumber = verification.UtrNumber,
+                    RequiresSmsPaste = true
+                });
+            }
+
             verification.VerificationStatus = mappedStatus;
 
             // Propagate status update to parent order tracking tables
@@ -953,8 +970,10 @@ namespace ShyamAgroSuite.Api.Controllers
                 });
             }
 
-            // Reconcile and Approve!
+            // Reconcile and Approve! Mark as SMS-verified so UpdateManualStatus gate passes.
             match.VerificationStatus = "Approved";
+            match.SmsVerified = true;
+            match.VerifiedUtr = parsedUtr;
 
             // Propagate status update to parent order tracking tables
             var orderSuccess = await _context.OrderSuccesses.FirstOrDefaultAsync(o => o.OrderId == match.OrderId);

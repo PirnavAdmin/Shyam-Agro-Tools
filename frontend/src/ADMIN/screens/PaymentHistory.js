@@ -325,7 +325,7 @@ const PaymentHistory = () => {
   }, [bankDetails.ifscCode]);
 
   const handleVerifyPayment = async (orderId, totalAmount, realOrderId, verificationRecordId) => {
-    if (!window.confirm(`Verify payment of INR ${totalAmount.toLocaleString('en-IN')} for Order #${orderId}?`)) return;
+    if (!window.confirm(`Verify payment of INR ${totalAmount.toLocaleString('en-IN')} for Order #${orderId}?\n\nThis will mark the order as Processing.`)) return;
     
     try {
       const isNumericId = /^\d+$/.test(String(realOrderId));
@@ -336,7 +336,27 @@ const PaymentHistory = () => {
 
       // 2. Approve manual verification record if present
       if (verificationRecordId) {
-        await updateManualVerificationStatus(verificationRecordId, 'Approved');
+        const res = await fetch(`${BASE_PAYMENT_URL}/verify-manual/${verificationRecordId}/status`, {
+          method: 'PUT',
+          headers: HEADERS,
+          body: JSON.stringify({ status: 'Approved' })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          // 422 = UTR not SMS-verified yet
+          if (res.status === 422) {
+            const utr = errData.utrNumber || '';
+            showBannerStatus('error',
+              `⚠️ Cannot approve — UTR not matched against bank records.` +
+              (utr ? ` Expected UTR: ${utr}.` : '') +
+              ` Paste the bank credit SMS in the "Auto-Verification Sandbox" tab first.`
+            );
+          } else {
+            showBannerStatus('error', errData.message || `Server error (${res.status}).`);
+          }
+          return; // stop — do not refresh
+        }
       }
       
       showBannerStatus('success', `Payment for Order #${orderId} verified successfully.${isNumericId ? ' Order status updated to Processing.' : ''}`);
@@ -625,6 +645,8 @@ const PaymentHistory = () => {
         screenshotUrl: mv.screenshotUrl,
         remarks: mv.remarks,
         isVerificationRecord: true,
+        smsVerified: mv.smsVerified === true,
+        verifiedUtr: mv.verifiedUtr || null,
         realOrderId: o ? (o.id || o.orderId) : mv.orderId
       });
     });
@@ -873,17 +895,40 @@ const PaymentHistory = () => {
                             )}
                           </td>
                           <td>
-                            {isPending && <span className="pay-status-badge pending"><RefreshCw size={11} className="animate-spin" /> Pending Match</span>}
+                            {isPending && (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <span className="pay-status-badge pending"><RefreshCw size={11} className="animate-spin" /> Pending Match</span>
+                                {payment.isVerificationRecord && (
+                                  payment.smsVerified
+                                    ? <span style={{ fontSize: '10px', fontWeight: 600, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                        <CheckCircle size={10} /> UTR Matched
+                                      </span>
+                                    : <span style={{ fontSize: '10px', fontWeight: 600, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '3px' }} title={`UTR ${payment.utr} not yet verified via bank SMS`}>
+                                        <AlertCircle size={10} /> UTR Not Matched
+                                      </span>
+                                )}
+                              </div>
+                            )}
                             {isVerified && <span className="pay-status-badge verified"><CheckCircle size={11} /> Verified</span>}
                             {isRejected && <span className="pay-status-badge rejected"><X size={11} /> Rejected</span>}
                           </td>
                           <td>
                             <div className="payment-actions-cell">
                               {isPending ? (
-                                <>
+                              <>
                                   <button 
                                     className="action-btn verify"
-                                    onClick={() => handleVerifyPayment(payment.orderId, payment.totalAmount || payment.amountPaid || 0, payment.realOrderId, payment.verificationRecordId)}
+                                    disabled={payment.isVerificationRecord && !payment.smsVerified}
+                                    title={
+                                      payment.isVerificationRecord && !payment.smsVerified
+                                        ? `UTR ${payment.utr || '—'} not yet matched against bank records.\nPaste the bank credit SMS in "Auto-Verification Sandbox" first.`
+                                        : 'Approve this payment'
+                                    }
+                                    style={payment.isVerificationRecord && !payment.smsVerified ? { opacity: 0.45, cursor: 'not-allowed' } : {}}
+                                    onClick={() => {
+                                      if (payment.isVerificationRecord && !payment.smsVerified) return;
+                                      handleVerifyPayment(payment.orderId, payment.totalAmount || payment.amountPaid || 0, payment.realOrderId, payment.verificationRecordId);
+                                    }}
                                   >
                                     <Check size={13} /> Verify Success
                                   </button>
