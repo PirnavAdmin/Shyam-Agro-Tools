@@ -391,6 +391,23 @@ using (var scope = app.Services.CreateScope())
             cmd.ExecuteNonQuery();
         }
 
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS `Banners` (
+                    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `Title` VARCHAR(250) NOT NULL DEFAULT '',
+                    `Subtitle` VARCHAR(500) NOT NULL DEFAULT '',
+                    `ImageUrl` TEXT NOT NULL,
+                    `TargetUrl` VARCHAR(500) NOT NULL DEFAULT '/categories',
+                    `BannerType` VARCHAR(50) NOT NULL DEFAULT 'Hero',
+                    `IsActive` TINYINT(1) NOT NULL DEFAULT 1,
+                    `DisplayOrder` INT NOT NULL DEFAULT 0,
+                    `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );";
+            cmd.ExecuteNonQuery();
+        }
+
         // 3.9 Ensure extra columns exist in Coupons table
         var existingCouponCols = new List<string>();
         using (var cmd = conn.CreateCommand())

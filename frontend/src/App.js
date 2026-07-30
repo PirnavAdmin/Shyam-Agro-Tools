@@ -63,6 +63,7 @@ import AdminReturns from './ADMIN/returns/AdminReturns';
 import StockUpdates from './ADMIN/stock/StockUpdates';
 
 // Admin Marketing, Brands, Blogs
+import BannersList from './ADMIN/marketing/BannersList';
 import CouponsList from './ADMIN/marketing/CouponsList';
 import Coupon from './ADMIN/marketing/Coupon';
 import BrandsList from './ADMIN/brands/BrandsList';
@@ -210,6 +211,7 @@ function App() {
 
                       {/* Marketing Routes */}
                       <Route path="marketing" element={<CouponsList />} />
+                      <Route path="marketing/banners" element={<BannersList />} />
                       <Route path="marketing/coupons" element={<CouponsList />} />
                       <Route path="marketing/coupon" element={<Coupon />} />
 

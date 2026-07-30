@@ -64,6 +64,7 @@ namespace ShyamAgroSuite.Api.Data
         public DbSet<ReturnEvidence> ReturnEvidences { get; set; }
         public DbSet<ReturnTimeline> ReturnTimelines { get; set; }
         public DbSet<ReturnPickup> ReturnPickups { get; set; }
+        public DbSet<Banner> Banners { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

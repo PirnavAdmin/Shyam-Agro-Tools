@@ -2,38 +2,64 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import axios from 'axios';
 import heroMachinery from '../../asset/hero-machinery.png';
 import heroSprayers from '../../asset/hero-sprayers.png';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+const defaultSlides = [
+  {
+    id: 1,
+    image: heroMachinery,
+    alt: 'Featured Machinery - Explore Powerful Farming Equipment',
+    targetPath: '/categories',
+  },
+  {
+    id: 2,
+    image: heroSprayers,
+    alt: 'Advanced & Reliable Sprayers - Powerful Performance & Better Farming',
+    targetPath: '/categories',
+  },
+];
 
 const Hero = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState(defaultSlides);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  const slides = [
-    {
-      id: 1,
-      image: heroMachinery,
-      alt: 'Featured Machinery - Explore Powerful Farming Equipment',
-      targetPath: '/categories',
-    },
-    {
-      id: 2,
-      image: heroSprayers,
-      alt: 'Advanced & Reliable Sprayers - Powerful Performance & Better Farming',
-      targetPath: '/categories',
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    const fetchHeroBanners = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/Banners?type=Hero`);
+        if (isMounted && response.data && Array.isArray(response.data) && response.data.length > 0) {
+          const apiSlides = response.data.map((b, index) => ({
+            id: b.id || index + 1,
+            image: b.imageUrl,
+            alt: b.title ? `${b.title} - ${b.subtitle}` : 'Hero Banner',
+            targetPath: b.targetUrl || '/categories',
+          }));
+          setSlides(apiSlides);
+        }
+      } catch (err) {
+        // Fallback to default slides
+      }
+    };
+    fetchHeroBanners();
+    return () => { isMounted = false; };
+  }, []);
 
   const totalSlides = slides.length;
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev >= totalSlides - 1 ? 0 : prev + 1));
   }, [totalSlides]);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev <= 0 ? totalSlides - 1 : prev - 1));
   }, [totalSlides]);
 
   // Continuous auto play every 3 seconds
