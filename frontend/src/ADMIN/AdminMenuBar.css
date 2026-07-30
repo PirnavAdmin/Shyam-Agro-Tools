@@ -12,8 +12,8 @@
   flex-direction: column;
   font-family: 'Outfit', 'Inter', sans-serif;
   overflow: hidden;
-  border-right: 1px solid var(--ems-border, #D6EAE5);
-  box-shadow: 2px 0 12px rgba(0, 95, 83, 0.02);
+  border-right: 2px solid #005F53;
+  box-shadow: 2px 0 12px rgba(0, 95, 83, 0.04);
   transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
