@@ -147,9 +147,6 @@ const AdminAccountSettings = () => {
             <h2>Account Settings</h2>
           </div>
         </div>
-        <button className="save-settings-btn" onClick={handleSubmit} disabled={isSaving}>
-          <Save size={16} /> Save Changes
-        </button>
       </section>
 
       {/* Settings Form Layout */}
@@ -250,7 +247,7 @@ const AdminAccountSettings = () => {
               Cancel
             </button>
             <button type="submit" className="save-btn" disabled={isSaving}>
-              Save Updates
+              {isSaving ? 'Updating...' : 'Update'}
             </button>
           </div>
         </form>
