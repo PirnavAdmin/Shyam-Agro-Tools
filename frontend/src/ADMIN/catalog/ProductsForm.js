@@ -161,7 +161,6 @@ const ProductsForm = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [brandsList, setBrandsList] = useState([]);
   const [suppliersList, setSuppliersList] = useState([]);
-  const [isLoadingTaxonomy, setIsLoadingTaxonomy] = useState(true);
 
   const [formData, setFormData] = useState({
     ...createEmptyProduct(),
@@ -206,10 +205,7 @@ const ProductsForm = () => {
         brand: current.brand || '',
         supplier: current.supplier || '',
       }));
-      setIsLoadingTaxonomy(false);
-    }).catch(() => {
-      if (isMounted) setIsLoadingTaxonomy(false);
-    });
+    }).catch(() => {});
     return () => { isMounted = false; };
   }, []);
 
@@ -555,17 +551,6 @@ const ProductsForm = () => {
     await saveProduct();
   };
 
-  if (isLoadingTaxonomy) {
-    return (
-      <div className="catalog-page">
-        <section className="catalog-empty-state">
-          <PackagePlus size={34} />
-          <h3>Loading Taxonomy</h3>
-          <p>Please wait while categories are loaded from the API.</p>
-        </section>
-      </div>
-    );
-  }
 
   if (!categories.length) {
     return (
