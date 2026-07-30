@@ -11,6 +11,7 @@ namespace ShyamAgroSuite.Api.Models
         public string Description { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
+        public int DisplayOrder { get; set; } = 0;
 
         [NotMapped]
         public string Slug => string.IsNullOrEmpty(Name) ? string.Empty : Name.ToLower()

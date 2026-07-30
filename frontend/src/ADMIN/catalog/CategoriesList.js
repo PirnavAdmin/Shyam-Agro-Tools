@@ -76,14 +76,21 @@ const CategoriesList = () => {
 
   const filteredCategories = useMemo(() => {
     const query = searchTerm.toLowerCase().trim();
-    return categories.filter((category) => {
-      return (
-        category.name.toLowerCase().includes(query) ||
-        (category.description || '').toLowerCase().includes(query) ||
-        (category.slug || '').toLowerCase().includes(query) ||
-        String(category.id).toLowerCase().includes(query)
-      );
-    });
+    return categories
+      .filter((category) => {
+        return (
+          category.name.toLowerCase().includes(query) ||
+          (category.description || '').toLowerCase().includes(query) ||
+          (category.slug || '').toLowerCase().includes(query) ||
+          String(category.id).toLowerCase().includes(query)
+        );
+      })
+      .sort((a, b) => {
+        const orderA = Number(a.displayOrder) > 0 ? Number(a.displayOrder) : 9999;
+        const orderB = Number(b.displayOrder) > 0 ? Number(b.displayOrder) : 9999;
+        if (orderA !== orderB) return orderA - orderB;
+        return Number(a.id) - Number(b.id);
+      });
   }, [categories, searchTerm]);
 
   // Reset page when filter/search changes
@@ -173,6 +180,7 @@ const CategoriesList = () => {
               <tr style={{ background: '#f8fafc' }}>
                 <th style={{ padding: '10px 16px' }}>ID</th>
                 <th style={{ padding: '10px 16px' }}>Category Name</th>
+                <th style={{ padding: '10px 16px' }}>Display Order</th>
                 <th style={{ padding: '10px 16px' }}>Slug</th>
                 <th style={{ padding: '10px 16px' }}>Description</th>
                 <th style={{ padding: '10px 16px' }}>Status</th>
@@ -182,7 +190,7 @@ const CategoriesList = () => {
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan="6" className="catalog-center-cell" style={{ padding: '32px' }}>
+                  <td colSpan="7" className="catalog-center-cell" style={{ padding: '32px' }}>
                     Loading categories...
                   </td>
                 </tr>
@@ -194,6 +202,9 @@ const CategoriesList = () => {
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#1e293b' }}>
                     {formatTitleCase(category.name)}
+                  </td>
+                  <td style={{ padding: '10px 16px', fontWeight: '700', color: '#005F53' }}>
+                    {category.displayOrder || 0}
                   </td>
                   <td className="catalog-path" style={{ padding: '10px 16px', color: '#2563eb' }}>
                     {category.slug}

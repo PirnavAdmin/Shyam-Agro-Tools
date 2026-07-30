@@ -449,6 +449,50 @@ using (var scope = app.Services.CreateScope())
             }
         }
 
+        // 3.10 Ensure DisplayOrder column exists in Categories table
+        var existingCatCols = new List<string>();
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "SHOW COLUMNS FROM `Categories`;";
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    existingCatCols.Add(reader["Field"].ToString().ToLower());
+                }
+            }
+        }
+        if (!existingCatCols.Contains("displayorder"))
+        {
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = "ALTER TABLE `Categories` ADD COLUMN `DisplayOrder` INT NOT NULL DEFAULT 0;";
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // 3.11 Ensure DisplayOrder column exists in Subcategories table
+        var existingSubcatCols = new List<string>();
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "SHOW COLUMNS FROM `Subcategories`;";
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    existingSubcatCols.Add(reader["Field"].ToString().ToLower());
+                }
+            }
+        }
+        if (!existingSubcatCols.Contains("displayorder"))
+        {
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = "ALTER TABLE `Subcategories` ADD COLUMN `DisplayOrder` INT NOT NULL DEFAULT 0;";
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         // 4. Cleanup mismatched foreign keys from orderitems table to avoid FK constraint errors with Orders table
         var fkNames = new List<string>();
         using (var cmd = conn.CreateCommand())

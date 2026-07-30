@@ -55,7 +55,7 @@ export const mapCategoryFromApi = (raw = {}) => ({
   slug: raw.slug || '',
   description: raw.description || '',
   status: raw.isActive === false ? 'Inactive' : 'Active',
-  displayOrder: raw.displayOrder ?? '',
+  displayOrder: Number(raw.displayOrder ?? raw.display_order ?? 0),
   metaTitle: raw.metaTitle || `${raw.name || ''} | Shyam Agro`,
   metaDescription: raw.metaDescription || raw.description || '',
   image: resolveImageUrl(raw.imageUrl || raw.image),
@@ -187,7 +187,7 @@ export const saveCategory = async (category) => {
   fd.append('Name', category.name || '');
   fd.append('Description', category.description || '');
   fd.append('Slug', category.slug || '');
-  fd.append('DisplayOrder', category.displayOrder || '');
+  fd.append('DisplayOrder', category.displayOrder !== undefined && category.displayOrder !== null && category.displayOrder !== '' ? String(category.displayOrder) : '0');
   fd.append('IsActive', category.status === 'Active' ? 'true' : 'false');
   fd.append('MetaTitle', category.metaTitle || '');
   fd.append('MetaDescription', category.metaDescription || '');

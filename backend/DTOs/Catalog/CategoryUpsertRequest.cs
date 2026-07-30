@@ -9,5 +9,6 @@ namespace ShyamAgroSuite.Api.DTOs.Catalog
         public string ImageUrl { get; set; } = string.Empty;
         public IFormFile? ImageFile { get; set; }
         public bool? IsActive { get; set; }
+        public int? DisplayOrder { get; set; }
     }
 }

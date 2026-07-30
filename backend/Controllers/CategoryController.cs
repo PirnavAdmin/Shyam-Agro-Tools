@@ -117,13 +117,24 @@ namespace ShyamAgroSuite.Api.Controllers
                     else if (isActiveStr.Equals("Inactive", StringComparison.OrdinalIgnoreCase)) isActive = false;
                 }
 
+                int? displayOrder = null;
+                var displayOrderStr = GetFormValue(form, "DisplayOrder");
+                if (string.IsNullOrEmpty(displayOrderStr)) displayOrderStr = GetFormValue(form, "displayOrder");
+                if (string.IsNullOrEmpty(displayOrderStr)) displayOrderStr = GetFormValue(form, "display_order");
+                if (string.IsNullOrEmpty(displayOrderStr)) displayOrderStr = GetFormValue(form, "order");
+                if (!string.IsNullOrEmpty(displayOrderStr) && int.TryParse(displayOrderStr, out var dispOrd))
+                {
+                    displayOrder = dispOrd;
+                }
+
                 return new CategoryUpsertRequest
                 {
                     Name = name,
                     Description = desc,
                     ImageUrl = imgUrl,
                     ImageFile = GetFormFile(form, "ImageFile") ?? GetFormFile(form, "image") ?? GetFormFile(form, "file"),
-                    IsActive = isActive
+                    IsActive = isActive,
+                    DisplayOrder = displayOrder
                 };
             }
             else
@@ -171,12 +182,20 @@ namespace ShyamAgroSuite.Api.Controllers
                         else if (isActiveVal.Equals("Inactive", StringComparison.OrdinalIgnoreCase)) isActive = false;
                     }
 
+                    int? displayOrder = null;
+                    var displayOrderVal = GetVal("DisplayOrder", "displayOrder", "display_order", "order");
+                    if (!string.IsNullOrEmpty(displayOrderVal) && int.TryParse(displayOrderVal, out var parsedOrd))
+                    {
+                        displayOrder = parsedOrd;
+                    }
+
                     return new CategoryUpsertRequest
                     {
                         Name = GetVal("Name", "categoryName", "CategoryName", "category_name", "category"),
                         Description = GetVal("Description", "categoryDescription", "category_description", "description"),
                         ImageUrl = GetVal("ImageUrl", "image"),
-                        IsActive = isActive
+                        IsActive = isActive,
+                        DisplayOrder = displayOrder
                     };
                 }
                 catch (Exception ex)
@@ -192,6 +211,8 @@ namespace ShyamAgroSuite.Api.Controllers
         {
             var categories = await _context.Categories
                 .Include(c => c.Subcategories)
+                .OrderBy(c => c.DisplayOrder)
+                .ThenBy(c => c.Id)
                 .ToListAsync();
             return Ok(categories);
         }
@@ -213,7 +234,8 @@ namespace ShyamAgroSuite.Api.Controllers
                 Name = request.Name,
                 Description = request.Description,
                 ImageUrl = finalImageUrl,
-                IsActive = request.IsActive ?? true
+                IsActive = request.IsActive ?? true,
+                DisplayOrder = request.DisplayOrder ?? 0
             };
 
             _context.Categories.Add(category);
@@ -240,6 +262,10 @@ namespace ShyamAgroSuite.Api.Controllers
             if (request.IsActive.HasValue)
             {
                 category.IsActive = request.IsActive.Value;
+            }
+            if (request.DisplayOrder.HasValue)
+            {
+                category.DisplayOrder = request.DisplayOrder.Value;
             }
             if (!string.IsNullOrEmpty(finalImageUrl))
             {
