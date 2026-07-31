@@ -465,7 +465,7 @@ const CoinsConverterScreen = () => {
             </button>
             <button className="catalog-btn catalog-btn--primary" type="submit" disabled={isSaving}>
               <Save size={16} />
-              {isSaving ? 'Saving...' : 'Save Settings'}
+              {isSaving ? 'Updating...' : 'Update Settings'}
             </button>
           </div>
         </aside>
