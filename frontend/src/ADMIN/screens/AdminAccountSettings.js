@@ -48,8 +48,11 @@ const AdminAccountSettings = () => {
   const validate = () => {
     let errs = {};
     if (!formData.name.trim()) errs.name = 'Full name is required';
+    if (!formData.email.trim()) errs.email = 'Email address is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = 'Enter a valid email address';
     if (!formData.mobile.trim()) errs.mobile = 'Mobile number is required';
     if (formData.mobile.length !== 10) errs.mobile = 'Must be exactly 10 digits';
+    if (!formData.employeeId.trim()) errs.employeeId = 'Employee ID is required';
 
     if (formData.newPassword) {
       if (formData.newPassword.length < 6) {
@@ -79,6 +82,7 @@ const AdminAccountSettings = () => {
     try {
       // 1. Update general localStorage
       localStorage.setItem('adminName', formData.name.trim());
+      localStorage.setItem('adminEmail', formData.email.trim());
       
       // 2. Update within added_staff_accounts if it is a staff account
       const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
@@ -170,14 +174,15 @@ const AdminAccountSettings = () => {
               </div>
 
               <div className="form-field">
-                <label>Email Address (Read-Only)</label>
+                <label>Email Address</label>
                 <input 
                   type="email" 
                   name="email" 
                   value={formData.email} 
-                  disabled 
-                  className="disabled-input"
+                  onChange={handleChange}
+                  placeholder="Enter email address"
                 />
+                {errors.email && <span className="field-error">{errors.email}</span>}
               </div>
 
               <div className="form-field">
@@ -197,14 +202,15 @@ const AdminAccountSettings = () => {
               </div>
 
               <div className="form-field">
-                <label>Employee ID (Read-Only)</label>
+                <label>Employee ID</label>
                 <input 
                   type="text" 
                   name="employeeId" 
                   value={formData.employeeId} 
-                  disabled 
-                  className="disabled-input"
+                  onChange={handleChange}
+                  placeholder="Enter employee ID"
                 />
+                {errors.employeeId && <span className="field-error">{errors.employeeId}</span>}
               </div>
             </div>
           </div>

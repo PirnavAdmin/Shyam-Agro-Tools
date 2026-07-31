@@ -96,6 +96,45 @@ const Customer = () => {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    
+    // 1. Customer Name Validation
+    const nameVal = (editForm.name || '').trim();
+    const distinctLetters = new Set(nameVal.toLowerCase().replace(/[^a-z]/g, '')).size;
+    if (!nameVal || nameVal.length < 3 || nameVal.length > 50 || !/^[A-Za-z\s.'\-]{3,50}$/.test(nameVal) || /(.)\1{3,}/.test(nameVal) || distinctLetters < 2) {
+      alert('Please enter a valid Customer Name (3-50 letters). Names like "vvvvvvvvv" or single repeating letters are invalid.');
+      return;
+    }
+
+    // 2. Phone Number Validation
+    const phoneVal = (editForm.phone || '').trim();
+    const dummyPhones = ['1234567890', '0123456789', '9876543210', '1234567891', '6789012345', '9999999999', '8888888888', '7777777777', '6666666666'];
+    if (!phoneVal || !/^[6-9]\d{9}$/.test(phoneVal) || new Set(phoneVal).size === 1 || dummyPhones.includes(phoneVal)) {
+      alert('Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9 (e.g. 9876543201). Dummy numbers like 1234567890 are invalid.');
+      return;
+    }
+
+    // 3. Street Address Validation
+    const addressVal = (editForm.address || '').trim();
+    const lettersOnlyAddress = addressVal.replace(/[^a-z]/gi, '');
+    const hasAddressSpaceOrSymbol = /[\s,\.\/\-]/.test(addressVal);
+    if (addressVal && (addressVal.length < 5 || !/[a-zA-Z]/.test(addressVal) || new Set(addressVal.toLowerCase()).size < 3 || /(.)\1{3,}/.test(addressVal) || (addressVal.length > 8 && !hasAddressSpaceOrSymbol) || /[bcdfghjklmnpqrstvwxyz]{5,}/i.test(lettersOnlyAddress))) {
+      alert('Please enter a valid street address (minimum 5 characters, e.g. "H.No 12, Main Road"). Random gibberish or long codes without spaces are invalid.');
+      return;
+    }
+
+    // 4. District Validation
+    const districtVal = (editForm.district || '').trim();
+    if (districtVal && (districtVal.length < 2 || !/^[A-Za-z\s.'\-]{2,50}$/.test(districtVal) || new Set(districtVal.toLowerCase().replace(/[^a-z]/g, '')).size < 2)) {
+      alert('Please enter a valid District name (letters and spaces only).');
+      return;
+    }
+
+    // 5. State Validation
+    const stateVal = (editForm.state || '').trim();
+    if (stateVal && (stateVal.length < 2 || !/^[A-Za-z\s.'\-]{2,50}$/.test(stateVal) || new Set(stateVal.toLowerCase().replace(/[^a-z]/g, '')).size < 2)) {
+      alert('Please enter a valid State name (letters and spaces only).');
+      return;
+    }
     try {
       const updatedPayload = {
         ...profile,

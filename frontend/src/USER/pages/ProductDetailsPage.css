@@ -342,7 +342,7 @@
   gap: 0.5rem;
 }
 
-.action-btn {
+.pdp-quick-actions .action-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -356,7 +356,7 @@
   transition: all 0.2s;
 }
 
-.action-btn:hover {
+.pdp-quick-actions .action-btn:hover {
   background-color: #f5f5f5;
   color: var(--primary-color);
 }

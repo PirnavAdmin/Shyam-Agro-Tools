@@ -90,6 +90,11 @@ const TrustRatingSection = () => {
               alt="Agro Machinery"
               className="w-full h-full object-cover object-center"
               loading="lazy"
+              onError={(e) => {
+                if (e.target.src !== '/hero_banner.png') {
+                  e.target.src = '/hero_banner.png';
+                }
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
           </motion.div>

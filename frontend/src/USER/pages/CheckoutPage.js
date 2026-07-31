@@ -430,20 +430,22 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     const state = data.state.trim();
     const zip = data.zip.trim();
 
+    const dummyPhones = ['1234567890', '0123456789', '9876543210', '1234567891', '6789012345', '9999999999', '8888888888', '7777777777', '6666666666'];
+
     if (!firstName) errors.firstName = t('firstNameRequired');
-    else if (!nameRegex.test(firstName)) errors.firstName = t('firstNameLettersOnly');
+    else if (!nameRegex.test(firstName) || /(.)\1{3,}/.test(firstName) || new Set(firstName.toLowerCase().replace(/[^a-z]/g, '')).size < 2) errors.firstName = t('firstNameLettersOnly');
 
     if (!lastName) errors.lastName = t('lastNameRequired');
-    else if (!nameRegex.test(lastName)) errors.lastName = t('lastNameLettersOnly');
+    else if (!nameRegex.test(lastName) || /(.)\1{3,}/.test(lastName) || new Set(lastName.toLowerCase().replace(/[^a-z]/g, '')).size < 2) errors.lastName = t('lastNameLettersOnly');
 
     if (!email) errors.email = t('emailRequired');
     else if (!emailRegex.test(email)) errors.email = t('validEmailAddress');
 
     if (!phone) errors.phone = t('phoneRequired');
-    else if (!/^\d{10}$/.test(phone)) errors.phone = t('phoneTenDigits');
+    else if (!/^[6-9]\d{9}$/.test(phone) || new Set(phone).size === 1 || dummyPhones.includes(phone)) errors.phone = t('phoneTenDigits');
 
     if (!address) errors.address = t('fullAddressRequired');
-    else if (address.length < 10) errors.address = t('fullAddressMinLength');
+    else if (address.length < 5 || /(.)\1{3,}/.test(address) || (!address.includes(' ') && address.length > 10 && !/[aeiouAEIOU]/i.test(address))) errors.address = t('fullAddressMinLength');
 
     if (!city) errors.city = t('cityRequired');
     if (!state) errors.state = t('stateRequired');

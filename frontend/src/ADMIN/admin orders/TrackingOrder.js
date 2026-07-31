@@ -223,7 +223,7 @@ const TrackingOrder = () => {
                 <div>
                   <strong style={{ fontSize: '13px', display: 'block', color: '#1e293b' }}>Order #{o.id || o.orderId}</strong>
                   <span style={{ fontSize: '11px', color: '#64748b', display: 'block', marginTop: '2px' }}>
-                    {o.customerName || o.customer || 'Unknown'} • {formatCurrency(o.totalAmount || o.total)}
+                    {o.customerName || o.customer || 'Unknown'} • {formatCurrency(o.finalAmount ?? o.totalAmount ?? o.total)}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

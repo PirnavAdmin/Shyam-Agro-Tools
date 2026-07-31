@@ -1,3 +1,4 @@
+import { getApiDomain } from "../../utils/apiConfig";
 import React, { useRef, useState } from 'react';
 import apiClient from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { useToast } from '../context/ToastContext';
 import headerLogo from '../../asset/header logo.png';
 import './LoginPopup.css';
 
-const DIRECT_API_BASE_URL = "https://shyamagrotools.com";
+const DIRECT_API_BASE_URL = getApiDomain();
 const API_HEADERS = {
   'Content-Type': 'application/json',
   'ngrok-skip-browser-warning': 'true',

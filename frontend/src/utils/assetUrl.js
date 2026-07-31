@@ -1,3 +1,4 @@
+import { getApiDomain } from "./apiConfig";
 const LEGACY_ASSET_HOSTS = [
   'https://wildlife-unwieldy-devotee.ngrok-free.dev',
   'http://wildlife-unwieldy-devotee.ngrok-free.dev',
@@ -10,7 +11,7 @@ export const normalizeAssetUrl = (value, baseUrl, fallback = '') => {
   if (!raw || INVALID_ASSET_VALUES.has(raw.toLowerCase())) return fallback;
   if (/^(data|blob):/i.test(raw)) return raw;
 
-  const cleanBaseUrl = (baseUrl || 'https://shyamagrotools.com').replace(/\/$/, '');
+  const cleanBaseUrl = (baseUrl || getApiDomain()).replace(/\/$/, '');
   const legacyHost = LEGACY_ASSET_HOSTS.find((host) => raw.toLowerCase().startsWith(host.toLowerCase()));
   if (legacyHost) {
     return `${cleanBaseUrl}${raw.slice(legacyHost.length)}`;

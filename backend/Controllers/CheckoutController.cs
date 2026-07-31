@@ -173,29 +173,81 @@ namespace ShyamAgroSuite.Api.Controllers
                 int coinsRedeemed = summary.coinsToRedeem;
                 decimal coinsDiscount = summary.coinsDiscount;
 
-                // 5. Create order in order_success table
+                decimal shippingCharges = summary.shippingCharges;
+                decimal tax = summary.tax;
+
+                // Generate a unique order number for the Orders table
+                string genOrderNum;
+                do
+                {
+                    genOrderNum = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{new Random().Next(100000, 999999)}";
+                } while (await _context.Orders.AnyAsync(o => o.OrderNumber == genOrderNum));
+
+                // Attempt to retrieve customer for the Orders table
+                var customerForOrder = await _context.Customers.FirstOrDefaultAsync(c => c.Email == userEmail || c.Phone == userEmail);
+
+                // 5a. Create full Order in Orders table for Admin Ledger visibility
+                var mainOrder = new Order
+                {
+                    CustomerId = customerForOrder?.Id ?? 1, // Fallback if no customer profile exists
+                    OrderNumber = genOrderNum,
+                    OrderDate = DateTime.UtcNow,
+                    TotalAmount = subTotal,
+                    DiscountAmount = couponDiscount + coinsDiscount,
+                    ShippingFee = shippingCharges,
+                    GstAmount = tax,
+                    FinalAmount = grandTotal,
+                    Status = "Placed",
+                    PaymentStatus = dto.PaymentStatus ?? "Pending",
+                    PaymentMethod = dto.PaymentMethod,
+                    ShippingAddress = address != null ? $"{address.FullAddress}, {address.City}, {address.State}, {address.Pincode}" : string.Empty,
+                    Items = new List<OrderItem>()
+                };
+
+                // 5b. Create order in order_success table (using the SAME generated order number)
                 var order = new OrderSuccess
                 {
-                    OrderId = "SAT" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    OrderId = genOrderNum,
                     CustomerAddressId = dto.CustomerAddressId,
                     TotalAmount = grandTotal,
                     PaymentMethod = dto.PaymentMethod,
                     OrderStatus = "Placed",
-                    OrderDate = DateTime.Now,
-                    IsTrackEnabled = true
+                    OrderDate = DateTime.UtcNow,
+                    IsTrackEnabled = true,
+                    PaymentStatus = dto.PaymentStatus ?? "Pending",
+                    TransactionId = dto.TransactionId,
+                    UpiId = dto.UpiId,
+                    CardNumber = dto.CardNumber,
+                    NameOnCard = dto.NameOnCard,
+                    ExpiryDate = dto.ExpiryDate,
+                    BankName = dto.BankName
                 };
 
                 _context.OrderSuccesses.Add(order);
 
-                // 6. Deduct stock from products
+                // 6. Deduct stock from products and build order items
                 foreach (var item in cartItems)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
+                    var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == item.ProductId);
                     if (product != null)
                     {
                         product.Stock -= item.Quantity;
+                        if (product.Stock < 0) product.Stock = 0;
+
+                        mainOrder.Items.Add(new OrderItem
+                        {
+                            ProductId = product.Id,
+                            ProductName = product.ProductName,
+                            ProductCode = product.SKU ?? "UNK-000",
+                            CategoryName = product.Category?.Name ?? "General",
+                            Price = product.SellingPrice ?? product.MRP,
+                            Quantity = item.Quantity,
+                            Subtotal = item.Quantity * (product.SellingPrice ?? product.MRP)
+                        });
                     }
                 }
+                
+                _context.Orders.Add(mainOrder);
 
                 // 7. Update user coins (redeem and earn)
                 var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == userEmail || c.Phone == userEmail);
@@ -262,6 +314,16 @@ namespace ShyamAgroSuite.Api.Controllers
                 // 9. Clear user's cart
                 _context.CartItems.RemoveRange(cartItems);
 
+                await _context.SaveChangesAsync();
+
+                // Add notification
+                var notification = new Notification
+                {
+                    Title = "Checkout Completed",
+                    Message = $"New order placed: {order.OrderId}. Amount: INR {order.TotalAmount:N0} via {order.PaymentMethod}.",
+                    Type = "CheckoutCompleted"
+                };
+                _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
 
                 return Ok(new

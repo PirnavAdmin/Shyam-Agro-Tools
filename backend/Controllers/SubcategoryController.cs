@@ -68,6 +68,16 @@ namespace ShyamAgroSuite.Api.Controllers
             _context.Subcategories.Add(subcategory);
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Subcategory Created",
+                Message = $"Subcategory '{subcategory.Name}' has been created.",
+                Type = "SubcategoryCreated"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(subcategory);
         }
 

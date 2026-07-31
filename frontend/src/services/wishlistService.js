@@ -1,9 +1,10 @@
+import { getApiDomain } from "../utils/apiConfig";
 import axios from '../api/axios';
 
 export const WISHLIST_API_BASE_URL = (
   process.env.REACT_APP_WISHLIST_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 export const WISHLIST_API_URL = `${WISHLIST_API_BASE_URL}/api/Wishlist`;
 

@@ -1,10 +1,11 @@
+import { getApiDomain } from "../utils/apiConfig";
 import apiClient from '../api/axios';
 import { getToken } from '../utils/auth';
 
 const getAuthApiBaseUrl = () => {
   const configuredBaseUrl = process.env.REACT_APP_AUTH_API_BASE_URL;
   if (configuredBaseUrl) return configuredBaseUrl.replace(/\/$/, '');
-  return 'https://shyamagrotools.com';
+  return getApiDomain();
 };
 
 const getHeaders = (isFormData = false) => {

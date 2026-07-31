@@ -118,13 +118,13 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
         <div className="sidebar-brand-inner">
           <img
             src="/logo.png"
-            alt="PIRNAV"
+            alt="ADMIN"
             className="sidebar-brand-logo"
             onError={(e) => { e.target.src = '/logo.svg'; }}
           />
           {expanded && (
             <div className="sidebar-brand-info">
-              <h2 className="stroyka-brand">PIRNAV</h2>
+              <h2 className="stroyka-brand">ADMIN</h2>
               <span className="stroyka-brand-sub">Shyam Agro Tools</span>
             </div>
           )}

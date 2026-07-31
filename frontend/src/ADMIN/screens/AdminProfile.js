@@ -92,7 +92,7 @@ const AdminProfile = () => {
           </div>
           <div className="detail-item">
             <span className="detail-label"><Phone size={16} /> Mobile Number</span>
-            <span className="detail-value">+91 {user.mobile}</span>
+            <span className="detail-value">{user.mobile ? (user.mobile.startsWith('+91') ? user.mobile : `+91 ${user.mobile.replace(/^\+?91\s*/, '')}`) : 'N/A'}</span>
           </div>
           <div className="detail-item">
             <span className="detail-label"><FileText size={16} /> Employee ID</span>

@@ -241,6 +241,16 @@ namespace ShyamAgroSuite.Api.Controllers
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Category Created",
+                Message = $"Category '{category.Name}' has been created.",
+                Type = "CategoryCreated"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(category);
         }
 

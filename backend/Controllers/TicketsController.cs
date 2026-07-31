@@ -162,6 +162,16 @@ namespace ShyamAgroSuite.Api.Controllers
             _context.SupportTickets.Add(ticket);
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Ticket Created",
+                Message = $"Support ticket '{ticket.TicketId}' ({ticket.Priority}) created by '{ticket.Name}'.",
+                Type = "TicketCreated"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetById), new { id = ticket.Id }, ticket);
         }
 

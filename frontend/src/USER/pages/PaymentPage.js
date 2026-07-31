@@ -106,10 +106,13 @@ const validateManualVerification = ({ values, orderAmount, t }) => {
     errors.orderId = t('orderIdFormat');
   }
 
+
   if (!transactionId) {
-    errors.transactionId = t('transactionUtrRequired');
-  } else if (!/^[A-Za-z0-9-]{8,30}$/.test(transactionId)) {
-    errors.transactionId = t('transactionUtrFormat');
+    errors.transactionId = t('utrNumberRequired') || 'Transaction ID (UTR) is required.';
+  } else if (transactionId.length < 12 || transactionId.length > 22) {
+    errors.transactionId = t('utrNumberLength') || 'UTR length must be between 12 and 22 characters.';
+  } else if (!/^[A-Za-z0-9]+$/.test(transactionId)) {
+    errors.transactionId = t('utrNumberFormat') || 'UTR must contain only letters and numbers.';
   }
 
   if (!values.amount) {
@@ -125,11 +128,18 @@ const validateManualVerification = ({ values, orderAmount, t }) => {
   }
 
   if (!values.paymentTime) errors.paymentTime = t('paymentTimeRequired');
-  if (!values.customerName.trim()) errors.customerName = t('customerNameRequired');
+  const nameVal = values.customerName.trim();
+  const distinctLetters = new Set(nameVal.toLowerCase().replace(/[^a-z]/g, '')).size;
+  if (!nameVal) {
+    errors.customerName = t('customerNameRequired');
+  } else if (nameVal.length < 3 || nameVal.length > 50 || !/^[A-Za-z\s.'\-]{3,50}$/.test(nameVal) || /(.)\1{3,}/.test(nameVal) || distinctLetters < 2) {
+    errors.customerName = t('customerNameInvalid') || 'Customer Name must contain valid letters (3-50 characters). Dummy repeating letters are invalid.';
+  }
 
+  const dummyPhones = ['1234567890', '0123456789', '9876543210', '1234567891', '6789012345', '9999999999', '8888888888', '7777777777', '6666666666'];
   if (!mobileNumber) {
     errors.mobileNumber = t('mobileNumberRequired');
-  } else if (!/^\d{10}$/.test(mobileNumber)) {
+  } else if (!/^[6-9]\d{9}$/.test(mobileNumber) || new Set(mobileNumber).size === 1 || dummyPhones.includes(mobileNumber)) {
     errors.mobileNumber = t('mobileNumberTenDigits');
   }
 
@@ -140,8 +150,6 @@ const validateManualVerification = ({ values, orderAmount, t }) => {
     const allowedExtensions = /\.(jpe?g|png|pdf)$/i;
     if (!allowedTypes.includes(attachment.type) && !allowedExtensions.test(attachment.name)) {
       errors.attachment = t('paymentScreenshotFileType');
-    } else if (attachment.size > 5 * 1024 * 1024) {
-      errors.attachment = t('paymentScreenshotFileSize');
     }
   }
 
@@ -333,6 +341,8 @@ const ManualVerificationForm = ({
           {errors.mobileNumber && <span className="field-error-msg">{errors.mobileNumber}</span>}
         </div>
       </div>
+
+
 
       <div className="payment-form-group">
         <label>{t('uploadPaymentScreenshot')} *</label>
@@ -1278,7 +1288,52 @@ const PaymentPage = () => {
 
   const handleManualVerificationFileChange = (event) => {
     const attachment = event.target.files?.[0] || null;
-    setManualVerificationAttachment(attachment);
+    if (!attachment || !attachment.type.startsWith('image/')) {
+      setManualVerificationAttachment(attachment);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDimension = 1200;
+
+        if (width > height && width > maxDimension) {
+          height = Math.round((height * maxDimension) / width);
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = Math.round((width * maxDimension) / height);
+          height = maxDimension;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], attachment.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              setManualVerificationAttachment(compressedFile);
+            } else {
+              setManualVerificationAttachment(attachment);
+            }
+          },
+          'image/jpeg',
+          0.8
+        );
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(attachment);
   };
 
   const openCameraCapture = async () => {
@@ -1468,8 +1523,9 @@ const PaymentPage = () => {
     if (id === 'qr') return t('qrPayment');
     if (id === 'upi') return t('upi');
     if (id === 'bankTransfer') return t('bankTransfer');
-    if (id === 'debitCard') return t('debitCard');
-    if (id === 'creditCard') return t('creditCard');
+    if (id === 'cards' || id === 'debitCard') return t('debitCard') || 'Debit Card';
+    if (id === 'creditCard') return t('creditCard') || 'Credit Card';
+    if (id === 'cod') return t('cashOnDelivery') || 'Cash on Delivery';
     return t('qrPayment');
   };
   const paymentVisualMethod = (id) => {
@@ -1766,7 +1822,6 @@ const PaymentPage = () => {
                       alt={paymentMethodLabel('debitCard')}
                       loading="lazy"
                     />
-                    <div className="payment-unavailable-note">{t('cardPaymentsUnavailable')}</div>
                     <div className="payment-form-group">
                       <label>{t('cardHolderName')} *</label>
                       <input
@@ -1776,7 +1831,6 @@ const PaymentPage = () => {
                         value={paymentDetails.cardName}
                         onChange={handlePaymentDetailChange}
                         placeholder={t('enterNameOnCard')}
-                        disabled
                       />
                       {paymentErrors.cardName && <span className="field-error-msg">{paymentErrors.cardName}</span>}
                     </div>
@@ -1793,7 +1847,6 @@ const PaymentPage = () => {
                         maxLength="16"
                         inputMode="numeric"
                         autoComplete="cc-number"
-                        disabled
                       />
                       {paymentErrors.cardNumber && <span className="field-error-msg">{paymentErrors.cardNumber}</span>}
                     </div>
@@ -1806,7 +1859,6 @@ const PaymentPage = () => {
                           className="payment-input"
                           value={debitCardDetails.expiryMonth}
                           onChange={handleDebitCardDetailChange}
-                          disabled
                         >
                           <option value="">{t('month')}</option>
                           {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map((m) => (
@@ -1822,7 +1874,6 @@ const PaymentPage = () => {
                           className="payment-input"
                           value={debitCardDetails.expiryYear}
                           onChange={handleDebitCardDetailChange}
-                          disabled
                         >
                           <option value="">{t('year')}</option>
                           {Array.from({ length: 15 }, (_, i) => String(new Date().getFullYear() + i)).map((y) => (
@@ -1850,7 +1901,6 @@ const PaymentPage = () => {
                           maxLength="3"
                           inputMode="numeric"
                           autoComplete="cc-csc"
-                          disabled
                         />
                         {paymentErrors.cvv && <span className="field-error-msg">{paymentErrors.cvv}</span>}
                       </div>
@@ -1863,7 +1913,6 @@ const PaymentPage = () => {
                           name="saveCard"
                           checked={debitCardDetails.saveCard}
                           onChange={handleDebitCardDetailChange}
-                          disabled
                         />
                         <span className="payment-checkbox-label">{t('saveThisCard')}</span>
                       </label>
@@ -1872,7 +1921,6 @@ const PaymentPage = () => {
                     <button
                       type="submit"
                       className="payment-primary-btn"
-                      disabled
                     >
                       {t('pay')} {formatCurrency(grandTotal)}
                     </button>
@@ -1890,7 +1938,6 @@ const PaymentPage = () => {
                       alt={paymentMethodLabel('creditCard')}
                       loading="lazy"
                     />
-                    <div className="payment-unavailable-note">{t('cardPaymentsUnavailable')}</div>
                     <div className="payment-form-group">
                       <label>{t('cardHolderName')} *</label>
                       <input
@@ -1900,7 +1947,6 @@ const PaymentPage = () => {
                         value={paymentDetails.cardName}
                         onChange={handlePaymentDetailChange}
                         placeholder={t('enterNameOnCard')}
-                        disabled
                       />
                       {paymentErrors.cardName && <span className="field-error-msg">{paymentErrors.cardName}</span>}
                     </div>
@@ -1917,7 +1963,6 @@ const PaymentPage = () => {
                         maxLength="16"
                         inputMode="numeric"
                         autoComplete="cc-number"
-                        disabled
                       />
                       {paymentErrors.cardNumber && <span className="field-error-msg">{paymentErrors.cardNumber}</span>}
                     </div>
@@ -1934,7 +1979,6 @@ const PaymentPage = () => {
                             setPaymentDetails((current) => ({ ...current, expiryDate: year ? `${month}/${year}` : month }));
                             setPaymentErrors((current) => ({ ...current, expiryDate: '' }));
                           }}
-                          disabled
                         >
                           <option value="">{t('month')}</option>
                           {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map((m) => (
@@ -1954,7 +1998,6 @@ const PaymentPage = () => {
                             setPaymentDetails((current) => ({ ...current, expiryDate: month ? `${month}/${year}` : '' }));
                             setPaymentErrors((current) => ({ ...current, expiryDate: '' }));
                           }}
-                          disabled
                         >
                           <option value="">{t('year')}</option>
                           {Array.from({ length: 15 }, (_, i) => String(new Date().getFullYear() + i)).map((y) => (
@@ -1982,7 +2025,6 @@ const PaymentPage = () => {
                           maxLength="3"
                           inputMode="numeric"
                           autoComplete="cc-csc"
-                          disabled
                         />
                         {paymentErrors.cvv && <span className="field-error-msg">{paymentErrors.cvv}</span>}
                       </div>
@@ -1997,7 +2039,6 @@ const PaymentPage = () => {
                         value={creditCardDetails.billingAddress}
                         onChange={handleCreditCardDetailChange}
                         placeholder={t('enterBillingAddress')}
-                        disabled
                       />
                       {paymentErrors.billingAddress && <span className="field-error-msg">{paymentErrors.billingAddress}</span>}
                     </div>
@@ -2009,7 +2050,6 @@ const PaymentPage = () => {
                           name="saveCard"
                           checked={creditCardDetails.saveCard}
                           onChange={handleCreditCardDetailChange}
-                          disabled
                         />
                         <span className="payment-checkbox-label">{t('saveCard')}</span>
                       </label>
@@ -2018,7 +2058,6 @@ const PaymentPage = () => {
                     <button
                       type="submit"
                       className="payment-primary-btn"
-                      disabled
                     >
                       {t('pay')} {formatCurrency(grandTotal)}
                     </button>

@@ -3,12 +3,39 @@ import { Link } from 'react-router-dom';
 import { 
   Search, CreditCard, Check, X, Upload, Copy, Info, 
   RefreshCw, CheckCircle, AlertCircle, ArrowUpRight, Activity, Eye,
-  Bell, BellOff
+  Bell, BellOff, Clock, Calendar
 } from 'lucide-react';
 import { getOrders, updateOrderStatus } from '../api/orders';
 import { Toast } from '../components/Toast';
 import { getApiDomain } from '../../utils/apiConfig';
 import './PaymentHistory.css';
+
+const formatDateDisplay = (dateStr) => {
+  if (!dateStr || dateStr === 'TBD') return 'TBD';
+  const cleanStr = String(dateStr).trim();
+
+  // If YYYY-MM-DD format (or ISO timestamp)
+  if (/^\d{4}-\d{2}-\d{2}/.test(cleanStr)) {
+    const parts = cleanStr.slice(0, 10).split('-');
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+
+  // If DD/MM/YYYY or DD-MM-YYYY format
+  if (/^\d{2}[\/\-]\d{2}[\/\-]\d{4}/.test(cleanStr)) {
+    const parts = cleanStr.slice(0, 10).split(/[\/\-]/);
+    return `${parts[0]}-${parts[1]}-${parts[2]}`;
+  }
+
+  const parsed = new Date(cleanStr);
+  if (!isNaN(parsed.getTime())) {
+    const yyyy = parsed.getFullYear();
+    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+    const dd = String(parsed.getDate()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
+  return cleanStr.slice(0, 10);
+};
 
 const BASE_PAYMENT_URL = `${getApiDomain()}/api/Payment`;
 const HEADERS = {
@@ -143,6 +170,22 @@ const PaymentHistory = () => {
   const [smsText, setSmsText] = useState('');
   const [simulationResult, setSimulationResult] = useState(null);
 
+  // Scrollbar synchronization
+  const topScrollRef = React.useRef(null);
+  const tableScrollRef = React.useRef(null);
+
+  const handleTopScroll = () => {
+    if (topScrollRef.current && tableScrollRef.current) {
+      tableScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+    }
+  };
+
+  const handleTableScroll = () => {
+    if (topScrollRef.current && tableScrollRef.current) {
+      topScrollRef.current.scrollLeft = tableScrollRef.current.scrollLeft;
+    }
+  };
+
   // Load configured settings on component mount
   useEffect(() => {
     const savedQr = localStorage.getItem('shyam_agro_qr_code') || '';
@@ -160,11 +203,11 @@ const PaymentHistory = () => {
       }
     } else {
       setBankDetails({
-        bankName: 'State Bank of India',
-        accountNumber: '38190012934',
-        accountHolderName: 'SHYAM AGRO TOOLS PRIVATE LIMITED',
-        ifscCode: 'SBIN0000001',
-        bankBranch: 'Nagpur Main Branch'
+        bankName: '',
+        accountNumber: '',
+        accountHolderName: '',
+        ifscCode: '',
+        bankBranch: ''
       });
     }
 
@@ -328,13 +371,7 @@ const PaymentHistory = () => {
     if (!window.confirm(`Verify payment of INR ${totalAmount.toLocaleString('en-IN')} for Order #${orderId}?\n\nThis will mark the order as Processing.`)) return;
     
     try {
-      const isNumericId = /^\d+$/.test(String(realOrderId));
-      if (isNumericId) {
-        // 1. Update order status to Processing on the server
-        await updateOrderStatus(Number(realOrderId), 'Processing');
-      }
-
-      // 2. Approve manual verification record if present
+      // 1. Approve manual verification record if present (validates UTR match against bank records first)
       if (verificationRecordId) {
         const res = await fetch(`${BASE_PAYMENT_URL}/verify-manual/${verificationRecordId}/status`, {
           method: 'PUT',
@@ -346,17 +383,23 @@ const PaymentHistory = () => {
           const errData = await res.json().catch(() => ({}));
           // 422 = UTR not SMS-verified yet
           if (res.status === 422) {
-            const utr = errData.utrNumber || '';
+            const utr = errData.utrNumber || errData.UtrNumber || '';
             showBannerStatus('error',
               `⚠️ Cannot approve — UTR not matched against bank records.` +
               (utr ? ` Expected UTR: ${utr}.` : '') +
               ` Paste the bank credit SMS in the "Auto-Verification Sandbox" tab first.`
             );
           } else {
-            showBannerStatus('error', errData.message || `Server error (${res.status}).`);
+            showBannerStatus('error', errData.message || errData.Message || `Server error (${res.status}).`);
           }
-          return; // stop — do not refresh
+          return; // stop — do not update order status or refresh
         }
+      }
+
+      // 2. Update order status to Processing on the server only after successful verification approval
+      const isNumericId = /^\d+$/.test(String(realOrderId));
+      if (isNumericId) {
+        await updateOrderStatus(Number(realOrderId), 'Processing');
       }
       
       showBannerStatus('success', `Payment for Order #${orderId} verified successfully.${isNumericId ? ' Order status updated to Processing.' : ''}`);
@@ -488,128 +531,6 @@ const PaymentHistory = () => {
     showBannerStatus('success', `Copied transaction reference UTR "${text}" to clipboard.`);
   };
 
-  // Simulator SMS Preloads
-  const fillSmsTemplate = (templateType) => {
-    let text = '';
-    if (templateType === 'sbi') {
-      text = "Dear Customer, A/C X9081 has been credited with INR 14,500.00 on 07-Jul-26 by UPI Ref No 620478129034. - SBI";
-    } else if (templateType === 'hdfc') {
-      text = "Alert: Your HDFC Bank A/c X3321 has been credited with Rs 8,500.00 by Net Banking Transfer (UTR: 998811223344) on 07/07/2026.";
-    } else if (templateType === 'upi') {
-      text = "UPI: Rs 14,500.00 received from RAJESH KUMAR (Ref: 620478129034) to your bank account.";
-    }
-    setSmsText(text);
-    setSimulationResult(null);
-  };
-
-  // Parse SMS credit alerts automatically
-  const handleSimulateAutoMatch = async () => {
-    if (!smsText.trim()) {
-      setSimulationResult({ success: false, error: 'Please enter notification text to simulate.' });
-      return;
-    }
-
-    try {
-      const response = await reconcileSmsOnServer(smsText);
-      if (response && response.success) {
-        setSimulationResult({
-          success: true,
-          utr: response.parsedUtr,
-          amount: response.parsedAmount,
-          orderId: response.orderId,
-          customerName: response.customerName || 'Customer',
-          message: response.message || `Successfully matched! Order #${response.orderId} (₹${response.parsedAmount}) was automatically verified and updated to "Processing".`
-        });
-        
-
-        
-        loadOrdersList();
-      } else {
-        setSimulationResult({
-          success: false,
-          utr: response.parsedUtr,
-          amount: response.parsedAmount,
-          error: response.message || `Extracted Reference: "${response.parsedUtr}" (Amount: ₹${response.parsedAmount}), but no matching pending manual order was found.`
-        });
-      }
-    } catch (err) {
-      console.warn("Failed to reconcile SMS on server, falling back to local simulation:", err);
-      const textClean = smsText.replace(/,/g, '');
-      
-      let utr = '';
-      const utrMatch = textClean.match(/(?:ref|utr|upi ref|reference|transaction id|txn)\s*(?:no|num)?[:\-#\s]*(\w+)/i) || 
-                       textClean.match(/\b(\d{12})\b/);
-      if (utrMatch) {
-        utr = utrMatch[1];
-      }
-
-      let amount = null;
-      const amtMatch = textClean.match(/(?:inr|rs\.?|rupees|credited)\s*([\d.]+)/i) ||
-                       textClean.match(/credited\s*(?:with)?\s*(?:inr|rs\.?)?\s*([\d.]+)/i) ||
-                       textClean.match(/recvd\s*([\d.]+)/i);
-      if (amtMatch) {
-        amount = parseFloat(amtMatch[1]);
-      }
-
-      if (!utr) {
-        setSimulationResult({
-          success: false,
-          error: 'Unable to extract transaction reference code (UTR) from this alert.'
-        });
-        return;
-      }
-
-      if (!amount) {
-        setSimulationResult({
-          success: false,
-          error: `Extracted UTR (${utr}) but failed to parse transaction amount.`
-        });
-        return;
-      }
-
-      const matchedOrder = orders.find(o => {
-        if (o.paymentMethod !== 'UPI / Bank Transfer') return false;
-        const orderUtr = String(o.utr || '').trim().toLowerCase();
-        const extractedUtr = String(utr).trim().toLowerCase();
-        return orderUtr && orderUtr === extractedUtr && Math.abs(Number(o.totalAmount || o.total) - amount) < 1;
-      }) || orders.find(o => {
-        const mvMatch = manualVerifications.find(mv => {
-          const mvUtr = String(mv.utrNumber || '').trim().toLowerCase();
-          const extractedUtr = String(utr).trim().toLowerCase();
-          return mvUtr === extractedUtr && Math.abs(Number(mv.amountPaid) - amount) < 1;
-        });
-        if (mvMatch) {
-          return String(o.id || o.orderId) === String(mvMatch.orderId) || String(o.orderNumber) === String(mvMatch.orderId);
-        }
-        return false;
-      });
-
-      if (matchedOrder) {
-        const orderId = matchedOrder.id || matchedOrder.orderId;
-        try {
-          await updateOrderStatus(orderId, 'Processing');
-        } catch (serverErr) {
-          console.warn("Failed to auto-verify order status on server:", serverErr);
-        }
-        setSimulationResult({
-          success: true,
-          utr,
-          amount,
-          orderId: orderId,
-          customerName: matchedOrder.customerName || matchedOrder.customer || 'Customer',
-          message: `Successfully matched! Order #${orderId} (₹${amount}) was automatically verified and updated to "Processing".`
-        });
-        loadOrdersList();
-      } else {
-        setSimulationResult({
-          success: false,
-          utr,
-          amount,
-          error: `Extracted Reference: "${utr}" (Amount: ₹${amount}), but no matching pending manual order was found.`
-        });
-      }
-    }
-  };
 
   // Combined UPI/Bank Transfer Payments list merging manual verifications and orders
   const combinedPayments = useMemo(() => {
@@ -686,9 +607,9 @@ const PaymentHistory = () => {
     let matchesFilter = true;
     const status = p.paymentStatus;
     if (statusFilter === 'Pending') {
-      matchesFilter = status === 'Pending Verification' || status === 'Pending' || status === 'PendingVerification';
+      matchesFilter = status === 'Pending Verification' || status === 'Pending' || status === 'PendingVerification' || status === 'Processing';
     } else if (statusFilter === 'Verified') {
-      matchesFilter = status === 'Paid' || status === 'Verified' || status === 'Processing';
+      matchesFilter = status === 'Paid' || status === 'Verified' || status === 'Approved';
     } else if (statusFilter === 'Rejected') {
       matchesFilter = status === 'Rejected' || status === 'Cancelled';
     }
@@ -697,45 +618,38 @@ const PaymentHistory = () => {
   });
 
   return (
-    <div className="payment-history-container">
-      <div className="payment-header">
-        <div className="payment-header-text">
-          <h1>Payments & Verification Settings</h1>
-          <p>Configure manual checkout credentials, track customer UTR submissions, and manage transaction matching.</p>
-          <div className="payment-notif-toggle-container" style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button 
-              type="button" 
-              className={`notif-toggle-pill ${notificationsEnabled ? 'enabled' : 'disabled'}`}
-              onClick={() => handleToggleNotifications({ target: { checked: !notificationsEnabled } })}
-              title={notificationsEnabled ? "Disable Payment Notifications" : "Enable Payment Notifications"}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '4px 10px',
-                fontSize: '11px',
-                fontWeight: '600',
-                borderRadius: '20px',
-                border: '1px solid',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                background: notificationsEnabled ? '#f0fdf4' : '#f8fafc',
-                color: notificationsEnabled ? '#15803d' : '#64748b',
-                borderColor: notificationsEnabled ? '#bbf7d0' : '#cbd5e1'
-              }}
-            >
-              {notificationsEnabled ? <Bell size={12} style={{ animation: 'bounce 1s infinite' }} /> : <BellOff size={12} />}
-              <span>Alerts: {notificationsEnabled ? 'ON' : 'OFF'}</span>
-            </button>
-            <span style={{ fontSize: '11px', color: '#64748b' }}>
-              {notificationsEnabled ? 'Will notify on incoming farmer payments.' : 'Notifications muted.'}
-            </span>
+    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 max-w-6xl mx-auto mt-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-5 mb-6 gap-4">
+        <div className="flex items-center gap-3">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Payments & Verification Settings</h2>
+            <p className="text-slate-500 text-xs mt-1">Configure manual checkout credentials, track customer UTR submissions, and manage transaction matching.</p>
+            
+            <div className="flex items-center gap-2 mt-3">
+              <button 
+                type="button" 
+                onClick={() => handleToggleNotifications({ target: { checked: !notificationsEnabled } })}
+                title={notificationsEnabled ? "Disable Payment Notifications" : "Enable Payment Notifications"}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold rounded-full border transition-all ${
+                  notificationsEnabled 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                    : 'bg-slate-50 text-slate-500 border-slate-200'
+                }`}
+              >
+                {notificationsEnabled ? <Bell size={12} className="animate-pulse" /> : <BellOff size={12} />}
+                <span>Alerts: {notificationsEnabled ? 'ON' : 'OFF'}</span>
+              </button>
+              <span className="text-[11px] text-slate-500">
+                {notificationsEnabled ? 'Will notify on incoming farmer payments.' : 'Notifications muted.'}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="payment-selector-wrap">
-          <span className="payment-selector-label">Settings Module:</span>
+        
+        <div className="flex items-center gap-3 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+          <span className="text-xs font-semibold text-slate-600 pl-2">Module:</span>
           <select 
-            className="payment-dropdown"
+            className="bg-white border border-slate-200 text-slate-800 text-sm font-semibold rounded-md px-3 py-2 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 cursor-pointer min-w-[200px]"
             value={activeTab} 
             onChange={(e) => {
               setActiveTab(e.target.value);
@@ -746,7 +660,6 @@ const PaymentHistory = () => {
             <option value="qr-code">QR Code Configurations</option>
             <option value="bank-details">Bank Transfer Details</option>
             <option value="upi-id">UPI ID Configuration</option>
-            <option value="auto-simulation">Auto-Verification Sandbox</option>
           </select>
         </div>
       </div>
@@ -759,51 +672,36 @@ const PaymentHistory = () => {
         />
       )}
 
-      <div className="payment-card-body">
+      <div className="mt-4">
         {/* Module 1: Payments List */}
         {activeTab === 'payments-list' && (
           <div>
-            <div className="tab-title-section">
-              <h2>Transaction Ledger</h2>
-              <p>Verify submitted customer reference details against bank credits to process orders.</p>
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-slate-800">Transaction Ledger</h3>
+              <p className="text-sm text-slate-500 mt-1">Verify submitted customer reference details against bank credits to process orders.</p>
             </div>
 
-            <div className="payments-filter-row">
-              <div className="payments-search-box">
-                <Search size={16} />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input 
                   type="text" 
-                  className="payments-search-input"
+                  className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
                   placeholder="Search by Order ID, Customer, or UTR..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="payments-filter-actions">
-                <button 
-                  className={`filter-btn ${statusFilter === 'All' ? 'active' : ''}`}
-                  onClick={() => setStatusFilter('All')}
-                >
-                  All Payments
-                </button>
-                <button 
-                  className={`filter-btn ${statusFilter === 'Pending' ? 'active' : ''}`}
-                  onClick={() => setStatusFilter('Pending')}
-                >
-                  Processing / Pending
-                </button>
-                <button 
-                  className={`filter-btn ${statusFilter === 'Verified' ? 'active' : ''}`}
-                  onClick={() => setStatusFilter('Verified')}
-                >
-                  Verified
-                </button>
-                <button 
-                  className={`filter-btn ${statusFilter === 'Rejected' ? 'active' : ''}`}
-                  onClick={() => setStatusFilter('Rejected')}
-                >
-                  Rejected
-                </button>
+              <div className="flex bg-slate-100/50 p-1 rounded-lg border border-slate-200 overflow-x-auto">
+                {['All', 'Pending', 'Verified', 'Rejected'].map(filter => (
+                  <button 
+                    key={filter}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${statusFilter === filter ? 'bg-white text-emerald-700 shadow-sm border border-slate-200/50' : 'text-slate-600 hover:text-slate-900'}`}
+                    onClick={() => setStatusFilter(filter)}
+                  >
+                    {filter === 'Pending' ? 'Processing / Pending' : filter}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -819,8 +717,20 @@ const PaymentHistory = () => {
                 <p>No orders matched your search or selected filter options.</p>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table className="payments-table">
+              <div className="ledger-table-card">
+                <div 
+                  ref={topScrollRef} 
+                  className="top-scrollbar-bar" 
+                  onScroll={handleTopScroll}
+                >
+                  <div className="top-scrollbar-dummy" />
+                </div>
+                <div 
+                  ref={tableScrollRef} 
+                  className="bottom-table-scroll" 
+                  onScroll={handleTableScroll}
+                >
+                  <table className="payments-table">
                   <thead>
                     <tr>
                       <th>Order ID</th>
@@ -834,12 +744,14 @@ const PaymentHistory = () => {
                   </thead>
                   <tbody>
                     {filteredPayments.map(payment => {
-                      const isPending = payment.paymentStatus === 'Pending Verification' || payment.paymentStatus === 'Pending' || payment.paymentStatus === 'PendingVerification';
-                      const isVerified = payment.paymentStatus === 'Paid' || payment.paymentStatus === 'Verified' || payment.paymentStatus === 'Processing';
-                      const isRejected = payment.paymentStatus === 'Rejected' || payment.paymentStatus === 'Cancelled';
+                      const status = (payment.paymentStatus || '').toLowerCase();
+                      const isPending = status.includes('pending') || status === 'unverified' || status === 'processing';
+                      const isVerified = !isPending && (status.includes('paid') || status.includes('verif') || status.includes('success') || status.includes('approved'));
+                      const isRejected = status.includes('reject') || status.includes('cancel') || status.includes('fail');
+                      const isUnknown = !isPending && !isVerified && !isRejected;
                       
                       return (
-                        <tr key={payment.orderId + '-' + payment.utr}>
+                        <tr key={payment.verificationRecordId ? `mv-${payment.verificationRecordId}` : `ord-${payment.orderId}-${payment.utr}`}>
                           <td>
                             <Link to={`/admin/orders/details/${payment.realOrderId}`} className="order-id">
                               #{payment.orderId}
@@ -885,7 +797,12 @@ const PaymentHistory = () => {
                               )}
                             </div>
                           </td>
-                          <td>{payment.paymentDate ? payment.paymentDate.slice(0, 10) : 'TBD'}</td>
+                          <td>
+                            <div className="order-date-wrap" style={{ display: 'flex', alignItems: 'center', minHeight: '32px', fontSize: '13px', fontWeight: 500, color: '#334155', whiteSpace: 'nowrap' }}>
+                              <Calendar size={13} style={{ marginRight: '6px', color: '#94a3b8', flexShrink: 0 }} />
+                              <span>{formatDateDisplay(payment.paymentDate)}</span>
+                            </div>
+                          </td>
                           <td style={{ fontWeight: 700 }}>
                             <div>₹{(payment.totalAmount || 0).toLocaleString('en-IN')}</div>
                             {payment.amountPaid !== undefined && payment.amountPaid !== payment.totalAmount && (
@@ -898,49 +815,43 @@ const PaymentHistory = () => {
                             {isPending && (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 <span className="pay-status-badge pending"><RefreshCw size={11} className="animate-spin" /> Pending Match</span>
-                                {payment.isVerificationRecord && (
-                                  payment.smsVerified
-                                    ? <span style={{ fontSize: '10px', fontWeight: 600, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                        <CheckCircle size={10} /> UTR Matched
-                                      </span>
-                                    : <span style={{ fontSize: '10px', fontWeight: 600, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '3px' }} title={`UTR ${payment.utr} not yet verified via bank SMS`}>
-                                        <AlertCircle size={10} /> UTR Not Matched
-                                      </span>
+                                {payment.isVerificationRecord && payment.smsVerified && (
+                                  <span style={{ fontSize: '10px', fontWeight: 600, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                    <CheckCircle size={10} /> UTR Matched
+                                  </span>
                                 )}
                               </div>
                             )}
                             {isVerified && <span className="pay-status-badge verified"><CheckCircle size={11} /> Verified</span>}
                             {isRejected && <span className="pay-status-badge rejected"><X size={11} /> Rejected</span>}
+                            {isUnknown && <span className="pay-status-badge" style={{ background: '#f1f5f9', color: '#64748b' }}><Clock size={11} /> Unknown ({payment.paymentStatus || 'None'})</span>}
                           </td>
                           <td>
                             <div className="payment-actions-cell">
                               {isPending ? (
                               <>
                                   <button 
-                                    className="action-btn verify"
-                                    disabled={payment.isVerificationRecord && !payment.smsVerified}
-                                    title={
-                                      payment.isVerificationRecord && !payment.smsVerified
-                                        ? `UTR ${payment.utr || '—'} not yet matched against bank records.\nPaste the bank credit SMS in "Auto-Verification Sandbox" first.`
-                                        : 'Approve this payment'
-                                    }
-                                    style={payment.isVerificationRecord && !payment.smsVerified ? { opacity: 0.45, cursor: 'not-allowed' } : {}}
+                                    className="pay-ledger-btn verify"
+                                    title="Approve this payment"
                                     onClick={() => {
-                                      if (payment.isVerificationRecord && !payment.smsVerified) return;
                                       handleVerifyPayment(payment.orderId, payment.totalAmount || payment.amountPaid || 0, payment.realOrderId, payment.verificationRecordId);
                                     }}
                                   >
                                     <Check size={13} /> Verify Success
                                   </button>
                                   <button 
-                                    className="action-btn reject"
+                                    className="pay-ledger-btn reject"
                                     onClick={() => handleRejectPayment(payment.orderId, payment.realOrderId, payment.verificationRecordId)}
                                   >
                                     <X size={13} /> Reject
                                   </button>
                                 </>
+                              ) : isRejected ? (
+                                <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>Rejected</span>
+                              ) : isVerified ? (
+                                <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>Completed</span>
                               ) : (
-                                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Processed</span>
+                                <span style={{ fontSize: '11px', color: '#94a3b8' }}>-</span>
                               )}
                             </div>
                           </td>
@@ -950,64 +861,68 @@ const PaymentHistory = () => {
                   </tbody>
                 </table>
               </div>
-            )}
+            </div>
+          )}
           </div>
         )}
 
         {/* Module 2: QR Code Settings */}
         {activeTab === 'qr-code' && (
-          <div>
-            <div className="tab-title-section">
-              <h2>QR Code Configurations</h2>
-              <p>Upload a QR code for user phase checkout payments. Customers scan this QR to pay during checkout.</p>
+          <div className="max-w-4xl">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-slate-800">QR Code Configurations</h3>
+              <p className="text-sm text-slate-500 mt-1">Upload a QR code for user phase checkout payments. Customers scan this QR to pay during checkout.</p>
             </div>
 
-            <form onSubmit={saveQrSettings} className="qr-settings-grid">
-              <div className="qr-preview-card">
-                <div className="qr-preview-box">
+            <form onSubmit={saveQrSettings} className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8 items-start">
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 flex flex-col items-center text-center">
+                <div className="w-48 h-48 bg-white border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center overflow-hidden mb-4 relative">
                   {qrPreview ? (
-                    <img src={qrPreview} alt="Payment QR Code Preview" />
+                    <img src={qrPreview} alt="Payment QR Code Preview" className="w-full h-full object-contain" />
                   ) : (
-                    <div className="qr-placeholder-text">
-                      <CreditCard size={32} style={{ marginBottom: '8px', color: '#cbd5e1' }} />
-                      No QR Code Uploaded
+                    <div className="flex flex-col items-center text-slate-400">
+                      <CreditCard size={32} className="mb-2" />
+                      <span className="text-xs font-medium">No QR Code</span>
                     </div>
                   )}
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>User Phase QR Preview</span>
+                <span className="text-xs font-semibold text-slate-600">User Phase QR Preview</span>
               </div>
 
-              <div className="qr-upload-instructions">
-                <div className="form-group-item">
-                  <label>Select QR Image File</label>
-                  <label className="file-upload-trigger">
-                    <Upload size={20} />
-                    <strong>Choose Image File...</strong>
-                    <span style={{ display: 'block', fontSize: '11px', color: '#64748b', marginTop: '4px' }}>PNG, JPG, JPEG, SVG up to 2MB</span>
+              <div className="flex flex-col gap-5">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Select QR Image File</label>
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload size={24} className="text-slate-400 mb-2" />
+                      <p className="text-sm font-medium text-slate-600">Click to upload image</p>
+                      <p className="text-xs text-slate-500 mt-1">PNG, JPG, JPEG, SVG up to 2MB</p>
+                    </div>
                     <input 
                       type="file" 
                       accept="image/*" 
-                      style={{ display: 'none' }}
+                      className="hidden"
                       onChange={handleQrUpload} 
                     />
                   </label>
                 </div>
                 
-                <div className="form-group-item">
-                  <label>Or Paste QR Image URL</label>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Or Paste QR Image URL</label>
                   <input 
                     type="url"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                     placeholder="https://example.com/payment-qr.png"
                     value={qrPreview && qrPreview.startsWith('http') ? qrPreview : ''}
                     onChange={(e) => setQrPreview(e.target.value)}
                   />
                 </div>
 
-                <div style={{ marginTop: '12px' }}>
-                  <button type="submit" className="form-submit-btn">
+                <div className="pt-2">
+                  <button type="submit" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
                     <Check size={16} /> Update QR Code
                   </button>
-                  <p style={{ fontSize: '11px', color: '#64748b', marginTop: '6px' }}>
+                  <p className="text-[11px] text-slate-500 mt-2">
                     Note: QR Code settings will be stored in your browser session for client-side override.
                   </p>
                 </div>
@@ -1018,38 +933,39 @@ const PaymentHistory = () => {
 
         {/* Module 3: Bank Details Settings */}
         {activeTab === 'bank-details' && (
-          <div>
-            <div className="tab-title-section">
-              <h2>Bank Transfer Credentials</h2>
-              <p>Edit bank account details displayed to farmers/dealers who choose direct bank wire transfers.</p>
+          <div className="max-w-2xl">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-slate-800">Bank Transfer Credentials</h3>
+              <p className="text-sm text-slate-500 mt-1">Edit bank account details displayed to farmers/dealers who choose direct bank wire transfers.</p>
             </div>
 
-            <form onSubmit={saveBankSettings} className="settings-form-layout">
-              <div className="form-group-item">
-                <label>IFSC Code *</label>
+            <form onSubmit={saveBankSettings} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">IFSC Code *</label>
                 <input 
                   type="text" 
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm uppercase focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                   placeholder="e.g. SBIN0000001"
                   required
                   maxLength={11}
-                  style={{ textTransform: 'uppercase' }}
                   value={bankDetails.ifscCode}
                   onChange={(e) => setBankDetails({ ...bankDetails, ifscCode: e.target.value.toUpperCase() })}
                 />
                 {ifscStatus.message && (
-                  <div className={`input-helper-status ${ifscStatus.type}`}>
-                    {ifscStatus.type === 'loading' && <RefreshCw size={11} className="animate-spin" />}
-                    {ifscStatus.type === 'success' && <CheckCircle size={11} />}
-                    {ifscStatus.type === 'error' && <AlertCircle size={11} />}
+                  <div className={`flex items-center gap-1.5 mt-2 text-xs font-medium ${ifscStatus.type === 'error' ? 'text-rose-600' : ifscStatus.type === 'success' ? 'text-emerald-600' : 'text-slate-500'}`}>
+                    {ifscStatus.type === 'loading' && <RefreshCw size={12} className="animate-spin" />}
+                    {ifscStatus.type === 'success' && <CheckCircle size={12} />}
+                    {ifscStatus.type === 'error' && <AlertCircle size={12} />}
                     <span>{ifscStatus.message}</span>
                   </div>
                 )}
               </div>
 
-              <div className="form-group-item">
-                <label>Bank Name *</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bank Name *</label>
                 <input 
                   type="text" 
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                   placeholder="e.g. State Bank of India"
                   required
                   value={bankDetails.bankName}
@@ -1057,10 +973,11 @@ const PaymentHistory = () => {
                 />
               </div>
 
-              <div className="form-group-item">
-                <label>Bank Branch *</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bank Branch *</label>
                 <input 
                   type="text" 
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                   placeholder="e.g. Nagpur Main Branch"
                   required
                   value={bankDetails.bankBranch}
@@ -1068,10 +985,11 @@ const PaymentHistory = () => {
                 />
               </div>
 
-              <div className="form-group-item">
-                <label>Account Number *</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Account Number *</label>
                 <input 
                   type="text" 
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                   placeholder="e.g. 38190012934"
                   required
                   value={bankDetails.accountNumber}
@@ -1079,10 +997,11 @@ const PaymentHistory = () => {
                 />
               </div>
 
-              <div className="form-group-item">
-                <label>Account Holder Name *</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Account Holder Name *</label>
                 <input 
                   type="text" 
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                   placeholder="e.g. SHYAM AGRO TOOLS PRIVATE LIMITED"
                   required
                   value={bankDetails.accountHolderName}
@@ -1090,11 +1009,11 @@ const PaymentHistory = () => {
                 />
               </div>
 
-              <div>
-                <button type="submit" className="form-submit-btn">
+              <div className="pt-2">
+                <button type="submit" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
                   <Check size={16} /> Save Bank details
                 </button>
-                <p style={{ fontSize: '11px', color: '#64748b', marginTop: '6px' }}>
+                <p className="text-[11px] text-slate-500 mt-2">
                   Note: Bank details are initialized from the server on load, and saved to your browser session for client-side override.
                 </p>
               </div>
@@ -1104,145 +1023,38 @@ const PaymentHistory = () => {
 
         {/* Module 4: UPI ID Settings */}
         {activeTab === 'upi-id' && (
-          <div>
-            <div className="tab-title-section">
-              <h2>UPI ID Settings</h2>
-              <p>Configure the merchant UPI handle shown to customers on the checkout payments screen.</p>
+          <div className="max-w-2xl">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-slate-800">UPI ID Settings</h3>
+              <p className="text-sm text-slate-500 mt-1">Configure the merchant UPI handle shown to customers on the checkout payments screen.</p>
             </div>
 
-            <form onSubmit={saveUpiSettings} className="settings-form-layout">
-              <div className="form-group-item">
-                <label>Business UPI ID / VPA *</label>
+            <form onSubmit={saveUpiSettings} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Business UPI ID / VPA *</label>
                 <input 
                   type="text" 
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
                   placeholder="e.g. shyamagro@ybl"
                   required
                   value={upiId}
                   onChange={(e) => setUpiId(e.target.value)}
                 />
-                <div className="input-helper-status">
-                  <Info size={11} />
+                <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500">
+                  <Info size={12} />
                   <span>Payments made to this VPA will appear in your linked business bank account.</span>
                 </div>
               </div>
 
-              <div>
-                <button type="submit" className="form-submit-btn">
+              <div className="pt-2">
+                <button type="submit" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
                   <Check size={16} /> Update UPI ID
                 </button>
-                <p style={{ fontSize: '11px', color: '#64748b', marginTop: '6px' }}>
+                <p className="text-[11px] text-slate-500 mt-2">
                   Note: Merchant UPI VPA is initialized from the server on load, and saved to your browser session for client-side override.
                 </p>
               </div>
             </form>
-          </div>
-        )}
-
-        {/* Module 5: Auto-Verification Simulator */}
-        {activeTab === 'auto-simulation' && (
-          <div>
-            <div className="tab-title-section">
-              <h2>Auto-Verification Sandbox</h2>
-              <p>Simulate how incoming bank notification logs or SMS alerts are matched and verified automatically without payment gateways.</p>
-            </div>
-
-            <div className="simulator-layout">
-              <div className="simulator-guide-card">
-                <h3><Info size={16} /> Automation Architecture Guide</h3>
-                <ol className="simulation-step-list">
-                  <li>
-                    <strong>Reference Collection:</strong> Customer executes the manual UPI/Bank credit to your QR/VPA and inputs the 12-digit transaction ID (UTR) in the Checkout screen, creating a pending order with status <em>"Pending Verification"</em>.
-                  </li>
-                  <li>
-                    <strong>Alert Interception:</strong> Bank alerts (SMS/emails) containing transaction numbers are captured. In production, you run an email parser (IMAP/Gmail API) or SMS gateway webhook listening for alerts.
-                  </li>
-                  <li>
-                    <strong>Notification Scraper:</strong> Regex scrapers extract the amount credited and the UTR code from the notification text payload.
-                  </li>
-                  <li>
-                    <strong>Automatic Reconciliation:</strong> The matching worker queries the database for pending orders where <code>utr === alert_utr</code> and <code>total === alert_amount</code>.
-                  </li>
-                  <li>
-                    <strong>Status Transition:</strong> If reconciled, the system instantly sets payment status to <code>Paid</code> and order status to <code>Processing</code>.
-                  </li>
-                </ol>
-              </div>
-
-              <div className="simulator-interactive-card">
-                <h3><Activity size={16} /> Live Simulation Sandbox</h3>
-                
-                <div style={{ marginBottom: '12px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>
-                    1. Select Credit SMS Notification Template:
-                  </span>
-                  <div className="sms-template-container">
-                    <button type="button" className="sms-template-btn" onClick={() => fillSmsTemplate('sbi')}>
-                      [SBI UPI] Rajesh Kumar (ORD10214) - ₹14,500
-                    </button>
-                    <button type="button" className="sms-template-btn" onClick={() => fillSmsTemplate('hdfc')}>
-                      [HDFC IMPS] Amit Patel (ORD10215) - ₹8,500
-                    </button>
-                    <button type="button" className="sms-template-btn" onClick={() => fillSmsTemplate('upi')}>
-                      [UPI Generic] Rajesh Kumar (ORD10214) - ₹14,500
-                    </button>
-                  </div>
-                </div>
-
-                <div className="form-group-item">
-                  <label>2. Customize SMS Notification Payload:</label>
-                  <textarea 
-                    className="simulation-sms-textarea"
-                    placeholder="Enter/edit SMS alert received from the bank..."
-                    value={smsText}
-                    onChange={(e) => {
-                      setSmsText(e.target.value);
-                      setSimulationResult(null);
-                    }}
-                  />
-                </div>
-
-                <button 
-                  type="button" 
-                  className="form-submit-btn" 
-                  style={{ background: '#0284c7' }}
-                  onClick={handleSimulateAutoMatch}
-                >
-                  <ArrowUpRight size={16} /> Parse & Reconcile Transaction
-                </button>
-
-                {simulationResult && (
-                  <div className="simulator-results-panel">
-                    <div className={`simulator-result-alert ${simulationResult.success ? 'success' : 'error'}`}>
-                      {simulationResult.success ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
-                      <span>{simulationResult.success ? simulationResult.message : simulationResult.error}</span>
-                    </div>
-
-                    {(simulationResult.utr || simulationResult.amount) && (
-                      <div>
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#475569' }}>Scraped Alert Elements:</span>
-                        <div className="extracted-badge-row">
-                          {simulationResult.utr && (
-                            <span className="extracted-badge-item">
-                              UTR: <strong>{simulationResult.utr}</strong>
-                            </span>
-                          )}
-                          {simulationResult.amount && (
-                            <span className="extracted-badge-item">
-                              Amount: <strong>₹{simulationResult.amount.toLocaleString('en-IN')}</strong>
-                            </span>
-                          )}
-                          {simulationResult.success && (
-                            <span className="extracted-badge-item" style={{ background: '#f0fdf4', color: '#166534', borderColor: '#bbf7d0' }}>
-                              Auto-Approved Order: <strong>#{simulationResult.orderId}</strong>
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         )}
       </div>

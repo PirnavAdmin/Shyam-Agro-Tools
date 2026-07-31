@@ -47,6 +47,17 @@ const unwrapList = (data) => {
 };
 
 
+const formatPhoneNumber = (phone) => {
+  if (!phone) return '';
+  const digits = String(phone).replace(/\D/g, '');
+  if (!digits) return String(phone);
+  if (digits.length >= 10) {
+    const main10 = digits.slice(-10);
+    return `+91 ${main10}`;
+  }
+  return `+91 ${digits}`;
+};
+
 const StaffList = () => {
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -292,7 +303,7 @@ const StaffList = () => {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#475569' }}><Mail size={12} /> {staff.email}</span>
                         {staff.mobile && (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#475569' }}><Phone size={12} /> +91 {staff.mobile}</span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#475569' }}><Phone size={12} /> {formatPhoneNumber(staff.mobile)}</span>
                         )}
                       </div>
                     </td>

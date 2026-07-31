@@ -1154,10 +1154,6 @@ img.app-line-thumb,
   pointer-events: none;
 }
 
-.visible {
-  visibility: visible;
-}
-
 .invisible {
   visibility: hidden;
 }
@@ -1647,12 +1643,20 @@ img.app-line-thumb,
   height: 0.875rem;
 }
 
+.h-32 {
+  height: 8rem;
+}
+
 .h-4 {
   height: 1rem;
 }
 
 .h-44 {
   height: 11rem;
+}
+
+.h-48 {
+  height: 12rem;
 }
 
 .h-7 {
@@ -1795,6 +1799,10 @@ img.app-line-thumb,
   width: 1rem;
 }
 
+.w-48 {
+  width: 12rem;
+}
+
 .w-52 {
   width: 13rem;
 }
@@ -1886,6 +1894,10 @@ img.app-line-thumb,
 
 .max-w-5xl {
   max-width: 64rem;
+}
+
+.max-w-6xl {
+  max-width: 72rem;
 }
 
 .max-w-\[1440px\] {
@@ -2521,8 +2533,17 @@ img.app-line-thumb,
   border-color: rgb(226 232 240 / var(--tw-border-opacity));
 }
 
+.border-slate-200\/50 {
+  border-color: rgb(226 232 240 / 0.5);
+}
+
 .border-slate-200\/60 {
   border-color: rgb(226 232 240 / 0.6);
+}
+
+.border-slate-300 {
+  --tw-border-opacity: 1;
+  border-color: rgb(203 213 225 / var(--tw-border-opacity));
 }
 
 .border-transparent {
@@ -2782,6 +2803,10 @@ img.app-line-thumb,
 .bg-slate-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
+
+.bg-slate-100\/50 {
+  background-color: rgb(241 245 249 / 0.5);
 }
 
 .bg-slate-200 {
@@ -3143,12 +3168,20 @@ img.app-line-thumb,
   padding-bottom: 1.25rem;
 }
 
+.pb-6 {
+  padding-bottom: 1.5rem;
+}
+
 .pl-0 {
   padding-left: 0px;
 }
 
 .pl-10 {
   padding-left: 2.5rem;
+}
+
+.pl-2 {
+  padding-left: 0.5rem;
 }
 
 .pl-4 {
@@ -3193,6 +3226,10 @@ img.app-line-thumb,
 
 .pt-4 {
   padding-top: 1rem;
+}
+
+.pt-5 {
+  padding-top: 1.25rem;
 }
 
 .pt-6 {
@@ -5260,6 +5297,11 @@ section + .brand-slider-section {
   color: rgb(71 85 105 / var(--tw-text-opacity));
 }
 
+.hover\:text-slate-900:hover {
+  --tw-text-opacity: 1;
+  color: rgb(15 23 42 / var(--tw-text-opacity));
+}
+
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -5643,6 +5685,10 @@ section + .brand-slider-section {
 
   .md\:grid-cols-\[1fr_120px_260px\] {
     grid-template-columns: 1fr 120px 260px;
+  }
+
+  .md\:grid-cols-\[240px_1fr\] {
+    grid-template-columns: 240px 1fr;
   }
 
   .md\:grid-cols-\[minmax\(0\2c 1fr\)_105px_130px_105px\] {

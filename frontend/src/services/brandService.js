@@ -1,10 +1,11 @@
+import { getApiDomain } from "../utils/apiConfig";
 import axios from '../api/axios';
 import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const BRAND_API_BASE_URL = (
   process.env.REACT_APP_BRAND_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 const BRAND_ENDPOINT = `${BRAND_API_BASE_URL}/api/Brand`;
 const CATALOG_BRANDS_ENDPOINT = `${BRAND_API_BASE_URL}/api/Catalog/brands`;

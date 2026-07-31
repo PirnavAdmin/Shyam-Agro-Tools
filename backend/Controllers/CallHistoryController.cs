@@ -103,11 +103,26 @@ namespace ShyamAgroSuite.Api.Controllers
             });
         }
 
+        private static bool IsValidCustomerName(string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return false;
+            var trimmed = name.Trim();
+            if (trimmed.Length < 2 || trimmed.Length > 50) return false;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[\p{L}\s.'\-]{2,50}$")) return false;
+            if (!trimmed.Any(char.IsLetter)) return false;
+            return true;
+        }
+
         // POST: api/CallHistory
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CallLogCreateRequest request)
         {
-            if (string.IsNullOrEmpty(request.CustomerName) || string.IsNullOrEmpty(request.CustomerPhone))
+            if (string.IsNullOrWhiteSpace(request.CustomerName) || !IsValidCustomerName(request.CustomerName))
+            {
+                return BadRequest(new { Message = "Invalid Customer Name. Name must contain only letters, spaces, dots, hyphens, or apostrophes (2-50 characters)." });
+            }
+
+            if (string.IsNullOrEmpty(request.CustomerPhone))
             {
                 return BadRequest(new { Message = "Customer Name and Customer Phone are required." });
             }
@@ -135,6 +150,16 @@ namespace ShyamAgroSuite.Api.Controllers
             _context.CallLogs.Add(log);
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Call Log Added",
+                Message = $"Call log created for '{log.CustomerName}' by {log.CalledByRep}.",
+                Type = "CallLogAdded"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(new
             {
                 Message = "Call log created successfully.",
@@ -148,6 +173,11 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CallLogUpdateRequest request)
         {
+            if (!string.IsNullOrWhiteSpace(request.CustomerName) && !IsValidCustomerName(request.CustomerName))
+            {
+                return BadRequest(new { Message = "Invalid Customer Name. Name must contain only letters, spaces, dots, hyphens, or apostrophes (2-50 characters)." });
+            }
+
             var log = await _context.CallLogs.FindAsync(id);
             if (log == null)
             {

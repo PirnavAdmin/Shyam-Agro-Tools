@@ -1,11 +1,9 @@
 import axios from '../api/axios';
 import { normalizeAssetUrl } from '../utils/assetUrl';
 
-export const CATEGORY_API_BASE_URL = (
-  process.env.REACT_APP_CATEGORY_API_BASE_URL ||
-  process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
-).replace(/\/$/, '');
+import { getApiDomain } from '../utils/apiConfig';
+
+export const CATEGORY_API_BASE_URL = getApiDomain();
 export const DEFAULT_CATEGORY_IMAGE = '/hero_banner.png';
 const CATEGORY_ENDPOINT = `${CATEGORY_API_BASE_URL}/api/Category`;
 const requestConfig = {

@@ -357,6 +357,16 @@ namespace ShyamAgroSuite.Api.Controllers
             order.OrderStatus = "Placed";
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "Payment Success",
+                Message = $"Payment completed successfully for Order #{order.OrderId}. Transaction ID: {order.TransactionId}.",
+                Type = "PaymentSuccess"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(new
             {
                 Success = true,
@@ -695,20 +705,14 @@ namespace ShyamAgroSuite.Api.Controllers
                 mappedStatus = "Rejected";
             }
 
-            // ── UTR Validation Gate ──────────────────────────────────────────────
-            // Approval is only permitted after the UTR has been confirmed via a
-            // real bank SMS through the ReconcileSms endpoint. Direct force-approve
-            // without SMS verification is blocked to prevent fraudulent approvals.
+            // UTR Validation Gate: Verification should only succeed if UTR matches bank records (SmsVerified)
             if (mappedStatus == "Approved" && !verification.SmsVerified)
             {
                 return UnprocessableEntity(new
                 {
                     Success = false,
-                    Message = "Cannot approve: UTR not verified against bank records. " +
-                              "Please paste the bank credit SMS in the Auto-Verification Sandbox first. " +
-                              $"Expected UTR: {verification.UtrNumber}",
-                    UtrNumber = verification.UtrNumber,
-                    RequiresSmsPaste = true
+                    Message = "Cannot approve payment — UTR has not been matched against bank records. Please reconcile SMS in Auto-Verification Sandbox first.",
+                    UtrNumber = verification.UtrNumber
                 });
             }
 
@@ -742,6 +746,17 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            // Add notification
+            var notification = new Notification
+            {
+                Title = $"Payment {mappedStatus}",
+                Message = $"Manual payment for Order #{verification.OrderId} has been {mappedStatus}.",
+                Type = mappedStatus == "Approved" ? "PaymentApproved" : "PaymentRejected"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(new { Success = true, Message = $"Verification status successfully updated to {mappedStatus}.", Data = verification });
         }
 
@@ -781,13 +796,17 @@ namespace ShyamAgroSuite.Api.Controllers
             if (string.IsNullOrEmpty(request.OrderId))
                 return BadRequest(new { Success = false, Message = "OrderId is required." });
             if (string.IsNullOrEmpty(request.UtrNumber))
-                return BadRequest(new { Success = false, Message = "Transaction / UTR Number is required." });
-
-            bool utrExists = await _context.ManualPayments.AnyAsync(m => m.UtrNumber == request.UtrNumber);
-            if (utrExists)
             {
-                return BadRequest(new { Success = false, Message = "This Transaction / UTR Number has already been submitted." });
+                return BadRequest(new { Success = false, Message = "UTR / Transaction Number is required." });
             }
+
+            string cleanUtr = request.UtrNumber.Trim();
+            if (cleanUtr.Length < 12 || cleanUtr.Length > 22)
+            {
+                return BadRequest(new { Success = false, Message = "Invalid UTR length. UTR Number must be between 12 and 22 characters (exceeding 22 or below 12 is rejected)." });
+            }
+
+            request.UtrNumber = cleanUtr;
 
             if (request.AmountPaid <= 0)
                 return BadRequest(new { Success = false, Message = "Amount Paid must be greater than zero." });
@@ -795,8 +814,8 @@ namespace ShyamAgroSuite.Api.Controllers
                 return BadRequest(new { Success = false, Message = "Payment Date is required." });
             if (string.IsNullOrEmpty(request.PaymentTime))
                 return BadRequest(new { Success = false, Message = "Payment Time is required." });
-            if (string.IsNullOrEmpty(request.CustomerName))
-                return BadRequest(new { Success = false, Message = "Customer Name is required." });
+            if (string.IsNullOrEmpty(request.CustomerName) || !IsValidCustomerName(request.CustomerName))
+                return BadRequest(new { Success = false, Message = "Invalid Customer Name. Name must contain only letters, spaces, dots, hyphens, or apostrophes (2-50 characters)." });
             if (string.IsNullOrEmpty(request.MobileNumber))
                 return BadRequest(new { Success = false, Message = "Mobile Number is required." });
 
@@ -863,6 +882,16 @@ namespace ShyamAgroSuite.Api.Controllers
 
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Manual Payment Submitted",
+                Message = $"Manual payment verification submitted for Order #{request.OrderId}. Amount: INR {request.AmountPaid:N0}. UTR: {request.UtrNumber}.",
+                Type = "PaymentSubmitted"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(new
             {
                 Success = true,
@@ -887,9 +916,9 @@ namespace ShyamAgroSuite.Api.Controllers
 
             string sms = request.SmsPayload;
 
-            // 1. Parse UTR (look for 10-30 digit sequence)
+            // 1. Parse UTR (look for 12-22 character sequence)
             string parsedUtr = "";
-            var utrMatch = System.Text.RegularExpressions.Regex.Match(sms, @"\b([0-9]{10,30})\b");
+            var utrMatch = System.Text.RegularExpressions.Regex.Match(sms, @"\b([0-9A-Za-z]{12,22})\b");
             if (utrMatch.Success)
             {
                 parsedUtr = utrMatch.Groups[1].Value;
@@ -1013,6 +1042,16 @@ namespace ShyamAgroSuite.Api.Controllers
                 OrderId = match.OrderId,
                 CustomerName = match.CustomerName
             });
+        }
+
+        private static bool IsValidCustomerName(string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return false;
+            var trimmed = name.Trim();
+            if (trimmed.Length < 2 || trimmed.Length > 50) return false;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[\p{L}\s.'\-]{2,50}$")) return false;
+            if (!trimmed.Any(char.IsLetter)) return false;
+            return true;
         }
     }
 }

@@ -19,9 +19,9 @@
   width: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: 0;
+  opacity: 1;
   transform: scale(1.035);
-  transition: opacity 560ms ease, transform 1200ms ease;
+  transition: transform 1200ms ease;
 }
 
 .category-banner-live__video {
@@ -30,7 +30,6 @@
 
 .category-banner-live__image.is-loaded,
 .category-banner-live__video.is-loaded {
-  opacity: 1;
   transform: scale(1);
 }
 

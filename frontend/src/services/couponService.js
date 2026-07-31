@@ -1,10 +1,11 @@
+import { getApiDomain } from "../utils/apiConfig";
 import apiClient from '../api/axios';
 import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const COUPON_API_BASE_URL = (
   process.env.REACT_APP_COUPON_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 
 const requestConfig = {

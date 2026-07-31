@@ -141,7 +141,7 @@ const SubcategoriesList = () => {
         <div className="catalog-title-wrap">
           <span className="catalog-kicker">Catalog Management</span>
           <h1 style={{ fontSize: '20px', fontWeight: '800' }}>Subcategories</h1>
-          <p style={{ fontSize: '13px', margin: '4px 0 0' }}>Manage subcategories SIT under categories.</p>
+          <p style={{ fontSize: '13px', margin: '4px 0 0' }}>Manage subcategories that sit under categories.</p>
         </div>
 
         <div className="catalog-header__actions">
@@ -189,7 +189,7 @@ const SubcategoriesList = () => {
             <thead>
               <tr style={{ background: '#f8fafc' }}>
                 <th style={{ padding: '10px 16px' }}>ID</th>
-                <th style={{ padding: '10px 16px' }}>Sub Category Name</th>
+                <th style={{ padding: '10px 16px' }}>Subcategory Name</th>
                 <th style={{ padding: '10px 16px' }}>Slug</th>
                 <th style={{ padding: '10px 16px' }}>Description</th>
                 <th style={{ padding: '10px 16px' }}>Status</th>

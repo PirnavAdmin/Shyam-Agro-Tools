@@ -1,10 +1,11 @@
+import { getApiDomain } from "../utils/apiConfig";
 import axios from '../api/axios';
 import { normalizeAssetUrl } from '../utils/assetUrl';
 
 export const BLOG_API_BASE_URL = (
   process.env.REACT_APP_BLOG_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 
 const BLOG_ENDPOINT = `${BLOG_API_BASE_URL}/api/Blog`;

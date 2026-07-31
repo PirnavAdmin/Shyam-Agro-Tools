@@ -155,7 +155,7 @@ const SubcategoryForm = () => {
             <ArrowLeft size={14} /> Subcategories List
           </Link>
           <button type="button" className="catalog-btn catalog-btn--primary" onClick={handleSave} disabled={isSaving} style={{ padding: '6px 12px', fontSize: '13px' }}>
-            <Plus size={14} /> {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Subcategory' : 'Save & Add Product')}
+            <Plus size={14} /> {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Subcategory' : 'Save Subcategory')}
           </button>
         </div>
       </section>

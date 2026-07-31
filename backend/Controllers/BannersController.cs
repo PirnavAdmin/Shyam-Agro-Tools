@@ -90,6 +90,16 @@ namespace ShyamAgroSuite.Api.Controllers
                 _context.Banners.Add(banner);
                 await _context.SaveChangesAsync();
 
+                // Add notification
+                var notification = new Notification
+                {
+                    Title = "New Banner Created",
+                    Message = $"Banner '{banner.Title}' ({banner.BannerType}) has been created.",
+                    Type = "BannerCreated"
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
                 return CreatedAtAction(nameof(GetById), new { id = banner.Id }, banner);
             }
             catch (Exception ex)

@@ -6,7 +6,17 @@ import {
   Info, 
   CheckCircle2,
   Trash2,
-  Loader2
+  Loader2,
+  CreditCard,
+  MessageSquare,
+  PlusCircle,
+  UserPlus,
+  PhoneCall,
+  Package,
+  BookOpen,
+  Tag,
+  Truck,
+  UserCheck
 } from 'lucide-react';
 import { 
   getNotifications, 
@@ -60,7 +70,67 @@ const NotificationsDropdown = () => {
         icon: <AlertTriangle size={15} className="text-amber-600" />
       };
     }
-    if (t.includes('success') || t.includes('order') || t.includes('placed') || t.includes('added') || t.includes('register')) {
+    if (t.includes('payment') || t.includes('checkout')) {
+      return {
+        className: 'info',
+        icon: <CreditCard size={15} className="text-indigo-600" />
+      };
+    }
+    if (t.includes('review') || t.includes('testimonial') || t.includes('ticket')) {
+      return {
+        className: 'info',
+        icon: <MessageSquare size={15} className="text-pink-600" />
+      };
+    }
+    if (t.includes('customer') || t.includes('register')) {
+      return {
+        className: 'success',
+        icon: <UserPlus size={15} className="text-emerald-600" />
+      };
+    }
+    if (t.includes('call')) {
+      return {
+        className: 'info',
+        icon: <PhoneCall size={15} className="text-teal-600" />
+      };
+    }
+    if (t.includes('product')) {
+      return {
+        className: 'success',
+        icon: <Package size={15} className="text-emerald-600" />
+      };
+    }
+    if (t.includes('blog')) {
+      return {
+        className: 'info',
+        icon: <BookOpen size={15} className="text-blue-600" />
+      };
+    }
+    if (t.includes('brand') || t.includes('coupon')) {
+      return {
+        className: 'success',
+        icon: <Tag size={15} className="text-emerald-600" />
+      };
+    }
+    if (t.includes('supplier')) {
+      return {
+        className: 'success',
+        icon: <Truck size={15} className="text-emerald-600" />
+      };
+    }
+    if (t.includes('staff')) {
+      return {
+        className: 'success',
+        icon: <UserCheck size={15} className="text-emerald-600" />
+      };
+    }
+    if (t.includes('category') || t.includes('subcategory') || t.includes('banner')) {
+      return {
+        className: 'success',
+        icon: <PlusCircle size={15} className="text-emerald-600" />
+      };
+    }
+    if (t.includes('success') || t.includes('order') || t.includes('placed') || t.includes('added')) {
       return {
         className: 'success',
         icon: <ShoppingBag size={15} className="text-emerald-600" />

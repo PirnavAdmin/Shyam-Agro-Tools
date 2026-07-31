@@ -1,3 +1,4 @@
+import { getApiDomain } from "../utils/apiConfig";
 import apiClient from '../api/axios';
 import { getAuthSession } from '../utils/auth';
 
@@ -14,7 +15,7 @@ const getUserWalletKey = () => {
 export const WALLET_API_BASE_URL = (
   process.env.REACT_APP_WALLET_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 
 const requestConfig = {

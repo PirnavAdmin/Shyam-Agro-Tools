@@ -133,40 +133,73 @@ export const getOrderShipping = async (id) => {
   return await response.json();
 };
 
-// POST /api/Orders/shipping/{id}/pack — mark order as packed (expects URL encoded form-data)
+// Helper to append image (Base64 data URL, File, or URL string) to FormData
+const appendImageToFormData = (formData, fieldName, fileFieldName, photoValue, defaultFileName) => {
+  if (!photoValue) return;
+  if (typeof photoValue === 'string' && photoValue.startsWith('data:')) {
+    try {
+      const arr = photoValue.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8arr], { type: mime });
+      formData.append(fileFieldName, blob, defaultFileName);
+    } catch (e) {
+      formData.append(fieldName, photoValue);
+    }
+  } else if (typeof photoValue === 'object' && photoValue instanceof File) {
+    formData.append(fileFieldName, photoValue, photoValue.name);
+  } else {
+    formData.append(fieldName, photoValue);
+  }
+};
+
+// POST /api/Orders/shipping/{id}/pack — mark order as packed
 export const packOrder = async (id, payload) => {
-  const body = toUrlEncoded({
-    packerName: payload.packerName,
-    packerPhotoUrl: payload.packerPhotoUrl || payload.packerImage || ''
-  });
+  const formData = new FormData();
+  formData.append('packerName', payload.packerName || '');
+  appendImageToFormData(formData, 'packerPhotoUrl', 'packerPhoto', payload.packerPhotoUrl || payload.packerImage, `packer_${id}.png`);
+
+  const token = localStorage.getItem('adminToken');
+  const headers = { 'ngrok-skip-browser-warning': 'true' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(`${BASE_URL}/shipping/${id}/pack`, {
     method: 'POST',
-    headers: {
-      ...DEFAULT_HEADERS,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body
+    headers,
+    body: formData
   });
-  if (!response.ok) throw new Error(`Failed to pack order ${id} (${response.status})`);
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '');
+    throw new Error(errText || `Failed to pack order ${id} (${response.status})`);
+  }
   return await response.json();
 };
 
-// POST /api/Orders/shipping/{id}/dispatch — mark order as dispatched (expects URL encoded form-data)
+// POST /api/Orders/shipping/{id}/dispatch — mark order as dispatched
 export const dispatchOrder = async (id, payload) => {
-  const body = toUrlEncoded({
-    shipperName: payload.shipperName || '',
-    packagePhotoUrl: payload.packagePhotoUrl || payload.packageImage || '',
-    carrierName: payload.carrierName || payload.logistics || '',
-    trackingNumber: payload.trackingNumber || payload.trackingNo || ''
-  });
+  const formData = new FormData();
+  formData.append('shipperName', payload.shipperName || '');
+  formData.append('carrierName', payload.carrierName || payload.logistics || '');
+  formData.append('trackingNumber', payload.trackingNumber || payload.trackingNo || '');
+  appendImageToFormData(formData, 'packagePhotoUrl', 'packagePhoto', payload.packagePhotoUrl || payload.packageImage, `package_${id}.png`);
+
+  const token = localStorage.getItem('adminToken');
+  const headers = { 'ngrok-skip-browser-warning': 'true' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(`${BASE_URL}/shipping/${id}/dispatch`, {
     method: 'POST',
-    headers: {
-      ...DEFAULT_HEADERS,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body
+    headers,
+    body: formData
   });
-  if (!response.ok) throw new Error(`Failed to dispatch order ${id} (${response.status})`);
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '');
+    throw new Error(errText || `Failed to dispatch order ${id} (${response.status})`);
+  }
   return await response.json();
 };

@@ -410,6 +410,27 @@ using (var scope = app.Services.CreateScope())
             cmd.ExecuteNonQuery();
         }
 
+        // 3.8.1 Seed default active banners if Banners table is empty
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "SELECT COUNT(*) FROM `Banners`;";
+            var count = Convert.ToInt32(cmd.ExecuteScalar());
+            if (count == 0)
+            {
+                using (var insertCmd = conn.CreateCommand())
+                {
+                    insertCmd.CommandText = @"
+                        INSERT INTO `Banners` (`Title`, `Subtitle`, `ImageUrl`, `TargetUrl`, `BannerType`, `IsActive`, `DisplayOrder`, `CreatedAt`) VALUES
+                        ('Advanced Agriculture Tools', 'High Precision Farm Machinery & Spraying Equipment', 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80', '/categories', 'Hero', 1, 1, NOW()),
+                        ('Modern Power Sprayers & Pumps', 'Heavy Duty Motorized & Battery Operated Sprayers', 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1600&q=80', '/categories', 'Hero', 1, 2, NOW()),
+                        ('Special Discount on Garden Tools', 'Up to 30% Off on Premium Pruning & Shovel Tools', 'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=1600&q=80', '/categories', 'Promo', 1, 1, NOW()),
+                        ('Organic Fertilizers & Soil Care', 'Boost Crop Yield Naturally with Organic Soil Boosters', 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1600&q=80', '/categories', 'Promo', 1, 2, NOW()),
+                        ('Trusted by 50,000+ Indian Farmers', '100% Genuine Quality Guarantee & Doorstep Delivery', 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80', '/categories', 'Trust', 1, 1, NOW());";
+                    insertCmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         // 3.9 Ensure extra columns exist in Coupons table
         var existingCouponCols = new List<string>();
         using (var cmd = conn.CreateCommand())

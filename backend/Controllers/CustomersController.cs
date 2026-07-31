@@ -40,7 +40,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 query = query.Where(c => c.Status == status);
             }
 
-            var customers = await query.ToListAsync();
+            var customers = await query.OrderByDescending(c => c.Id).ToListAsync();
             return Ok(customers);
         }
 
@@ -63,13 +63,82 @@ namespace ShyamAgroSuite.Api.Controllers
             return Ok(customer);
         }
 
+        private static bool IsValidCustomerName(string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return false;
+            var trimmed = name.Trim();
+            if (trimmed.Length < 3 || trimmed.Length > 50) return false;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[\p{L}\s.'\-]{3,50}$")) return false;
+            if (trimmed.Where(char.IsLetter).Select(char.ToLower).Distinct().Count() < 2) return false;
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(.)\1{3,}")) return false;
+            return true;
+        }
+
+        private static bool IsValidPhone(string? phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return false;
+            var trimmed = phone.Trim();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[6-9]\d{9}$")) return false;
+            if (trimmed.Distinct().Count() == 1) return false;
+            string[] invalidPhones = new string[] {
+                "1234567890", "0123456789", "9876543210", "1234567891",
+                "6789012345", "9876543211", "9999999999", "8888888888", "7777777777", "6666666666"
+            };
+            if (invalidPhones.Contains(trimmed)) return false;
+            return true;
+        }
+
+        private static bool IsValidAddress(string? address)
+        {
+            if (string.IsNullOrWhiteSpace(address)) return true; // optional
+            var trimmed = address.Trim();
+            if (trimmed.Length < 5 || trimmed.Length > 200) return false;
+            if (!trimmed.Any(char.IsLetter)) return false;
+            if (trimmed.Distinct().Count() < 3) return false;
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(.)\1{3,}")) return false;
+            if (trimmed.Length > 8 && !trimmed.Any(c => char.IsWhiteSpace(c) || c == ',' || c == '-' || c == '/' || c == '.')) return false;
+            var lettersOnly = new string(trimmed.Where(char.IsLetter).ToArray());
+            if (System.Text.RegularExpressions.Regex.IsMatch(lettersOnly, @"[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{5,}")) return false;
+            return true;
+        }
+
+        private static bool IsValidDistrictOrState(string? location)
+        {
+            if (string.IsNullOrWhiteSpace(location)) return true; // optional
+            var trimmed = location.Trim();
+            if (trimmed.Length < 2 || trimmed.Length > 50) return false;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[\p{L}\s.'\-]{2,50}$")) return false;
+            if (trimmed.Where(char.IsLetter).Select(char.ToLower).Distinct().Count() < 2) return false;
+            return true;
+        }
+
         // POST: api/Customers
         [HttpPost]
         public async Task<ActionResult<Customer>> Create([FromBody] Customer customer)
         {
-            if (string.IsNullOrEmpty(customer.Name) || string.IsNullOrEmpty(customer.Phone))
+            if (string.IsNullOrWhiteSpace(customer.Name) || !IsValidCustomerName(customer.Name))
             {
-                return BadRequest(new { Message = "Name and Phone number are required." });
+                return BadRequest(new { Message = "Invalid Customer Name. Must contain valid letters (3-50 characters), no dummy repeating characters like 'vvvvvv'." });
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.Phone) || !IsValidPhone(customer.Phone))
+            {
+                return BadRequest(new { Message = "Invalid Phone Number. Must be a valid 10-digit mobile number starting with 6, 7, 8, or 9." });
+            }
+
+            if (!IsValidAddress(customer.Address))
+            {
+                return BadRequest(new { Message = "Invalid Address. Street address must be at least 5 characters long and cannot be random gibberish." });
+            }
+
+            if (!IsValidDistrictOrState(customer.District))
+            {
+                return BadRequest(new { Message = "Invalid District name." });
+            }
+
+            if (!IsValidDistrictOrState(customer.State))
+            {
+                return BadRequest(new { Message = "Invalid State name." });
             }
 
             // Register user if not already exists for this phone
@@ -97,6 +166,16 @@ namespace ShyamAgroSuite.Api.Controllers
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Customer Registered",
+                Message = $"Customer '{customer.Name}' ({customer.Phone}) has registered.",
+                Type = "CustomerRegistered"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
         }
 
@@ -104,6 +183,31 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Customer updateData)
         {
+            if (string.IsNullOrWhiteSpace(updateData.Name) || !IsValidCustomerName(updateData.Name))
+            {
+                return BadRequest(new { Message = "Invalid Customer Name. Must contain valid letters (3-50 characters), no dummy repeating characters like 'vvvvvv'." });
+            }
+
+            if (string.IsNullOrWhiteSpace(updateData.Phone) || !IsValidPhone(updateData.Phone))
+            {
+                return BadRequest(new { Message = "Invalid Phone Number. Must be a valid 10-digit mobile number starting with 6, 7, 8, or 9." });
+            }
+
+            if (!IsValidAddress(updateData.Address))
+            {
+                return BadRequest(new { Message = "Invalid Address. Street address must be at least 5 characters long and cannot be random gibberish." });
+            }
+
+            if (!IsValidDistrictOrState(updateData.District))
+            {
+                return BadRequest(new { Message = "Invalid District name." });
+            }
+
+            if (!IsValidDistrictOrState(updateData.State))
+            {
+                return BadRequest(new { Message = "Invalid State name." });
+            }
+
             var customer = await _context.Customers
                 .Include(c => c.AgrarianProfile)
                 .FirstOrDefaultAsync(c => c.Id == id);

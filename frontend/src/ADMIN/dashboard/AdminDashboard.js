@@ -703,7 +703,7 @@ const AdminDashboard = () => {
 
             <div className="traffic-list">
               {categorySeriesData.slice(0, 5).map((category, idx) => {
-                const percentage = metrics.productsCount > 0 ? ((category.value / metrics.productsCount) * 100).toFixed(1) : '0.0';
+                const percentage = metrics.productsCount > 0 ? Math.round((category.value / metrics.productsCount) * 100) : 0;
                 return (
                   <div className="traffic-row" key={idx}>
                     <div className="traffic-source">

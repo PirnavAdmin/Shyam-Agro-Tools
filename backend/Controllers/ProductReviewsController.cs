@@ -56,6 +56,16 @@ namespace ShyamAgroSuite.Api.Controllers
             RecalculateRatings(product, reviews);
             await _context.SaveChangesAsync();
 
+            // Add notification
+            var notification = new Notification
+            {
+                Title = "New Product Review",
+                Message = $"Review submitted for product '{product.ProductName}' with rating {review.Rating}.",
+                Type = "ProductReviewAdded"
+            };
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return Ok(new { message = "Review added successfully" });
         }
 

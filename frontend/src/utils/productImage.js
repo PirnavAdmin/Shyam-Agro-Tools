@@ -1,10 +1,11 @@
+import { getApiDomain } from "./apiConfig";
 import { normalizeAssetUrl } from './assetUrl';
 
 export const PRODUCT_ASSET_BASE_URL = (
   process.env.REACT_APP_PRODUCT_ASSET_BASE_URL ||
   process.env.REACT_APP_PRODUCT_API_BASE_URL ||
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
+  getApiDomain()
 ).replace(/\/$/, '');
 export const PRODUCT_IMAGE_FALLBACK = '/hero_banner.png';
 

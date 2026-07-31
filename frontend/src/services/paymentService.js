@@ -1,10 +1,7 @@
 import axios from '../api/axios';
+import { getApiDomain } from '../utils/apiConfig';
 
-export const PAYMENT_API_BASE_URL = (
-  process.env.REACT_APP_PAYMENT_API_BASE_URL ||
-  process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
-  'https://shyamagrotools.com'
-).replace(/\/$/, '');
+export const PAYMENT_API_BASE_URL = getApiDomain();
 
 const paymentRequestConfig = {
   timeout: 30000,
@@ -245,6 +242,9 @@ export const submitManualPaymentVerification = async ({
       throw new Error('The verification request timed out. Please try again.');
     }
     if (!error.response && error.message === 'Network Error') {
+      if (screenshot && screenshot.size > 1024 * 1024) {
+        throw new Error('The selected image is too large. The payment server restricts uploads to 1MB. Please compress your screenshot and try again.');
+      }
       throw new Error('Unable to reach the payment server. Check your connection and try again.');
     }
     const message = getPaymentErrorMessage(error);

@@ -160,6 +160,16 @@ namespace ShyamAgroSuite.Api.Controllers
                 _context.Testimonials.Add(testimonial);
                 await _context.SaveChangesAsync();
 
+                // Add notification
+                var notification = new Notification
+                {
+                    Title = "New Testimonial Added",
+                    Message = $"New testimonial submitted by '{testimonial.Name}' ({testimonial.Role}).",
+                    Type = "TestimonialAdded"
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
                 return CreatedAtAction(nameof(GetById), new { id = testimonial.Id }, testimonial);
             }
             catch (Exception ex)

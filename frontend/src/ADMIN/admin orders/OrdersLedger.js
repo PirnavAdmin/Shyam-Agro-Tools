@@ -23,7 +23,12 @@ import { getApiDomain } from '../../utils/apiConfig';
 import { Pagination } from '../components/ActionButtons';
 import './adminOrders.css';
 
-export const formatCurrency = (amount) => `INR ${Number(amount || 0).toLocaleString('en-IN')}`;
+export const formatCurrency = (amount) => {
+  if (amount === null || amount === undefined) return 'INR 0';
+  if (typeof amount === 'string' && amount.trim().startsWith('INR')) return amount;
+  const num = typeof amount === 'number' ? amount : parseFloat(String(amount || 0).replace(/[^0-9.]/g, ''));
+  return `INR ${(isNaN(num) ? 0 : num).toLocaleString('en-IN')}`;
+};
 
 export const statusMeta = {
   Completed: { icon: CheckCircle2, className: 'status-pill completed' },
@@ -168,6 +173,10 @@ const normaliseOrder = (o) => {
     email: o.customerEmail || o.email || (o.customerDetails?.email) || '',
     date: o.dateBooked ? o.dateBooked.slice(0, 10) : (o.orderDate ? o.orderDate.slice(0, 10) : (o.date ? o.date.slice(0, 10) : '')),
     deliveryDate: o.deliveryDate ? o.deliveryDate.slice(0, 10) : (o.expectedDelivery || 'TBD'),
+    subtotal: parseAmount(o.totalAmount || 0),
+    shippingFee: parseAmount(o.shippingFee || 0),
+    gstAmount: parseAmount(o.gstAmount || 0),
+    discountAmount: parseAmount(o.discountAmount || 0),
     total: totalVal,
     paid: o.paidAmount !== undefined ? parseAmount(o.paidAmount) : (o.paymentStatus === 'Paid' ? totalVal : 0),
     status: statusMapped,
@@ -180,14 +189,14 @@ const normaliseOrder = (o) => {
     billingAddress: o.billingAddress || o.shippingAddress || '',
     notes: o.notes || o.adminNotes || '',
     // Packer / Shipper Details added
-    isPacked: !!(o.packerName && o.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()),
-    packerName: (o.packerName && o.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") ? o.packerName : '',
+    isPacked: !!(o.packerName && o.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()) || !!(o.carrierName || o.trackingNumber),
+    packerName: (o.packerName && o.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") ? o.packerName : (!!(o.carrierName || o.trackingNumber) || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()) ? 'Warehouse Team' : ''),
     packerImage: o.packerPhotoUrl || o.packerImage || '',
-    packedDate: o.packedDate || (o.packerName ? 'Verified' : ''),
+    packedDate: o.packedDate || (o.packerName || !!(o.carrierName || o.trackingNumber) || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()) ? 'Verified' : ''),
     isShipped: !!(o.carrierName || o.trackingNumber) || ['DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()),
-    shipperName: o.shipperName || o.carrierName || '',
+    shipperName: o.shipperName || o.carrierName || 'Warehouse Team',
     packageImage: o.packagePhotoUrl || o.packageImage || '',
-    shippedDate: o.shippedDate || (o.carrierName ? 'Verified' : ''),
+    shippedDate: o.shippedDate || (o.carrierName || o.trackingNumber ? 'Verified' : ''),
     items: Array.isArray(o.items) ? o.items.map(i => ({
       sku: i.sku || i.productCode || '',
       name: i.name || i.productName || '',
@@ -362,6 +371,7 @@ const OrdersLedger = () => {
               normalized.customerType = custInfo.role || 'Farmer';
               normalized.phone = custInfo.phone || normalized.phone;
               normalized.email = custInfo.email || normalized.email;
+              normalized.shippingAddress = custInfo.address || normalized.shippingAddress;
             }
             return normalized;
           });
@@ -628,7 +638,15 @@ const OrdersLedger = () => {
                     onClick={async () => {
                       try {
                         const fullOrder = await getOrder(order.id);
-                        setSelectedOrder(normaliseOrder(fullOrder));
+                        const norm = normaliseOrder(fullOrder);
+                        norm.customer = order.customer;
+                        norm.customerType = order.customerType;
+                        norm.phone = order.phone;
+                        norm.email = order.email;
+                        norm.shippingAddress = order.shippingAddress;
+                        norm.logistics = order.logistics || norm.logistics;
+                        norm.trackingNo = order.trackingNo || norm.trackingNo;
+                        setSelectedOrder(norm);
                       } catch (err) {
                         alert(`Failed to load order details: ${err.message}`);
                       }
@@ -853,6 +871,28 @@ const OrdersLedger = () => {
                   </div>
                 )}
                 <div className="detail-info-row">
+                  <span className="detail-info-label">Subtotal:</span>
+                  <span className="detail-info-value">{formatCurrency(selectedOrder.subtotal)}</span>
+                </div>
+                {selectedOrder.shippingFee > 0 && (
+                  <div className="detail-info-row">
+                    <span className="detail-info-label">Shipping Fee:</span>
+                    <span className="detail-info-value">{formatCurrency(selectedOrder.shippingFee)}</span>
+                  </div>
+                )}
+                {selectedOrder.gstAmount > 0 && (
+                  <div className="detail-info-row">
+                    <span className="detail-info-label">GST:</span>
+                    <span className="detail-info-value">{formatCurrency(selectedOrder.gstAmount)}</span>
+                  </div>
+                )}
+                {selectedOrder.discountAmount > 0 && (
+                  <div className="detail-info-row">
+                    <span className="detail-info-label">Discount:</span>
+                    <span className="detail-info-value" style={{ color: '#ef4444' }}>-{formatCurrency(selectedOrder.discountAmount)}</span>
+                  </div>
+                )}
+                <div className="detail-info-row">
                   <span className="detail-info-label">Total Amount:</span>
                   <span className="detail-info-value" style={{ color: '#059669', fontWeight: 700 }}>{formatCurrency(selectedOrder.total)}</span>
                 </div>
@@ -894,7 +934,9 @@ const OrdersLedger = () => {
                         <span className="timeline-title">Packed / Prepared</span>
                         {selectedOrder.isPacked ? (
                           <>
-                            <span className="timeline-time">Packed on {selectedOrder.packedDate} by {selectedOrder.packerName}</span>
+                            <span className="timeline-time">
+                              {selectedOrder.packedDate === 'Verified' ? 'Automatically Verified' : `Packed on ${selectedOrder.packedDate}`} by {selectedOrder.packerName}
+                            </span>
                           </>
                         ) : (
                           <span className="timeline-time">Pending Packaging</span>
@@ -907,7 +949,9 @@ const OrdersLedger = () => {
                         <span className="timeline-title">Dispatched / Shipped</span>
                         {selectedOrder.isShipped ? (
                           <>
-                            <span className="timeline-time">Shipped on {selectedOrder.shippedDate} via {selectedOrder.logistics || 'Delhivery'} by {selectedOrder.shipperName}</span>
+                            <span className="timeline-time">
+                              {selectedOrder.shippedDate === 'Verified' ? 'Automatically Verified' : `Shipped on ${selectedOrder.shippedDate}`} via {selectedOrder.logistics || 'Courier'} {selectedOrder.shipperName !== (selectedOrder.logistics || 'Courier') ? `by ${selectedOrder.shipperName}` : ''}
+                            </span>
                           </>
                         ) : (
                           <span className="timeline-time">Pending Shipment Dispatch</span>

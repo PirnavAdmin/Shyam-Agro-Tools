@@ -281,6 +281,12 @@ namespace ShyamAgroSuite.Api.Controllers
                     PaymentMethod = displayPaymentMethod,
                     TotalAmount = $"INR {o.FinalAmount:N0}",
                     Fulfillment = displayFulfillment,
+                    ShippingAddress = o.ShippingAddress,
+                    TrackingNumber = o.TrackingNumber,
+                    CarrierName = o.CarrierName,
+                    PackerName = o.PackerName,
+                    PackerPhotoUrl = o.PackerPhotoUrl,
+                    PackagePhotoUrl = o.PackagePhotoUrl,
                     Items = o.Items
                 };
             }).ToList();
@@ -357,6 +363,7 @@ namespace ShyamAgroSuite.Api.Controllers
         {
             var query = _context.Orders
                 .Include(o => o.Customer)
+                .Include(o => o.Items)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -369,14 +376,18 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             var orders = await query.OrderByDescending(o => o.OrderDate).ToListAsync();
-            var formatted = orders.Select(o => new
-            {
-                o.Id,
-                OrderNumber = o.OrderNumber.StartsWith("#") ? o.OrderNumber : $"#{o.OrderNumber}",
-                CustomerName = o.Customer?.Name ?? "Walk-in Customer",
-                CustomerPhone = o.Customer?.Phone ?? "",
-                FinalAmount = o.FinalAmount,
-                Status = o.Status.ToUpper()
+            var formatted = orders.Select(o => {
+                decimal effective = o.FinalAmount > 0 ? o.FinalAmount : (o.TotalAmount > 0 ? o.TotalAmount : (o.Items != null && o.Items.Any() ? o.Items.Sum(i => i.Subtotal) : 0));
+                return new
+                {
+                    o.Id,
+                    OrderNumber = o.OrderNumber.StartsWith("#") ? o.OrderNumber : $"#{o.OrderNumber}",
+                    CustomerName = o.Customer?.Name ?? "Walk-in Customer",
+                    CustomerPhone = o.Customer?.Phone ?? "",
+                    FinalAmount = effective,
+                    TotalAmount = $"INR {effective:N0}",
+                    Status = o.Status.ToUpper()
+                };
             }).ToList();
 
             return Ok(formatted);
@@ -522,6 +533,8 @@ namespace ShyamAgroSuite.Api.Controllers
                     OrderNumber = o.OrderNumber.StartsWith("#") ? o.OrderNumber : $"#{o.OrderNumber}",
                     CustomerName = o.Customer?.Name ?? "Unknown",
                     ItemsCount = $"{o.Items?.Count ?? 0} items",
+                    FinalAmount = o.FinalAmount,
+                    TotalAmount = $"INR {o.FinalAmount:N0}",
                     Status = displayStatus
                 };
             }).ToList();
@@ -635,6 +648,10 @@ namespace ShyamAgroSuite.Api.Controllers
             {
                 order.PackagePhotoUrl = photoUrl;
             }
+            else if (!string.IsNullOrEmpty(request.PackagePhotoUrl))
+            {
+                order.PackagePhotoUrl = request.PackagePhotoUrl;
+            }
 
             // Save timeline log
             var log = new OrderTrackingLog
@@ -687,9 +704,11 @@ namespace ShyamAgroSuite.Api.Controllers
 
         public class DispatchOrderRequest
         {
+            public string ShipperName { get; set; } = string.Empty;
             public string CarrierName { get; set; } = string.Empty;
             public string TrackingNumber { get; set; } = string.Empty;
             public IFormFile? PackagePhoto { get; set; }
+            public string? PackagePhotoUrl { get; set; }
         }
 
         // POST: api/Orders
