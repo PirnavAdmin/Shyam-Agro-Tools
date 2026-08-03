@@ -421,15 +421,20 @@
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  z-index: 1050;
+  z-index: 9999999;
   animation: fadeInBackdrop 0.2s ease-out;
+  padding: 95px 20px 30px 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 @keyframes fadeInBackdrop {
@@ -439,15 +444,17 @@
 
 .ticket-modal-content {
   background: white;
-  width: 90vw;
-  max-width: 1100px;
-  height: 85vh;
+  width: 100%;
+  max-width: 980px;
+  max-height: calc(100vh - 130px);
   border-radius: 20px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  position: relative;
+  margin: 0 auto;
 }
 
 @keyframes slideUp {
@@ -456,36 +463,42 @@
 }
 
 .modal-header {
-  padding: 20px 24px;
+  padding: 20px 28px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8fafc;
+  background: #ffffff;
+  flex-shrink: 0;
+  min-height: 70px;
 }
 
 .modal-title-area {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .modal-header-icon {
   color: var(--primary-color);
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .modal-title-area h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: #0f172a;
+  line-height: 1.2;
 }
 
 .modal-subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 2px;
+  display: block;
 }
 
 .modal-close-btn {

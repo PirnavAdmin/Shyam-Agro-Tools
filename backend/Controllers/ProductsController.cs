@@ -24,16 +24,17 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // GET: api/products
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var products = _context.Products
+            var products = await _context.Products
+                .AsNoTracking()
                 .Include(x => x.Category)
                 .Include(x => x.Subcategory)
                 .Include(x => x.Images)
                 .Include(x => x.Videos)
                 .Include(x => x.Features)
                 .Include(x => x.Reviews)
-                .ToList();
+                .ToListAsync();
 
             return Ok(products);
         }
@@ -220,12 +221,12 @@ namespace ShyamAgroSuite.Api.Controllers
             if (reviewsList.Count > 0)
             {
                 totalReviews = reviewsList.Count;
-                averageRating = Math.Round((decimal)reviewsList.Average(r => r.Rating), 2);
-                fiveStar = reviewsList.Count(r => r.Rating == 5);
-                fourStar = reviewsList.Count(r => r.Rating == 4);
-                threeStar = reviewsList.Count(r => r.Rating == 3);
-                twoStar = reviewsList.Count(r => r.Rating == 2);
-                oneStar = reviewsList.Count(r => r.Rating == 1);
+                averageRating = Math.Round(reviewsList.Average(r => r.Rating), 2);
+                fiveStar = reviewsList.Count(r => Math.Round(r.Rating) >= 5);
+                fourStar = reviewsList.Count(r => Math.Round(r.Rating) == 4);
+                threeStar = reviewsList.Count(r => Math.Round(r.Rating) == 3);
+                twoStar = reviewsList.Count(r => Math.Round(r.Rating) == 2);
+                oneStar = reviewsList.Count(r => Math.Round(r.Rating) <= 1);
             }
 
             var product = new Product
@@ -445,12 +446,12 @@ namespace ShyamAgroSuite.Api.Controllers
             if (product.Reviews.Count > 0)
             {
                 totalReviews = product.Reviews.Count;
-                averageRating = Math.Round((decimal)product.Reviews.Average(r => r.Rating), 2);
-                fiveStar = product.Reviews.Count(r => r.Rating == 5);
-                fourStar = product.Reviews.Count(r => r.Rating == 4);
-                threeStar = product.Reviews.Count(r => r.Rating == 3);
-                twoStar = product.Reviews.Count(r => r.Rating == 2);
-                oneStar = product.Reviews.Count(r => r.Rating == 1);
+                averageRating = Math.Round(product.Reviews.Average(r => r.Rating), 2);
+                fiveStar = product.Reviews.Count(r => Math.Round(r.Rating) >= 5);
+                fourStar = product.Reviews.Count(r => Math.Round(r.Rating) == 4);
+                threeStar = product.Reviews.Count(r => Math.Round(r.Rating) == 3);
+                twoStar = product.Reviews.Count(r => Math.Round(r.Rating) == 2);
+                oneStar = product.Reviews.Count(r => Math.Round(r.Rating) <= 1);
             }
 
             product.ProductName = dto.ProductName;

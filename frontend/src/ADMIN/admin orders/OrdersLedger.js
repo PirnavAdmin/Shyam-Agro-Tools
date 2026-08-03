@@ -16,7 +16,8 @@ import {
   User,
   ShieldCheck,
   DollarSign,
-  Printer
+  Printer,
+  Trash2
 } from 'lucide-react';
 import { getOrders, getOrder } from '../api/orders';
 import { getApiDomain } from '../../utils/apiConfig';
@@ -213,88 +214,397 @@ const normaliseOrder = (o) => {
   };
 };
 
+const formatDateToDMyLong = (dateStr) => {
+  if (!dateStr) return '';
+  const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+  const parts = cleanDate.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const day = parts[2];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${day}-${months[monthIndex]}-${year}`;
+  }
+  return dateStr;
+};
+
 const printInvoice = (order) => {
   const printWindow = window.open('', '_blank');
-  const itemsHtml = order.items.map(item => `
-    <tr>
-      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: left;">${item.name}<br/><small>${item.sku}</small></td>
-      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.qty}</td>
-      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
-      <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">₹${(item.price * item.qty).toLocaleString('en-IN')}</td>
-    </tr>
-  `).join('');
+  
+  const gstRate = order.gstAmount > 0 && order.subtotal > 0 
+    ? (order.gstAmount / (order.subtotal - (order.discountAmount || 0))) 
+    : 0.18;
+    
+  const itemsHtml = (order.items || []).map((item, idx) => {
+    const unitPrice = item.price;
+    const itemTax = unitPrice * gstRate * item.qty;
+    const itemTotal = (unitPrice * item.qty) + itemTax;
+    
+    return `
+      <tr>
+        <td style="text-align: center; font-weight: 600;">${idx + 1}</td>
+        <td>
+          <div style="font-weight: 700; color: #0f172a;">${item.name}</div>
+          <div style="font-size: 11px; color: #64748b;">SKU: ${item.sku}</div>
+        </td>
+        <td style="text-align: center;">${item.qty}</td>
+        <td style="text-align: right;">₹${unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td style="text-align: right;">₹${itemTax.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td style="text-align: right; font-weight: 700; color: #0f172a;">₹${itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const cgst = (order.gstAmount / 2);
+  const sgst = (order.gstAmount / 2);
 
   printWindow.document.write(`
+    <!DOCTYPE html>
     <html>
       <head>
-        <title>Invoice - ${order.invoiceNo}</title>
+        <title>Tax Invoice - ${order.invoiceNo}</title>
         <style>
-          body { font-family: 'Poppins', sans-serif; margin: 40px; color: #333; }
-          .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; }
-          .header { display: flex; justify-content: space-between; border-bottom: 2px solid #10b981; padding-bottom: 20px; margin-bottom: 30px; }
-          .logo { font-size: 24px; font-weight: bold; color: #10b981; }
-          .details { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 13px; line-height: 1.6; }
-          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-          th { background: #f8fafc; text-align: left; padding: 10px; font-weight: bold; border-bottom: 2px solid #ddd; }
-          .totals { text-align: right; font-size: 14px; line-height: 1.8; }
-          .footer { margin-top: 50px; text-align: center; font-size: 11px; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+            background: #ffffff;
+            color: #0f172a;
+            padding: 20px;
+            line-height: 1.5;
+          }
+          .invoice-container { 
+            max-width: 820px; 
+            margin: auto; 
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 32px;
+          }
+          
+          /* Header */
+          .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0f172a;
+            margin-bottom: 20px;
+          }
+          .company-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #065f46;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+          }
+          .company-subtitle {
+            font-size: 11px;
+            font-weight: 700;
+            color: #047857;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+          }
+          .company-meta {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 6px;
+            line-height: 1.5;
+          }
+          .badge-tax-invoice {
+            text-align: right;
+          }
+          .tax-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 1px;
+          }
+          .tax-subtitle {
+            display: inline-block;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 20px;
+            margin-top: 4px;
+            text-transform: uppercase;
+          }
+          
+          /* Metadata Grid */
+          .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+          }
+          .info-block {
+            font-size: 12px;
+          }
+          .info-block-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+          }
+          .info-row {
+            display: flex;
+            margin-bottom: 4px;
+          }
+          .info-label {
+            width: 110px;
+            color: #64748b;
+            font-weight: 500;
+          }
+          .info-val {
+            font-weight: 700;
+            color: #0f172a;
+          }
+          
+          /* Addresses Grid */
+          .address-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+          }
+          .address-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+          }
+          .address-card-title {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #047857;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+          }
+          .address-card p {
+            font-size: 12px;
+            color: #334155;
+            line-height: 1.5;
+          }
+
+          /* Table */
+          table.item-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          table.item-table th {
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 8px 10px;
+            letter-spacing: 0.5px;
+          }
+          table.item-table td {
+            padding: 10px;
+            font-size: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+          }
+          table.item-table tr:nth-child(even) {
+            background: #f8fafc;
+          }
+
+          /* Summary & Financials */
+          .summary-flex {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+          }
+          .bank-box {
+            flex: 1;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 11px;
+          }
+          .bank-box-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: #166534;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+          }
+          .bank-row {
+            display: flex;
+            margin-bottom: 3px;
+          }
+          .bank-label {
+            width: 90px;
+            color: #15803d;
+            font-weight: 600;
+          }
+          .bank-val {
+            font-weight: 700;
+            color: #166534;
+          }
+          .financial-totals {
+            width: 320px;
+            font-size: 12px;
+          }
+          .total-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+          }
+          .grand-total-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+            padding: 8px 0;
+            border-top: 2px solid #0f172a;
+            border-bottom: 2px solid #0f172a;
+            margin-top: 4px;
+          }
+
+          /* Footer */
+          .invoice-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 11px;
+            color: #64748b;
+          }
+          .signatory-box {
+            text-align: center;
+            width: 180px;
+          }
+          .signatory-line {
+            height: 35px;
+            border-bottom: 1px dashed #94a3b8;
+            margin-bottom: 4px;
+          }
         </style>
       </head>
       <body>
-        <div class="invoice-box">
-          <div class="header">
+        <div class="invoice-container">
+          <!-- Header -->
+          <div class="invoice-header">
             <div>
-              <div class="logo">SHYAM AGRO TOOLS</div>
-              <div style="font-size: 12px; color: #666; margin-top: 4px;">Premium Farming Tools & Machinery</div>
-            </div>
-            <div style="text-align: right;">
-              <h2 style="margin: 0; color: #333;">INVOICE</h2>
-              <div style="font-size: 13px; margin-top: 6px;">
-                <strong>Invoice:</strong> ${order.invoiceNo}<br/>
-                <strong>Date:</strong> ${order.date}
+              <div class="company-title">Shyam Agro Tools</div>
+              <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
+              <div class="company-meta">
+                Plot 42, GIDC Estate, Rajkot, Gujarat - 360002<br/>
+                GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 98765 43210<br/>
+                Email: sales@shyamagro.com | Web: www.shyamagrotools.com
               </div>
             </div>
-          </div>
-          
-          <div class="details">
-            <div>
-              <strong>Billed To:</strong><br/>
-              ${order.customer}<br/>
-              Phone: ${order.phone}<br/>
-              ${order.email ? `Email: ${order.email}<br/>` : ''}
-              Address: ${order.shippingAddress || 'N/A'}
-            </div>
-            <div style="text-align: right;">
-              <strong>Seller Details:</strong><br/>
-              Shyam Agro Tools & Equipments<br/>
-              Sidhpur, Gujarat - 384151<br/>
-              GSTIN: 24DYYPP1677P1Z6
+            <div class="badge-tax-invoice">
+              <div class="tax-title">TAX INVOICE</div>
+              <div class="tax-subtitle">Original for Recipient</div>
             </div>
           </div>
-          
-          <table>
+
+          <!-- Info Grid -->
+          <div class="info-grid">
+            <div class="info-block">
+              <div class="info-block-title">Invoice & Order Details</div>
+              <div class="info-row"><span class="info-label">Invoice No:</span><span class="info-val">${order.invoiceNo}</span></div>
+              <div class="info-row"><span class="info-label">Invoice Date:</span><span class="info-val">${formatDateToDMyLong(order.date)}</span></div>
+              <div class="info-row"><span class="info-label">Order Ref ID:</span><span class="info-val">ORD-${order.id}</span></div>
+              <div class="info-row"><span class="info-label">Place of Supply:</span><span class="info-val">Gujarat (24)</span></div>
+            </div>
+            <div class="info-block">
+              <div class="info-block-title">Payment & Settlement Status</div>
+              <div class="info-row"><span class="info-label">Payment Method:</span><span class="info-val">${order.payMethod || 'UPI / Bank Transfer'}</span></div>
+              <div class="info-row"><span class="info-label">Payment Status:</span><span class="info-val" style="color: #047857;">${order.paymentStatus || 'Paid'}</span></div>
+              <div class="info-row"><span class="info-label">Billing Currency:</span><span class="info-val">INR (₹)</span></div>
+            </div>
+          </div>
+
+          <!-- Customer & Shipping Addresses -->
+          <div class="address-grid">
+            <div class="address-card">
+              <div class="address-card-title">Billed To (Customer Details)</div>
+              <p>
+                <strong>${order.customer}</strong><br/>
+                ${order.phone ? `Phone: ${order.phone}<br/>` : ''}
+                ${order.email ? `Email: ${order.email}<br/>` : ''}
+              </p>
+            </div>
+            <div class="address-card">
+              <div class="address-card-title">Shipped To (Delivery Destination)</div>
+              <p>${(order.shippingAddress || 'Standard Client Delivery Destination').replace(/\n/g, '<br/>')}</p>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <table class="item-table">
             <thead>
               <tr>
-                <th>Item Description</th>
-                <th style="text-align: center;">Qty</th>
-                <th style="text-align: right;">Price</th>
-                <th style="text-align: right;">Subtotal</th>
+                <th style="width: 5%;">#</th>
+                <th style="width: 45%; text-align: left;">Product Description</th>
+                <th style="width: 10%; text-align: center;">Qty</th>
+                <th style="width: 13%; text-align: right;">Price</th>
+                <th style="width: 12%; text-align: right;">GST (18%)</th>
+                <th style="width: 15%; text-align: right;">Total</th>
               </tr>
             </thead>
             <tbody>
               ${itemsHtml}
             </tbody>
           </table>
-          
-          <div class="totals">
-            <div>Taxable Value: ₹${(order.total * 0.84).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-            <div>GST (18%): ₹${(order.total * 0.16).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-            <div style="font-size: 18px; font-weight: bold; color: #10b981; margin-top: 6px;">Total Amount: ₹${order.total.toLocaleString('en-IN')}</div>
+
+          <!-- Summary Flex -->
+          <div class="summary-flex">
+            <div class="bank-box">
+              <div class="bank-box-title">Remittance / Bank Account Details</div>
+              <div class="bank-row"><span class="bank-label">Bank Name:</span><span class="bank-val">State Bank of India</span></div>
+              <div class="bank-row"><span class="bank-label">Account Name:</span><span class="bank-val">Shyam Agro Tools & Equipments</span></div>
+              <div class="bank-row"><span class="bank-label">Account No:</span><span class="bank-val">50200012345678</span></div>
+              <div class="bank-row"><span class="bank-label">IFSC Code:</span><span class="bank-val">SBIN0001234</span></div>
+              <div class="bank-row"><span class="bank-label">UPI VPA:</span><span class="bank-val">sales@shyamagro</span></div>
+            </div>
+
+            <div class="financial-totals">
+              <div class="total-line"><span>Subtotal (Taxable Value)</span><span>₹${order.subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+              ${order.discountAmount > 0 ? `<div class="total-line" style="color: #dc2626;"><span>Discount</span><span>-₹${order.discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>` : ''}
+              ${order.shippingFee > 0 ? `<div class="total-line"><span>Shipping Charges</span><span>₹${order.shippingFee.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>` : ''}
+              <div class="total-line"><span>CGST (9%)</span><span>₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+              <div class="total-line"><span>SGST (9%)</span><span>₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+              <div class="grand-total-line">
+                <span>Grand Total Due</span>
+                <span>₹${order.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+            </div>
           </div>
-          
-          <div class="footer">
-            Thank you for your business!<br/>
-            For support, contact sales@shyamagro.com or call +91 98765 43210.
+
+          <!-- Footer -->
+          <div class="invoice-footer">
+            <div>
+              <strong>Terms & Memos:</strong><br/>
+              1. Goods once sold will not be taken back without valid return approval.<br/>
+              2. Subject to Rajkot Jurisdiction only.<br/>
+              <em>This is a computer-generated tax invoice requiring no physical signature.</em>
+            </div>
+            <div class="signatory-box">
+              <div class="signatory-line"></div>
+              <strong>For Shyam Agro Tools</strong><br/>
+              <span>Authorized Signatory</span>
+            </div>
           </div>
         </div>
         <script>
@@ -304,6 +614,16 @@ const printInvoice = (order) => {
     </html>
   `);
   printWindow.document.close();
+};
+
+const formatDateToDMY = (dateStr) => {
+  if (!dateStr) return '';
+  const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+  const parts = cleanDate.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
 };
 
 const OrdersLedger = () => {
@@ -433,7 +753,7 @@ const OrdersLedger = () => {
       }
 
       return matchesSearch && matchesDate;
-    });
+    }).sort((a, b) => Number(b.id) - Number(a.id));
   }, [verifiedOrders, searchTerm, dateFilter, startDate, endDate]);
 
   // Reset page when filter/search changes
@@ -618,7 +938,7 @@ const OrdersLedger = () => {
                   <div style={{ fontWeight: 600, color: '#1e293b' }}>{order.customer}</div>
                   <div style={{ fontSize: '11px', color: '#64748b' }}>{order.customerType} • {order.phone}</div>
                 </td>
-                <td style={{ color: '#475569', fontWeight: 500 }}>{order.date}</td>
+                <td style={{ color: '#475569', fontWeight: 500 }}>{formatDateToDMY(order.date)}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569' }}>
                     <Truck size={14} style={{ color: '#6366f1' }} />
@@ -633,44 +953,77 @@ const OrdersLedger = () => {
                 <td>
                   <OrderStatusBadge status={order.status} />
                 </td>
-                <td style={{ textAlign: 'center' }}>
-                  <button
-                    onClick={async () => {
-                      try {
-                        const fullOrder = await getOrder(order.id);
-                        const norm = normaliseOrder(fullOrder);
-                        norm.customer = order.customer;
-                        norm.customerType = order.customerType;
-                        norm.phone = order.phone;
-                        norm.email = order.email;
-                        norm.shippingAddress = order.shippingAddress;
-                        norm.logistics = order.logistics || norm.logistics;
-                        norm.trackingNo = order.trackingNo || norm.trackingNo;
-                        setSelectedOrder(norm);
-                      } catch (err) {
-                        alert(`Failed to load order details: ${err.message}`);
-                      }
-                    }}
-                    style={{
-                      background: '#10b981',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '6px 12px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      transition: 'background 0.2s'
-                    }}
-                    onMouseOver={(e) => e.target.style.background = '#059669'}
-                    onMouseOut={(e) => e.target.style.background = '#10b981'}
-                  >
-                    <Eye size={14} />
-                    Details
-                  </button>
+                <td style={{ padding: '16px 20px', textAlign: 'center' }}>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const fullOrder = await getOrder(order.id);
+                          const norm = normaliseOrder(fullOrder);
+                          norm.customer = order.customer;
+                          norm.customerType = order.customerType;
+                          norm.phone = order.phone;
+                          norm.email = order.email;
+                          norm.shippingAddress = order.shippingAddress;
+                          norm.logistics = order.logistics || norm.logistics;
+                          norm.trackingNo = order.trackingNo || norm.trackingNo;
+                          setSelectedOrder(norm);
+                        } catch (err) {
+                          alert(`Failed to load order details: ${err.message}`);
+                        }
+                      }}
+                      style={{
+                        background: '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseOver={(e) => e.target.style.background = '#059669'}
+                      onMouseOut={(e) => e.target.style.background = '#10b981'}
+                    >
+                      <Eye size={14} />
+                      Details
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (window.confirm(`Are you sure you want to delete Order #${order.id}?`)) {
+                          try {
+                            const res = await fetch(`${getApiDomain()}/api/Orders/${order.id}`, { method: 'DELETE' });
+                            if (res.ok) {
+                              setOrders(prev => prev.filter(o => o.id !== order.id));
+                            } else {
+                              alert('Failed to delete order.');
+                            }
+                          } catch (err) {
+                            alert(`Error: ${err.message}`);
+                          }
+                        }
+                      }}
+                      title="Delete Order"
+                      style={{
+                        background: '#fee2e2',
+                        color: '#ef4444',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '6px 10px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -735,7 +1088,7 @@ const OrdersLedger = () => {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>Date Placed</span>
-                  <strong style={{ fontSize: '14px', color: '#0f172a', display: 'block', marginTop: '4px' }}>{selectedOrder.date}</strong>
+                  <strong style={{ fontSize: '14px', color: '#0f172a', display: 'block', marginTop: '4px' }}>{formatDateToDMY(selectedOrder.date)}</strong>
                 </div>
               </div>
 
@@ -918,7 +1271,7 @@ const OrdersLedger = () => {
                       <span className="timeline-dot" />
                       <div className="timeline-info">
                         <span className="timeline-title">Order Created</span>
-                        <span className="timeline-time">{selectedOrder.date}</span>
+                        <span className="timeline-time">{formatDateToDMY(selectedOrder.date)}</span>
                       </div>
                     </div>
                     <div className="timeline-event completed">

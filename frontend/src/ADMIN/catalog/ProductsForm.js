@@ -10,6 +10,7 @@ import {
   Tractor,
   Trash2,
   Upload,
+  UploadCloud,
   X,
   Eye,
 } from 'lucide-react';
@@ -17,7 +18,7 @@ import {
   getCategoryName,
   getSubcategoryName,
 } from './catalogStore';
-import { fetchCategories, fetchSubcategories, fetchProduct, saveProduct as saveProductApi } from './productsApi';
+import { fetchCategories, fetchSubcategories, fetchProduct, saveProduct as saveProductApi, computeStockStatus } from './productsApi';
 import { fetchSuppliers } from '../suppliers/suppliersApi';
 import { getApiDomain } from '../../utils/apiConfig';
 import { Toast } from '../components/Toast';
@@ -27,13 +28,12 @@ import './ProductsForm.css';
 const createReview = () => ({
   customer: '',
   rating: '5',
-  date: '',
   comment: '',
+  date: new Date().toISOString().split('T')[0],
   verified: true,
 });
 
 const createEmptyProduct = () => ({
-  id: '',
   name: '',
   sku: '',
   brand: '',
@@ -45,55 +45,48 @@ const createEmptyProduct = () => ({
   discountType: 'none',
   discountValue: '',
   stock: '',
-  status: 'In Stock',
+  reorderLevel: '10',
+  costPrice: '',
   countryOfOrigin: 'India',
   codAvailable: 'Yes',
   deliveryEstimate: '3-7 business days',
   returnPolicy: 'Easy Returns',
   shortDescription: '',
-  description: '',
   productDetails: '',
-  packageIncludes: '',
   specifications: {
     weight: '',
     dimensions: '',
     powerSource: '',
     material: '',
-    coverage: '',
+    coverageUsage: '',
   },
   keyFeatures: [''],
-  rating: '',
-  totalReviews: '',
+  rating: '4.5',
+  totalReviews: '0',
   ratingBreakdown: {
-    5: '',
-    4: '',
-    3: '',
-    2: '',
-    1: '',
+    fiveStar: '0',
+    fourStar: '0',
+    threeStar: '0',
+    twoStar: '0',
+    oneStar: '0',
   },
-  reviews: [createReview(), createReview()],
-  image: '',
+  reviews: [],
+  status: 'In Stock',
+  images: [],
+  videos: [],
 });
 
-const normalizeList = (list, minimumRows, factoryValue = '') => {
-  const values = Array.isArray(list) && list.length ? list : [];
-  const normalized = values.map((item) => (typeof item === 'string' ? item : String(item || '')));
-
-  while (normalized.length < minimumRows) {
-    normalized.push(factoryValue);
+const normalizeReviews = (reviews) => {
+  if (!Array.isArray(reviews) || reviews.length === 0) {
+    return [];
   }
 
-  return normalized;
-};
-
-const normalizeReviews = (reviews) => {
-  const normalized = Array.isArray(reviews) && reviews.length ? reviews : [createReview(), createReview()];
-
-  return normalized.map((review) => ({
-    ...createReview(),
-    ...review,
-    rating: String(review.rating || 5),
-    verified: review.verified !== false,
+  return reviews.map((review) => ({
+    customer: review.customer || review.customerName || '',
+    rating: String(review.rating || '5'),
+    comment: review.comment || review.reviewComment || '',
+    date: review.date || review.reviewDate || new Date().toISOString().split('T')[0],
+    verified: Boolean(review.verified ?? review.verifiedPurchase ?? true),
   }));
 };
 
@@ -105,6 +98,9 @@ const normalizeProduct = (product) => {
     weight: product.specifications?.weight || product.weight || '',
   };
 
+  const currentStock = String(product.stock || '');
+  const currentReorder = String(product.reorderLevel || 10);
+
   return {
     ...emptyProduct,
     ...product,
@@ -112,13 +108,15 @@ const normalizeProduct = (product) => {
     price: String(product.price || ''),
     discountType: product.discountType || 'none',
     discountValue: String(product.discountValue || ''),
-    stock: String(product.stock || ''),
+    stock: currentStock,
+    reorderLevel: currentReorder,
+    status: computeStockStatus(currentStock, currentReorder),
     rating: String(product.rating || ''),
     totalReviews: String(product.totalReviews || ''),
     shortDescription: product.shortDescription || product.shortDesc || product.description || '',
     productDetails: product.productDetails || product.longDesc || product.description || '',
     specifications,
-    keyFeatures: normalizeList(product.keyFeatures || product.features, 1),
+    keyFeatures: product.keyFeatures || product.features || [''],
     ratingBreakdown: {
       ...emptyProduct.ratingBreakdown,
       ...(product.ratingBreakdown || {}),
@@ -224,9 +222,16 @@ const ProductsForm = () => {
     if (!mrp || formData.discountType === 'none' || !Number(formData.discountValue)) return 'No active discount';
 
     const savedAmount = mrp - sellingPrice;
-    const percentOff = Math.round((savedAmount / mrp) * 100);
+    if (savedAmount <= 0) return 'No active discount';
 
-    return `${formatCurrency(savedAmount)} saved (${percentOff}% off)`;
+    const rawPct = (savedAmount / mrp) * 100;
+    const percentOff = rawPct % 1 === 0 ? rawPct.toFixed(0) : rawPct.toFixed(1);
+
+    if (formData.discountType === 'fixed') {
+      return `${formatCurrency(savedAmount)} saved (${percentOff}% off)`;
+    }
+
+    return `${formatCurrency(savedAmount)} saved (${formData.discountValue}% off)`;
   }, [formData.discountType, formData.discountValue, formData.mrp, sellingPrice]);
 
   useEffect(() => {
@@ -237,25 +242,29 @@ const ProductsForm = () => {
     setToast(null);
 
     fetchProduct(productId, categories, subcategories)
-      .then((product) => {
+      .then((data) => {
         if (!isMounted) return;
-        setFormData(normalizeProduct(product));
+        if (!data) {
+          setToast({ message: 'Product not found. Redirecting to product catalog...', type: 'error' });
+          setTimeout(() => navigate('/admin/catalog/products'), 1500);
+          return;
+        }
+        setFormData(normalizeProduct(data));
       })
-      .catch((error) => {
+      .catch(() => {
         if (!isMounted) return;
-        setToast({ message: error.response?.data?.message || error.message || 'Unable to load product details.', type: 'error' });
+        setToast({ message: 'Failed to load product. Redirecting...', type: 'error' });
+        setTimeout(() => navigate('/admin/catalog/products'), 1500);
       })
       .finally(() => {
         if (isMounted) setIsLoadingProduct(false);
       });
 
-    return () => {
-      isMounted = false;
-    };
-  }, [categories, productId, subcategories]);
+    return () => { isMounted = false; };
+  }, [productId, categories, subcategories, navigate]);
 
   useEffect(() => {
-    if (!formData.categoryId) {
+    if (availableSubcategories.length === 0) {
       setFormData((current) => {
         if (current.subcategoryId === '') return current;
         return { ...current, subcategoryId: '' };
@@ -276,7 +285,13 @@ const ProductsForm = () => {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
+    setFormData((current) => {
+      const updated = { ...current, [name]: value };
+      if (name === 'stock' || name === 'reorderLevel') {
+        updated.status = computeStockStatus(updated.stock, updated.reorderLevel);
+      }
+      return updated;
+    });
   };
 
   const handleSpecificationChange = (name, value) => {
@@ -297,6 +312,26 @@ const ProductsForm = () => {
         [rating]: value,
       },
     }));
+  };
+
+  const handleAverageRatingKeyDown = (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const current = parseFloat(formData.rating) || 0;
+      const delta = e.key === 'ArrowUp' ? 0.1 : -0.1;
+      const next = Math.min(5.00, Math.max(0.00, Math.round((current + delta) * 100) / 100));
+      setFormData((prev) => ({ ...prev, rating: String(next) }));
+    }
+  };
+
+  const handleReviewRatingKeyDown = (index, e) => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const current = parseFloat(formData.reviews[index]?.rating) || 0;
+      const delta = e.key === 'ArrowUp' ? 0.1 : -0.1;
+      const next = Math.min(5.00, Math.max(0.01, Math.round((current + delta) * 100) / 100));
+      handleReviewChange(index, 'rating', String(next));
+    }
   };
 
   const handleFeatureChange = (index, value) => {
@@ -900,10 +935,11 @@ const ProductsForm = () => {
                     type="number"
                     min="0"
                     max="5"
-                    step="0.1"
+                    step="0.01"
                     value={formData.rating}
                     onChange={handleInputChange}
-                    placeholder="4.6"
+                    onKeyDown={handleAverageRatingKeyDown}
+                    placeholder="4.67"
                   />
                 </div>
 
@@ -976,18 +1012,18 @@ const ProductsForm = () => {
                       </div>
 
                       <div className="catalog-field">
-                        <label htmlFor={`review-rating-${index}`}>Rating</label>
-                        <select
+                        <label htmlFor={`review-rating-${index}`}>Rating (1.00 – 5.00)</label>
+                        <input
                           id={`review-rating-${index}`}
+                          type="number"
+                          min="0.01"
+                          max="5.00"
+                          step="0.01"
                           value={review.rating}
                           onChange={(event) => handleReviewChange(index, 'rating', event.target.value)}
-                        >
-                          <option value="5">5 Stars</option>
-                          <option value="4">4 Stars</option>
-                          <option value="3">3 Stars</option>
-                          <option value="2">2 Stars</option>
-                          <option value="1">1 Star</option>
-                        </select>
+                          onKeyDown={(e) => handleReviewRatingKeyDown(index, e)}
+                          placeholder="4.67"
+                        />
                       </div>
 
                       <div className="catalog-field">
@@ -1246,13 +1282,13 @@ const ProductsForm = () => {
               {/* Upload trigger box (only shown if total images < 7) */}
               {((formData.images?.length || 0) + imageFiles.length) < 7 ? (
                 <label className="catalog-upload" htmlFor="product-images" style={{ cursor: 'pointer' }}>
-                  <span className="catalog-upload__box" style={{ height: '60px', width: '60px' }}>
-                    <Upload size={18} />
+                  <span className="catalog-upload__box">
+                    <UploadCloud size={22} className="upload-icon-svg" />
                   </span>
-                  <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <strong>Upload Images ({((formData.images?.length || 0) + imageFiles.length)}/7)</strong>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Select 4 to 7 images.</span>
-                  </span>
+                    <span style={{ fontSize: '11px', color: '#64748b' }}>Select 4 to 7 high quality product images.</span>
+                  </div>
                   <input 
                     id="product-images" 
                     type="file" 

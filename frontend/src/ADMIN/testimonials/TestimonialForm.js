@@ -262,7 +262,7 @@ const TestimonialForm = () => {
                         style={{ display: 'none' }}
                       />
                     </label>
-                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>Recommended: Square portrait image, up to 2MB</span>
+                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>Supported: PNG, JPG image up to 2MB</span>
                   </div>
                 </div>
               </div>

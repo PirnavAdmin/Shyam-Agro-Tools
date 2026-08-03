@@ -60,9 +60,14 @@ const ProductReviews = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  // ── Field helpers ────────────────────────────────────────────────────────
-  const handleNewChange = (field, value) => {
-    setNewReview((prev) => ({ ...prev, [field]: value }));
+  const handleRatingKeyDown = (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const current = parseFloat(newReview.rating) || 0;
+      const delta = e.key === 'ArrowUp' ? 0.1 : -0.1;
+      const next = Math.min(5.00, Math.max(0.01, Math.round((current + delta) * 100) / 100));
+      handleNewChange('rating', String(next));
+    }
   };
 
   // ── Add a new review ─────────────────────────────────────────────────────
@@ -207,18 +212,18 @@ const ProductReviews = () => {
               </div>
 
               <div className="catalog-field">
-                <label htmlFor="new-review-rating">Rating</label>
-                <select
+                <label htmlFor="new-review-rating">Rating (1.00 – 5.00)</label>
+                <input
                   id="new-review-rating"
+                  type="number"
+                  min="0.01"
+                  max="5.00"
+                  step="0.01"
                   value={newReview.rating}
                   onChange={(e) => handleNewChange('rating', e.target.value)}
-                >
-                  <option value="5">5 Stars</option>
-                  <option value="4">4 Stars</option>
-                  <option value="3">3 Stars</option>
-                  <option value="2">2 Stars</option>
-                  <option value="1">1 Star</option>
-                </select>
+                  onKeyDown={handleRatingKeyDown}
+                  placeholder="4.67"
+                />
               </div>
 
               <div className="catalog-field">

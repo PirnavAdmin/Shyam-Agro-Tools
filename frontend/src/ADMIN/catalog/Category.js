@@ -168,15 +168,19 @@ const Category = () => {
                 </select>
               </div>
               <div className="catalog-field">
-                <label style={{ fontSize: '12px', fontWeight: '600' }}>Category Image</label>
-                <label className="catalog-upload" htmlFor="category-image" style={{ padding: '8px', gap: '10px' }}>
-                  <span className="catalog-upload__box" style={{ width: '48px', height: '48px' }}>
-                    {formData.image ? <img src={formData.image} alt="" /> : <Upload size={18} />}
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#334155' }}>Category Image</label>
+                <label className="catalog-upload" htmlFor="category-image">
+                  <span className="catalog-upload__box">
+                    {formData.image ? (
+                      <img src={formData.image} alt="Category preview" />
+                    ) : (
+                      <Upload size={18} className="upload-icon-svg" />
+                    )}
                   </span>
-                  <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <strong style={{ fontSize: '12px' }}>Upload Image</strong>
-                    <span style={{ fontSize: '10px' }}>Square image is recommended.</span>
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <strong>Upload Image</strong>
+                    <span>PNG, JPG or WEBP supported</span>
+                  </div>
                   <input id="category-image" type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
                 </label>
               </div>

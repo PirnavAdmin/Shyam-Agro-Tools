@@ -195,18 +195,20 @@ const SuppliersList = () => {
   const filteredSuppliers = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
-    return suppliersList.filter((supplier) => {
-      const matchesSearch = [
-        supplier.id,
-        supplier.name,
-        supplier.contactPerson,
-        supplier.email,
-        supplier.phone
-      ].join(' ').toLowerCase().includes(normalizedSearch);
-      const matchesStatus = statusFilter === 'All' || supplier.status === statusFilter;
+    return suppliersList
+      .filter((supplier) => {
+        const matchesSearch = [
+          supplier.id,
+          supplier.name,
+          supplier.contactPerson,
+          supplier.email,
+          supplier.phone
+        ].join(' ').toLowerCase().includes(normalizedSearch);
+        const matchesStatus = statusFilter === 'All' || supplier.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
-    });
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => Number(b.id) - Number(a.id));
   }, [suppliersList, searchTerm, statusFilter]);
 
   // Reset page when filter/search changes

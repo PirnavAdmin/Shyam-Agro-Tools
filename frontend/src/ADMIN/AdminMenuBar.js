@@ -174,11 +174,11 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 </div>
                 <ul className={`stroyka-submenu ${openDropdowns.catalog && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/catalog/categories"   className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Categories List</NavLink></li>
-                  <li><NavLink to="/admin/catalog/category"     className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Category Form</NavLink></li>
+                  <li><NavLink to="/admin/catalog/category"     className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Category</NavLink></li>
                   <li><NavLink to="/admin/catalog/subcategories" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Subcategories List</NavLink></li>
-                  <li><NavLink to="/admin/catalog/subcategory"  className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Subcategory Form</NavLink></li>
+                  <li><NavLink to="/admin/catalog/subcategory"  className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Subcategory</NavLink></li>
                   <li><NavLink to="/admin/catalog/products"     className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Products List</NavLink></li>
-                  <li><NavLink to="/admin/catalog/products-form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Products Form</NavLink></li>
+                  <li><NavLink to="/admin/catalog/products-form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Products</NavLink></li>
                 </ul>
               </li>
             )}
@@ -349,7 +349,7 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 <ul className={`stroyka-submenu ${openDropdowns.marketing && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/marketing/banners" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Hero & Banners</NavLink></li>
                   <li><NavLink to="/admin/marketing/coupons" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Coupons List</NavLink></li>
-                  <li><NavLink to="/admin/marketing/coupon"  className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Coupon Form</NavLink></li>
+                  <li><NavLink to="/admin/marketing/coupon"  className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Coupon</NavLink></li>
                 </ul>
               </li>
             )}
@@ -371,7 +371,7 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 </div>
                 <ul className={`stroyka-submenu ${openDropdowns.brands && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/brands/list" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Brands List</NavLink></li>
-                  <li><NavLink to="/admin/brands/form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Brand Form</NavLink></li>
+                  <li><NavLink to="/admin/brands/form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Brand</NavLink></li>
                 </ul>
               </li>
             )}
@@ -396,7 +396,7 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 </div>
                 <ul className={`stroyka-submenu ${openDropdowns.blogs && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/blogs/list" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Blogs List</NavLink></li>
-                  <li><NavLink to="/admin/blogs/form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Blog Form</NavLink></li>
+                  <li><NavLink to="/admin/blogs/form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Blog</NavLink></li>
                 </ul>
               </li>
             )}
@@ -471,7 +471,7 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 </div>
                 <ul className={`stroyka-submenu ${openDropdowns.settings && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/settings/toc"  className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Table of Content</NavLink></li>
-                  <li><NavLink to="/admin/settings/form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Settings Form</NavLink></li>
+                  <li><NavLink to="/admin/settings/form" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Settings</NavLink></li>
                 </ul>
               </li>
             )}

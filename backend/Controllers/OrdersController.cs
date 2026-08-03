@@ -856,9 +856,9 @@ namespace ShyamAgroSuite.Api.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Orders/5  (cancel order & restore stock)
+        // DELETE: api/Orders/5  (permanently delete order from database)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> CancelOrder(int id)
+        public async Task<IActionResult> DeleteOrder(int id)
         {
             var order = await _context.Orders
                 .Include(o => o.Items)
@@ -869,17 +869,30 @@ namespace ShyamAgroSuite.Api.Controllers
                 return NotFound(new { Message = "Order not found." });
             }
 
-            if (order.Status == "Cancelled")
-            {
-                return BadRequest(new { Message = "Order is already cancelled." });
-            }
-
-            // Stock restoration removed since Product table is removed
-
-            order.Status = "Cancelled";
+            _context.OrderItems.RemoveRange(order.Items);
+            _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // POST: api/Orders/cleanup-test-orders
+        [HttpPost("cleanup-test-orders")]
+        public async Task<IActionResult> CleanupTestOrders()
+        {
+            var testOrders = await _context.Orders
+                .Include(o => o.Items)
+                .Include(o => o.Customer)
+                .Where(o => o.Id >= 96 && o.Id <= 99 || (o.Customer != null && o.Customer.Name.Contains("DFWEY7RTIEWYF")))
+                .ToListAsync();
+
+            foreach (var o in testOrders)
+            {
+                _context.OrderItems.RemoveRange(o.Items);
+                _context.Orders.Remove(o);
+            }
+            await _context.SaveChangesAsync();
+            return Ok(new { Message = $"Deleted {testOrders.Count} test orders." });
         }
 
         private async Task PopulateItemImagesAsync(IEnumerable<Order> orders)

@@ -79,7 +79,7 @@ const BlogsList = () => {
       (blog.summary    || '').toLowerCase().includes(q) ||
       (blog.description|| '').toLowerCase().includes(q)
     );
-  }), [blogs, searchTerm]);
+  }).sort((a, b) => Number(b.id) - Number(a.id)), [blogs, searchTerm]);
 
   // Pagination
   const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);

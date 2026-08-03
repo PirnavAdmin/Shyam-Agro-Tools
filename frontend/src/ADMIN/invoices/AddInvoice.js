@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, RefreshCw, Plus, Trash2, CreditCard, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getApiDomain } from '../../utils/apiConfig';
 import './invoices.css';
@@ -17,6 +17,8 @@ const AddInvoice = () => {
     contactNo: '',
     address: '',
     paymentMethod: 'UPI / Bank Transfer',
+    transactionRef: '',
+    paymentDate: new Date().toISOString().split('T')[0],
     subTotal: 0,
     taxAmount: 0,
     discount: 0,
@@ -24,15 +26,57 @@ const AddInvoice = () => {
     notes: ''
   });
 
+  const [items, setItems] = useState([
+    { productName: '', productCode: '', quantity: 1, price: 0 }
+  ]);
+
+  const [productList, setProductList] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${getApiDomain()}/api/products`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+            'Accept': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setProductList(Array.isArray(data) ? data : (data.products || []));
+        }
+      } catch (err) {
+        console.error('Failed to fetch product list', err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const [totalAmount, setTotalAmount] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  // Auto-fill subTotal & default taxAmount when items list changes
+  useEffect(() => {
+    const sub = items.reduce((sum, item) => sum + (Number(item.quantity || 0) * Number(item.price || 0)), 0);
+    const disc = parseFloat(formData.discount) || 0;
+    const netTaxable = Math.max(0, sub - disc);
+    const tax = Math.round(netTaxable * 0.18 * 100) / 100;
+    
+    setFormData(prev => ({
+      ...prev,
+      subTotal: sub,
+      taxAmount: tax
+    }));
+  }, [items]);
+
+  // Recalculate Grand Total whenever subTotal, taxAmount, discount, or shippingCharge change
   useEffect(() => {
     const sub = parseFloat(formData.subTotal) || 0;
     const tax = parseFloat(formData.taxAmount) || 0;
     const ship = parseFloat(formData.shippingCharge) || 0;
     const disc = parseFloat(formData.discount) || 0;
+    
     setTotalAmount(sub + tax + ship - disc);
   }, [formData.subTotal, formData.taxAmount, formData.shippingCharge, formData.discount]);
 
@@ -44,10 +88,90 @@ const AddInvoice = () => {
     }));
   };
 
+  const handleItemChange = (index, field, value) => {
+    setItems(prev => prev.map((item, idx) => {
+      if (idx === index) {
+        return { ...item, [field]: value };
+      }
+      return item;
+    }));
+  };
+
+  const handleProductNameChange = (index, value) => {
+    handleItemChange(index, 'productName', value);
+    if (!value) return;
+    const selectedProd = productList.find(p => (p.productName || '').trim().toLowerCase() === value.trim().toLowerCase());
+    if (selectedProd) {
+      handleItemChange(index, 'productCode', selectedProd.sku || '');
+      handleItemChange(index, 'price', selectedProd.sellingPrice || selectedProd.mrp || 0);
+    }
+  };
+
+  const handleAddItem = () => {
+    setItems(prev => [...prev, { productName: '', productCode: '', quantity: 1, price: 0 }]);
+  };
+
+  const handleRemoveItem = (index) => {
+    if (items.length === 1) {
+      setItems([{ productName: '', productCode: '', quantity: 1, price: 0 }]);
+      return;
+    }
+    setItems(prev => prev.filter((_, idx) => idx !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.clientName) {
-      setError('Client Name is required.');
+
+    // 1. Client / Customer Name Validation
+    const nameTrim = (formData.clientName || '').trim();
+    if (!nameTrim) {
+      setError('Client / Customer Name is required.');
+      return;
+    }
+    if (nameTrim.length < 2 || !/^[a-zA-Z\s.'-]+$/.test(nameTrim)) {
+      setError('Please enter a valid Customer Name (minimum 2 letters, no numbers or special symbols).');
+      return;
+    }
+
+    // 2. Contact Number Validation (10-digit mobile starting 6-9)
+    const phoneClean = (formData.contactNo || '').replace(/[\s\-\+\(\)]/g, '');
+    if (!formData.contactNo || !phoneClean) {
+      setError('Contact Number is required.');
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(phoneClean.slice(-10))) {
+      setError('Please enter a valid 10-digit mobile number starting with 6-9 (e.g. 9876543210).');
+      return;
+    }
+
+    // 3. Email Address Validation (if provided)
+    if (formData.emailAddress && formData.emailAddress.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.emailAddress.trim())) {
+        setError('Please enter a valid Email Address format (e.g. client@example.com).');
+        return;
+      }
+    }
+
+    // 4. Billing & Delivery Address Validation
+    const addressTrim = (formData.address || '').trim();
+    if (!addressTrim) {
+      setError('Billing & Delivery Address is required.');
+      return;
+    }
+    if (addressTrim.length < 8) {
+      setError('Please enter a detailed delivery address (minimum 8 characters with street/city details).');
+      return;
+    }
+
+    // 5. Product Items Validation
+    if (items.length === 0) {
+      setError('At least one product item row is required.');
+      return;
+    }
+    const invalidItem = items.some(item => !item.productName.trim());
+    if (invalidItem) {
+      setError('Product Name is required for all item rows.');
       return;
     }
     
@@ -62,7 +186,16 @@ const AddInvoice = () => {
         taxAmount: parseFloat(formData.taxAmount) || 0,
         discount: parseFloat(formData.discount) || 0,
         shippingCharge: parseFloat(formData.shippingCharge) || 0,
-        totalAmount: totalAmount
+        totalAmount: totalAmount,
+        notes: formData.transactionRef
+          ? `[Txn Ref / UTR: ${formData.transactionRef}] ${formData.notes || ''}`.trim()
+          : formData.notes,
+        items: items.map(item => ({
+          productName: item.productName,
+          productCode: item.productCode || 'PROD-GEN',
+          quantity: parseInt(item.quantity) || 1,
+          price: parseFloat(item.price) || 0
+        }))
       };
 
       const response = await fetch(`${getApiDomain()}/api/Invoices`, {
@@ -136,33 +269,6 @@ const AddInvoice = () => {
                 />
               </div>
             </div>
-
-            <div className="form-input-row-2">
-              <div className="form-input-field">
-                <label>Payment Method</label>
-                <select
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleChange}
-                >
-                  <option value="UPI / Bank Transfer">UPI / Bank Transfer</option>
-                  <option value="Cash">Cash</option>
-                  <option value="COD">COD</option>
-                </select>
-              </div>
-              <div className="form-input-field">
-                <label>Payment Status</label>
-                <select
-                  name="paymentStatus"
-                  value={formData.paymentStatus}
-                  onChange={handleChange}
-                >
-                  <option value="Unpaid">Unpaid</option>
-                  <option value="Paid">Paid</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
           </div>
 
           {/* Group 2: Client Info */}
@@ -170,13 +276,15 @@ const AddInvoice = () => {
             <h3 className="section-group-title">Customer Information</h3>
             
             <div className="form-input-field">
-              <label>Client / Customer Name</label>
+              <label>Client / Customer Name <span style={{ color: '#ef4444' }}>*</span></label>
               <input
                 type="text"
                 name="clientName"
-                placeholder="Enter client full name"
+                placeholder="e.g. Ramesh Patel"
                 value={formData.clientName}
                 onChange={handleChange}
+                pattern="[a-zA-Z\s.'-]{2,}"
+                title="Please enter a valid full name (minimum 2 letters)"
                 required
               />
             </div>
@@ -193,36 +301,225 @@ const AddInvoice = () => {
                 />
               </div>
               <div className="form-input-field">
-                <label>Contact Number</label>
+                <label>Contact Number <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
-                  type="text"
+                  type="tel"
                   name="contactNo"
-                  placeholder="Enter 10-digit mobile"
+                  placeholder="e.g. 9876543210"
                   value={formData.contactNo}
                   onChange={handleChange}
+                  maxLength={13}
+                  required
                 />
               </div>
             </div>
 
             <div className="form-input-field">
-              <label>Billing & Delivery Address</label>
+              <label>Billing & Delivery Address <span style={{ color: '#ef4444' }}>*</span></label>
               <textarea
                 name="address"
-                placeholder="Enter client delivery destination address"
+                placeholder="Enter client full street address, city, state and pincode"
                 value={formData.address}
                 onChange={handleChange}
                 rows={2}
+                minLength={8}
+                required
               />
             </div>
           </div>
 
         </div>
 
+        {/* Group 2.2: Payment & Settlement Details */}
+        <div className="payment-section-card">
+          <h3 className="section-group-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <CreditCard size={18} style={{ color: '#10b981' }} /> Payment & Settlement Details
+          </h3>
+
+          <div className="form-input-row-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <div className="form-input-field">
+              <label>Payment Method</label>
+              <select
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleChange}
+              >
+                <option value="UPI / Bank Transfer">UPI / Bank Transfer</option>
+                <option value="Cash">Cash</option>
+                <option value="Cheque / Demand Draft">Cheque / Demand Draft</option>
+                <option value="Net Banking / NEFT / RTGS">Net Banking / NEFT / RTGS</option>
+              </select>
+            </div>
+
+            <div className="form-input-field">
+              <label>Payment Status</label>
+              <select
+                name="paymentStatus"
+                value={formData.paymentStatus}
+                onChange={handleChange}
+              >
+                <option value="Unpaid">Unpaid (Pending Settlement)</option>
+                <option value="Paid">Paid (Settled)</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div className="form-input-field">
+              <label>Transaction / UTR Ref No. (Optional)</label>
+              <input
+                type="text"
+                name="transactionRef"
+                placeholder="e.g. UTR-987654321 / UPI-8849"
+                value={formData.transactionRef}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-input-field">
+              <label>Payment Received Date</label>
+              <input
+                type="date"
+                name="paymentDate"
+                value={formData.paymentDate}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Official Receiving Account Box */}
+          <div className="seller-bank-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#15803d', fontWeight: 700, fontSize: '12px' }}>
+              <ShieldCheck size={16} /> Official Seller Receiving Account (Shyam Agro Tools)
+            </div>
+            <div className="seller-bank-grid">
+              <div className="seller-bank-item">
+                <label>Bank Name</label>
+                <span>State Bank of India</span>
+              </div>
+              <div className="seller-bank-item">
+                <label>Account Name</label>
+                <span>Shyam Agro Tools & Equipments</span>
+              </div>
+              <div className="seller-bank-item">
+                <label>Account Number</label>
+                <span>50200012345678</span>
+              </div>
+              <div className="seller-bank-item">
+                <label>IFSC Code</label>
+                <span>SBIN0001234</span>
+              </div>
+              <div className="seller-bank-item">
+                <label>UPI ID</label>
+                <span>sales@shyamagro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group 2.5: Product Details List */}
+        <div className="invoice-products-section" style={{ marginBottom: '24px' }}>
+          <h3 className="section-group-title" style={{ marginBottom: '16px' }}>Product Details</h3>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="invoice-products-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '45%' }}>Product Name</th>
+                  <th style={{ width: '20%' }}>SKU / Code</th>
+                  <th style={{ width: '10%', textAlign: 'center' }}>Qty</th>
+                  <th style={{ width: '13%', textAlign: 'right', paddingRight: '12px' }}>Price (Rs.)</th>
+                  <th style={{ width: '12%', textAlign: 'right', paddingRight: '12px' }}>Total (Rs.)</th>
+                  <th style={{ width: '5%', textAlign: 'center' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        type="text"
+                        className="invoice-item-input"
+                        placeholder="Type name or search catalog..."
+                        value={item.productName}
+                        onChange={(e) => handleProductNameChange(index, e.target.value)}
+                        list={`product-options-${index}`}
+                        required
+                        autoComplete="off"
+                      />
+                      <datalist id={`product-options-${index}`}>
+                        {productList.map((p, pIdx) => (
+                          <option key={pIdx} value={p.productName}>
+                            SKU: {p.sku} | Price: ₹{(p.sellingPrice || p.mrp || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        className="invoice-item-input"
+                        placeholder="e.g. WM-102"
+                        value={item.productCode}
+                        onChange={(e) => handleItemChange(index, 'productCode', e.target.value)}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className="invoice-item-input"
+                        style={{ textAlign: 'center' }}
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 0)}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className="invoice-item-input"
+                        style={{ textAlign: 'right' }}
+                        min="0"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value) || 0)}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <span className="invoice-item-readonly" style={{ textAlign: 'right' }}>
+                        ₹{(Number(item.quantity || 0) * Number(item.price || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItem(index)}
+                        className="remove-item-btn"
+                        title="Remove product"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="add-item-btn"
+            style={{ marginTop: '12px' }}
+          >
+            <Plus size={14} /> Add Product Row
+          </button>
+        </div>
+
         {/* Group 3: Financial Calculations */}
         <div className="invoice-form-financial-card">
           <h3 className="section-group-title">Calculations & Pricing Summary</h3>
           
-          <div className="financial-form-grid">
+          <div className="financial-form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
             <div className="form-input-field">
               <label>Subtotal (Rs.)</label>
               <input

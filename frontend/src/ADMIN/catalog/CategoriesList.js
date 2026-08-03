@@ -76,12 +76,7 @@ const CategoriesList = () => {
           String(category.id).toLowerCase().includes(query)
         );
       })
-      .sort((a, b) => {
-        const orderA = Number(a.displayOrder) > 0 ? Number(a.displayOrder) : 9999;
-        const orderB = Number(b.displayOrder) > 0 ? Number(b.displayOrder) : 9999;
-        if (orderA !== orderB) return orderA - orderB;
-        return Number(a.id) - Number(b.id);
-      });
+      .sort((a, b) => Number(b.id) - Number(a.id));
   }, [categories, searchTerm]);
 
   // Reset page when filter/search changes

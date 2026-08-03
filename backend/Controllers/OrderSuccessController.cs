@@ -210,14 +210,53 @@ namespace ShyamAgroSuite.Api.Controllers
         // ====================================================
         // TRACK ORDER
         // ====================================================
+        [HttpGet("track")]
         [HttpGet("track/{orderId}")]
-        public async Task<IActionResult> TrackOrder(string orderId)
+        public async Task<IActionResult> TrackOrder([FromQuery] string? orderId = null, [FromRoute] string? orderIdRoute = null)
         {
+            var searchId = !string.IsNullOrWhiteSpace(orderId) ? orderId : orderIdRoute;
+            searchId = searchId?.Trim();
+
+            if (string.IsNullOrEmpty(searchId))
+                return BadRequest(new { Message = "Order ID is required." });
+
+            // Check primary Orders table first for live admin status & tracking updates
+            var dbOrder = await _context.Orders
+                .AsNoTracking()
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(x => x.OrderNumber == searchId || x.Id.ToString() == searchId);
+
+            if (dbOrder != null)
+            {
+                return Ok(new
+                {
+                    OrderId = dbOrder.OrderNumber,
+                    OrderStatus = dbOrder.Status,
+                    Status = dbOrder.Status,
+                    CarrierName = dbOrder.CarrierName,
+                    TrackingNumber = dbOrder.TrackingNumber,
+                    TotalAmount = dbOrder.FinalAmount,
+                    PaymentMethod = dbOrder.PaymentMethod,
+                    PaymentStatus = dbOrder.PaymentStatus,
+                    EstimatedDelivery = "3-7 business days",
+                    PackerName = dbOrder.PackerName,
+                    PackagePhotoUrl = dbOrder.PackagePhotoUrl,
+                    Items = dbOrder.Items.Select(i => new {
+                        i.ProductId,
+                        i.ProductName,
+                        i.ProductCode,
+                        i.Quantity,
+                        i.Price
+                    })
+                });
+            }
+
             var order = await _context.OrderSuccesses
-                .FirstOrDefaultAsync(x => x.OrderId == orderId);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.OrderId == searchId);
 
             if (order == null)
-                return NotFound("Order not found.");
+                return NotFound(new { Message = "Order not found." });
 
             return Ok(order);
         }

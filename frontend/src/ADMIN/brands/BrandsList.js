@@ -167,10 +167,12 @@ const BrandsList = () => {
 
   const filteredBrands = useMemo(() => {
     const query = searchTerm.toLowerCase().trim();
-    return brands.filter(brand => 
-      String(brand.name || '').toLowerCase().includes(query) ||
-      String(brand.id || '').toLowerCase().includes(query)
-    );
+    return brands
+      .filter(brand => 
+        String(brand.name || '').toLowerCase().includes(query) ||
+        String(brand.id || '').toLowerCase().includes(query)
+      )
+      .sort((a, b) => Number(b.id) - Number(a.id));
   }, [brands, searchTerm]);
 
   // Reset page when search changes

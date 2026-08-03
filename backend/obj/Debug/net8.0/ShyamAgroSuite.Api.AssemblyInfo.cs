@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ShyamAgroSuite.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+223a890fa048e3014f01dc55c67d4ef3866a8591")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3efd492ef68ea58b26e1cbb4de9962ddc3e27ffd")]
 [assembly: System.Reflection.AssemblyProductAttribute("ShyamAgroSuite.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ShyamAgroSuite.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

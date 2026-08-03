@@ -20,16 +20,16 @@ namespace ShyamAgroSuite.Api.Controllers
         // Helper: recalculate all rating stats for a product
         private void RecalculateRatings(Product product, List<ProductReview> reviews)
         {
-            product.TotalReviews  = reviews.Count;
+            product.TotalReviews = reviews.Count;
             product.AverageRating = reviews.Count > 0
-                ? Math.Round((decimal)reviews.Average(x => x.Rating), 2)
-                : 0;
+                ? Math.Round(reviews.Average(x => x.Rating), 2)
+                : product.AverageRating;
 
-            product.FiveStar  = reviews.Count(x => x.Rating == 5);
-            product.FourStar  = reviews.Count(x => x.Rating == 4);
-            product.ThreeStar = reviews.Count(x => x.Rating == 3);
-            product.TwoStar   = reviews.Count(x => x.Rating == 2);
-            product.OneStar   = reviews.Count(x => x.Rating == 1);
+            product.FiveStar  = reviews.Count(x => Math.Round(x.Rating) >= 5);
+            product.FourStar  = reviews.Count(x => Math.Round(x.Rating) == 4);
+            product.ThreeStar = reviews.Count(x => Math.Round(x.Rating) == 3);
+            product.TwoStar   = reviews.Count(x => Math.Round(x.Rating) == 2);
+            product.OneStar   = reviews.Count(x => Math.Round(x.Rating) <= 1);
         }
 
         // POST: api/reviews
@@ -37,8 +37,8 @@ namespace ShyamAgroSuite.Api.Controllers
         public async Task<IActionResult> AddReview([FromBody] ProductReview review)
         {
             // Validate rating range
-            if (review.Rating < 1 || review.Rating > 5)
-                return BadRequest("Rating must be between 1 and 5.");
+            if (review.Rating < 0.1m || review.Rating > 5.0m)
+                return BadRequest("Rating must be between 0.1 and 5.0.");
 
             // Validate that the ProductId exists
             var product = _context.Products.FirstOrDefault(p => p.Id == review.ProductId);

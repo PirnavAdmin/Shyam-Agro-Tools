@@ -7,7 +7,7 @@ const BASE_URL = getApiDomain();
 // Axios instance — always skip the ngrok browser-warning page
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000,
+  timeout: 60000,
   headers: {
     'ngrok-skip-browser-warning': 'true',
     Accept: 'application/json',

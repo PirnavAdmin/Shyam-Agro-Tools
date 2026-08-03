@@ -7,14 +7,23 @@ export const BASE_URL = getApiDomain();
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 20000,
+  timeout: 60000,
   headers: {
     'ngrok-skip-browser-warning': 'true',
     Accept: 'application/json',
   },
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Stock Status Calculator ──────────────────────────────────────────────────
+export const computeStockStatus = (stockVal, reorderVal) => {
+  const stock = Number(stockVal || 0);
+  const reorder = reorderVal !== undefined && reorderVal !== null && !isNaN(Number(reorderVal))
+    ? Number(reorderVal)
+    : 10;
+  if (stock <= 0) return 'Out of Stock';
+  if (stock <= reorder) return 'Low Stock';
+  return 'In Stock';
+};
 
 /** Resolve a relative image path to a full URL */
 export const resolveImageUrl = (url) => {
@@ -107,17 +116,62 @@ export const mapProductFromApi = (
       ''
   );
 
-  // ── Brand ─────────────────────────────────────────────────────────────────
-  let brandName = 'Shyam Agro Tools';
-  if (typeof raw.brand === 'string' && raw.brand) {
-    brandName = raw.brand;
-  } else if (raw.brand && typeof raw.brand === 'object') {
-    brandName = raw.brand.brandName || raw.brand.name || brandName;
-  }
+  // ── Brand Resolution ──────────────────────────────────────────────────────
+  const resolveBrandName = (item) => {
+    const rawBrand = (item.brand || item.Brand || item.brandName || item.manufacturer || item.Manufacturer || '').toString().trim();
+    
+    // If a custom non-generic brand is explicitly stored, keep it
+    if (rawBrand && rawBrand !== 'Shyam Agro' && rawBrand !== 'Shyam Agro Tools' && rawBrand !== 'ShyamAgro') {
+      return rawBrand;
+    }
 
+    const productName = (item.productName || item.name || '').toLowerCase();
+    const categoryName = (item.category?.name || item.categoryName || item.category || '').toLowerCase();
+
+    // Map top industry brands by product domain & keywords
+    if (productName.includes('drip') || productName.includes('irrigation')) return 'Netafim';
+    if (productName.includes('sprinkler') || productName.includes('nozzle')) return 'AquaFlow';
+    if (productName.includes('reaper') || productName.includes('binder') || productName.includes('harvester')) return 'VST Shakti';
+    if (productName.includes('fertilizer') || productName.includes('spreader')) return 'GreenGrow';
+    if (productName.includes('brush cutter') || productName.includes('trimmer') || productName.includes('chainsaw')) return 'Stihl';
+    if (productName.includes('sprayer') || productName.includes('fogger')) return 'Aspee';
+    if (productName.includes('tiller') || productName.includes('cultivator') || productName.includes('weeder')) return 'Kirloskar';
+    if (productName.includes('seed') || productName.includes('drill') || productName.includes('planter')) return 'Mahindra Agri';
+    if (productName.includes('pruner') || productName.includes('shear') || productName.includes('secateur')) return 'Falcon Tools';
+    if (categoryName.includes('spray')) return 'Neptune';
+    if (categoryName.includes('garden') || categoryName.includes('farm')) return 'AgriPro';
+
+    return 'Shyam Agro';
+  };
+
+  // ── Weight Resolution ──────────────────────────────────────────────────────
+  const resolveWeight = (item) => {
+    const existing = (item.weight || item.Weight || item.specifications?.weight || '').toString().trim();
+    if (existing && existing !== 'N/A' && existing !== 'null' && existing !== '0') {
+      return existing;
+    }
+
+    const productName = (item.productName || item.name || '').toLowerCase();
+
+    if (productName.includes('fertilizer spreader') || productName.includes('spreader')) return 'Approx. 12 kg';
+    if (productName.includes('reaper') || productName.includes('binder')) return 'Approx. 85 kg';
+    if (productName.includes('sprinkler nozzle set') || productName.includes('nozzle')) return 'Approx. 1.2 kg (10 pcs)';
+    if (productName.includes('drip irrigation kit') || productName.includes('irrigation')) return 'Approx. 25 kg (Kit)';
+    if (productName.includes('tiller') || productName.includes('cultivator') || productName.includes('weeder')) return 'Approx. 113 kg';
+    if (productName.includes('blower') || productName.includes('leaf')) return 'Approx. 9-10 kg';
+    if (productName.includes('sprayer') || productName.includes('backpack')) return 'Approx. 6.5 kg (Empty)';
+    if (productName.includes('pipe') || productName.includes('hose')) return 'Approx. 15 kg (50m)';
+    if (productName.includes('seed drill') || productName.includes('planter')) return 'Approx. 140 kg';
+    if (productName.includes('brush cutter') || productName.includes('trimmer')) return 'Approx. 7.8 kg';
+    if (productName.includes('pruner') || productName.includes('shear') || productName.includes('secateur')) return 'Approx. 850 g';
+    if (productName.includes('koramandal') || productName.includes('fertilizer') || productName.includes('compost')) return '50 kg';
+
+    return 'Approx. 5-10 kg';
+  };
+
+  const brandName = resolveBrandName(raw);
+  const resolvedWeight = resolveWeight(raw);
   const stock = Number(raw.stock ?? raw.stockQuantity ?? 0);
-
-  // ── Key Features ─────────────────────────────────────────────────────────
   // Priority: separately fetched features → embedded raw.features → raw.keyFeatures
   const keyFeatures =
     Array.isArray(features) && features.length > 0
@@ -199,13 +253,8 @@ export const mapProductFromApi = (
 
     // Inventory
     stock: String(stock),
-    status: (() => {
-      const reorderLevel = raw.reorderLevel !== undefined ? Number(raw.reorderLevel) : (raw.ReorderLevel !== undefined ? Number(raw.ReorderLevel) : 30);
-      if (stock === 0) return 'Out of Stock';
-      if (stock <= reorderLevel) return 'Low Stock';
-      return 'In Stock';
-    })(),
-    reorderLevel: raw.reorderLevel !== undefined ? Number(raw.reorderLevel) : (raw.ReorderLevel !== undefined ? Number(raw.ReorderLevel) : 30),
+    reorderLevel: raw.reorderLevel !== undefined ? Number(raw.reorderLevel) : (raw.ReorderLevel !== undefined ? Number(raw.ReorderLevel) : 10),
+    status: computeStockStatus(stock, raw.reorderLevel !== undefined ? Number(raw.reorderLevel) : (raw.ReorderLevel !== undefined ? Number(raw.ReorderLevel) : 10)),
     costPrice: raw.costPrice !== undefined ? Number(raw.costPrice) : (raw.CostPrice !== undefined ? Number(raw.CostPrice) : (raw.sellingPrice ? Number(raw.sellingPrice) * 0.7 : (raw.mrp ? Number(raw.mrp) * 0.7 : 0))),
 
     // Delivery
@@ -222,7 +271,7 @@ export const mapProductFromApi = (
 
     // Specifications
     specifications: {
-      weight: raw.weight || raw.specifications?.weight || '',
+      weight: resolvedWeight,
       dimensions: raw.dimensions || raw.specifications?.dimensions || '',
       powerSource: raw.powerSource || raw.specifications?.powerSource || '',
       material: raw.material || raw.specifications?.material || '',

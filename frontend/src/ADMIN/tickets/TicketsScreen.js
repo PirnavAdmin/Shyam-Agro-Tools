@@ -20,6 +20,32 @@ import './TicketsScreen.css';
 
 const formatCurrency = (amount) => `INR ${Number(amount || 0).toLocaleString('en-IN')}`;
 
+const formatDateToDMY = (dateInput) => {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return dateInput;
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+const formatDateTimeToDMY = (dateInput) => {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return dateInput;
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const timeStr = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+  return `${day}-${month}-${year} ${timeStr}`;
+};
+
 const priorityMeta = {
   Critical: { className: 'priority-badge critical' },
   High: { className: 'priority-badge high' },
@@ -87,19 +113,21 @@ const TicketsScreen = () => {
 
   // Filtered tickets
   const filteredTickets = useMemo(() => {
-    return tickets.filter(ticket => {
-      const matchesSearch = 
-        ticket.ticketNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (ticket.orderId && ticket.orderId.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        ticket.issue.toLowerCase().includes(searchTerm.toLowerCase());
+    return tickets
+      .filter(ticket => {
+        const matchesSearch = 
+          ticket.ticketNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          ticket.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (ticket.orderId && ticket.orderId.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          ticket.issue.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesType = typeFilter === 'All' || ticket.type === typeFilter;
-      const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter;
-      const matchesPriority = priorityFilter === 'All' || ticket.priority === priorityFilter;
+        const matchesType = typeFilter === 'All' || ticket.type === typeFilter;
+        const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter;
+        const matchesPriority = priorityFilter === 'All' || ticket.priority === priorityFilter;
 
-      return matchesSearch && matchesType && matchesStatus && matchesPriority;
-    });
+        return matchesSearch && matchesType && matchesStatus && matchesPriority;
+      })
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [tickets, searchTerm, typeFilter, statusFilter, priorityFilter]);
 
   // List of all tickets
@@ -220,15 +248,6 @@ const TicketsScreen = () => {
         </div>
         <div className="tickets-filters-wrapper">
           <div className="filter-select-group">
-            <label>Type</label>
-            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
-              <option value="All">All Types</option>
-              <option value="order_related">Order Related</option>
-              <option value="chatbot">Chatbot Raised</option>
-              <option value="general">General Enquiry</option>
-            </select>
-          </div>
-          <div className="filter-select-group">
             <label>Status</label>
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="All">All Statuses</option>
@@ -268,7 +287,6 @@ const TicketsScreen = () => {
                 <tr>
                   <th>Ticket Details</th>
                   <th>Customer Contact</th>
-                  <th>Source Type</th>
                   <th>Priority</th>
                   <th>Audit Note</th>
                   <th>Assigned Agent</th>
@@ -286,11 +304,7 @@ const TicketsScreen = () => {
                           <strong>{ticket.ticketNo}</strong>
                           <span className="ticket-date">
                             <Calendar size={12} style={{ marginRight: '4px' }} />
-                            {new Date(ticket.createdAt).toLocaleDateString('en-IN', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric'
-                            })}
+                             {formatDateToDMY(ticket.createdAt)}
                           </span>
                         </div>
                       </td>
@@ -300,14 +314,6 @@ const TicketsScreen = () => {
                           {ticket.email && <span className="sub"><Mail size={10} /> {ticket.email}</span>}
                           {ticket.phone && <span className="sub"><Phone size={10} /> {ticket.phone}</span>}
                         </div>
-                      </td>
-                      <td>
-                        <span className={`type-badge ${ticket.type}`}>
-                          {ticket.type === 'order_related' ? '📦 Order-Related' : ticket.type === 'chatbot' ? '🤖 Chatbot' : '❓ General'}
-                        </span>
-                        {ticket.type === 'order_related' && ticket.orderId && (
-                          <div className="order-link-hint">Ref: #{ticket.orderId}</div>
-                        )}
                       </td>
                       <td>
                         <span className={priorityMeta[ticket.priority]?.className || 'priority-badge medium'}>
@@ -359,7 +365,7 @@ const TicketsScreen = () => {
                 <Ticket className="modal-header-icon" />
                 <div>
                   <h2>{selectedTicket.ticketNo} Details</h2>
-                  <span className="modal-subtitle">Raised on {new Date(selectedTicket.createdAt).toLocaleString()}</span>
+                  <span className="modal-subtitle">Raised on {formatDateTimeToDMY(selectedTicket.createdAt)}</span>
                 </div>
               </div>
               <button className="modal-close-btn" onClick={() => setSelectedTicket(null)}>

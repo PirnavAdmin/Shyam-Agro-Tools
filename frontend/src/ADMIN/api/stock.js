@@ -4,7 +4,7 @@ export const BASE_URL = 'https://wildlife-unwieldy-devotee.ngrok-free.dev';
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 20000,
+  timeout: 60000,
   headers: {
     'ngrok-skip-browser-warning': 'true',
     'Accept': 'application/json',

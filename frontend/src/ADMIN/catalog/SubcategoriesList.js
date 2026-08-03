@@ -77,17 +77,19 @@ const SubcategoriesList = () => {
 
   const filteredSubcategories = useMemo(() => {
     const query = searchTerm.toLowerCase().trim();
-    return subcategories.filter((subcategory) => {
-      const categoryName = getCategoryName(categories, subcategory.categoryId).toLowerCase();
-      const matchesSearch =
-        subcategory.name.toLowerCase().includes(query) ||
-        (subcategory.slug || '').toLowerCase().includes(query) ||
-        categoryName.includes(query) ||
-        String(subcategory.id).toLowerCase().includes(query);
-      const matchesCategory = selectedCategoryId === 'All' || subcategory.categoryId === selectedCategoryId;
+    return subcategories
+      .filter((subcategory) => {
+        const categoryName = getCategoryName(categories, subcategory.categoryId).toLowerCase();
+        const matchesSearch =
+          subcategory.name.toLowerCase().includes(query) ||
+          (subcategory.slug || '').toLowerCase().includes(query) ||
+          categoryName.includes(query) ||
+          String(subcategory.id).toLowerCase().includes(query);
+        const matchesCategory = selectedCategoryId === 'All' || subcategory.categoryId === selectedCategoryId;
 
-      return matchesSearch && matchesCategory;
-    });
+        return matchesSearch && matchesCategory;
+      })
+      .sort((a, b) => Number(b.id) - Number(a.id));
   }, [subcategories, searchTerm, categories, selectedCategoryId]);
 
   // Reset page when filter/search changes

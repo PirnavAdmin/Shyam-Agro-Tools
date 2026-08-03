@@ -192,14 +192,16 @@ const CouponsList = () => {
 
   const filteredCoupons = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    return coupons.filter((coupon) => {
-      const matchesSearch = [coupon.code, coupon.description, coupon.type]
-        .join(' ')
-        .toLowerCase()
-        .includes(normalizedSearch);
-      const matchesStatus = statusFilter === 'All' || coupon.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+    return coupons
+      .filter((coupon) => {
+        const matchesSearch = [coupon.code, coupon.description, coupon.type]
+          .join(' ')
+          .toLowerCase()
+          .includes(normalizedSearch);
+        const matchesStatus = statusFilter === 'All' || coupon.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => Number(b.id) - Number(a.id));
   }, [coupons, searchTerm, statusFilter]);
 
   // Reset page when filter/search changes

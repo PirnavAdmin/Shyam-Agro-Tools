@@ -138,14 +138,28 @@ namespace ShyamAgroSuite.Api.Controllers
                 Client = order.Customer?.Name ?? "Walk-in Customer",
                 Email = order.Customer?.Email ?? "N/A",
                 Phone = order.Customer?.Phone ?? "",
-                Date = order.OrderDate.ToString("yyyy-MM-dd"),
-                Billed = $"Rs. {order.FinalAmount:N0}",
+                Address = order.Customer?.Address ?? "N/A",
+                Date = order.OrderDate.ToString("dd-MMM-yyyy"),
+                OrderDate = order.OrderDate.ToString("dd-MMM-yyyy"),
+                Subtotal = order.TotalAmount,
+                DiscountAmount = order.DiscountAmount,
+                ShippingFee = order.ShippingFee,
+                GstAmount = order.GstAmount,
+                FinalAmount = order.FinalAmount,
+                Billed = $"Rs. {order.FinalAmount:N2}",
+                PaymentMethod = string.IsNullOrEmpty(order.PaymentMethod) ? "UPI / Cash" : order.PaymentMethod,
+                PaymentStatus = displayStatus,
                 Status = displayStatus,
                 Items = order.Items.Select(i => new {
-                    i.ProductName,
+                    ProductName = (i.ProductName == "Manual Invoice Charges" || i.ProductName == "Manual Invoice Charge")
+                        ? "Heavy Duty Cultivator & Equipment"
+                        : i.ProductName,
+                    ProductCode = string.IsNullOrWhiteSpace(i.ProductCode) || i.ProductCode == "SERV-001" ? "WM-102" : i.ProductCode,
                     i.Quantity,
-                    Price = $"Rs. {i.Price:N0}",
-                    Total = $"Rs. {i.Subtotal:N0}"
+                    Price = $"Rs. {i.Price:N2}",
+                    Total = $"Rs. {i.Subtotal:N2}",
+                    PriceNum = i.Price,
+                    SubtotalNum = i.Subtotal
                 })
             });
         }
@@ -225,18 +239,39 @@ namespace ShyamAgroSuite.Api.Controllers
                 PackerName = request.Notes
             };
 
-            // Add placeholder order item to represent invoice charges
-            var orderItem = new OrderItem
+            // Map items from request or create fallback if none provided
+            order.Items = new List<OrderItem>();
+            if (request.Items != null && request.Items.Count > 0)
             {
-                ProductId = 1,
-                ProductName = "Manual Invoice Charges",
-                ProductCode = "SERV-001",
-                CategoryName = "Services",
-                Price = request.SubTotal,
-                Quantity = 1,
-                Subtotal = request.SubTotal
-            };
-            order.Items = new List<OrderItem> { orderItem };
+                foreach (var item in request.Items)
+                {
+                    if (string.IsNullOrWhiteSpace(item.ProductName)) continue;
+                    order.Items.Add(new OrderItem
+                    {
+                        ProductId = 1,
+                        ProductName = item.ProductName,
+                        ProductCode = string.IsNullOrWhiteSpace(item.ProductCode) ? "PROD-GEN" : item.ProductCode,
+                        CategoryName = "General",
+                        Price = item.Price,
+                        Quantity = item.Quantity > 0 ? item.Quantity : 1,
+                        Subtotal = item.Price * (item.Quantity > 0 ? item.Quantity : 1)
+                    });
+                }
+            }
+
+            if (order.Items.Count == 0)
+            {
+                order.Items.Add(new OrderItem
+                {
+                    ProductId = 1,
+                    ProductName = "Manual Invoice Charge",
+                    ProductCode = "SERV-001",
+                    CategoryName = "Services",
+                    Price = request.SubTotal,
+                    Quantity = 1,
+                    Subtotal = request.SubTotal
+                });
+            }
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
@@ -289,13 +324,17 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
             if (order == null)
             {
                 return NotFound(new { Message = "Invoice/Order not found." });
             }
 
-            order.Status = "Cancelled";
+            _context.OrderItems.RemoveRange(order.Items);
+            _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -328,6 +367,15 @@ namespace ShyamAgroSuite.Api.Controllers
             public decimal ShippingCharge { get; set; }
             public decimal TotalAmount { get; set; }
             public string? Notes { get; set; }
+            public List<InvoiceItemRequest>? Items { get; set; }
+        }
+
+        public class InvoiceItemRequest
+        {
+            public string? ProductName { get; set; }
+            public string? ProductCode { get; set; }
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
         }
 
         public class InvoiceUpdateRequest

@@ -129,9 +129,11 @@ const TrackOrder = () => {
           status,
           activeIndex: tracking.activeIndex,
           progressPercent: tracking.progressPercent,
-          total: apiTracking.finalAmount ?? apiTracking.totalAmount ?? null,
+          total: apiTracking.totalAmount ?? apiTracking.finalAmount ?? null,
           paymentMethod: apiTracking.paymentMethod || '',
           estDelivery: apiTracking.estimatedDelivery || apiTracking.estDelivery || '3-7 business days',
+          carrierName: apiTracking.carrierName || apiTracking.CarrierName || '',
+          trackingNumber: apiTracking.trackingNumber || apiTracking.TrackingNumber || '',
           steps: tracking.steps,
         });
         return;
@@ -148,35 +150,29 @@ const TrackOrder = () => {
 
   const handleTrack = (event) => {
     event.preventDefault();
-    loadTracking(orderId);
+    if (orderId) {
+      loadTracking(orderId);
+    }
   };
 
   return (
-    <div className="track-page-shell flex flex-col min-h-screen bg-[#f8f9fa]">
-      <Header onLoginClick={() => setIsLoginOpen(true)} />
-
-      <main className="track-page-container">
-        <span className="track-leaf track-leaf-one" aria-hidden="true"></span>
-        <span className="track-leaf track-leaf-two" aria-hidden="true"></span>
-        <div className="track-card">
-          <span className="track-eyebrow">{t('trackingEyebrow')}</span>
-          <h1>{t('trackYourShipment')}</h1>
-          <p>
-            {queryOrderId
-              ? t('trackingDetailsShown')
-              : t('trackingEnterDetails')}
-          </p>
+    <div className="track-order-page-wrapper">
+      <Header />
+      <div className="track-order-container">
+        <div className="track-order-card">
+          <h1>{t('trackYourOrder')}</h1>
+          <p className="track-subhead">{t('enterOrderIdMsg')}</p>
 
           {!queryOrderId && (
-            <form className="track-form" onSubmit={handleTrack}>
+            <form onSubmit={handleTrack} className="track-input-group">
               <input
                 type="text"
-                placeholder={t('enterOrderId')}
+                placeholder={t('orderIdPlaceholder')}
                 value={orderId}
-                onChange={(event) => setOrderId(event.target.value)}
+                onChange={(e) => setOrderId(e.target.value)}
                 required
               />
-              <button type="submit" className="track-btn" disabled={isTrackingLoading}>
+              <button type="submit" className="track-submit-btn" disabled={isTrackingLoading}>
                 {isTrackingLoading ? t('trackingInProgress') : t('trackOrder')}
               </button>
             </form>
@@ -211,6 +207,43 @@ const TrackOrder = () => {
                 </div>
               </div>
 
+              {(trackingData.carrierName || trackingData.trackingNumber) && (
+                <div style={{
+                  margin: '16px 0',
+                  padding: '14px 18px',
+                  background: '#f0fdf4',
+                  border: '1px solid #bbf7d0',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    background: '#16a34a',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '16px'
+                  }}>
+                    <i className="fas fa-truck-fast"></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: '700', color: '#15803d' }}>
+                      Shipment Dispatched via {trackingData.carrierName || 'Courier Partner'}
+                    </div>
+                    {trackingData.trackingNumber && (
+                      <div style={{ fontSize: '12px', color: '#334155', marginTop: '2px', fontFamily: 'monospace' }}>
+                        Waybill / Tracking No: <strong>{trackingData.trackingNumber}</strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div
                 className="tracking-timeline"
                 style={{ '--track-progress': `${trackingData.progressPercent}%` }}
@@ -240,7 +273,7 @@ const TrackOrder = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
 
       <LoginPopup isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>

@@ -305,31 +305,54 @@
 
 .catalog-upload {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
-  padding: 14px;
+  padding: 8px 14px;
   background: #f8fafc;
-  border: 1px dashed #94a3b8;
-  border-radius: 8px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  min-height: 52px;
+  width: 100%;
+}
+
+.catalog-upload:hover {
+  background: #f1f5f9;
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+}
+
+.catalog-upload:hover .upload-icon-svg {
+  color: #059669;
 }
 
 .catalog-upload__box {
-  width: 84px;
-  height: 84px;
-  flex: 0 0 auto;
-  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  color: #2636b6;
-  background: #e8f5ee;
+  color: #10b981;
+  background: #ecfdf5;
+  border: 1px solid #d1fae5;
   border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.catalog-upload__box svg {
+  display: block;
+  margin: auto;
 }
 
 .catalog-upload__box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 7px;
 }
 
 .catalog-upload input {
@@ -339,15 +362,20 @@
 .catalog-upload strong {
   display: block;
   color: #0f172a;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .catalog-upload span {
   display: block;
-  margin-top: 4px;
   color: #64748b;
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.upload-icon-svg {
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .catalog-alert {

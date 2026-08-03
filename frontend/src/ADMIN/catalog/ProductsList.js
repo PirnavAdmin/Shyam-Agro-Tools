@@ -17,12 +17,39 @@ const getStatusClass = (status) => {
   return 'catalog-badge--out';
 };
 
+const parsePriceNumber = (val) => {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === 'number') return isNaN(val) ? 0 : val;
+  const cleaned = String(val).replace(/[^0-9.]/g, '');
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 const getDiscountLabel = (product) => {
-  const mrp = Number(product.mrp) || 0;
-  const price = Number(product.price) || 0;
-  if (!mrp || mrp <= price) return 'No discount';
-  const percentage = Math.round(((mrp - price) / mrp) * 100);
-  return `${percentage}% off`;
+  if (!product) return 'No discount';
+
+  // 1. If product explicitly specifies percentage discountType
+  if (product.discountType === 'percentage' && parsePriceNumber(product.discountValue) > 0) {
+    const pct = parsePriceNumber(product.discountValue);
+    const formatted = pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1);
+    return `${formatted}% off`;
+  }
+
+  // 2. If product explicitly specifies flat rupee discountType
+  if (product.discountType === 'fixed' && parsePriceNumber(product.discountValue) > 0) {
+    const flat = parsePriceNumber(product.discountValue);
+    return `₹${flat.toLocaleString('en-IN')} off`;
+  }
+
+  // 3. Compute from MRP vs Selling Price safely
+  const mrp = parsePriceNumber(product.mrp);
+  const price = parsePriceNumber(product.price);
+
+  if (mrp <= 0 || price <= 0 || mrp <= price) return 'No discount';
+
+  const rawPercentage = ((mrp - price) / mrp) * 100;
+  const formattedPct = rawPercentage % 1 === 0 ? rawPercentage.toFixed(0) : rawPercentage.toFixed(1);
+  return `${formattedPct}% off`;
 };
 
 const ProductsList = () => {
@@ -89,13 +116,15 @@ const ProductsList = () => {
 
   // ── Client-side filter by category + status ───────────────────────────────
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesCategory =
-        selectedCategoryId === 'All' || product.categoryId === selectedCategoryId;
-      const matchesStatus =
-        selectedStatus === 'All' || product.status === selectedStatus;
-      return matchesCategory && matchesStatus;
-    });
+    return products
+      .filter((product) => {
+        const matchesCategory =
+          selectedCategoryId === 'All' || product.categoryId === selectedCategoryId;
+        const matchesStatus =
+          selectedStatus === 'All' || product.status === selectedStatus;
+        return matchesCategory && matchesStatus;
+      })
+      .sort((a, b) => Number(b.id) - Number(a.id));
   }, [products, selectedCategoryId, selectedStatus]);
 
   // Reset page on filter change
@@ -231,7 +260,7 @@ const ProductsList = () => {
                     </span>
                     <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: '600' }}>{product.name}</div>
                     <div className="catalog-table__muted" style={{ fontSize: '10px' }}>
-                      {product.brand || 'No brand'} · {product.specifications?.weight || 'N/A'}
+                      Brand: <strong>{product.brand && product.brand.trim() ? product.brand : 'No Brand'}</strong> · {product.specifications?.weight || 'N/A'}
                     </div>
                   </td>
                   <td className="catalog-path" style={{ padding: '5px 8px', fontSize: '11px' }}>{product.sku || '—'}</td>

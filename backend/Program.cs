@@ -132,6 +132,21 @@ using (var cleanupScope = app.Services.CreateScope())
                 Console.WriteLine($"[Startup] Removed {deleted} legacy supplier record(s).");
         }
 
+        // 1b. Ensure ProductReviews.Rating column is DECIMAL(5,2)
+        using (var cmd = conn.CreateCommand())
+        {
+            try
+            {
+                cmd.CommandText = "ALTER TABLE ProductReviews MODIFY COLUMN Rating DECIMAL(5,2) NOT NULL DEFAULT 5.00";
+                cmd.ExecuteNonQuery();
+                Console.WriteLine("[Startup] Altered ProductReviews.Rating column to DECIMAL(5,2).");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Startup] ProductReviews.Rating column alter info: {ex.Message}");
+            }
+        }
+
         // 2. Fix NULL values - replace with safe defaults
         using (var cmd = conn.CreateCommand())
         {

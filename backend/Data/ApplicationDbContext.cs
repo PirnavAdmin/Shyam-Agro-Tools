@@ -193,6 +193,10 @@ namespace ShyamAgroSuite.Api.Data
                 .Property(p => p.AverageRating)
                 .HasPrecision(5, 2);
 
+            modelBuilder.Entity<ProductReview>()
+                .Property(pr => pr.Rating)
+                .HasPrecision(5, 2);
+
             modelBuilder.Entity<Coupon>()
                 .Property(c => c.DiscountValue)
                 .HasPrecision(18, 2);
