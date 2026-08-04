@@ -63,28 +63,50 @@ namespace ShyamAgroSuite.Api.Controllers
             return Ok(customer);
         }
 
-        private static bool IsValidCustomerName(string? name)
+        public static bool IsValidCustomerName(string? name)
         {
             if (string.IsNullOrWhiteSpace(name)) return false;
             var trimmed = name.Trim();
             if (trimmed.Length < 3 || trimmed.Length > 50) return false;
             if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[\p{L}\s.'\-]{3,50}$")) return false;
-            if (trimmed.Where(char.IsLetter).Select(char.ToLower).Distinct().Count() < 2) return false;
-            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(.)\1{3,}")) return false;
+            
+            var lettersOnly = new string(trimmed.Where(char.IsLetter).ToArray()).ToLower();
+            if (lettersOnly.Distinct().Count() < 2) return false;
+
+            // Must contain at least one vowel
+            if (!lettersOnly.Any(c => "aeiouy".Contains(c))) return false;
+
+            // Reject 3 or more consecutive repeating characters (e.g. Nnnnnn, vvvvvv)
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(.)\1{2,}", System.Text.RegularExpressions.RegexOptions.IgnoreCase)) return false;
+
+            // Reject random keyboard mashing (5+ consecutive consonants)
+            if (System.Text.RegularExpressions.Regex.IsMatch(lettersOnly, @"[bcdfghjklmnpqrstvwxz]{5,}")) return false;
+
             return true;
         }
 
-        private static bool IsValidPhone(string? phone)
+        public static bool IsValidPhone(string? phone)
         {
             if (string.IsNullOrWhiteSpace(phone)) return false;
-            var trimmed = phone.Trim();
+            var trimmed = phone.Trim().Replace(" ", "").Replace("-", "").Replace("+91", "");
             if (!System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[6-9]\d{9}$")) return false;
-            if (trimmed.Distinct().Count() == 1) return false;
+            
+            // Must have at least 3 distinct digits
+            if (trimmed.Distinct().Count() < 3) return false;
+
+            // Reject 5 or more consecutive repeating digits (e.g. 9888881234)
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(\d)\1{4,}")) return false;
+
+            // Reject repeating 2-digit pairs (e.g. 5454545454, 9898989898)
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(\d{2})\1{3,}")) return false;
+
             string[] invalidPhones = new string[] {
-                "1234567890", "0123456789", "9876543210", "1234567891",
-                "6789012345", "9876543211", "9999999999", "8888888888", "7777777777", "6666666666"
+                "1234567890", "0123456789", "9876543210", "1234567891", "6789012345",
+                "9876543211", "9999999999", "8888888888", "7777777777", "6666666666",
+                "5454545454", "9898989898", "9123456789", "6543210987", "0000000000"
             };
             if (invalidPhones.Contains(trimmed)) return false;
+
             return true;
         }
 
@@ -139,6 +161,13 @@ namespace ShyamAgroSuite.Api.Controllers
             if (!IsValidDistrictOrState(customer.State))
             {
                 return BadRequest(new { Message = "Invalid State name." });
+            }
+
+            // Check for existing duplicate customer by Phone
+            var existingCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == customer.Phone);
+            if (existingCustomer != null)
+            {
+                return BadRequest(new { Message = $"A customer with phone number '{customer.Phone}' already exists in the directory (#{existingCustomer.Id} - {existingCustomer.Name}). Duplicate customer records are not allowed." });
             }
 
             // Register user if not already exists for this phone

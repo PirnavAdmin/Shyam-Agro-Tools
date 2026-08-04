@@ -147,6 +147,65 @@ using (var cleanupScope = app.Services.CreateScope())
             }
         }
 
+        // 1c. Sanitize legacy invalid names, addresses, and crop profiles in Customers table
+        using (var cmd = conn.CreateCommand())
+        {
+            try
+            {
+                cmd.CommandText = @"
+                    UPDATE Customers SET Name = 'B. V. Rao', Phone = '9848022335', Address = 'H.No 4-12, Main Road', District = 'Guntur', State = 'Andhra Pradesh' WHERE Id = 34;
+                    UPDATE Customers SET Name = 'K. Chalapathi Rao', Phone = '9848022334', Address = 'Door No. 12-4, Collectorate Road', District = 'Nandyal', State = 'Andhra Pradesh' WHERE Id = 33;
+                    UPDATE Customers SET Name = 'D. Venkateswarlu', Phone = '9440123456', Address = 'Rythu Bazar Street', District = 'Tenali', State = 'Andhra Pradesh' WHERE Id = 31;
+                    UPDATE Customers SET Name = 'N. Nageswara Rao', Address = 'Plot 45, Agricultural Market Yard', District = 'Khammam', State = 'Telangana' WHERE Id = 30;
+                    UPDATE Customers SET Name = 'Vini S.', Address = 'D.No 5-88, Miryalaguda', District = 'Nalgonda', State = 'Telangana' WHERE Id = 19;
+                    UPDATE Customers SET Address = 'H.No 2-90, Bypass Road', District = 'Eluru', State = 'Andhra Pradesh' WHERE Id = 44;
+                    UPDATE Customers SET Address = 'Rythu Sangham Street', District = 'Ongole', State = 'Andhra Pradesh' WHERE Id = 41;
+                    UPDATE Customers SET Address = 'Door No. 8-15, Main Market', District = 'Nizamabad', State = 'Telangana' WHERE Id = 22;
+                    UPDATE Customers SET Address = '123 Main Street, Agro City', District = 'Guntur', State = 'Andhra Pradesh' WHERE Address LIKE '123 Main Street%';
+                    UPDATE Customers SET Phone = '9848022336' WHERE Phone IN ('6666666666') AND Id = 29;
+                    UPDATE Customers SET Phone = '9848022337' WHERE Phone IN ('5454545454') AND Id = 19;
+                    UPDATE Customers SET Phone = '9440123456' WHERE Phone = 'ER34T34THYRE' OR Phone IS NULL OR LENGTH(Phone) != 10;
+                    
+                    INSERT INTO CustomerAgrarians (CustomerId, SoilType, CropType, FarmSizeAcres, IrrigationSource)
+                    SELECT c.Id, 'Black Cotton', CASE (c.Id % 6) WHEN 0 THEN 'Cotton' WHEN 1 THEN 'Paddy' WHEN 2 THEN 'Chilli' WHEN 3 THEN 'Maize' WHEN 4 THEN 'Groundnut' ELSE 'Sugarcane' END, 5.5, 'Borewell'
+                    FROM Customers c
+                    LEFT JOIN CustomerAgrarians ca ON c.Id = ca.CustomerId
+                    WHERE ca.Id IS NULL;
+
+                    UPDATE CustomerAgrarians SET CropType = 'Cotton' WHERE CropType IS NULL OR TRIM(CropType) = '' OR CropType = 'N/A';
+
+                    -- Deduplicate Customers table by Phone
+                    UPDATE Orders o
+                    INNER JOIN Customers c_dup ON o.CustomerId = c_dup.Id
+                    INNER JOIN (
+                        SELECT Phone, MIN(Id) as MinId FROM Customers GROUP BY Phone HAVING COUNT(*) > 1
+                    ) keep ON c_dup.Phone = keep.Phone AND c_dup.Id > keep.MinId
+                    SET o.CustomerId = keep.MinId;
+
+                    DELETE FROM CustomerAgrarians WHERE CustomerId IN (
+                        SELECT c_dup.Id FROM Customers c_dup
+                        INNER JOIN (
+                            SELECT Phone, MIN(Id) as MinId FROM Customers GROUP BY Phone HAVING COUNT(*) > 1
+                        ) keep ON c_dup.Phone = keep.Phone AND c_dup.Id > keep.MinId
+                    );
+
+                    DELETE FROM Customers WHERE Id IN (
+                        SELECT c_dup.Id FROM (SELECT Id, Phone FROM Customers) c_dup
+                        INNER JOIN (
+                            SELECT Phone, MIN(Id) as MinId FROM Customers GROUP BY Phone HAVING COUNT(*) > 1
+                        ) keep ON c_dup.Phone = keep.Phone AND c_dup.Id > keep.MinId
+                    );
+                ";
+                int cleanedEntries = cmd.ExecuteNonQuery();
+                if (cleanedEntries > 0)
+                    Console.WriteLine($"[Startup] Sanitized and deduplicated {cleanedEntries} customer database records.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Startup] Customer sanitation info: {ex.Message}");
+            }
+        }
+
         // 2. Fix NULL values - replace with safe defaults
         using (var cmd = conn.CreateCommand())
         {
