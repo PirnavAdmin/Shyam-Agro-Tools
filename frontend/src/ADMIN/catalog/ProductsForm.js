@@ -231,7 +231,12 @@ const ProductsForm = () => {
       return `${formatCurrency(savedAmount)} saved (${percentOff}% off)`;
     }
 
-    return `${formatCurrency(savedAmount)} saved (${formData.discountValue}% off)`;
+    const valueNum = Number(formData.discountValue) || 0;
+    if (valueNum > 99) {
+      return `${formatCurrency(savedAmount)} saved (${percentOff}% off)`;
+    }
+
+    return `${formatCurrency(savedAmount)} saved (${valueNum}% off)`;
   }, [formData.discountType, formData.discountValue, formData.mrp, sellingPrice]);
 
   useEffect(() => {

@@ -195,10 +195,25 @@ using (var cleanupScope = app.Services.CreateScope())
                             SELECT Phone, MIN(Id) as MinId FROM Customers GROUP BY Phone HAVING COUNT(*) > 1
                         ) keep ON c_dup.Phone = keep.Phone AND c_dup.Id > keep.MinId
                     );
+
+                    -- Deduplicate Orders table by OrderNumber
+                    DELETE o1 FROM Orders o1
+                    INNER JOIN Orders o2 ON o1.OrderNumber = o2.OrderNumber AND o1.Id > o2.Id;
+
+                    -- Standardize OrderNumber strings
+                    UPDATE Orders SET OrderNumber = REPLACE(OrderNumber, '#', '');
+                    UPDATE Orders SET OrderNumber = REPLACE(OrderNumber, 'ORD-ORD-', 'ORD-');
+                    UPDATE Orders SET OrderNumber = CONCAT('ORD-', OrderNumber) WHERE OrderNumber NOT LIKE 'ORD-%';
+
+                    -- Synchronize PaymentStatus for completed, delivered, and cancelled orders
+                    UPDATE Orders SET PaymentStatus = 'Paid' WHERE Status IN ('Completed', 'Delivered') AND PaymentStatus IN ('Pending', 'Pending Verification');
+                    UPDATE Orders SET PaymentStatus = 'Cancelled', Status = 'Cancelled' WHERE FinalAmount = 0 OR TotalAmount = 0;
+                    UPDATE Orders SET PaymentStatus = 'Cancelled', Status = 'Cancelled' WHERE Status = 'Pending' AND PaymentStatus = 'Pending' AND OrderDate < DATE_SUB(NOW(), INTERVAL 7 DAY);
+                    UPDATE Orders SET PaymentStatus = 'Cancelled' WHERE Status = 'Cancelled';
                 ";
                 int cleanedEntries = cmd.ExecuteNonQuery();
                 if (cleanedEntries > 0)
-                    Console.WriteLine($"[Startup] Sanitized and deduplicated {cleanedEntries} customer database records.");
+                    Console.WriteLine($"[Startup] Sanitized and deduplicated {cleanedEntries} customer & order database records.");
             }
             catch (Exception ex)
             {

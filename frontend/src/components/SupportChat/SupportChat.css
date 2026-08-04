@@ -76,38 +76,41 @@
 
 .support-chat-panel {
   position: fixed;
-  top: 0;
-  left: 0;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  top: auto;
+  left: auto;
   z-index: 100000;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: 100%;
-  height: 100vh;
+  width: 760px;
+  max-width: calc(100vw - 2.5rem);
+  height: 780px;
+  max-height: calc(100vh - 2.5rem);
   overflow: hidden;
-  max-width: none;
   overscroll-behavior: contain;
-  border: 0;
-  border-radius: 0;
+  border: 1px solid rgba(88, 184, 46, 0.22);
+  border-radius: 20px;
   background: #ffffff;
   color: #18251f;
-  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.24);
-  animation: supportChatIn 300ms ease-out;
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.26);
+  animation: supportChatIn 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes supportChatIn {
   from {
     opacity: 0;
-    transform: translateY(-100%);
+    transform: translateY(16px) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .support-chat-z-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 2.3rem 2.3rem;
+  grid-template-columns: auto minmax(0, 1fr) 2.3rem 2.3rem;
   align-items: center;
   gap: 0.65rem;
   position: sticky;
@@ -116,6 +119,28 @@
   border-bottom: 1px solid #edf2ed;
   background: #ffffff;
   padding: 0.95rem;
+}
+
+.support-chat-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #d1fae5;
+  border-radius: 999px;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.support-chat-back-btn:hover {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+  transform: translateX(-2px);
 }
 
 .support-chat-brand {
@@ -203,9 +228,9 @@
 
 .support-z-message {
   display: flex;
-  gap: 0.55rem;
+  gap: 0.4rem;
   min-width: 0;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.25rem;
 }
 
 .support-z-message-user {
@@ -216,61 +241,69 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 1.75rem;
+  height: 1.75rem;
   flex: 0 0 auto;
   border-radius: 999px;
   background: #ffffff;
   color: #58b82e;
-  box-shadow: 0 8px 18px rgba(15, 61, 46, 0.1);
+  box-shadow: 0 3px 8px rgba(15, 61, 46, 0.08);
 }
 
 .support-z-bubble {
   width: fit-content;
-  max-width: min(100%, 300px);
+  max-width: min(100%, 580px);
   min-width: 0;
   border: 1px solid #e8eee8;
-  border-radius: 18px;
-  border-top-left-radius: 7px;
+  border-radius: 14px;
+  border-top-left-radius: 4px;
   background: #ffffff;
-  padding: 0.72rem 0.82rem;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+  padding: 0.65rem 0.95rem;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
 }
 
 .support-z-message-user .support-z-bubble {
   border-color: #58b82e;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 7px;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 4px;
   background: #58b82e;
   color: #ffffff;
 }
 
-.support-z-bubble p {
+.support-z-bubble-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.support-z-bubble-header p {
   margin: 0;
-  font-size: 0.82rem;
-  line-height: 1.55;
+  font-size: 0.94rem;
+  line-height: 1.5;
   overflow-wrap: anywhere;
   white-space: pre-line;
 }
 
-.support-z-bubble time {
-  display: block;
-  margin-top: 0.42rem;
+.support-z-bubble-header time {
+  display: inline-block;
+  margin: 0;
   color: currentColor;
-  font-size: 0.62rem;
-  font-weight: 800;
-  opacity: 0.55;
-  text-align: right;
+  font-size: 0.68rem;
+  font-weight: 700;
+  opacity: 0.65;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .support-tracking-card {
   display: grid;
-  gap: 0.72rem;
-  margin-top: 0.72rem;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
   border: 1px solid rgba(88, 184, 46, 0.2);
-  border-radius: 14px;
+  border-radius: 12px;
   background: #f8fbf6;
-  padding: 0.72rem;
+  padding: 0.55rem;
 }
 
 .support-tracking-grid {
@@ -361,11 +394,11 @@
 .support-option-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.42rem;
+  gap: 0.32rem;
   max-width: 100%;
-  margin-top: 0.65rem;
+  margin-top: 0.38rem;
   border-top: 1px solid rgba(15, 61, 46, 0.08);
-  padding-top: 0.55rem;
+  padding-top: 0.38rem;
 }
 
 .support-option-list button {
@@ -375,11 +408,11 @@
   background: #f4fbf1;
   color: #1f8a43;
   cursor: pointer;
-  font-size: 0.68rem;
-  font-weight: 900;
-  line-height: 1.25;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1.2;
   overflow-wrap: anywhere;
-  padding: 0.48rem 0.68rem;
+  padding: 0.35rem 0.6rem;
   text-align: left;
   text-transform: uppercase;
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;

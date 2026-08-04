@@ -46,6 +46,18 @@ const formatDateTimeToDMY = (dateInput) => {
   return `${day}-${month}-${year} ${timeStr}`;
 };
 
+const formatOrderId = (rawId) => {
+  if (!rawId) return 'ORD-000000';
+  let str = String(rawId).trim().replace(/^#+/, '');
+  while (str.startsWith('ORD-ORD-')) {
+    str = str.substring(4);
+  }
+  if (!str.startsWith('ORD-')) {
+    str = `ORD-${str}`;
+  }
+  return str;
+};
+
 const priorityMeta = {
   Critical: { className: 'priority-badge critical' },
   High: { className: 'priority-badge high' },
@@ -160,7 +172,7 @@ const TicketsScreen = () => {
       setSaving(true);
       const updated = await updateTicket(selectedTicket.id, {
         status: editStatus,
-        priority: editPriority,
+        priority: editStatus === 'Closed' ? 'Low' : editPriority,
         assignedTo: editAssignedTo,
         notes: editNotes
       });
@@ -316,9 +328,15 @@ const TicketsScreen = () => {
                         </div>
                       </td>
                       <td>
-                        <span className={priorityMeta[ticket.priority]?.className || 'priority-badge medium'}>
-                          {ticket.priority}
-                        </span>
+                        {ticket.status === 'Closed' ? (
+                          <span className="priority-badge closed" style={{ background: '#f1f5f9', color: '#64748b', borderColor: '#cbd5e1' }}>
+                            N/A (Closed)
+                          </span>
+                        ) : (
+                          <span className={priorityMeta[ticket.priority]?.className || 'priority-badge medium'}>
+                            {ticket.priority}
+                          </span>
+                        )}
                       </td>
                       <td>
                         <div className="ticket-notes-cell" style={{ maxWidth: '180px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={ticket.notes || 'No notes added'}>
@@ -408,9 +426,48 @@ const TicketsScreen = () => {
                   {/* Ticket Details & Issue Description */}
                   <div className="detail-section-card">
                     <h3>Issue Description</h3>
-                    <div className="issue-desc-box">
-                      <p>{selectedTicket.issue}</p>
+
+                    {/* Ticket Metadata Row */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px',
+                        background: selectedTicket.type === 'order_related' ? '#fef3c7' : selectedTicket.type === 'chatbot' ? '#e0e7ff' : '#f1f5f9',
+                        color: selectedTicket.type === 'order_related' ? '#92400e' : selectedTicket.type === 'chatbot' ? '#3730a3' : '#475569',
+                        border: `1px solid ${selectedTicket.type === 'order_related' ? '#fcd34d' : selectedTicket.type === 'chatbot' ? '#a5b4fc' : '#cbd5e1'}`
+                      }}>
+                        {selectedTicket.type === 'order_related' ? '📦 Order Related' : selectedTicket.type === 'chatbot' ? '💬 Chatbot Raised' : '📋 General Enquiry'}
+                      </span>
+                      {selectedTicket.type === 'order_related' && selectedTicket.orderId && selectedTicket.orderId !== 'N/A' && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', background: '#f0fdf4', color: '#166534', border: '1px solid #86efac' }}>
+                          🔗 Order Ref: {formatOrderId(selectedTicket.orderId)}
+                        </span>
+                      )}
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '600', background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0' }}>
+                        🕒 Raised: {formatDateTimeToDMY(selectedTicket.createdAt)}
+                      </span>
                     </div>
+
+                    {/* Issue Description Content */}
+                    <div className="issue-desc-box" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '14px 16px' }}>
+                      <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.7', color: '#1e293b', fontWeight: '500' }}>
+                        {selectedTicket.issue}
+                      </p>
+                    </div>
+
+                    {/* Fallback note if issue is vague */}
+                    {(selectedTicket.issue === 'No Description' || selectedTicket.issue === 'Order Dispute' || selectedTicket.issue === 'Chatbot Handover Request' || (selectedTicket.issue && selectedTicket.issue.length < 20)) && (
+                      <div style={{ marginTop: '8px', padding: '8px 12px', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '6px', fontSize: '11.5px', color: '#92400e', fontWeight: '500', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                        <span>⚠️</span>
+                        <span>
+                          <strong>Note:</strong> The issue description appears brief. 
+                          {selectedTicket.type === 'chatbot' && selectedTicket.chatHistory?.length > 0
+                            ? ' Review the Chatbot Transcript Logs below for the full conversation context.'
+                            : selectedTicket.type === 'order_related' && selectedTicket.orderId !== 'N/A'
+                              ? ` Check the Linked Order ${formatOrderId(selectedTicket.orderId)} details below for more context.`
+                              : ' Consider contacting the customer for clarification and updating the Internal Audit Notes.'
+                          }
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Order Link Details (If Order Related) */}
@@ -422,7 +479,7 @@ const TicketsScreen = () => {
                           <div className="order-summary-row">
                             <div>
                               <span>Order Reference</span>
-                              <strong>#{linkedOrder.id || linkedOrder.orderId}</strong>
+                              <strong>{formatOrderId(linkedOrder.id || linkedOrder.orderId)}</strong>
                             </div>
                             <div>
                               <span>Order Status</span>
@@ -453,7 +510,7 @@ const TicketsScreen = () => {
                         <div className="linked-order-notfound">
                           <ShoppingBag size={20} className="warning-icon" />
                           <div>
-                            <strong>Order #{selectedTicket.orderId} not found in Admin Ledger</strong>
+                            <strong>Order {formatOrderId(selectedTicket.orderId)} not found in Admin Ledger</strong>
                             <span>Please verify if this is a custom order or manual transaction.</span>
                           </div>
                         </div>
@@ -508,12 +565,18 @@ const TicketsScreen = () => {
 
                     <div className="form-group">
                       <label>Update Priority</label>
-                      <select value={editPriority} onChange={(e) => setEditPriority(e.target.value)}>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                      </select>
+                      {editStatus === 'Closed' ? (
+                        <div style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', color: '#64748b', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>🔒</span> N/A — Closed Ticket (No Active Priority)
+                        </div>
+                      ) : (
+                        <select value={editPriority} onChange={(e) => setEditPriority(e.target.value)}>
+                          <option value="Low">Low</option>
+                          <option value="Medium">Medium</option>
+                          <option value="High">High</option>
+                          <option value="Critical">Critical</option>
+                        </select>
+                      )}
                     </div>
 
                     <div className="form-group">

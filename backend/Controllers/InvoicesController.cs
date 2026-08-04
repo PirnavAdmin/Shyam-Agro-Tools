@@ -131,6 +131,18 @@ namespace ShyamAgroSuite.Api.Controllers
                 displayStatus = "Paid";
             }
 
+            var addressParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(order.Customer?.Address) && order.Customer.Address != "N/A")
+                addressParts.Add(order.Customer.Address.Trim());
+            if (!string.IsNullOrWhiteSpace(order.Customer?.District) && order.Customer.District != "N/A")
+                addressParts.Add(order.Customer.District.Trim());
+            if (!string.IsNullOrWhiteSpace(order.Customer?.State) && order.Customer.State != "N/A")
+                addressParts.Add(order.Customer.State.Trim());
+
+            var fullAddress = addressParts.Count > 0 
+                ? string.Join(", ", addressParts) 
+                : (!string.IsNullOrWhiteSpace(order.ShippingAddress) ? order.ShippingAddress : "Main Road, Shyam Agro Market Zone");
+
             return Ok(new
             {
                 Id = order.Id,
@@ -138,7 +150,8 @@ namespace ShyamAgroSuite.Api.Controllers
                 Client = order.Customer?.Name ?? "Walk-in Customer",
                 Email = order.Customer?.Email ?? "N/A",
                 Phone = order.Customer?.Phone ?? "",
-                Address = order.Customer?.Address ?? "N/A",
+                Address = fullAddress,
+                ShippingAddress = string.IsNullOrWhiteSpace(order.ShippingAddress) ? fullAddress : order.ShippingAddress,
                 Date = order.OrderDate.ToString("dd-MMM-yyyy"),
                 OrderDate = order.OrderDate.ToString("dd-MMM-yyyy"),
                 Subtotal = order.TotalAmount,
@@ -171,6 +184,22 @@ namespace ShyamAgroSuite.Api.Controllers
             if (string.IsNullOrEmpty(request.ClientName))
             {
                 return BadRequest(new { Message = "Client Name is required." });
+            }
+
+            // Validate & normalize EmailAddress if provided
+            if (!string.IsNullOrWhiteSpace(request.EmailAddress))
+            {
+                var cleanEmail = request.EmailAddress.Trim().ToLower();
+                if (cleanEmail.EndsWith("@gmail.in", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { Message = "Invalid email domain '@gmail.in'. Gmail addresses must end with @gmail.com." });
+                }
+                var emailRegex = new System.Text.RegularExpressions.Regex(@"^[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|org|net|edu|gov|co\.in|in|io|co|biz|info|me|farm|agro)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (!emailRegex.IsMatch(cleanEmail))
+                {
+                    return BadRequest(new { Message = "Please enter a valid lowercase email address ending with a valid extension (e.g., .com, .org, .net, .in)." });
+                }
+                request.EmailAddress = cleanEmail;
             }
 
             // 1. Lookup or create customer by phone/email

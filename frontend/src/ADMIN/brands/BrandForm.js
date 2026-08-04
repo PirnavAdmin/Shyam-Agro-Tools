@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Upload, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Lock, Save, Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { getApiDomain } from '../../utils/apiConfig';
 import './brands.css';
 import { Toast } from '../components/Toast';
@@ -91,6 +91,40 @@ export const fetchBrands = async () => {
   }
 };
 
+export const validateBrandName = (rawName) => {
+  if (!rawName || !rawName.trim()) {
+    return 'Brand Name is required.';
+  }
+  const name = rawName.trim();
+  if (name.length < 2 || name.length > 50) {
+    return 'Brand Name must be between 2 and 50 characters.';
+  }
+  if (!/[a-zA-Z]/.test(name)) {
+    return 'Brand Name must contain valid letters.';
+  }
+  if (/(.)\1{3,}/.test(name)) {
+    return 'Brand Name cannot contain repeated random characters.';
+  }
+  if (!/^[A-Za-z0-9][A-Za-z0-9\s&\-\'\./]{1,49}$/.test(name)) {
+    return 'Brand Name contains invalid characters. Only letters, numbers, spaces, and standard punctuation (&, -, \', ., /) are allowed.';
+  }
+  return null;
+};
+
+const parseApiError = async (res) => {
+  try {
+    const text = await res.text();
+    try {
+      const data = JSON.parse(text);
+      return data.Message || data.message || text;
+    } catch {
+      return text || `Request failed with status ${res.status}`;
+    }
+  } catch {
+    return `Request failed with status ${res.status}`;
+  }
+};
+
 export const createBrand = async (brand) => {
   const fd = new FormData();
   fd.append('Id', brand.id);
@@ -114,8 +148,12 @@ export const createBrand = async (brand) => {
       body: fd,
     });
     if (res.ok) return await res.json();
-    console.warn(`Primary create brand API returned status: ${res.status}`);
+    if (res.status === 400 || res.status === 409) {
+      const msg = await parseApiError(res);
+      throw new Error(msg);
+    }
   } catch (e) {
+    if (e.message && !e.message.includes('fetch')) throw e;
     console.warn('Failed to post to primary Brand API, trying Catalog/brands API...', e);
   }
 
@@ -126,8 +164,8 @@ export const createBrand = async (brand) => {
     body: fd,
   });
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Create brand failed: ${res.status} ${err}`);
+    const err = await parseApiError(res);
+    throw new Error(err);
   }
   return await res.json();
 };
@@ -157,8 +195,12 @@ export const updateBrand = async (brand) => {
       body: fd,
     });
     if (res.ok) return { success: true };
-    console.warn(`Primary update brand API returned status: ${res.status}`);
+    if (res.status === 400 || res.status === 409) {
+      const msg = await parseApiError(res);
+      throw new Error(msg);
+    }
   } catch (e) {
+    if (e.message && !e.message.includes('fetch')) throw e;
     console.warn('Failed to put to primary Brand API, trying Catalog/brands API...', e);
   }
 
@@ -169,8 +211,8 @@ export const updateBrand = async (brand) => {
     body: fd,
   });
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Update brand failed: ${res.status} ${err}`);
+    const err = await parseApiError(res);
+    throw new Error(err);
   }
   return { success: true };
 };
@@ -241,9 +283,23 @@ const BrandForm = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
+    const allowedExts = ['.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif'];
+    const fileName = file.name.toLowerCase();
+    const isExtensionValid = allowedExts.some(ext => fileName.endsWith(ext));
+    const isMimeValid = file.type && file.type.startsWith('image/');
+
+    if (!isExtensionValid || !isMimeValid) {
+      e.target.value = '';
+      setToastMessage('Invalid file format. Only image files (PNG, JPG, JPEG, WEBP, SVG) are allowed.');
+      setToastType('error');
+      return;
+    }
+
     if (file.size > 2 * 1024 * 1024) {
-      setToastMessage('Image size must be less than 2MB.');
-      setToastType('warning');
+      e.target.value = '';
+      setToastMessage('File size exceeds 2MB limit. Please upload a smaller image.');
+      setToastType('error');
       return;
     }
 
@@ -264,8 +320,9 @@ const BrandForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) {
-      setToastMessage('Brand Name is required.');
+    const nameError = validateBrandName(name);
+    if (nameError) {
+      setToastMessage(nameError);
       setToastType('warning');
       return;
     }
@@ -308,10 +365,10 @@ const BrandForm = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link to="/admin/brands/list" className="catalog-btn" style={{ fontSize: '11px', padding: '6px 12px' }}>
+          <Link to="/admin/brands/list" className="catalog-btn catalog-btn--danger" style={{ fontSize: '11px', padding: '6px 12px' }}>
             Cancel
           </Link>
-          <button className="catalog-btn catalog-btn--primary" onClick={handleSubmit} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
+          <button className="catalog-btn catalog-btn--success" onClick={handleSubmit} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
             <Save size={14} style={{ marginRight: '4px' }} />
             {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Brand' : 'Save Brand')}
           </button>
@@ -327,19 +384,38 @@ const BrandForm = () => {
               Brand Information
             </h3>
 
-            {/* Brand ID Field */}
+            {/* Brand ID Field (System Generated & Readonly) */}
             <div className="brand-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label htmlFor="brand-id" style={{ fontSize: '11px', fontWeight: 700, color: '#475569' }}>Brand ID</label>
-              <input
-                id="brand-id"
-                type="text"
-                value={id}
-                onChange={(e) => !isEditing && setId(e.target.value)}
-                placeholder="e.g. BRD-001"
-                disabled={isEditing}
-                required
-                style={{ padding: '6px 10px', fontSize: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', backgroundColor: isEditing ? '#f8fafc' : '#fff' }}
-              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="brand-id" style={{ fontSize: '11px', fontWeight: 700, color: '#475569' }}>Brand ID</label>
+                <span style={{ fontSize: '10px', color: '#059669', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  <Lock size={10} /> Auto-generated System ID
+                </span>
+              </div>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  id="brand-id"
+                  type="text"
+                  value={id || (isEditing ? 'Loading...' : 'Auto-assigned')}
+                  readOnly={true}
+                  disabled={true}
+                  placeholder="Auto-generated System ID"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px 6px 30px',
+                    fontSize: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    backgroundColor: '#f1f5f9',
+                    color: '#334155',
+                    fontWeight: 700,
+                    cursor: 'not-allowed'
+                  }}
+                />
+                <Lock size={13} style={{ position: 'absolute', left: '10px', color: '#94a3b8', pointerEvents: 'none' }} />
+              </div>
             </div>
 
             {/* Brand Name Field */}
@@ -394,7 +470,7 @@ const BrandForm = () => {
                 <label className="brand-image-upload" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px', border: '2.5px dashed #cbd5e1', borderRadius: '10px', cursor: 'pointer', backgroundColor: '#f8fafc', transition: 'all 0.15s' }}>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif"
                     onChange={handleImageChange}
                     style={{ display: 'none' }}
                   />

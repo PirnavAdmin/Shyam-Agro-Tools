@@ -110,7 +110,16 @@ const mapServerTicketToFrontend = (st) => {
     customer: st.name || st.customerName || 'Unknown Customer',
     email: st.email || '',
     phone: st.phone || '',
-    issue: st.message || st.issueName || st.subject || 'No Description',
+    issue: (() => {
+      const msg = st.message || st.issueName || '';
+      const subj = st.subject || '';
+      // If we have both a message and subject, combine them for clarity
+      if (msg && subj && msg !== subj && subj !== 'Order Dispute' && subj !== 'Chatbot Handover Request') {
+        return `[${subj}] ${msg}`;
+      }
+      // Prefer the detailed message over a vague subject
+      return msg || (subj && subj !== 'Order Dispute' && subj !== 'Chatbot Handover Request' ? subj : '') || 'No Description';
+    })(),
     priority: st.priority || st.priorityName || 'Medium',
     status: status,
     assignedTo: st.assignedAgent || st.assignedTo || 'Unassigned',

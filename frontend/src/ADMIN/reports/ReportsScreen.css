@@ -213,6 +213,45 @@
   box-shadow: var(--shadow-md);
 }
 
+.reports-stat-card-clickable {
+  cursor: pointer;
+}
+
+.reports-stat-card-clickable:hover {
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border-color: #10b981;
+}
+
+.stat-drilldown-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #10b981;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 7px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.stat-drilldown-badge.highlight {
+  color: #d97706;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.stat-drilldown-badge.highlight-red {
+  color: #ef4444;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.reports-stat-card-clickable:hover .stat-drilldown-badge {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
 .stat-icon {
   width: 48px;
   height: 48px;

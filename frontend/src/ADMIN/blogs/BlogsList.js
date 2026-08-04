@@ -24,6 +24,15 @@ const formatDate = (isoStr) => {
   }
 };
 
+const formatAuthorName = (name) => {
+  if (!name) return 'Admin';
+  return name
+    .trim()
+    .split(/\s+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const BlogsList = () => {
   const [blogs, setBlogs]           = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +40,8 @@ const BlogsList = () => {
   const [error, setError]           = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedSummaryId, setExpandedSummaryId] = useState(null);
+  const [searchError, setSearchError] = useState('');
   const itemsPerPage = 10;
 
   /* ── Fetch all blogs ── */
@@ -88,6 +99,17 @@ const BlogsList = () => {
   // Reset page on search
   useEffect(() => { setCurrentPage(1); }, [searchTerm]);
 
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    if (/[^a-zA-Z0-9\s\-_.,]/.test(val) && val !== '') {
+      setSearchError('Please provide valid input');
+      return;
+    } else {
+      setSearchError('');
+    }
+    setSearchTerm(val);
+  };
+
   const resolveImage = (src) => {
     if (!src) return null;
     if (src.startsWith('http')) return src;
@@ -139,8 +161,13 @@ const BlogsList = () => {
               type="text"
               placeholder="Search by title, author, category or summary..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
+            { (searchError || (searchTerm && filteredBlogs.length === 0)) && (
+              <div style={{ position: 'absolute', top: '100%', left: '12px', marginTop: '4px', color: '#ef4444', fontSize: '11px', fontWeight: 600 }}>
+                {searchError || 'Please provide valid input'}
+              </div>
+            )}
           </div>
           <span className="catalog-count">
             {loading ? 'Loading…' : `${filteredBlogs.length} article${filteredBlogs.length !== 1 ? 's' : ''}`}
@@ -187,12 +214,31 @@ const BlogsList = () => {
                             </div>
                           )}
                           <div>
-                            <div className="catalog-table__title" style={{ fontWeight: 600, color: '#1e293b', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '12px' }}>
+                            <div className="catalog-table__title" style={{ fontWeight: 600, color: '#1e293b', maxWidth: 380, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '12px' }}>
                               {blog.title || 'Untitled'}
                             </div>
-                            <div className="catalog-table__muted" style={{ fontSize: 10, color: '#94a3b8', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>
-                              {blog.summary || (blog.description ? blog.description.slice(0, 70) + '…' : '—')}
-                            </div>
+                            {(() => {
+                              const fullText = (blog.description || blog.summary || '').replace(/>+/g, '').trim();
+                              const isLong = fullText.length > 100;
+                              const isExpanded = expandedSummaryId === blog.id;
+                              const truncated = isLong ? fullText.slice(0, 100).replace(/\s+\S*$/, '') : fullText;
+                              return (
+                                <div style={{ marginTop: 2, maxWidth: 420 }}>
+                                  <span style={{ fontSize: 11, color: '#64748b', lineHeight: '1.55' }}>
+                                    {isExpanded ? fullText : truncated}
+                                  </span>
+                                  {isLong && (
+                                    <span
+                                      onClick={(e) => { e.stopPropagation(); setExpandedSummaryId(isExpanded ? null : blog.id); }}
+                                      style={{ display: 'inline-block', color: '#2563eb', cursor: 'pointer', fontWeight: 700, marginLeft: '6px', fontSize: '10.5px', whiteSpace: 'nowrap', background: '#eff6ff', padding: '1px 6px', borderRadius: '4px', border: '1px solid #bfdbfe', verticalAlign: 'middle' }}
+                                    >
+                                      {isExpanded ? '▲ Less' : '▸ Read More'}
+                                    </span>
+                                  )}
+                                  {!fullText && '—'}
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       </td>
@@ -201,7 +247,7 @@ const BlogsList = () => {
                       <td style={{ padding: '5px 8px' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#475569', fontSize: 11 }}>
                           <User size={11} color="#94a3b8" />
-                          {blog.authorName || 'Admin'}
+                          {formatAuthorName(blog.authorName)}
                         </span>
                       </td>
 

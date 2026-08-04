@@ -1916,6 +1916,10 @@ img.app-line-thumb,
   max-width: 1840px;
 }
 
+.max-w-\[220px\] {
+  max-width: 220px;
+}
+
 .max-w-\[280px\] {
   max-width: 280px;
 }
@@ -3358,6 +3362,10 @@ img.app-line-thumb,
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.lowercase {
+  text-transform: lowercase;
 }
 
 .capitalize {

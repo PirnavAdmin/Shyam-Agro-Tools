@@ -54,12 +54,22 @@ namespace ShyamAgroSuite.Api.Controllers
                 .Include(o => o.Items)
                 .ToListAsync();
 
+            // Group and deduplicate orders by unique OrderNumber / Id
+            var uniqueOrdersList = ordersList
+                .GroupBy(o => string.IsNullOrEmpty(o.OrderNumber) ? o.Id.ToString() : o.OrderNumber)
+                .Select(g => g.OrderByDescending(o => o.OrderDate).First())
+                .ToList();
+
             // Calculate metrics (excluding Cancelled status if needed, or including them but noting final sales)
-            var activeOrders = ordersList.Where(o => o.Status != "Cancelled").ToList();
+            var activeOrders = uniqueOrdersList.Where(o => o.Status != "Cancelled").ToList();
             var totalSalesRevenue = activeOrders.Sum(o => o.FinalAmount);
             var ordersVolume = activeOrders.Count;
             var averageOrderValue = ordersVolume > 0 ? Math.Round(totalSalesRevenue / ordersVolume, 2) : 0;
-            var unconfirmedPaymentsCount = ordersList.Count(o => o.PaymentStatus == "Pending");
+            var unconfirmedPaymentsCount = activeOrders.Count(o => 
+                (o.PaymentStatus == "Pending" || o.PaymentStatus == "Pending Verification" || o.PaymentStatus == "PendingVerification") &&
+                !o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) &&
+                !o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase)
+            );
 
             // Group by date for Revenue Performance Trend (e.g. past 7 days or formatted as "dd MMM")
             var trend = activeOrders
@@ -72,7 +82,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 .ToList();
 
             // Order Fulfillment States
-            var fulfillmentStates = ordersList
+            var fulfillmentStates = uniqueOrdersList
                 .GroupBy(o => o.Status)
                 .Select(g => new
                 {
@@ -82,7 +92,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 .ToList();
 
             // Payment Methods Distribution
-            var paymentMethods = ordersList
+            var paymentMethods = uniqueOrdersList
                 .GroupBy(o => string.IsNullOrEmpty(o.PaymentMethod) ? "Unknown" : o.PaymentMethod)
                 .Select(g => new
                 {
@@ -92,17 +102,24 @@ namespace ShyamAgroSuite.Api.Controllers
                 .ToList();
 
             // Detailed Orders Ledger Summary
-            var detailedLedger = ordersList
+            var detailedLedger = uniqueOrdersList
                 .OrderByDescending(o => o.OrderDate)
-                .Select(o => new
-                {
-                    Date = o.OrderDate.ToString("dd MMM yyyy"),
-                    OrderId = o.OrderNumber,
-                    Customer = o.Customer != null ? o.Customer.Name : "Walk-in Customer",
-                    ItemsCount = $"{o.Items?.Count ?? 0} items",
-                    TotalAmount = $"INR {o.FinalAmount:N0}",
-                    PaymentStatus = o.PaymentStatus,
-                    FulfillmentStatus = o.Status
+                .Select(o => {
+                    var rawId = string.IsNullOrEmpty(o.OrderNumber) ? $"ORD-{o.Id}" : o.OrderNumber;
+                    rawId = rawId.Replace("#", "").Trim();
+                    while (rawId.StartsWith("ORD-ORD-")) rawId = rawId.Substring(4);
+                    if (!rawId.StartsWith("ORD-")) rawId = $"ORD-{rawId}";
+
+                    return new
+                    {
+                        Date = o.OrderDate.ToString("dd MMM yyyy"),
+                        OrderId = rawId,
+                        Customer = o.Customer != null ? o.Customer.Name : "Walk-in Customer",
+                        ItemsCount = (o.Items?.Count ?? 0) == 1 ? "1 item" : $"{o.Items?.Count ?? 0} items",
+                        TotalAmount = $"INR {o.FinalAmount:N0}",
+                        PaymentStatus = o.PaymentStatus,
+                        FulfillmentStatus = o.Status
+                    };
                 })
                 .ToList();
 

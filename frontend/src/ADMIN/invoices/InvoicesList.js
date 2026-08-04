@@ -122,8 +122,9 @@ const InvoicesList = () => {
       const itemsHtml = (order.items || []).map((item, idx) => {
         const itemPrice = item.priceNum !== undefined ? Number(item.priceNum) : parseCurrencyValue(item.price);
         const itemQty = Number(item.quantity || 1);
-        const itemTotal = item.subtotalNum !== undefined ? Number(item.subtotalNum) : parseCurrencyValue(item.total);
-        const itemTax = itemPrice * 0.18 * itemQty;
+        const itemSubtotal = itemPrice * itemQty;
+        const itemTax = itemSubtotal * 0.18;
+        const itemTotal = itemSubtotal + itemTax;
 
         return `
           <tr>
@@ -151,11 +152,20 @@ const InvoicesList = () => {
         }
       };
 
+      const isPaid = (order.paymentStatus || '').toLowerCase() === 'paid';
+      const isCancelled = (order.paymentStatus || '').toLowerCase() === 'cancelled';
+
+      const docTitle = isPaid ? 'TAX INVOICE' : isCancelled ? 'CANCELLED INVOICE' : 'PROFORMA INVOICE';
+      const docSubTitle = isPaid ? 'Original for Recipient' : isCancelled ? 'Void / Cancelled Document' : 'Proforma / Quotation - Payment Pending';
+      const statusColor = isPaid ? '#047857' : isCancelled ? '#dc2626' : '#d97706';
+      const statusBg = isPaid ? '#ecfdf5' : isCancelled ? '#fef2f2' : '#fffbe5';
+      const statusBorder = isPaid ? '#a7f3d0' : isCancelled ? '#fca5a5' : '#fde68a';
+
       printWindow.document.write(`
         <!DOCTYPE html>
         <html>
           <head>
-            <title>Tax Invoice - ${order.invoiceId}</title>
+            <title>${docTitle} - ${order.invoiceId}</title>
             <style>
               @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
               * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -215,9 +225,9 @@ const InvoicesList = () => {
               }
               .tax-subtitle {
                 display: inline-block;
-                background: #ecfdf5;
-                color: #047857;
-                border: 1px solid #a7f3d0;
+                background: ${statusBg};
+                color: ${statusColor};
+                border: 1px solid ${statusBorder};
                 font-size: 10px;
                 font-weight: 700;
                 padding: 4px 8px;
@@ -406,8 +416,8 @@ const InvoicesList = () => {
                   </div>
                 </div>
                 <div class="badge-tax-invoice">
-                  <div class="tax-title">TAX INVOICE</div>
-                  <div class="tax-subtitle">Original for Recipient</div>
+                  <div class="tax-title">${docTitle}</div>
+                  <div class="tax-subtitle">${docSubTitle}</div>
                 </div>
               </div>
 
@@ -423,7 +433,7 @@ const InvoicesList = () => {
                 <div class="info-block">
                   <div class="info-block-title">Payment & Settlement Status</div>
                   <div class="info-row"><span class="info-label">Payment Method:</span><span class="info-val">${order.paymentMethod || 'UPI / Bank Transfer'}</span></div>
-                  <div class="info-row"><span class="info-label">Payment Status:</span><span class="info-val" style="color: #047857;">${order.paymentStatus || 'Paid'}</span></div>
+                  <div class="info-row"><span class="info-label">Payment Status:</span><span class="info-val" style="color: ${statusColor}; font-weight: 800;">${(order.paymentStatus || 'UNPAID').toUpperCase()} ${!isPaid && !isCancelled ? '(Payment Pending)' : ''}</span></div>
                   <div class="info-row"><span class="info-label">Billing Currency:</span><span class="info-val">INR (₹)</span></div>
                 </div>
               </div>
@@ -434,13 +444,17 @@ const InvoicesList = () => {
                   <div class="address-card-title">Billed To (Customer Details)</div>
                   <p>
                     <strong>${order.client}</strong><br/>
+                    ${(order.address && order.address !== 'N/A') ? `Address: ${order.address.replace(/\n/g, '<br/>')}<br/>` : ''}
                     ${order.phone ? `Phone: ${order.phone}<br/>` : ''}
-                    ${order.email && !order.email.includes('N/A') ? `Email: ${order.email}<br/>` : ''}
+                    ${order.email && !order.email.includes('N/A') ? `Email: ${order.email.toLowerCase()}<br/>` : ''}
                   </p>
                 </div>
                 <div class="address-card">
                   <div class="address-card-title">Shipped To (Delivery Destination)</div>
-                  <p>${(order.address || 'Standard Client Delivery Destination').replace(/\n/g, '<br/>')}</p>
+                  <p>
+                    <strong>${order.client}</strong><br/>
+                    Address: ${(order.shippingAddress || order.address || 'Standard Client Delivery Destination').replace(/\n/g, '<br/>')}
+                  </p>
                 </div>
               </div>
 

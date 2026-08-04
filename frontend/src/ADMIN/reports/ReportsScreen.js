@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bar,
   BarChart,
@@ -24,7 +25,14 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FolderTree,
-  Boxes
+  Boxes,
+  ExternalLink,
+  X,
+  Search,
+  Eye,
+  ArrowUpRight,
+  Settings,
+  Trash2
 } from 'lucide-react';
 import { getOrders } from '../api/orders';
 import { fetchProducts, fetchCategories } from '../catalog/productsApi';
@@ -35,14 +43,26 @@ import {
   updateReportSettings,
   clearReportCache
 } from '../api/reports';
-import { Settings, Trash2 } from 'lucide-react';
 import './ReportsScreen.css';
 
 const formatCurrency = (value) => `INR ${Number(value || 0).toLocaleString('en-IN')}`;
 
+const formatOrderId = (rawId) => {
+  if (!rawId) return 'ORD-000000';
+  let str = String(rawId).trim().replace(/^#+/, '');
+  while (str.startsWith('ORD-ORD-')) {
+    str = str.substring(4);
+  }
+  if (!str.startsWith('ORD-')) {
+    str = `ORD-${str}`;
+  }
+  return str;
+};
+
 const REPORTS_COLORS = ['#10b981', '#6366f1', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6', '#14b8a6', '#f43f5e'];
 
 const ReportsScreen = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'catalog'
   const [datePreset, setDatePreset] = useState('All'); // 'All', '7days', '30days', 'year'
   const [loading, setLoading] = useState(true);
@@ -60,6 +80,16 @@ const ReportsScreen = () => {
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [notification, setNotification] = useState(null);
+
+  // Drill-down Modal State
+  const [drillDownModal, setDrillDownModal] = useState({
+    isOpen: false,
+    title: '',
+    type: '', // 'orders' or 'products'
+    data: [],
+    filterType: ''
+  });
+  const [drillDownSearch, setDrillDownSearch] = useState('');
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
@@ -177,7 +207,7 @@ const ReportsScreen = () => {
   // Date filtering logic
   const filteredOrders = useMemo(() => {
     const now = new Date();
-    return orders.filter(order => {
+    const dateFiltered = orders.filter(order => {
       const orderDate = new Date(order.orderDate || order.date);
       if (datePreset === '7days') {
         const diffTime = Math.abs(now - orderDate);
@@ -194,13 +224,34 @@ const ReportsScreen = () => {
       }
       return true; // All
     });
+
+    // Deduplicate by Order ID
+    const seenOrderIds = new Set();
+    return dateFiltered.filter(o => {
+      const key = String(o.id || o.orderId || '').toLowerCase();
+      if (!key || seenOrderIds.has(key)) return false;
+      seenOrderIds.add(key);
+      return true;
+    });
   }, [orders, datePreset]);
 
   const orderStats = useMemo(() => {
-    const total = filteredOrders.length;
-    const revenue = filteredOrders.reduce((sum, o) => sum + (Number(o.totalAmount || o.total || 0)), 0);
-    const aov = total > 0 ? Math.round(revenue / total) : 0;
-    const pendingPayment = filteredOrders.filter(o => o.paymentStatus === 'Pending Verification' || o.paymentStatus === 'Pending').length;
+    // Exclude Cancelled orders to match backend ReportsController logic (line 64)
+    const activeOrders = filteredOrders.filter(o => {
+      const st = (o.status || '').toLowerCase();
+      return st !== 'cancelled';
+    });
+    const total = activeOrders.length;
+    const revenue = activeOrders.reduce((sum, o) => sum + (Number(o.totalAmount || o.total || o.finalAmount || 0)), 0);
+    // Use 2-decimal rounding to match backend Math.Round(totalSalesRevenue / ordersVolume, 2)
+    const aov = total > 0 ? Math.round((revenue / total) * 100) / 100 : 0;
+    const pendingPayment = activeOrders.filter(o => {
+      const ps = (o.paymentStatus || '').toLowerCase();
+      const st = (o.status || '').toLowerCase();
+      const isPendingStatus = ps === 'pending' || ps === 'pending verification' || ps === 'pendingverification';
+      const isSettledOrder = st === 'completed' || st === 'delivered';
+      return isPendingStatus && !isSettledOrder;
+    }).length;
     return { total, revenue, aov, pendingPayment };
   }, [filteredOrders]);
 
@@ -220,6 +271,83 @@ const ReportsScreen = () => {
       pendingPayment: `${orderStats.pendingPayment} Pending`
     };
   }, [datePreset, ordersReport, orderStats]);
+
+  // Drill-down openers
+  const openUnconfirmedPaymentsDrillDown = () => {
+    const unconfirmed = filteredOrders.filter(o => {
+      const ps = (o.paymentStatus || '').toLowerCase();
+      const st = (o.status || '').toLowerCase();
+      const isPendingStatus = ps.includes('pending') || ps.includes('unconfirmed') || ps.includes('verification');
+      const isSettledOrder = st === 'completed' || st === 'delivered' || st === 'cancelled';
+      return isPendingStatus && !isSettledOrder;
+    });
+    setDrillDownSearch('');
+    setDrillDownModal({
+      isOpen: true,
+      title: 'Unconfirmed & Pending Payments Drill-Down',
+      type: 'orders',
+      data: unconfirmed,
+      filterType: 'unconfirmed'
+    });
+  };
+
+  const openOrdersVolumeDrillDown = () => {
+    setDrillDownSearch('');
+    setDrillDownModal({
+      isOpen: true,
+      title: 'Total Orders Volume Ledger Drill-Down',
+      type: 'orders',
+      data: filteredOrders,
+      filterType: 'all_orders'
+    });
+  };
+
+  const openOutOfStockDrillDown = () => {
+    const outOfStock = products.filter(p => Number(p.stock || 0) === 0);
+    setDrillDownSearch('');
+    setDrillDownModal({
+      isOpen: true,
+      title: 'Critical Out-of-Stock Products Drill-Down',
+      type: 'products',
+      data: outOfStock,
+      filterType: 'out_of_stock'
+    });
+  };
+
+  const openLowStockDrillDown = () => {
+    const limit = settings.lowStockAlertLimit || 5;
+    const lowStock = products.filter(p => Number(p.stock || 0) > 0 && Number(p.stock || 0) <= limit);
+    setDrillDownSearch('');
+    setDrillDownModal({
+      isOpen: true,
+      title: 'Low Stock Warning Products Drill-Down',
+      type: 'products',
+      data: lowStock,
+      filterType: 'low_stock'
+    });
+  };
+
+  const filteredDrillDownData = useMemo(() => {
+    if (!drillDownModal.isOpen || !drillDownModal.data) return [];
+    const query = drillDownSearch.trim().toLowerCase();
+    if (!query) return drillDownModal.data;
+
+    if (drillDownModal.type === 'orders') {
+      return drillDownModal.data.filter(o =>
+        String(o.orderId || o.id || '').toLowerCase().includes(query) ||
+        String(o.customerName || o.customer || '').toLowerCase().includes(query) ||
+        String(o.paymentStatus || '').toLowerCase().includes(query) ||
+        String(o.status || '').toLowerCase().includes(query)
+      );
+    } else {
+      return drillDownModal.data.filter(p =>
+        String(p.sku || '').toLowerCase().includes(query) ||
+        String(p.name || '').toLowerCase().includes(query) ||
+        String(p.categoryId || '').toLowerCase().includes(query) ||
+        String(p.brand || '').toLowerCase().includes(query)
+      );
+    }
+  }, [drillDownModal, drillDownSearch]);
 
   // Sales Trend chart data (Grouped by Date)
   const salesTrendData = useMemo(() => {
@@ -555,20 +683,28 @@ const ReportsScreen = () => {
             <div className="reports-view-fadein">
               {/* Stats Cards */}
               <div className="reports-stats-grid">
-                <div className="reports-stat-card">
+                <div className="reports-stat-card reports-stat-card-clickable" onClick={openOrdersVolumeDrillDown} title="Click to view all revenue orders ledger">
                   <div className="stat-icon revenue"><DollarSign size={20} /></div>
-                  <div className="stat-details">
-                    <span>Total Revenue</span>
+                  <div className="stat-details" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Total Revenue</span>
+                      <span className="stat-drilldown-badge">Drill Down ↗</span>
+                    </div>
                     <strong>{displayStats.revenue}</strong>
                   </div>
                 </div>
-                <div className="reports-stat-card">
+
+                <div className="reports-stat-card reports-stat-card-clickable" onClick={openOrdersVolumeDrillDown} title="Click to view all orders volume">
                   <div className="stat-icon orders"><ShoppingBag size={20} /></div>
-                  <div className="stat-details">
-                    <span>Orders Volume</span>
+                  <div className="stat-details" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Orders Volume</span>
+                      <span className="stat-drilldown-badge">Drill Down ↗</span>
+                    </div>
                     <strong>{displayStats.total}</strong>
                   </div>
                 </div>
+
                 <div className="reports-stat-card">
                   <div className="stat-icon aov"><TrendingUp size={20} /></div>
                   <div className="stat-details">
@@ -576,11 +712,15 @@ const ReportsScreen = () => {
                     <strong>{displayStats.aov}</strong>
                   </div>
                 </div>
-                <div className="reports-stat-card">
+
+                <div className="reports-stat-card reports-stat-card-clickable" onClick={openUnconfirmedPaymentsDrillDown} title="Click to view detailed list of unconfirmed & pending payment orders">
                   <div className="stat-icon pending"><AlertTriangle size={20} /></div>
-                  <div className="stat-details">
-                    <span>Unconfirmed Payments</span>
-                    <strong>{displayStats.pendingPayment}</strong>
+                  <div className="stat-details" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Unconfirmed Payments</span>
+                      <span className="stat-drilldown-badge highlight">Drill Down ↗</span>
+                    </div>
+                    <strong style={{ color: '#d97706' }}>{displayStats.pendingPayment}</strong>
                   </div>
                 </div>
               </div>
@@ -601,7 +741,16 @@ const ReportsScreen = () => {
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                         <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
-                        <YAxis stroke="#64748b" fontSize={11} />
+                        <YAxis 
+                          stroke="#64748b" 
+                          fontSize={11} 
+                          tickFormatter={(value) => {
+                            if (value >= 1000000) return `₹${(value / 1000000).toFixed(1).replace(/\.0$/, '')}m`;
+                            if (value >= 1000) return `₹${(value / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+                            return `₹${value}`;
+                          }} 
+                          width={60} 
+                        />
                         <Tooltip formatter={(value) => formatCurrency(value)} />
                         <Area type="monotone" dataKey="Sales" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorSales)" />
                       </AreaChart>
@@ -613,23 +762,53 @@ const ReportsScreen = () => {
                 <div className="chart-card-widget">
                   <h3>Order fulfillment States</h3>
                   <div className="chart-container-inner">
-                    <ResponsiveContainer width="100%" height={240}>
+                    <ResponsiveContainer width="100%" height={280}>
                       <PieChart>
                         <Pie
                           data={statusPieData}
                           cx="50%"
-                          cy="50%"
-                          innerRadius={60}
+                          cy="45%"
+                          innerRadius={40}
                           outerRadius={80}
-                          paddingAngle={5}
+                          paddingAngle={2}
                           dataKey="value"
+                          labelLine={false}
+                          label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, value }) => {
+                            if (percent < 0.04) return null; // Hide labels for very small slices to prevent overlap
+                            const RADIAN = Math.PI / 180;
+                            const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                            return (
+                              <text x={x} y={y} fill="#ffffff" fontSize={11} fontWeight="bold" textAnchor="middle" dominantBaseline="central">
+                                {value}
+                              </text>
+                            );
+                          }}
                         >
                           {statusPieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={REPORTS_COLORS[index % REPORTS_COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip />
-                        <Legend verticalAlign="bottom" height={36} iconType="circle" fontSize={10} />
+                        <Tooltip
+                          formatter={(val, name) => {
+                            const total = statusPieData.reduce((s, i) => s + (Number(i.value) || 0), 0);
+                            const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                            return [`${val} orders (${pct}%)`, name];
+                          }}
+                        />
+                        <Legend
+                          verticalAlign="bottom"
+                          height={48}
+                          iconType="circle"
+                          formatter={(value, entry) => {
+                            const val = entry.payload?.value ?? 0;
+                            const total = statusPieData.reduce((s, i) => s + (Number(i.value) || 0), 0);
+                            const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
+                            return `${value}: ${val} (${pct}%)`;
+                          }}
+                          wrapperStyle={{ fontSize: '11px', fontWeight: '600', color: '#334155' }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -676,9 +855,9 @@ const ReportsScreen = () => {
                       {filteredOrders.map(o => (
                         <tr key={o.id || o.orderId}>
                           <td>{new Date(o.orderDate || o.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                          <td><strong>#{o.id || o.orderId}</strong></td>
+                          <td><strong>{formatOrderId(o.orderId || o.id)}</strong></td>
                           <td>{o.customerName || o.customer || 'Unknown'}</td>
-                          <td>{o.items?.length || 0} items</td>
+                          <td>{o.items?.length || 0} {(o.items?.length === 1) ? 'item' : 'items'}</td>
                           <td><strong>{formatCurrency(o.totalAmount || o.total)}</strong></td>
                           <td>
                             <span className={`mini-badge payment-${(o.paymentStatus || 'Pending').toLowerCase().replace(' ', '-')}`}>
@@ -709,6 +888,7 @@ const ReportsScreen = () => {
                     <strong>{catalogReport ? catalogStats.totalProducts : `${catalogStats.totalProducts} Items`}</strong>
                   </div>
                 </div>
+
                 <div className="reports-stat-card">
                   <div className="stat-icon categories"><FolderTree size={20} /></div>
                   <div className="stat-details">
@@ -716,19 +896,27 @@ const ReportsScreen = () => {
                     <strong>{catalogReport ? catalogStats.totalCategories : `${catalogStats.totalCategories} Classes`}</strong>
                   </div>
                 </div>
-                <div className="reports-stat-card">
+
+                <div className="reports-stat-card reports-stat-card-clickable" onClick={openOutOfStockDrillDown} title="Click to view out-of-stock products list">
                   <div className="stat-icon critical"><AlertTriangle size={20} /></div>
-                  <div className="stat-details">
-                    <span>Critical Out-of-Stock</span>
-                    <strong style={{ color: (catalogReport ? parseInt(catalogStats.outOfStock) : catalogStats.outOfStock) > 0 ? '#ef4444' : 'inherit' }}>
+                  <div className="stat-details" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Critical Out-of-Stock</span>
+                      <span className="stat-drilldown-badge highlight-red">Drill Down ↗</span>
+                    </div>
+                    <strong style={{ color: '#ef4444' }}>
                       {catalogReport ? catalogStats.outOfStock : `${catalogStats.outOfStock} items`}
                     </strong>
                   </div>
                 </div>
-                <div className="reports-stat-card">
+
+                <div className="reports-stat-card reports-stat-card-clickable" onClick={openLowStockDrillDown} title="Click to view low-stock warning products list">
                   <div className="stat-icon warning"><SlidersHorizontal size={20} /></div>
-                  <div className="stat-details">
-                    <span>Low Stock Warning</span>
+                  <div className="stat-details" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Low Stock Warning</span>
+                      <span className="stat-drilldown-badge">Drill Down ↗</span>
+                    </div>
                     <strong>{catalogReport ? catalogStats.lowStock : `${catalogStats.lowStock} Items`}</strong>
                   </div>
                 </div>
@@ -740,23 +928,53 @@ const ReportsScreen = () => {
                 <div className="chart-card-widget">
                   <h3>Category allocation Share</h3>
                   <div className="chart-container-inner">
-                    <ResponsiveContainer width="100%" height={240}>
+                    <ResponsiveContainer width="100%" height={280}>
                       <PieChart>
                         <Pie
                           data={categoryPieData}
                           cx="50%"
-                          cy="50%"
-                          innerRadius={60}
+                          cy="45%"
+                          innerRadius={40}
                           outerRadius={80}
-                          paddingAngle={3}
+                          paddingAngle={2}
                           dataKey="value"
+                          labelLine={false}
+                          label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, value }) => {
+                            if (percent < 0.04) return null;
+                            const RADIAN = Math.PI / 180;
+                            const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                            return (
+                              <text x={x} y={y} fill="#ffffff" fontSize={11} fontWeight="bold" textAnchor="middle" dominantBaseline="central">
+                                {value}
+                              </text>
+                            );
+                          }}
                         >
                           {categoryPieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={REPORTS_COLORS[index % REPORTS_COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip />
-                        <Legend verticalAlign="bottom" height={36} iconType="circle" fontSize={10} />
+                        <Tooltip
+                          formatter={(val, name) => {
+                            const total = categoryPieData.reduce((s, i) => s + (Number(i.value) || 0), 0);
+                            const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                            return [`${val} products (${pct}%)`, name];
+                          }}
+                        />
+                        <Legend
+                          verticalAlign="bottom"
+                          height={48}
+                          iconType="circle"
+                          formatter={(value, entry) => {
+                            const val = entry.payload?.value ?? 0;
+                            const total = categoryPieData.reduce((s, i) => s + (Number(i.value) || 0), 0);
+                            const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
+                            return `${value}: ${val} (${pct}%)`;
+                          }}
+                          wrapperStyle={{ fontSize: '11px', fontWeight: '600', color: '#334155' }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -789,7 +1007,16 @@ const ReportsScreen = () => {
                     <ResponsiveContainer width="100%" height={240}>
                       <BarChart layout="vertical" data={topProductsRevenue}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                        <XAxis type="number" stroke="#64748b" fontSize={10} />
+                        <XAxis 
+                          type="number" 
+                          stroke="#64748b" 
+                          fontSize={10} 
+                          tickFormatter={(value) => {
+                            if (value >= 1000000) return `₹${(value / 1000000).toFixed(1).replace(/\.0$/, '')}m`;
+                            if (value >= 1000) return `₹${(value / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+                            return `₹${value}`;
+                          }}
+                        />
                         <YAxis type="category" dataKey="name" stroke="#64748b" fontSize={10} />
                         <Tooltip formatter={formatPerformanceTooltip} />
                         <Bar dataKey="Value" fill="#10b981" radius={[0, 4, 4, 0]} />
@@ -844,6 +1071,176 @@ const ReportsScreen = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Interactive Drill-Down Modal */}
+      {drillDownModal.isOpen && (
+        <div className="reports-modal-overlay" onClick={() => setDrillDownModal({ ...drillDownModal, isOpen: false })}>
+          <div className="reports-modal-content drilldown-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '900px', width: '95%' }}>
+            <div className="drilldown-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '14px', marginBottom: '16px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: '#059669', letterSpacing: '0.05em' }}>Analytics Drill-Down</span>
+                <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '2px 0 0 0' }}>{drillDownModal.title}</h2>
+              </div>
+              <button className="reports-icon-btn" onClick={() => setDrillDownModal({ ...drillDownModal, isOpen: false })} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', padding: '6px', cursor: 'pointer' }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Filter / Actions Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+              <div style={{ position: 'relative', flex: '1', minWidth: '220px' }}>
+                <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <input
+                  type="text"
+                  placeholder={drillDownModal.type === 'orders' ? "Search by Order ID, Customer, Payment Status..." : "Search by SKU, Product Name, Brand..."}
+                  value={drillDownSearch}
+                  onChange={(e) => setDrillDownSearch(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px 8px 32px', fontSize: '13px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {drillDownModal.type === 'orders' ? (
+                  <button
+                    className="reports-btn primary"
+                    onClick={() => {
+                      setDrillDownModal({ ...drillDownModal, isOpen: false });
+                      navigate('/admin/orders');
+                    }}
+                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                  >
+                    View in Orders Directory <ExternalLink size={14} />
+                  </button>
+                ) : (
+                  <button
+                    className="reports-btn primary"
+                    onClick={() => {
+                      setDrillDownModal({ ...drillDownModal, isOpen: false });
+                      navigate('/admin/products');
+                    }}
+                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                  >
+                    View in Products Catalog <ExternalLink size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Drill-down Records Counter */}
+            <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '12px', fontWeight: 600 }}>
+              Showing {filteredDrillDownData.length} {drillDownModal.type === 'orders' ? 'Orders' : 'Products'}
+            </div>
+
+            {/* Drill-down Data Table */}
+            <div className="table-wrapper" style={{ maxHeight: '380px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+              {drillDownModal.type === 'orders' ? (
+                <table className="reports-data-table" style={{ width: '100%' }}>
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Date</th>
+                      <th>Customer</th>
+                      <th>Total Amount</th>
+                      <th>Payment Status</th>
+                      <th>Fulfillment</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredDrillDownData.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '24px', color: '#94a3b8' }}>
+                          No matching order records found for this drill-down.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredDrillDownData.map((o) => (
+                        <tr key={o.id || o.orderId}>
+                          <td><strong>{formatOrderId(o.orderId || o.id)}</strong></td>
+                          <td>{new Date(o.orderDate || o.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                          <td>{o.customerName || o.customer || 'Unknown'}</td>
+                          <td><strong>{formatCurrency(o.totalAmount || o.total)}</strong></td>
+                          <td>
+                            <span className={`mini-badge payment-${(o.paymentStatus || 'Pending').toLowerCase().replace(/\s+/g, '-')}`}>
+                              {o.paymentStatus || 'Pending'}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`mini-badge order-${(o.status || 'Processing').toLowerCase()}`}>
+                              {o.status || 'Processing'}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              onClick={() => {
+                                setDrillDownModal({ ...drillDownModal, isOpen: false });
+                                navigate('/admin/orders');
+                              }}
+                              style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              Details <ArrowUpRight size={12} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="reports-data-table" style={{ width: '100%' }}>
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Brand</th>
+                      <th>Price</th>
+                      <th>Stock</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredDrillDownData.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '24px', color: '#94a3b8' }}>
+                          No matching product records found for this drill-down.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredDrillDownData.map((p) => {
+                        const stockVal = Number(p.stock || 0);
+                        const statusClass = stockVal === 0 ? 'out' : stockVal <= (settings.lowStockAlertLimit || 5) ? 'low' : 'in';
+                        const statusText = stockVal === 0 ? 'Out of Stock' : stockVal <= (settings.lowStockAlertLimit || 5) ? 'Low Stock' : 'In Stock';
+                        return (
+                          <tr key={p.id || p.sku}>
+                            <td><code>{p.sku}</code></td>
+                            <td><strong>{p.name}</strong></td>
+                            <td>{p.categoryId}</td>
+                            <td>{p.brand}</td>
+                            <td><strong>{formatCurrency(p.price)}</strong></td>
+                            <td><strong style={{ color: stockVal === 0 ? '#ef4444' : '#f59e0b' }}>{stockVal} units</strong></td>
+                            <td>
+                              <span className={`mini-badge stock-${statusClass}`}>
+                                {statusText}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+              <button className="reports-btn secondary" onClick={() => setDrillDownModal({ ...drillDownModal, isOpen: false })}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Settings Modal */}

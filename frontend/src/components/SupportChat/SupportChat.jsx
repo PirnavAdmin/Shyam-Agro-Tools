@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bot, Headphones, MessageCircle, RotateCcw, Send, X } from 'lucide-react';
+import { ArrowLeft, Bot, Headphones, MessageCircle, RotateCcw, Send, X } from 'lucide-react';
 import { useLanguage } from '../../USER/context/LanguageContext';
 import { getOrderById, getOrderTracking, getOrders } from '../../USER/utils/orders';
 import TicketForm from './TicketForm';
@@ -188,7 +188,7 @@ const SupportChat = () => {
   }, [language]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!isOpen || window.innerWidth > 640) return undefined;
     const scrollY = window.scrollY;
     const previousOverflow = document.body.style.overflow;
     const previousPaddingRight = document.body.style.paddingRight;
@@ -384,6 +384,16 @@ const SupportChat = () => {
       {isOpen && (
         <section className="support-chat-panel" aria-label={labels.title}>
           <header className="support-chat-z-header">
+            <button 
+              type="button" 
+              className="support-chat-back-btn" 
+              onClick={() => setIsOpen(false)} 
+              aria-label="Navigate Back to Previous Screen"
+              title="Navigate Back to Previous Screen"
+            >
+              <ArrowLeft size={18} />
+              <span>Back</span>
+            </button>
             <div className="support-chat-brand">
               <div className="support-chat-title-copy">
                 <h2>{labels.title}</h2>
@@ -392,69 +402,77 @@ const SupportChat = () => {
             <button type="button" className="support-chat-icon-btn" onClick={resetChat} aria-label={labels.reset} title={labels.reset}>
               <RotateCcw size={17} />
             </button>
-            <button type="button" className="support-chat-icon-btn" onClick={() => setIsOpen(false)} aria-label={labels.closeChat}>
+            <button type="button" className="support-chat-icon-btn" onClick={() => setIsOpen(false)} aria-label={labels.closeChat} title="Close Chat">
               <X size={19} />
             </button>
           </header>
 
           <div className="support-chat-z-body" role="log" aria-live="polite">
-            {messages.map((message) => (
-              <article key={message.id} className={`support-z-message support-z-message-${message.sender}`}>
-                {message.sender === 'bot' && (
-                  <div className="support-z-avatar" aria-hidden="true">
-                    <Bot size={15} />
-                  </div>
-                )}
-                <div className="support-z-bubble">
-                  <p>{message.text}</p>
-                  {message.tracking && (
-                    <div className="support-tracking-card">
-                      <div className="support-tracking-grid">
-                        <span>{labels.orderId}</span>
-                        <strong>{message.tracking.orderId}</strong>
-                        <span>{labels.orderStatus}</span>
-                        <strong>{message.tracking.status}</strong>
-                        <span>{labels.estimatedDelivery}</span>
-                        <strong>{message.tracking.estimatedDelivery}</strong>
-                        <span>{labels.paymentMethod}</span>
-                        <strong>{message.tracking.paymentMethod}</strong>
-                        <span>{labels.currentStep}</span>
-                        <strong>{message.tracking.currentStep}</strong>
+            {(() => {
+              const lastBotIndex = messages.reduce((lastIdx, msg, idx) => (msg.sender === 'bot' ? idx : lastIdx), -1);
+              return messages.map((message, index) => {
+                const isLatestBotMessage = message.sender === 'bot' && index === lastBotIndex;
+                return (
+                  <article key={message.id} className={`support-z-message support-z-message-${message.sender}`}>
+                    {message.sender === 'bot' && (
+                      <div className="support-z-avatar" aria-hidden="true">
+                        <Bot size={15} />
                       </div>
-                      <div className="support-tracking-timeline" aria-label={labels.trackingTimeline}>
-                        <div className="support-tracking-route">
-                          {message.tracking.steps.map((step, index) => (
-                            <React.Fragment key={`route-${step.label}`}>
-                              <span className={step.completed ? 'is-complete' : ''}>{step.label}</span>
-                              {index < message.tracking.steps.length - 1 && <b aria-hidden="true">-&gt;</b>}
-                            </React.Fragment>
+                    )}
+                    <div className="support-z-bubble">
+                      <div className="support-z-bubble-header">
+                        <p>{message.text}</p>
+                        <time>{message.time}</time>
+                      </div>
+                      {message.tracking && (
+                        <div className="support-tracking-card">
+                          <div className="support-tracking-grid">
+                            <span>{labels.orderId}</span>
+                            <strong>{message.tracking.orderId}</strong>
+                            <span>{labels.orderStatus}</span>
+                            <strong>{message.tracking.status}</strong>
+                            <span>{labels.estimatedDelivery}</span>
+                            <strong>{message.tracking.estimatedDelivery}</strong>
+                            <span>{labels.paymentMethod}</span>
+                            <strong>{message.tracking.paymentMethod}</strong>
+                            <span>{labels.currentStep}</span>
+                            <strong>{message.tracking.currentStep}</strong>
+                          </div>
+                          <div className="support-tracking-timeline" aria-label={labels.trackingTimeline}>
+                            <div className="support-tracking-route">
+                              {message.tracking.steps.map((step, stepIdx) => (
+                                <React.Fragment key={`route-${step.label}`}>
+                                  <span className={step.completed ? 'is-complete' : ''}>{step.label}</span>
+                                  {stepIdx < message.tracking.steps.length - 1 && <b aria-hidden="true">-&gt;</b>}
+                                </React.Fragment>
+                              ))}
+                            </div>
+                            {message.tracking.steps.map((step) => (
+                              <div
+                                key={step.label}
+                                className={`support-tracking-step ${step.completed ? 'is-complete' : ''} ${step.active ? 'is-active' : ''}`}
+                              >
+                                <span></span>
+                                <p>{step.label}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {isLatestBotMessage && message.options?.length > 0 && !isTicketFormOpen && (
+                        <div className="support-option-list" aria-label="Support options">
+                          {message.options.map((option) => (
+                            <button key={`${message.id}-${getOptionId(option)}`} type="button" onClick={() => handleOptionClick(option)}>
+                              {option.action === 'ticket' ? labels.raiseTicket : getLocalizedOptionLabel(option)}
+                            </button>
                           ))}
                         </div>
-                        {message.tracking.steps.map((step) => (
-                          <div
-                            key={step.label}
-                            className={`support-tracking-step ${step.completed ? 'is-complete' : ''} ${step.active ? 'is-active' : ''}`}
-                          >
-                            <span></span>
-                            <p>{step.label}</p>
-                          </div>
-                        ))}
-                      </div>
+                      )}
                     </div>
-                  )}
-                  <time>{message.time}</time>
-                  {message.sender === 'bot' && message.options?.length > 0 && (
-                    <div className="support-option-list" aria-label="Support options">
-                      {message.options.map((option) => (
-                        <button key={`${message.id}-${getOptionId(option)}`} type="button" onClick={() => handleOptionClick(option)}>
-                          {option.action === 'ticket' ? labels.raiseTicket : getLocalizedOptionLabel(option)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </article>
-            ))}
+                  </article>
+                );
+              });
+            })()}
             {isTicketFormOpen && (
               <div className="support-z-ticket-wrap">
                 <TicketForm

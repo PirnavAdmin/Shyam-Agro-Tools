@@ -82,9 +82,13 @@ const AddInvoice = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let finalValue = value;
+    if (name === 'emailAddress') {
+      finalValue = value.toLowerCase().trimStart();
+    }
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: finalValue
     }));
   };
 
@@ -146,9 +150,25 @@ const AddInvoice = () => {
 
     // 3. Email Address Validation (if provided)
     if (formData.emailAddress && formData.emailAddress.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.emailAddress.trim())) {
-        setError('Please enter a valid Email Address format (e.g. client@example.com).');
+      const rawEmail = formData.emailAddress.trim();
+      const cleanEmail = rawEmail.toLowerCase();
+
+      // Lowercase enforcement check
+      if (rawEmail !== cleanEmail) {
+        setError('Email address must be written in lowercase letters only.');
+        return;
+      }
+
+      // Reject invalid @gmail.in domain extension
+      if (/@gmail\.in$/i.test(cleanEmail)) {
+        setError('Invalid email domain "@gmail.in". Gmail addresses must end with @gmail.com.');
+        return;
+      }
+
+      // Strict email regex matching valid formats (.com, .org, .net, .in, .co.in, etc.)
+      const strictEmailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|org|net|edu|gov|co\.in|in|io|co|biz|info|me|farm|agro)$/;
+      if (!strictEmailRegex.test(cleanEmail)) {
+        setError('Please enter a valid lowercase email address ending with a valid extension (e.g., .com, .org, .net, .in, .co.in).');
         return;
       }
     }
@@ -358,10 +378,15 @@ const AddInvoice = () => {
                 value={formData.paymentStatus}
                 onChange={handleChange}
               >
-                <option value="Unpaid">Unpaid (Pending Settlement)</option>
-                <option value="Paid">Paid (Settled)</option>
+                <option value="Unpaid">Unpaid (Proforma Invoice)</option>
+                <option value="Paid">Paid (Tax Invoice)</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
+              {formData.paymentStatus === 'Unpaid' && (
+                <span style={{ fontSize: '11px', color: '#d97706', marginTop: '4px', display: 'block', fontWeight: 600 }}>
+                  ℹ️ Unpaid invoices will be issued as a <strong>Proforma Invoice</strong>. Tax Invoice (Original for Recipient) is issued upon payment confirmation.
+                </span>
+              )}
             </div>
 
             <div className="form-input-field">
@@ -487,7 +512,7 @@ const AddInvoice = () => {
                     </td>
                     <td>
                       <span className="invoice-item-readonly" style={{ textAlign: 'right' }}>
-                        ₹{(Number(item.quantity || 0) * Number(item.price || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ₹{((Number(item.quantity || 0) * Number(item.price || 0)) * 1.18).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </td>
                     <td style={{ textAlign: 'center' }}>

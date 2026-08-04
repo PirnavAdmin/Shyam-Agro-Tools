@@ -255,11 +255,15 @@ const MyOrdersPage = () => {
       doc.setFontSize(8);
       doc.text('High-Quality Agricultural Tools & Equipment', 15, 28);
 
-      // TAX INVOICE Header on the right
-      doc.setTextColor(...primaryGreen);
+      // TAX / PROFORMA INVOICE Header on the right
+      const isPaidOrder = (order.paymentStatus || order.paymentMethod || '').toLowerCase().includes('paid') || (order.paymentStatus || '').toLowerCase() === 'paid';
+      const isCancelledOrder = (order.status || '').toLowerCase() === 'cancelled';
+      const pdfTitle = isPaidOrder ? 'TAX INVOICE' : isCancelledOrder ? 'CANCELLED INVOICE' : 'PROFORMA INVOICE';
+
+      doc.setTextColor(isPaidOrder ? primaryGreen[0] : isCancelledOrder ? 220 : 217, isPaidOrder ? primaryGreen[1] : isCancelledOrder ? 38 : 119, isPaidOrder ? primaryGreen[2] : isCancelledOrder ? 38 : 6);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      doc.text('TAX INVOICE', 195, 24, { align: 'right' });
+      doc.setFontSize(16);
+      doc.text(pdfTitle, 195, 24, { align: 'right' });
 
       // Invoice metadata on the right
       const invNo = inv.invoiceNo || order.id;
@@ -269,6 +273,7 @@ const MyOrdersPage = () => {
       doc.setFontSize(8);
       doc.text(`Invoice No: ${invNo}`, 195, 29, { align: 'right' });
       doc.text(`Date: ${invDate}`, 195, 33, { align: 'right' });
+      doc.text(`Status: ${(order.paymentStatus || (isPaidOrder ? 'Paid' : 'Unpaid')).toUpperCase()}`, 195, 37, { align: 'right' });
 
       // Horizontal separator line
       doc.setDrawColor(...borderLine);

@@ -111,7 +111,7 @@ const BlogForm = () => {
       body.append('category',    formData.category);
       body.append('authorName',  formData.authorName.trim() || 'Admin');
       body.append('publishDate', formData.publishDate || new Date().toISOString().split('T')[0]);
-      body.append('summary',     formData.summary.trim() || formData.description.slice(0, 150));
+      body.append('summary',     formData.summary.trim() || (formData.description.length > 200 ? formData.description.slice(0, 200).replace(/\s+\S*$/, '') + '…' : formData.description));
       body.append('description', formData.description.trim());
 
       if (imageFile) {

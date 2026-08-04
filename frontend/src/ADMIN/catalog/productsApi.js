@@ -241,8 +241,8 @@ export const mapProductFromApi = (
     subcategoryId: subcategoryId || (subcategories[0]?.id ?? ''),
 
     // Pricing
-    mrp: String(raw.mrp ?? ''),
-    price: String(raw.sellingPrice ?? raw.price ?? ''),
+    mrp: String(raw.mrp ?? raw.MRP ?? raw.Mrp ?? raw.oldPrice ?? raw.OldPrice ?? raw.sellingPrice ?? raw.price ?? ''),
+    price: String(raw.sellingPrice ?? raw.price ?? raw.mrp ?? raw.MRP ?? ''),
     discountType: (() => {
       const dt = (raw.discountType || '').toLowerCase();
       if (dt === 'percentage' || dt === 'percent') return 'percentage';

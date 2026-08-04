@@ -28,26 +28,33 @@ const parsePriceNumber = (val) => {
 const getDiscountLabel = (product) => {
   if (!product) return 'No discount';
 
-  // 1. If product explicitly specifies percentage discountType
-  if (product.discountType === 'percentage' && parsePriceNumber(product.discountValue) > 0) {
-    const pct = parsePriceNumber(product.discountValue);
-    const formatted = pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1);
+  const mrp = parsePriceNumber(product.mrp);
+  const price = parsePriceNumber(product.price);
+  const discountVal = parsePriceNumber(product.discountValue);
+
+  // 1. If product explicitly specifies percentage discountType AND discountVal is a valid percentage (1% to 99%)
+  if (product.discountType === 'percentage' && discountVal > 0 && discountVal <= 99) {
+    const formatted = discountVal % 1 === 0 ? discountVal.toFixed(0) : discountVal.toFixed(1);
     return `${formatted}% off`;
   }
 
   // 2. If product explicitly specifies flat rupee discountType
-  if (product.discountType === 'fixed' && parsePriceNumber(product.discountValue) > 0) {
-    const flat = parsePriceNumber(product.discountValue);
-    return `₹${flat.toLocaleString('en-IN')} off`;
+  if (product.discountType === 'fixed' && discountVal > 0) {
+    return `₹${discountVal.toLocaleString('en-IN')} off`;
   }
 
   // 3. Compute from MRP vs Selling Price safely
-  const mrp = parsePriceNumber(product.mrp);
-  const price = parsePriceNumber(product.price);
+  const effectiveMrp = mrp > 0 ? mrp : price;
+  if (effectiveMrp <= 0 || price <= 0 || effectiveMrp <= price) return 'No discount';
 
-  if (mrp <= 0 || price <= 0 || mrp <= price) return 'No discount';
+  const rawPercentage = ((effectiveMrp - price) / effectiveMrp) * 100;
+  if (rawPercentage <= 0 || isNaN(rawPercentage)) return 'No discount';
 
-  const rawPercentage = ((mrp - price) / mrp) * 100;
+  if (rawPercentage > 99) {
+    const savedAmount = effectiveMrp - price;
+    return `₹${savedAmount.toLocaleString('en-IN')} off`;
+  }
+
   const formattedPct = rawPercentage % 1 === 0 ? rawPercentage.toFixed(0) : rawPercentage.toFixed(1);
   return `${formattedPct}% off`;
 };
@@ -267,15 +274,23 @@ const ProductsList = () => {
                   <td style={{ padding: '5px 8px', fontSize: '11px' }}>{getCategoryName(categories, product.categoryId)}</td>
                   <td style={{ padding: '5px 8px', fontSize: '11px' }}>{getSubcategoryName(subcategories, product.subcategoryId)}</td>
                   <td className="catalog-number-cell" style={{ padding: '5px 8px', fontSize: '11px' }}>
-                    {formatCurrency(product.price)}
-                    {Number(product.mrp) > Number(product.price) && (
-                      <div className="catalog-table__muted" style={{ fontSize: '10px' }}>
-                        MRP {formatCurrency(product.mrp)}
-                      </div>
-                    )}
+                    {(() => {
+                      const priceNum = parsePriceNumber(product.price);
+                      const mrpNum = parsePriceNumber(product.mrp);
+                      const effectiveMrp = mrpNum > 0 ? mrpNum : priceNum;
+                      const isDiscounted = mrpNum > priceNum;
+                      return (
+                        <>
+                          <div style={{ fontWeight: '600', color: '#0f172a' }}>{formatCurrency(priceNum)}</div>
+                          <div className="catalog-table__muted" style={{ fontSize: '10px', color: '#64748b', textDecoration: isDiscounted ? 'line-through' : 'none' }}>
+                            MRP {formatCurrency(effectiveMrp)}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </td>
                   <td style={{ padding: '5px 8px' }}>
-                    <span className={`catalog-badge ${Number(product.mrp) > Number(product.price) ? 'catalog-badge--low' : ''}`} style={{ fontSize: '10px' }}>
+                    <span className={`catalog-badge ${parsePriceNumber(product.mrp) > parsePriceNumber(product.price) ? 'catalog-badge--low' : ''}`} style={{ fontSize: '10px' }}>
                       {getDiscountLabel(product)}
                     </span>
                   </td>

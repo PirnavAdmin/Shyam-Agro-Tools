@@ -88,7 +88,10 @@ const ProductList = () => {
                     <td className="catalog-path">{product.sku || 'N/A'}</td>
                     <td>{product.categoryId}</td>
                     <td className="catalog-number-cell">
-                      INR {Number(product.price || product.mrp || 0).toLocaleString('en-IN')}
+                      <div style={{ fontWeight: '600' }}>₹{Number(product.price || product.mrp || 0).toLocaleString('en-IN')}</div>
+                      <div className="catalog-table__muted" style={{ fontSize: '10px' }}>
+                        MRP ₹{Number(product.mrp || product.price || 0).toLocaleString('en-IN')}
+                      </div>
                     </td>
                     <td className="catalog-center-cell">{product.stock}</td>
                     <td>
