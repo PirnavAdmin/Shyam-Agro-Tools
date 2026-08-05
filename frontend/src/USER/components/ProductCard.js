@@ -211,7 +211,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
 
         <div className="mt-auto">
           <div className="mb-1.5 flex flex-wrap items-end gap-2">
-            <span className="text-base font-bold text-primary">{formatPrice(displayPrice)}</span>
+            <span className="text-base font-bold text-blue-900">{formatPrice(displayPrice)}</span>
           </div>
 
           {product.codAvailable ? (

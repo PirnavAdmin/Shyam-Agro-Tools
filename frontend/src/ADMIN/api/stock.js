@@ -16,16 +16,16 @@ export const mapStockItemFromApi = (raw = {}) => {
   const currentStock = Number(raw.currentStock ?? raw.stockQuantity ?? raw.stock ?? 0);
   const reorderLevel = Number(raw.reorderLevel ?? 0);
   
-  // Determine status
-  let status = raw.status || raw.stockStatus;
-  if (!status) {
-    if (currentStock === 0) {
-      status = 'Out of Stock';
-    } else if (currentStock <= reorderLevel) {
-      status = 'Low Stock';
-    } else {
-      status = 'In Stock';
-    }
+  // Force determine status regardless of what the backend string says
+  let status = 'In Stock';
+  if (currentStock === 0) {
+    status = 'Out of Stock';
+  } else if (currentStock <= reorderLevel) {
+    status = 'Low Stock';
+  } else {
+    // If backend provided a specific status that isn't 'Low' or 'Out of', preserve it if needed
+    // But typically we just want 'In Stock'
+    status = 'In Stock';
   }
 
   const parseAmount = (val) => {

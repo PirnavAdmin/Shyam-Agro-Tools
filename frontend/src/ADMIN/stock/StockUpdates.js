@@ -807,13 +807,17 @@ const StockUpdates = () => {
               </tr>
             </thead>
             <tbody>
-              {pagedItems.map((item) => (
+              {pagedItems.map((item) => {
+                const isOutOfStock = Number(item.currentStock) === 0;
+                const isLowStock = !isOutOfStock && Number(item.currentStock) <= Number(item.reorderLevel);
+                
+                return (
                 <tr 
                   key={item.id} 
                   className={
-                    item.status === 'Out of Stock' 
+                    isOutOfStock
                       ? 'stock-row--alert' 
-                      : item.status === 'Low Stock' 
+                      : isLowStock
                         ? 'stock-row--warning' 
                         : 'stock-row--success'
                   }
@@ -829,7 +833,7 @@ const StockUpdates = () => {
                   </td>
                   <td style={{ padding: '6px 12px' }}>{item.supplier}</td>
                   <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>
-                    <span className={`stock-qty ${item.status === 'Out of Stock' ? 'stock-qty--zero' : item.status === 'Low Stock' ? 'stock-qty--low' : 'stock-qty--ok'}`} style={{ fontSize: '12px', padding: '2px 8px' }}>
+                    <span className={`stock-qty ${isOutOfStock ? 'stock-qty--zero' : isLowStock ? 'stock-qty--low' : 'stock-qty--ok'}`} style={{ fontSize: '12px', padding: '2px 8px' }}>
                       {item.currentStock}
                     </span>
                   </td>
@@ -850,7 +854,8 @@ const StockUpdates = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {!filtered.length && (
                 <tr>
                   <td colSpan="9">

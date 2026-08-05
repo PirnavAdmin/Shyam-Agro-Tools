@@ -8,7 +8,7 @@
 }
 
 .product-sticky-panel {
-  position: sticky;
+  /* position: sticky; */
   top: 18px;
 }
 
@@ -209,8 +209,8 @@
 }
 
 .product-form-actions {
-  position: sticky;
-  bottom: 0;
+  /* position: sticky; */
+  /* bottom: 0; */
   z-index: 10;
   padding: 14px 0;
   /* Very light background to keep buttons visible while scrolling */
@@ -293,5 +293,10 @@
   background: #2636b6;
   border-color: #2636b6;
   color: #ffffff;
+}
+
+
+.product-form-layout {
+  padding-bottom: 80px;
 }
 

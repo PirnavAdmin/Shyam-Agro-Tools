@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
-import headerLogo from '../../asset/headerlogo-cropped.png';
+import headerLogo from '../../asset/headerlogo-new.png';
 import './Footer.css';
 
 const Footer = () => {

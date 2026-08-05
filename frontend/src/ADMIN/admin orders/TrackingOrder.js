@@ -34,6 +34,17 @@ const STATUS_THEMES = {
   Cancelled: { bg: '#fef2f2', text: '#b91c1c', border: '#fecaca', icon: AlertCircle }
 };
 
+const STATUS_ORDER = {
+  Pending: 1,
+  Processing: 2,
+  Packed: 3,
+  Shipped: 4,
+  Dispatched: 5,
+  Completed: 6,
+  Delivered: 6,
+  Cancelled: -1
+};
+
 const TrackingOrder = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -277,11 +288,18 @@ const TrackingOrder = () => {
                         const theme = STATUS_THEMES[s];
                         const Icon = theme.icon;
                         const isActive = tempStatus === s;
+                        
+                        const currentStatusWeight = STATUS_ORDER[activeOrderDetails?.status] || 0;
+                        const sWeight = STATUS_ORDER[s] || 0;
+                        const isDisabled = s !== 'Cancelled' && sWeight > 0 && sWeight < currentStatusWeight;
+
                         return (
                           <div
                             key={s}
-                            onClick={() => setTempStatus(s)}
-                            className={`status-select-card ${isActive ? 'active' : ''}`}
+                            onClick={() => {
+                              if (!isDisabled) setTempStatus(s);
+                            }}
+                            className={`status-select-card ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`}
                             style={{
                               '--theme-bg': theme.bg,
                               '--theme-text': theme.text,

@@ -14,7 +14,7 @@ const invoiceData = {
     name: 'Shyam Agro Tools',
     address: 'Sidhpur, Gujarat - 384151',
     gstin: '24DYYPP1677P1Z6',
-    phone: '+91 98765 43210',
+    phone: '+91 9912649265',
     email: 'sales@shyamagro.com',
   },
   buyer: {

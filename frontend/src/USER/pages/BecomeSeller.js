@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useCategories } from '../context/CategoryContext';
@@ -34,6 +36,7 @@ const getSupplierReference = (response) => {
 };
 
 const BecomeSeller = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,14 +132,21 @@ const BecomeSeller = () => {
     <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
       <Header onLoginClick={() => setIsLoginOpen(true)} />
 
-      <main className="seller-page-container">
+      <main className="seller-page-container relative">
         <div className="seller-hero">
           <h1>Grow Your Business with Shyam Agro</h1>
           <p>Register your supplier details and track your application status.</p>
         </div>
 
         <div className="seller-content seller-content-simple">
-          <div className="form-card">
+          <div className="form-card relative">
+            <button 
+              onClick={() => navigate('/')}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors z-10"
+              title="Close"
+            >
+              <X size={24} />
+            </button>
             
             {/* Elegant Tabs Selector */}
             <div className="flex border-b border-gray-200 mb-6 justify-center gap-6">

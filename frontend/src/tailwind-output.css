@@ -3493,6 +3493,11 @@ img.app-line-thumb,
   color: rgb(29 78 216 / var(--tw-text-opacity));
 }
 
+.text-blue-900 {
+  --tw-text-opacity: 1;
+  color: rgb(30 58 138 / var(--tw-text-opacity));
+}
+
 .text-dark {
   --tw-text-opacity: 1;
   color: rgb(26 26 26 / var(--tw-text-opacity));
@@ -5203,6 +5208,11 @@ section + .brand-slider-section {
 
 .hover\:bg-primary\/10:hover {
   background-color: rgb(109 189 47 / 0.1);
+}
+
+.hover\:bg-red-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 242 242 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-red-700:hover {

@@ -49,12 +49,42 @@ namespace ShyamAgroSuite.Api.Controllers
 
             if (!string.IsNullOrEmpty(status))
             {
-                query = query.Where(r => r.Status == status);
+                var s = status.ToLower();
+                if (s == "pending") {
+                    query = query.Where(r => r.Status.ToLower() == "request_submitted" || r.Status.ToLower() == "pending");
+                }
+                else if (s == "approved") {
+                    query = query.Where(r => r.Status.ToLower() == "claim_approved" || r.Status.ToLower() == "approved" || r.Status.ToLower() == "under_review");
+                }
+                else if (s == "pickup scheduled") {
+                    query = query.Where(r => r.Status.ToLower() == "pickup_scheduled" || r.Status.ToLower() == "pickup scheduled" || r.Status.ToLower() == "product_picked_up");
+                }
+                else if (s == "refunded") {
+                    query = query.Where(r => r.Status.ToLower() == "refunded" || r.Status.ToLower() == "refund_initiated" || r.Status.ToLower() == "refund_completed");
+                }
+                else if (s == "completed") {
+                    query = query.Where(r => r.Status.ToLower() == "completed" || r.Status.ToLower() == "replacement_shipped" || r.Status.ToLower() == "refunded" || r.Status.ToLower() == "replacement_completed");
+                }
+                else if (s == "rejected") {
+                    query = query.Where(r => r.Status.ToLower() == "rejected" || r.Status.ToLower() == "claim_rejected");
+                }
+                else {
+                    query = query.Where(r => r.Status.ToLower() == s);
+                }
             }
 
             if (!string.IsNullOrEmpty(requestType))
             {
-                query = query.Where(r => r.RequestType == requestType);
+                var rt = requestType.ToLower();
+                if (rt == "refund" || rt == "return_refund") {
+                    query = query.Where(r => r.RequestType.ToLower() == "return_refund" || r.RequestType.ToLower() == "refund");
+                }
+                else if (rt == "replacement") {
+                    query = query.Where(r => r.RequestType.ToLower() == "replacement");
+                }
+                else {
+                    query = query.Where(r => r.RequestType.ToLower() == rt);
+                }
             }
 
             if (dateFrom.HasValue)

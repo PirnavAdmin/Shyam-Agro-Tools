@@ -729,3 +729,10 @@
   font-weight: 600;
   color: #334155;
 }
+
+.status-select-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(100%);
+}
+

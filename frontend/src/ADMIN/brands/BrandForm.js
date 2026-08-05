@@ -105,6 +105,27 @@ export const validateBrandName = (rawName) => {
   if (/(.)\1{3,}/.test(name)) {
     return 'Brand Name cannot contain repeated random characters.';
   }
+  const mashPatterns = /(asdf|qwer|zxcv|hjkl|uiop|vbnm|wert|xcvb|erty|dfgh|cvbn|tyui|ghjk|bnm|swq|qwe|asd|zxc|qaz|wsx|edc|rfv|tgb|yhn|ujm)/i;
+  if (mashPatterns.test(name)) {
+    return 'Brand Name appears to be random keyboard typing.';
+  }
+  if (/[bcdfghjklmnpqrstvwxz]{6,}/i.test(name)) {
+    return 'Brand Name contains too many consecutive consonants.';
+  }
+  const cleanWord = name.toLowerCase().replace(/[^a-z]/g, '');
+  const uniqueChars = new Set(cleanWord).size;
+  if (cleanWord.length >= 6 && uniqueChars <= cleanWord.length / 2.0) {
+    return 'Brand Name appears to contain invalid repetitive characters.';
+  }
+  const words = name.split(/\s+/);
+  for (const w of words) {
+    if (w.length > 5) {
+      const vowels = (w.match(/[aeiouy]/gi) || []).length;
+      if (vowels === 0) return 'Brand Name words must contain vowels.';
+      const consonants = (w.match(/[bcdfghjklmnpqrstvwxz]/gi) || []).length;
+      if (consonants / vowels > 3.5) return 'Brand Name contains invalid random characters.';
+    }
+  }
   if (!/^[A-Za-z0-9][A-Za-z0-9\s&\-\'\./]{1,49}$/.test(name)) {
     return 'Brand Name contains invalid characters. Only letters, numbers, spaces, and standard punctuation (&, -, \', ., /) are allowed.';
   }
@@ -225,6 +246,7 @@ const BrandForm = () => {
 
   const [id, setId] = useState('');
   const [name, setName] = useState('');
+  const [nameErrorInline, setNameErrorInline] = useState('');
   const [description, setDescription] = useState('');
   const [logo, setLogo] = useState('');
   const [logoFile, setLogoFile] = useState(null);
@@ -425,12 +447,28 @@ const BrandForm = () => {
                 id="brand-name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setNameErrorInline(validateBrandName(e.target.value));
+                }}
+                onBlur={(e) => setNameErrorInline(validateBrandName(e.target.value))}
                 placeholder="e.g. Shyam Agro Tools"
                 required
                 autoFocus
-                style={{ padding: '6px 10px', fontSize: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }}
+                style={{ 
+                  padding: '6px 10px', 
+                  fontSize: '12px', 
+                  borderRadius: '8px', 
+                  border: nameErrorInline ? '1px solid #ef4444' : '1px solid #cbd5e1', 
+                  outline: 'none',
+                  backgroundColor: nameErrorInline ? '#fef2f2' : 'transparent'
+                }}
               />
+              {nameErrorInline && (
+                <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: 500, marginTop: '2px' }}>
+                  {nameErrorInline}
+                </span>
+              )}
             </div>
 
             {/* Brand Description Field */}

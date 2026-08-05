@@ -229,9 +229,15 @@
 
 .site-header-logo {
   display: block;
-  width: clamp(3.5rem, 4vw, 4.5rem);
-  height: clamp(3rem, 3.55vw, 3.9rem);
+  width: clamp(4rem, 5vw, 5.5rem);
+  height: clamp(3.5rem, 4.5vw, 4.5rem);
   object-fit: contain;
+  margin-right: -0.75rem; /* Reduces the gap between the logo and text */
+  transition: transform 0.2s ease-in-out;
+}
+
+.group:hover .site-header-logo {
+  transform: scale(1.05);
 }
 
 .header-brand-link {

@@ -517,7 +517,7 @@ const printInvoice = (order) => {
               <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
               <div class="company-meta">
                 Plot 42, GIDC Estate, Rajkot, Gujarat - 360002<br/>
-                GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 98765 43210<br/>
+                GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265<br/>
                 Email: sales@shyamagro.com | Web: www.shyamagrotools.com
               </div>
             </div>

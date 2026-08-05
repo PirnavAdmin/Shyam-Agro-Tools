@@ -448,8 +448,40 @@ namespace ShyamAgroSuite.Api.Controllers
                 return BadRequest(new { Message = "Status is required." });
             }
 
+            // Define standard status progression
+            var statusOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Pending", 1 },
+                { "Processing", 2 },
+                { "Packed", 3 },
+                { "Shipped", 4 },
+                { "Dispatched", 5 },
+                { "Out for Delivery", 6 },
+                { "Delivered", 7 },
+                { "Completed", 7 }
+            };
+
+            var currentStatus = order.Status;
+            var newStatus = request.Status;
+
+            if (!newStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                int currentOrder = statusOrder.TryGetValue(currentStatus, out var c) ? c : 0;
+                int newOrder = statusOrder.TryGetValue(newStatus, out var n) ? n : 0;
+
+                if (newOrder > 0 && newOrder < currentOrder)
+                {
+                    return BadRequest(new { Message = $"Cannot update status backward from '{currentStatus}' to '{newStatus}'." });
+                }
+                
+                // Allow same status updates (e.g. multiple "Shipped" logs with different notes if needed, though usually discouraged)
+                // If they strictly shouldn't duplicate:
+                // if (newOrder > 0 && newOrder == currentOrder && !newStatus.Equals(currentStatus, StringComparison.OrdinalIgnoreCase))
+                //     return BadRequest(...)
+            }
+
             // Update order status
-            order.Status = request.Status;
+            order.Status = newStatus;
 
             // Generate standard description if notes are left blank
             var description = request.Notes;

@@ -218,7 +218,10 @@ const BlogsList = () => {
                               {blog.title || 'Untitled'}
                             </div>
                             {(() => {
-                              const fullText = (blog.description || blog.summary || '').replace(/>+/g, '').trim();
+                              const fullText = (blog.description || blog.summary || '')
+                                .replace(/<[^>]*>/g, '') // Strip HTML tags
+                                .replace(/>+/g, '') // Remove lingering consecutive > characters
+                                .trim();
                               const isLong = fullText.length > 100;
                               const isExpanded = expandedSummaryId === blog.id;
                               const truncated = isLong ? fullText.slice(0, 100).replace(/\s+\S*$/, '') : fullText;

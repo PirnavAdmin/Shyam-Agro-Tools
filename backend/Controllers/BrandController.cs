@@ -152,6 +152,38 @@ namespace ShyamAgroSuite.Api.Controllers
                 return (false, "Brand name contains invalid characters. Only letters, numbers, spaces, and standard punctuation (&, -, ', ., /) are allowed.");
             }
 
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(?i)(asdf|qwer|zxcv|hjkl|uiop|vbnm|wert|xcvb|erty|dfgh|cvbn|tyui|ghjk|bnm|swq|qwe|asd|zxc|qaz|wsx|edc|rfv|tgb|yhn|ujm)"))
+            {
+                return (false, "Brand name appears to be random keyboard typing.");
+            }
+
+            if (System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"(?i)[bcdfghjklmnpqrstvwxz]{6,}"))
+            {
+                return (false, "Brand name contains too many consecutive consonants.");
+            }
+
+            var cleanWord = System.Text.RegularExpressions.Regex.Replace(trimmed.ToLower(), @"[^a-z]", "");
+            var uniqueCharsCount = cleanWord.Distinct().Count();
+            if (cleanWord.Length >= 6 && uniqueCharsCount <= cleanWord.Length / 2.0)
+            {
+                return (false, "Brand name appears to contain invalid repetitive characters.");
+            }
+
+            var words = trimmed.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var w in words)
+            {
+                if (w.Length > 5)
+                {
+                    var vowels = System.Text.RegularExpressions.Regex.Matches(w, @"(?i)[aeiouy]").Count;
+                    if (vowels == 0) return (false, "Brand name words must contain vowels.");
+                    var consonants = System.Text.RegularExpressions.Regex.Matches(w, @"(?i)[bcdfghjklmnpqrstvwxz]").Count;
+                    if (vowels > 0 && (double)consonants / vowels > 3.5)
+                    {
+                        return (false, "Brand name contains invalid random characters.");
+                    }
+                }
+            }
+
             return (true, string.Empty);
         }
 

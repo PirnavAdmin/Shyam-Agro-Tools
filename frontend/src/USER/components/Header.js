@@ -23,7 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Check, ShoppingBag, Heart, User, Search, Phone, Mail, LogOut, Package, Wallet, Menu, X, FileText, MapPin } from 'lucide-react';
 import { buildSearchResults } from '../utils/searchIndex';
 import LanguageDropdown from './LanguageDropdown';
-import headerLogo from '../../asset/headerlogo-cropped.png';
+import headerLogo from '../../asset/headerlogo-new.png';
 import './Header.css';
 
 const topBarAnnouncements = [
@@ -765,11 +765,11 @@ const Header = ({ onLoginClick }) => {
           <div className="top-header-contact flex gap-4 md:gap-6 items-center flex-wrap">
             <div className="top-header-contact-item flex items-center gap-2">
               <span className="icon-shade icon-teal icon-shade-sm"><Phone size={12} /></span>
-              <Link to="/contact-support" className="top-header-contact-link">+91 98765 43210</Link>
+              <Link to="/contact-support" className="top-header-contact-link">+91 9912649265</Link>
             </div>
             <div className="top-header-contact-item flex items-center gap-2 hidden sm:flex">
               <span className="icon-shade icon-grey icon-shade-sm"><Mail size={12} /></span>
-              <Link to="/contact-support" className="top-header-contact-link">support@shyamagro.com</Link>
+              <Link to="/contact-support" className="top-header-contact-link">Support@shyamagrotools.com</Link>
             </div>
             <Link to="/become-seller" className="top-header-seller-link hidden sm:inline">
               {t('becomeSeller')}
@@ -812,7 +812,7 @@ const Header = ({ onLoginClick }) => {
 
           {/* Logo */}
           <Link to="/" className="header-brand-link flex items-center gap-3 group">
-            <img src={headerLogo} alt="Shyam Agro" className="site-header-logo transition-transform group-hover:scale-105" />
+            <img src={headerLogo} alt="Shyam Agro" className="site-header-logo transition-transform" />
             <h1 className="header-brand-title hidden sm:block text-lg md:text-xl font-black tracking-tight text-dark whitespace-nowrap">
               SHYAM AGRO<span className="header-brand-accent text-primary"> TOOLS</span>
             </h1>
@@ -1147,3 +1147,5 @@ const Header = ({ onLoginClick }) => {
 };
 
 export default Header;
+
+
