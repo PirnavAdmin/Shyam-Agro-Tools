@@ -184,14 +184,33 @@ function AddStaff() {
             const permsJson = await safeParseJson(permsResponse);
             targetPerms = unwrapList(permsJson);
           }
+          const ROLE_DEFAULTS = {
+            advisory: ['dashboard', 'customers', 'call history', 'reports'],
+            sales: ['dashboard', 'catalog', 'orders', 'invoices', 'customers', 'marketing'],
+            inventory: ['dashboard', 'catalog', 'stockupdates', 'suppliers'],
+            admin: ['dashboard', 'catalog', 'customers', 'orders', 'stockupdates', 'marketing', 'brands', 'blogs', 'settings', 'suppliers', 'coins converter', 'call history', 'invoices', 'reports'],
+            staff: ['dashboard'],
+          };
+
           const permsState = { ...initialPerms };
-          targetPerms.forEach(p => {
-            const name = p.moduleName || p.ModuleName || (p.module && (p.module.moduleName || p.module.ModuleName));
-            const isAllowed = p.isAllowed ?? p.IsAllowed ?? false;
-            if (name) {
-              permsState[name] = isAllowed;
-            }
-          });
+          if (targetPerms.length > 0) {
+            targetPerms.forEach(p => {
+              const name = p.moduleName || p.ModuleName || (p.module && (p.module.moduleName || p.module.ModuleName));
+              const isAllowed = p.isAllowed ?? p.IsAllowed ?? false;
+              if (name) {
+                permsState[name] = isAllowed;
+              }
+            });
+          } else {
+            // Fallback to role-based defaults if API returns nothing (e.g., 404)
+            const roleKey = (target.role || target.Role || "staff").toLowerCase();
+            const fallbackPerms = ROLE_DEFAULTS[roleKey] || ROLE_DEFAULTS.staff;
+            fallbackPerms.forEach(p => {
+              if (p in permsState) {
+                permsState[p] = true;
+              }
+            });
+          }
           setPermissions(permsState);
 
         } catch (err) {
@@ -645,7 +664,10 @@ function AddStaff() {
               <select name="role" value={formData.role} onChange={handleChange}>
                 <option value="">Select Role</option>
                 <option value="admin">Admin</option>
+                <option value="advisory">Advisory</option>
+                <option value="inventory">Inventory</option>
                 <option value="manager">Manager</option>
+                <option value="sales">Sales</option>
                 <option value="staff">Staff</option>
               </select>
               {errors.role && <span className="field-error-msg">{errors.role}</span>}
