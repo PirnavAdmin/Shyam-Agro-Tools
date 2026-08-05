@@ -60,6 +60,8 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // POST: api/products
         [HttpPost]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<IActionResult> CreateProduct([FromForm] CreateProductDto dto)
         {
             // Fallback for CategoryId
@@ -308,6 +310,8 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // PUT: api/products/{id}
         [HttpPut("{id}")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<IActionResult> UpdateProduct(int id, [FromForm] CreateProductDto dto)
         {
             var product = await _context.Products

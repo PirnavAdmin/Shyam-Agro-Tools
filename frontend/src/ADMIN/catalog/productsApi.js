@@ -7,7 +7,7 @@ export const BASE_URL = getApiDomain();
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000,
+  timeout: 300000, // Increased to 5 minutes for large media uploads
   headers: {
     'ngrok-skip-browser-warning': 'true',
     Accept: 'application/json',
