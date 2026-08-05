@@ -169,8 +169,7 @@ const SuppliersList = () => {
   const loadSuppliers = async () => {
     try {
       const data = await fetchSuppliers();
-      const approvedOnly = (data || []).filter(s => s.status !== 'Pending' && s.status !== 'Rejected');
-      setSuppliersList(approvedOnly);
+      setSuppliersList(data || []);
     } catch (err) {
       console.error('Failed to fetch suppliers from API:', err);
       setSuppliersList([]);

@@ -158,13 +158,21 @@ function AddStaff() {
           const target = unwrapItem(staffJson);
           setExistingStaffRecord(target);
 
+          const fullName = target.name || target.Name || "";
+          const parts = fullName.trim().split(" ");
+          const fName = parts[0] || "";
+          const lName = parts.slice(1).join(" ") || "";
+
+          const actualId = target.id ?? target.Id;
+          const empIdVal = target.employeeId || target.EmployeeId || (actualId ? `EMP-${String(actualId).padStart(4, '0')}` : "");
+
           setFormData({
-            firstName: target.firstName || target.FirstName || "",
-            lastName: target.lastName || target.LastName || "",
+            firstName: target.firstName || target.FirstName || fName,
+            lastName: target.lastName || target.LastName || lName,
             email: target.email || target.Email || "",
-            mobile: target.mobileNumber || target.MobileNumber || target.mobile || target.Mobile || "",
-            employeeId: target.employeeId || target.EmployeeId || "",
-            role: target.role || target.Role || "",
+            mobile: target.phone || target.Phone || target.mobileNumber || target.MobileNumber || target.mobile || target.Mobile || "",
+            employeeId: empIdVal,
+            role: (target.role || target.Role || "").toLowerCase(),
             password: "",
             confirmPassword: ""
           });
@@ -411,8 +419,10 @@ function AddStaff() {
         employeeId: formData.employeeId.trim().toUpperCase(),
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
+        name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         email: formData.email.trim().toLowerCase(),
         mobileNumber: formData.mobile.trim(),
+        phone: formData.mobile.trim(),
         role: formData.role
       };
 
