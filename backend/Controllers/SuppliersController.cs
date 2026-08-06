@@ -205,7 +205,6 @@ namespace ShyamAgroSuite.Api.Controllers
             supplier.ProductCount = updateData.ProductCount;
             supplier.PerformanceRating = updateData.PerformanceRating;
             supplier.CommercialTerms = updateData.CommercialTerms;
-            supplier.IsActive = updateData.IsActive;
             supplier.LeadTime = updateData.LeadTime;
             supplier.ProductLines = updateData.ProductLines;
             supplier.ActivePo = updateData.ActivePo;
@@ -215,7 +214,11 @@ namespace ShyamAgroSuite.Api.Controllers
             // If updated by form, let them sync gstin/category
             if (!string.IsNullOrEmpty(updateData.Gstin)) supplier.Gstin = updateData.Gstin;
             if (!string.IsNullOrEmpty(updateData.ProductCategory)) supplier.ProductCategory = updateData.ProductCategory;
-            if (!string.IsNullOrEmpty(updateData.Status)) supplier.Status = updateData.Status;
+            if (!string.IsNullOrEmpty(updateData.Status)) {
+                supplier.Status = updateData.Status;
+                supplier.IsActive = updateData.Status.Equals("Verified", StringComparison.OrdinalIgnoreCase) || 
+                                    updateData.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase);
+            }
 
             // Notify Admin
             var notification = new Notification
@@ -275,15 +278,7 @@ namespace ShyamAgroSuite.Api.Controllers
             // Operational fields
             if (string.IsNullOrWhiteSpace(s.LeadTime))        { s.LeadTime = "4-6 days";      changed = true; }
             if (string.IsNullOrWhiteSpace(s.CommercialTerms)) { s.CommercialTerms = "Net 30";  changed = true; }
-            if (string.IsNullOrWhiteSpace(s.City))            { s.City = "Not specified";      changed = true; }
             if (string.IsNullOrWhiteSpace(s.ProductLines))    { s.ProductLines = "General";    changed = true; }
-
-            // Contact fields
-            if (string.IsNullOrWhiteSpace(s.Name))            { s.Name = "Unknown Supplier";   changed = true; }
-            if (string.IsNullOrWhiteSpace(s.ContactPerson))   { s.ContactPerson = "Not provided"; changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Phone))           { s.Phone = "Not provided";      changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Email))           { s.Email = "Not provided";      changed = true; }
-            if (string.IsNullOrWhiteSpace(s.Address))         { s.Address = "Not specified";   changed = true; }
 
             // Numeric fields
             if (s.PerformanceRating <= 0) { s.PerformanceRating = 4.5; changed = true; }

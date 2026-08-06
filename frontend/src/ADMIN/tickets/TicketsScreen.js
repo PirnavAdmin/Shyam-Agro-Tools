@@ -84,6 +84,15 @@ const TicketsScreen = () => {
   const [statusFilter, setStatusFilter] = useState('All'); // All, Open, In Progress, Resolved, Closed
   const [priorityFilter, setPriorityFilter] = useState('All'); // All, Critical, High, Medium, Low
   
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  
+  // Reset pagination on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, typeFilter, statusFilter, priorityFilter]);
+  
   // Selected ticket for details modal
   const [selectedTicket, setSelectedTicket] = useState(null);
   
@@ -144,8 +153,9 @@ const TicketsScreen = () => {
 
   // List of all tickets
   const paginatedTickets = useMemo(() => {
-    return filteredTickets;
-  }, [filteredTickets]);
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredTickets.slice(startIndex, startIndex + pageSize);
+  }, [filteredTickets, currentPage]);
 
   // Open Details Modal
   const handleOpenDetails = (ticket) => {
@@ -369,7 +379,27 @@ const TicketsScreen = () => {
               </tbody>
             </table>
 
-            {/* All matching tickets are listed directly (no pagination) */}
+            {filteredTickets.length > pageSize && (
+              <div style={{ padding: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+                <span style={{ color: '#64748b' }}>Showing {paginatedTickets.length} of {filteredTickets.length} tickets</span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    disabled={currentPage === 1} 
+                    onClick={() => setCurrentPage(p => p - 1)}
+                    style={{ padding: '6px 12px', background: '#f8fafc', borderRadius: '4px', border: '1px solid #cbd5e1', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    disabled={currentPage * pageSize >= filteredTickets.length} 
+                    onClick={() => setCurrentPage(p => p + 1)}
+                    style={{ padding: '6px 12px', background: '#f8fafc', borderRadius: '4px', border: '1px solid #cbd5e1', cursor: currentPage * pageSize >= filteredTickets.length ? 'not-allowed' : 'pointer', opacity: currentPage * pageSize >= filteredTickets.length ? 0.5 : 1 }}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

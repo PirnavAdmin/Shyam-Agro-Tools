@@ -87,7 +87,10 @@ export const getStockLedger = async (params = {}) => {
           : (Array.isArray(data?.items) 
             ? data.items 
             : []))));
-  return list.map(mapStockItemFromApi);
+  return {
+    items: list.map(mapStockItemFromApi),
+    apiMetrics: data
+  };
 };
 
 /**

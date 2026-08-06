@@ -461,9 +461,9 @@ const AdminReturns = () => {
                       <td className="font-extrabold text-slate-700">#RET-{1000 + ret.id}</td>
                       <td>#{ret.orderId}</td>
                       <td className="font-semibold text-slate-600">{ret.customerName || `Cust ID: ${ret.pickupAddressId}`}</td>
-                      <td className="truncate max-w-[150px] font-medium" title={ret.productName}>
+                      <td className="max-w-[250px] font-medium whitespace-normal break-words leading-tight" title={ret.productName}>
                         {ret.productName}
-                        <span className="block text-[10px] text-slate-400">Qty: {ret.requestedQuantity}</span>
+                        <span className="block text-[10px] text-slate-400 mt-0.5">Qty: {ret.requestedQuantity}</span>
                       </td>
                       <td className="font-semibold text-slate-500">
                         {normalizeRequestType(ret.requestType) === 'refund' ? 'Return / Refund' : 'Replacement'}
@@ -474,10 +474,10 @@ const AdminReturns = () => {
                       </td>
                       <td className="text-center">
                         <button 
-                          className="table-action-btn"
+                          className={`table-action-btn ${['refunded', 'completed', 'rejected'].includes(normalizeStatus(ret.status)) ? 'opacity-70 cursor-pointer' : ''}`}
                           onClick={(e) => { e.stopPropagation(); handleSelectReturn(ret); }}
                         >
-                          <Eye size={14} /> Review
+                          <Eye size={14} /> {['refunded', 'completed', 'rejected'].includes(normalizeStatus(ret.status)) ? 'View Only' : 'Review'}
                         </button>
                       </td>
                     </tr>
@@ -561,12 +561,7 @@ const AdminReturns = () => {
                 <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Claim Context</h4>
                 <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-2">
                   <p><strong>Customer:</strong> {selectedReturn.customerName || 'Rajesh Kumar'}</p>
-                  <p><strong>Reason:</strong> {selectedReturn.reasonCode}</p>
-                  {selectedReturn.description && (
-                    <p className="italic text-slate-500 bg-white p-2 rounded border border-slate-100/80 mt-2">
-                      "{selectedReturn.description}"
-                    </p>
-                  )}
+                  <p><strong>Reason:</strong> {selectedReturn.reason || selectedReturn.reasonCode}</p>
                 </div>
                 
                 {/* Evidence files simulated list */}
@@ -707,7 +702,7 @@ const AdminReturns = () => {
                 )}
 
                 {/* 5. Admin Override — force change status at any point */}
-                {!['pending', 'request_submitted'].includes(normalizeStatus(selectedReturn.status)) && (
+                {!['pending', 'request_submitted', 'refunded', 'completed', 'rejected'].includes(normalizeStatus(selectedReturn.status)) && (
                   <button 
                     onClick={() => { setActiveModal('status'); setStatusUpdateVal('Approved'); }}
                     className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white font-bold text-xs py-2.5 rounded-lg hover:bg-orange-600 transition"

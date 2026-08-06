@@ -341,7 +341,7 @@ namespace ShyamAgroSuite.Api.Controllers
             {
                 RequestNumber = requestNumber,
                 CustomerId = customer.Id,
-                OrderId = submission.OrderId,
+                OrderId = orderItem.OrderId,
                 OrderItemId = submission.OrderItemId,
                 ProductId = orderItem.ProductId,
                 RequestType = submission.RequestType,
@@ -806,10 +806,10 @@ namespace ShyamAgroSuite.Api.Controllers
 
         public class ReturnSubmissionDto
         {
-            public int OrderId { get; set; }
+            public string? OrderId { get; set; }
             public int OrderItemId { get; set; }
-            public string RequestType { get; set; } = string.Empty;
-            public string ReasonCode { get; set; } = string.Empty;
+            public string? RequestType { get; set; }
+            public string? ReasonCode { get; set; }
             public string? Description { get; set; }
             public int RequestedQuantity { get; set; }
             public string? RefundMethod { get; set; }

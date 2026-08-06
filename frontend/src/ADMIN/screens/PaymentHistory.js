@@ -1010,7 +1010,11 @@ const PaymentHistory = () => {
               </div>
 
               <div className="pt-2">
-                <button type="submit" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
+                <button 
+                  type="submit" 
+                  disabled={!bankDetails.ifscCode?.trim() || !bankDetails.bankName?.trim() || !bankDetails.bankBranch?.trim() || !bankDetails.accountNumber?.trim() || !bankDetails.accountHolderName?.trim()}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm"
+                >
                   <Check size={16} /> Save Bank details
                 </button>
                 <p className="text-[11px] text-slate-500 mt-2">
@@ -1047,7 +1051,11 @@ const PaymentHistory = () => {
               </div>
 
               <div className="pt-2">
-                <button type="submit" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm">
+                <button 
+                  type="submit" 
+                  disabled={!upiId || !upiId.trim()}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm"
+                >
                   <Check size={16} /> Update UPI ID
                 </button>
                 <p className="text-[11px] text-slate-500 mt-2">

@@ -5445,6 +5445,11 @@ section + .brand-slider-section {
   opacity: 0.5;
 }
 
+.disabled\:hover\:bg-emerald-600:hover:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(5 150 105 / var(--tw-bg-opacity));
+}
+
 .group:hover .group-hover\:visible {
   visibility: visible;
 }

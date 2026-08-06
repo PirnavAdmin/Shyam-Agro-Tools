@@ -26,5 +26,6 @@ namespace ShyamAgroSuite.Api.Models
         public string ProductCategory { get; set; } = "General";
         public string TrackingId { get; set; } = string.Empty;
         public string Status { get; set; } = "Pending";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

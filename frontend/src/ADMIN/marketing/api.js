@@ -9,12 +9,13 @@ function mapBackendToFrontend(apiCoupon) {
     discount: String(apiCoupon.discountValue || 0),
     type: apiCoupon.discountType === 'FixedAmount' ? 'Flat Amount' : (apiCoupon.discountType || 'Percentage'),
     minSpend: String(apiCoupon.minCartValue || 0),
-    maxDiscount: String(apiCoupon.maxDiscount || apiCoupon.discountValue || 0),
+    maxDiscount: apiCoupon.maxDiscountAmount ? String(apiCoupon.maxDiscountAmount) : '',
     startDate: apiCoupon.startDate ? apiCoupon.startDate.split('T')[0] : '',
     endDate: apiCoupon.endDate ? apiCoupon.endDate.split('T')[0] : '',
     usageLimit: String(apiCoupon.usageLimit || 0),
     perCustomerLimit: String(apiCoupon.perCustomerLimit || 1),
-    status: apiCoupon.isActive ? 'Active' : 'Inactive',
+    isActive: apiCoupon.isActive,
+    status: apiCoupon.couponStatus || (apiCoupon.isActive ? 'Active' : 'Inactive'),
     usedCount: apiCoupon.usedCount || 0,
     audience: apiCoupon.audience || 'All Customers'
   };
@@ -26,12 +27,13 @@ function mapFrontendToBackend(coupon) {
     code: coupon.code,
     discountType: coupon.type === 'Flat Amount' ? 'FixedAmount' : coupon.type,
     discountValue: Number(coupon.discount || 0),
+    maxDiscountAmount: coupon.maxDiscount ? Number(coupon.maxDiscount) : null,
     minCartValue: Number(coupon.minSpend || 0),
     usageLimit: Number(coupon.usageLimit || 0),
     usedCount: Number(coupon.usedCount || 0),
     startDate: coupon.startDate ? `${coupon.startDate}T00:00:00` : null,
     endDate: coupon.endDate ? `${coupon.endDate}T23:59:59` : null,
-    isActive: coupon.status === 'Active'
+    isActive: coupon.isActive !== undefined ? coupon.isActive : (coupon.status === 'Active')
   };
 }
 
@@ -79,7 +81,16 @@ export async function updateCoupon(id, updates) {
   if (!response.ok) {
     throw new Error(`Failed to update coupon: ${response.status}`);
   }
-  return response.json();
+  
+  if (response.status === 204) {
+    return { status: true };
+  }
+  
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
+  }
+  return { status: true };
 }
 
 export async function deleteCoupon(id) {

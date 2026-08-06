@@ -223,11 +223,14 @@ const CouponsList = () => {
   const toggleCouponStatus = async (id, code) => {
     const target = coupons.find((c) => c.id === id);
     if (!target || target.status === 'Expired') return;
-    const newStatus = target.status === 'Active' ? 'Inactive' : 'Active';
+    const newIsActive = !target.isActive;
+    // Optimistic status mapping:
+    const newStatus = newIsActive ? (target.status === 'Inactive' ? 'Active' : target.status) : 'Inactive';
+    
     try {
-      await updateCoupon(id, { ...target, status: newStatus });
+      await updateCoupon(id, { ...target, isActive: newIsActive, status: newStatus });
       setCoupons((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
+        prev.map((c) => (c.id === id ? { ...c, isActive: newIsActive, status: newStatus } : c))
       );
       setToastMessage(`Coupon "${code}" status updated to ${newStatus}.`);
       setToastType('success');
@@ -361,19 +364,19 @@ const CouponsList = () => {
 
               <div className="coupon-meta-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Calendar size={11} /> {coupon.endDate}</span>
-                <span>Cap {formatCurrency(coupon.maxDiscount)}</span>
+                <span>{coupon.maxDiscount ? `Cap ${formatCurrency(coupon.maxDiscount)}` : 'No Cap'}</span>
               </div>
 
               <div className="coupon-card__footer" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px', marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <button
-                  className={`catalog-btn ${coupon.status === 'Active' ? 'catalog-btn--outline' : 'catalog-btn--success'}`}
-                  type="button"
-                  onClick={() => toggleCouponStatus(coupon.id, coupon.code)}
-                  disabled={coupon.status === 'Expired'}
-                  style={{ fontSize: '11px', padding: '4px 10px', height: 'auto', minHeight: 'unset' }}
-                >
-                  {coupon.status === 'Active' ? 'Deactivate' : 'Activate'}
-                </button>
+                  <button
+                    className={`catalog-btn ${coupon.isActive ? 'catalog-btn--outline' : 'catalog-btn--success'}`}
+                    type="button"
+                    onClick={() => toggleCouponStatus(coupon.id, coupon.code)}
+                    disabled={coupon.status === 'Expired'}
+                    style={{ fontSize: '11px', padding: '4px 10px', height: 'auto', minHeight: 'unset' }}
+                  >
+                    {coupon.isActive ? 'Deactivate' : 'Activate'}
+                  </button>
                 <div className="catalog-inline-actions" style={{ display: 'flex', gap: '8px' }}>
                   <AnimatedEditButton onClick={() => setEditingCoupon(coupon)} title="Edit coupon" />
                   <OutlookDeleteButton onClick={() => deleteCoupon(coupon.id, coupon.code)} title="Delete coupon" />

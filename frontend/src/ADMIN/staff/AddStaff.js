@@ -202,14 +202,26 @@ function AddStaff() {
               }
             });
           } else {
-            // Fallback to role-based defaults if API returns nothing (e.g., 404)
-            const roleKey = (target.role || target.Role || "staff").toLowerCase();
-            const fallbackPerms = ROLE_DEFAULTS[roleKey] || ROLE_DEFAULTS.staff;
-            fallbackPerms.forEach(p => {
-              if (p in permsState) {
-                permsState[p] = true;
-              }
-            });
+            // Try to load permissions from local storage first
+            const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
+            const localStaff = localAccounts.find(s => String(s.employeeId) === String(empIdVal) || String(s.email).toLowerCase() === String(target.email || target.Email).toLowerCase() || String(s.employeeId) === String(staffId) || String(s.id ?? s.Id) === String(staffId));
+            
+            if (localStaff && Array.isArray(localStaff.permissions) && localStaff.permissions.length > 0) {
+              localStaff.permissions.forEach(p => {
+                if (p in permsState) {
+                  permsState[p] = true;
+                }
+              });
+            } else {
+              // Fallback to role-based defaults if API returns nothing (e.g., 404)
+              const roleKey = (target.role || target.Role || "staff").toLowerCase();
+              const fallbackPerms = ROLE_DEFAULTS[roleKey] || ROLE_DEFAULTS.staff;
+              fallbackPerms.forEach(p => {
+                if (p in permsState) {
+                  permsState[p] = true;
+                }
+              });
+            }
           }
           setPermissions(permsState);
 
@@ -350,18 +362,15 @@ function AddStaff() {
       }
     });
 
-    if (formData.email && !formData.email.endsWith("@gmail.com")) {
-      newErrors.email = "Must be @gmail.com";
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
     }
 
     if (formData.mobile && formData.mobile.length !== 10) {
       newErrors.mobile = "Must be 10 digits";
     }
 
-    const empRegex = /^[A-Za-z]{1}[0-9]+$/;
-    if (formData.employeeId && !empRegex.test(formData.employeeId)) {
-      newErrors.employeeId = "Format must be A123";
-    }
+
 
     const passwordRequired = !isEditing || formData.password !== "" || formData.confirmPassword !== "";
     if (passwordRequired) {
@@ -622,10 +631,11 @@ function AddStaff() {
             </div>
 
             <div className="staff-field">
-              <label>Email Address (@gmail.com)</label>
+              <label>Email Address</label>
               <input
+                type="email"
                 name="email"
-                placeholder="email@gmail.com"
+                placeholder="name@company.com"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -647,14 +657,12 @@ function AddStaff() {
             </div>
 
             <div className="staff-field">
-              <label>Employee ID (Format: A123)</label>
+              <label>Employee ID</label>
               <input
                 name="employeeId"
                 placeholder="e.g. M102"
                 value={formData.employeeId}
                 onChange={handleChange}
-                disabled={isEditing}
-                style={{ backgroundColor: isEditing ? '#f8fafc' : '#fff' }}
               />
               {errors.employeeId && <span className="field-error-msg">{errors.employeeId}</span>}
             </div>

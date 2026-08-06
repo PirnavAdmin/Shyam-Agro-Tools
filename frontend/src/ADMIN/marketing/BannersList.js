@@ -62,6 +62,7 @@ const BannersList = () => {
 
   const handleOpenCreateModal = () => {
     setEditingBanner(null);
+    const maxOrder = banners.length > 0 ? Math.max(...banners.map(b => b.displayOrder || 0)) : 0;
     setFormData({
       title: '',
       subtitle: '',
@@ -69,7 +70,7 @@ const BannersList = () => {
       targetUrl: '/categories',
       bannerType: 'Hero',
       isActive: true,
-      displayOrder: banners.length + 1
+      displayOrder: maxOrder + 1
     });
     setIsModalOpen(true);
   };
@@ -117,6 +118,16 @@ const BannersList = () => {
     e.preventDefault();
     if (!formData.imageUrl) {
       alert('Please upload an image or provide an Image URL.');
+      return;
+    }
+
+    const duplicateOrder = banners.find(b => 
+      b.displayOrder === formData.displayOrder && 
+      b.id !== (editingBanner?.id)
+    );
+    
+    if (duplicateOrder) {
+      alert('This display order is already in use by another banner. Please choose a unique order number.');
       return;
     }
 

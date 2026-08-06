@@ -1102,8 +1102,9 @@ namespace ShyamAgroSuite.Api.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Rating")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<string>("ReviewComment")
                         .IsRequired()
@@ -1551,6 +1552,9 @@ namespace ShyamAgroSuite.Api.Migrations
                     b.Property<string>("ContactPerson")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
                         .IsRequired()

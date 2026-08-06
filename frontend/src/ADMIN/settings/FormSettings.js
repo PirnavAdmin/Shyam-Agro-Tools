@@ -41,18 +41,19 @@ const FormSettings = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isSaved && (
+          {isSaved ? (
             <span className="flex items-center gap-1 text-emerald-600 font-semibold text-sm bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 animate-pulse">
               <CheckCircle size={16} /> Saved Settings
             </span>
+          ) : (
+            <button 
+              type="submit" 
+              onClick={handleSubmit} 
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors text-sm"
+            >
+              <Save size={16} /> Save Settings
+            </button>
           )}
-          <button 
-            type="submit" 
-            onClick={handleSubmit} 
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors text-sm"
-          >
-            <Save size={16} /> Save Settings
-          </button>
         </div>
       </div>
 

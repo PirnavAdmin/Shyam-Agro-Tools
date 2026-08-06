@@ -116,6 +116,8 @@ const StaffList = () => {
           staff: ['dashboard'],
         };
 
+        const empIdVal = staff.employeeId || staff.EmployeeId || (actualId ? `EMP-${String(actualId).padStart(4, '0')}` : 'N/A');
+
         if (actualId) {
           try {
             const permsResponse = await fetch(`${BASE_URL}/Permission/${actualId}`, { headers: getHeaders() });
@@ -127,18 +129,35 @@ const StaffList = () => {
                 .map(p => p.moduleName || p.ModuleName || (p.module && (p.module.moduleName || p.module.ModuleName)) || '');
               permissions = allowed.length > 0 ? allowed : (ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff);
             } else {
-              permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
+              const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
+              const localStaff = localAccounts.find(s => String(s.employeeId) === String(empIdVal) || String(s.id ?? s.Id) === String(actualId) || (staff.email && String(s.email).toLowerCase() === String(staff.email || staff.Email).toLowerCase()));
+              if (localStaff && Array.isArray(localStaff.permissions) && localStaff.permissions.length > 0) {
+                permissions = localStaff.permissions;
+              } else {
+                permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
+              }
             }
           } catch (err) {
             console.warn(`Could not load permissions for staff #${actualId}`, err);
-            permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
+            const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
+            const localStaff = localAccounts.find(s => String(s.employeeId) === String(empIdVal) || String(s.id ?? s.Id) === String(actualId) || (staff.email && String(s.email).toLowerCase() === String(staff.email || staff.Email).toLowerCase()));
+            if (localStaff && Array.isArray(localStaff.permissions) && localStaff.permissions.length > 0) {
+              permissions = localStaff.permissions;
+            } else {
+              permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
+            }
           }
         } else {
-          permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
+          const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
+          const localStaff = localAccounts.find(s => String(s.employeeId) === String(empIdVal) || (staff.email && String(s.email).toLowerCase() === String(staff.email || staff.Email).toLowerCase()));
+          if (localStaff && Array.isArray(localStaff.permissions) && localStaff.permissions.length > 0) {
+            permissions = localStaff.permissions;
+          } else {
+            permissions = ROLE_DEFAULTS[role] || ROLE_DEFAULTS.staff;
+          }
         }
         const isActive = staff.isActive ?? staff.IsActive ?? (staff.status ? staff.status.toLowerCase() === 'active' : true);
         const nameVal = staff.name || staff.Name || `${staff.firstName || staff.FirstName || ''} ${staff.lastName || staff.LastName || ''}`.trim() || 'N/A';
-        const empIdVal = staff.employeeId || staff.EmployeeId || (actualId ? `EMP-${String(actualId).padStart(4, '0')}` : 'N/A');
         const phoneVal = staff.phone || staff.Phone || staff.mobileNumber || staff.MobileNumber || staff.mobile || staff.Mobile || '';
 
         return {

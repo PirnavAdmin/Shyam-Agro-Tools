@@ -53,6 +53,7 @@ const statusMeta = {
   'Out of Stock':{ className: 'stock-badge--out', icon: X },
 };
 
+const formatNumber = (n) => Number(n || 0).toLocaleString('en-IN');
 const formatINR = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
 
 /* ─── Stock Badge ─────────────────────────────────────── */
@@ -492,6 +493,7 @@ const getLocalStock = () => {
 /* ─── Main Screen ────────────────────────────────────── */
 const StockUpdates = () => {
   const [items, setItems] = useState([]);
+  const [apiMetrics, setApiMetrics] = useState(null);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -515,10 +517,11 @@ const StockUpdates = () => {
   const loadLedger = async () => {
     setLoading(true);
     try {
-      const data = await getStockLedger();
-      if (data && data.length > 0) {
-        setItems(data);
-        saveLocalStock(data);
+      const response = await getStockLedger({ _t: Date.now() });
+      if (response && response.items && response.items.length > 0) {
+        setItems(response.items);
+        setApiMetrics(response.apiMetrics);
+        saveLocalStock(response.items);
       } else {
         setItems(getLocalStock());
       }
@@ -545,13 +548,24 @@ const StockUpdates = () => {
   }, []);
 
   /* ── Metrics ── */
-  const metrics = useMemo(() => ({
-    total: items.length,
-    inStock: items.filter(i => i.status === 'In Stock').length,
-    lowStock: items.filter(i => i.status === 'Low Stock').length,
-    outOfStock: items.filter(i => i.status === 'Out of Stock').length,
-    totalValue: items.reduce((s, i) => s + i.currentStock * i.costPrice, 0),
-  }), [items]);
+  const metrics = useMemo(() => {
+    if (apiMetrics && apiMetrics.inventoryValue) {
+      return {
+        total: apiMetrics.totalSkus ?? items.length,
+        inStock: apiMetrics.inStock ?? items.filter(i => i.status === 'In Stock').length,
+        lowStock: apiMetrics.lowStock ?? items.filter(i => i.status === 'Low Stock').length,
+        outOfStock: apiMetrics.outOfStock ?? items.filter(i => i.status === 'Out of Stock').length,
+        totalValueStr: apiMetrics.inventoryValue
+      };
+    }
+    return {
+      total: items.length,
+      inStock: items.filter(i => i.status === 'In Stock').length,
+      lowStock: items.filter(i => i.status === 'Low Stock').length,
+      outOfStock: items.filter(i => i.status === 'Out of Stock').length,
+      totalValueNum: items.reduce((s, i) => s + i.currentStock * i.costPrice, 0)
+    };
+  }, [items, apiMetrics]);
 
   /* ── Filtered list ── */
   const filtered = useMemo(() => {
@@ -656,12 +670,65 @@ const StockUpdates = () => {
     await loadLedger();
   };
 
+  const handleExport = () => {
+    try {
+      const headers = ['SKU / Product ID', 'Product Name', 'Category', 'Quantity', 'Status', 'Last Updated', 'Location'];
+      const csvRows = [headers.join(',')];
+      
+      filtered.forEach(item => {
+        const row = [
+          `"${item.id || item.product_id || ''}"`,
+          `"${(item.name || '').replace(/"/g, '""')}"`,
+          `"${(item.category || '').replace(/"/g, '""')}"`,
+          item.quantity || 0,
+          `"${item.status || ''}"`,
+          `"${item.lastUpdated || ''}"`,
+          `"${(item.location || '').replace(/"/g, '""')}"`
+        ];
+        csvRows.push(row.join(','));
+      });
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Stock_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      showNotification('Export successful!', 'success');
+    } catch (err) {
+      console.error('Export failed:', err);
+      showNotification('Failed to export stock ledger', 'error');
+    }
+  };
+
   // Pagination calculations
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const pagedItems = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="stock-page">
+    <div className="stock-page" style={{ position: 'relative' }}>
+      {loading && (
+        <div style={{
+          position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.6)', 
+          backdropFilter: 'blur(2px)', zIndex: 50, display: 'flex', 
+          justifyContent: 'center', alignItems: 'center', transition: 'all 0.2s'
+        }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '10px', 
+            color: '#166534', fontWeight: 600, background: 'white', 
+            padding: '12px 24px', borderRadius: '8px', 
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
+          }}>
+            <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite' }} />
+            Refreshing Stock Ledger...
+          </div>
+        </div>
+      )}
       {/* Toast Notification */}
       {notification && (
         <div className={`stock-notification ${notification.type}`}>
@@ -675,7 +742,7 @@ const StockUpdates = () => {
           <h1>Stock Ledger</h1>
           <p className="catalog-card__subtitle" style={{ margin: 0, fontSize: '12px' }}>
             {metrics.total} SKUs tracked &nbsp;·&nbsp;
-            Last refreshed: {lastRefreshed.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+            Last refreshed: {lastRefreshed.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </p>
         </div>
         <div className="stock-header-actions">
@@ -683,7 +750,7 @@ const StockUpdates = () => {
             <RefreshCw size={14} style={loading ? { animation: 'spin 1.5s linear infinite' } : {}} />
             <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
           </button>
-          <button className="catalog-btn" title="Export stock report">
+          <button className="catalog-btn" onClick={handleExport} title="Export stock report">
             <Download size={14} />
             <span>Export</span>
           </button>
@@ -742,7 +809,7 @@ const StockUpdates = () => {
           </div>
           <div className="stock-metric-card__body">
             <span style={{ fontSize: '10px' }}>Inventory Value</span>
-            <strong style={{ fontSize: '18px' }}>{formatINR(metrics.totalValue)}</strong>
+            <strong style={{ fontSize: '18px' }}>{metrics.totalValueStr ? metrics.totalValueStr : `₹${formatNumber(metrics.totalValueNum)}`}</strong>
           </div>
         </div>
       </div>
@@ -755,11 +822,6 @@ const StockUpdates = () => {
             <p className="catalog-card__subtitle">
               {filtered.length} products match filters
             </p>
-          </div>
-          <div className="stock-legend">
-            <span className="stock-badge stock-badge--in"><CheckCircle2 size={11} /> In Stock</span>
-            <span className="stock-badge stock-badge--low"><AlertTriangle size={11} /> Low</span>
-            <span className="stock-badge stock-badge--out"><X size={11} /> Out</span>
           </div>
         </div>
 
@@ -798,10 +860,10 @@ const StockUpdates = () => {
                 <th style={{ padding: '8px 12px' }}>Product / SKU</th>
                 <th style={{ padding: '8px 12px' }}>Category</th>
                 <th style={{ padding: '8px 12px' }}>Supplier</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Current Stock</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Reorder Level</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Cost Price</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px' }}>Selling Price</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Current Stock</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Reorder Level</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Cost Price (₹)</th>
+                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Selling Price (₹)</th>
                 <th style={{ padding: '8px 12px' }}>Last Updated</th>
                 <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Actions</th>
               </tr>
@@ -832,14 +894,14 @@ const StockUpdates = () => {
                     <div className="catalog-table__muted" style={{ fontSize: '10px' }}>{item.subcategory}</div>
                   </td>
                   <td style={{ padding: '6px 12px' }}>{item.supplier}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>
                     <span className={`stock-qty ${isOutOfStock ? 'stock-qty--zero' : isLowStock ? 'stock-qty--low' : 'stock-qty--ok'}`} style={{ fontSize: '12px', padding: '2px 8px' }}>
                       {item.currentStock}
                     </span>
                   </td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{item.reorderLevel}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice > 0 && item.sellingPrice > 0 ? Math.min(item.costPrice, item.sellingPrice) : item.costPrice)}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px' }}>{formatINR(item.costPrice > 0 && item.sellingPrice > 0 ? Math.max(item.costPrice, item.sellingPrice) : item.sellingPrice)}</td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>{item.reorderLevel}</td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>{formatNumber(item.costPrice > 0 && item.sellingPrice > 0 ? Math.min(item.costPrice, item.sellingPrice) : item.costPrice)}</td>
+                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>{formatNumber(item.costPrice > 0 && item.sellingPrice > 0 ? Math.max(item.costPrice, item.sellingPrice) : item.sellingPrice)}</td>
                   <td style={{ padding: '6px 12px' }}>
                     <div className="catalog-table__muted" style={{ fontSize: '11px' }}>{item.lastUpdated}</div>
                   </td>

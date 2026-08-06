@@ -207,7 +207,11 @@ const SuppliersList = () => {
 
         return matchesSearch && matchesStatus;
       })
-      .sort((a, b) => Number(b.id) - Number(a.id));
+      .sort((a, b) => {
+        const numA = parseInt(String(a.id).replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(String(b.id).replace(/\D/g, ''), 10) || 0;
+        return numB - numA;
+      });
   }, [suppliersList, searchTerm, statusFilter]);
 
   // Reset page when filter/search changes
@@ -326,7 +330,6 @@ const SuppliersList = () => {
                       <Truck size={12} />
                       {supplier.leadTime || '4-6 days'}
                     </div>
-                    <div className="catalog-table__muted" style={{ fontSize: '10px' }}>Last: {supplier.lastSupply}</div>
                   </td>
                   <td style={{ padding: '6px 12px' }}><SupplierStatusBadge status={supplier.status} /></td>
                   <td className="catalog-center-cell" style={{ padding: '6px 12px' }} onClick={(e) => e.stopPropagation()}>

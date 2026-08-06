@@ -61,6 +61,46 @@ namespace ShyamAgroSuite.Api.Controllers
             }
         }
 
+        // GET: api/Orders/my-orders
+        [HttpGet("my-orders")]
+        public async Task<IActionResult> GetMyOrders()
+        {
+            var customerIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id" || c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(customerIdClaim) || !int.TryParse(customerIdClaim, out int customerId))
+            {
+                return Unauthorized(new { Message = "User not authenticated." });
+            }
+
+            var orders = await _context.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.Items)
+                .Where(o => o.CustomerId == customerId)
+                .OrderByDescending(o => o.OrderDate)
+                .Select(o => new
+                {
+                    id = o.Id,
+                    orderNumber = o.OrderNumber.StartsWith("#") ? o.OrderNumber : $"#{o.OrderNumber}",
+                    customerId = o.CustomerId,
+                    totalAmount = o.FinalAmount > 0 ? o.FinalAmount : o.TotalAmount,
+                    status = o.Status,
+                    createdAt = o.OrderDate,
+                    items = o.Items.Select(i => new
+                    {
+                        id = i.Id,
+                        productId = i.ProductId,
+                        quantity = i.Quantity,
+                        price = i.Price,
+                        subtotal = i.Subtotal,
+                        productCode = i.ProductCode,
+                        productName = i.ProductName,
+                        imageUrl = _context.ProductImages.Where(img => img.ProductId == i.ProductId).OrderBy(img => img.Id).Select(img => img.ImageUrl).FirstOrDefault() ?? ""
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(orders);
+        }
+
         // GET: api/Orders?status=&search=&dateBooked=&startDate=&endDate=
         [HttpGet]
         public async Task<IActionResult> GetAll(

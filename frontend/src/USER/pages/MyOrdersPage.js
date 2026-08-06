@@ -1019,7 +1019,7 @@ const ReturnRequestModal = ({ item, order, config, addresses, onAddressCreated, 
     try {
       const formData = new FormData();
       formData.append('OrderId', String(order.backendId || order.id || ''));
-      formData.append('OrderItemId', String(item.orderItemId || ''));
+      formData.append('OrderItemId', String(item.orderItemId || item.id || ''));
       formData.append('RequestType', requestType);
       formData.append('ReasonCode', reasonCode);
       formData.append('Description', description);

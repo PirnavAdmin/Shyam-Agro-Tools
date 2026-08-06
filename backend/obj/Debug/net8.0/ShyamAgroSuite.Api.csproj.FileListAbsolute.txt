@@ -1,3 +1,4 @@
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\web.config
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\appsettings.json
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\ShyamAgroSuite.Api.staticwebassets.runtime.json
@@ -151,3 +152,9 @@ C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\net8.0\ShyamAgroSuite.Api.pdb
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\net8.0\ShyamAgroSuite.Api.genruntimeconfig.cache
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\net8.0\ref\ShyamAgroSuite.Api.dll
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\publish\web.config
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\publish\appsettings.Development.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\publish\appsettings.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\publish\ShyamAgroSuite.Api.deps.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\publish\ShyamAgroSuite.Api.runtimeconfig.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\publish\ShyamAgroSuite.Api.staticwebassets.endpoints.json

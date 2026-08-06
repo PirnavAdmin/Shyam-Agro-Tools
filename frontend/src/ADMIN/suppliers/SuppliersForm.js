@@ -72,8 +72,21 @@ const SuppliersForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!supplier.name.trim() || !supplier.contactPerson.trim() || !supplier.email.trim() || !supplier.phone.trim()) {
-      setToastMessage('Please fill in all required fields.');
+    const isInvalid = (val) => {
+      const str = String(val || '').trim();
+      return !str || str.toLowerCase() === 'not specified';
+    };
+
+    if (
+      isInvalid(supplier.name) ||
+      isInvalid(supplier.contactPerson) ||
+      isInvalid(supplier.email) ||
+      isInvalid(supplier.phone) ||
+      isInvalid(supplier.city) ||
+      isInvalid(supplier.address) ||
+      isInvalid(supplier.productLines)
+    ) {
+      setToastMessage('Please fill in all required fields (asterisk fields cannot be left blank or "Not specified").');
       setToastType('warning');
       return;
     }
@@ -162,7 +175,7 @@ const SuppliersForm = () => {
 
             <div className="catalog-form-grid" style={{ gap: '12px' }}>
               <div className="catalog-field">
-                <label htmlFor="name">Supplier Name</label>
+                <label htmlFor="name">Supplier Name <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   id="name"
                   name="name"
@@ -176,7 +189,7 @@ const SuppliersForm = () => {
               </div>
 
               <div className="catalog-field">
-                <label htmlFor="contactPerson">Contact Person</label>
+                <label htmlFor="contactPerson">Contact Person <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   id="contactPerson"
                   name="contactPerson"
@@ -222,7 +235,7 @@ const SuppliersForm = () => {
               </div>
 
               <div className="catalog-field">
-                <label htmlFor="productLines">Product Lines</label>
+                <label htmlFor="productLines">Product Lines <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   id="productLines"
                   name="productLines"
@@ -245,7 +258,7 @@ const SuppliersForm = () => {
 
             <div className="catalog-form-grid" style={{ gap: '12px' }}>
               <div className="catalog-field">
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email">Email Address <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   id="email"
                   name="email"
@@ -259,7 +272,7 @@ const SuppliersForm = () => {
               </div>
 
               <div className="catalog-field">
-                <label htmlFor="phone">Phone Number</label>
+                <label htmlFor="phone">Phone Number <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   id="phone"
                   name="phone"
@@ -273,7 +286,7 @@ const SuppliersForm = () => {
               </div>
 
               <div className="catalog-field">
-                <label htmlFor="city">City / Region</label>
+                <label htmlFor="city">City / Region <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   id="city"
                   name="city"
@@ -300,7 +313,7 @@ const SuppliersForm = () => {
               </div>
 
               <div className="catalog-field catalog-field--full">
-                <label htmlFor="address">Registered Address</label>
+                <label htmlFor="address">Registered Address <span style={{ color: '#ef4444' }}>*</span></label>
                 <textarea
                   id="address"
                   name="address"

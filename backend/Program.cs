@@ -20,11 +20,11 @@ builder.Services.AddControllers()
 // Swagger
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Limits.MaxRequestBodySize = 104857600; // 100 MB
+    serverOptions.Limits.MaxRequestBodySize = 524288000; // 500 MB
 });
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 104857600; // 100 MB
+    options.MultipartBodyLengthLimit = 524288000; // 500 MB
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -666,3 +666,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+// Dummy comment to change DLL hash
