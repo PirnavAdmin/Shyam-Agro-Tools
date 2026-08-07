@@ -378,11 +378,7 @@ using (var scope = app.Services.CreateScope())
                     `SubmittedAt` DATETIME NOT NULL
                 );";
             cmd.ExecuteNonQuery();
-        }
 
-        // 3.6 Create BankDetailsConfigs, UpiDetailsConfigs, and QrCodeConfigs tables if they do not exist
-        using (var cmd = conn.CreateCommand())
-        {
             cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS `BankDetailsConfigs` (
                     `Id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -413,85 +409,7 @@ using (var scope = app.Services.CreateScope())
                     `UpdatedAt` DATETIME NOT NULL
                 );";
             cmd.ExecuteNonQuery();
-        }
 
-        // 3.7 Ensure extra columns exist in Suppliers table
-        var existingSupplierCols = new List<string>();
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = "SHOW COLUMNS FROM `Suppliers`;";
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    existingSupplierCols.Add(reader["Field"].ToString().ToLower());
-                }
-            }
-        }
-
-        var supplierColsToEnsure = new System.Collections.Generic.Dictionary<string, string>
-        {
-            { "Gstin", "VARCHAR(100) NULL" },
-            { "ProductCategory", "VARCHAR(200) NULL" },
-            { "TrackingId", "VARCHAR(50) NULL" },
-            { "Status", "VARCHAR(50) NOT NULL DEFAULT 'Pending'" }
-        };
-
-        foreach (var c in supplierColsToEnsure)
-        {
-            if (!existingSupplierCols.Contains(c.Key.ToLower()))
-            {
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = $"ALTER TABLE `Suppliers` ADD COLUMN `{c.Key}` {c.Value};";
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        // 3.8 Create SupportConfigs and SupportTickets tables if they do not exist
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = @"
-                CREATE TABLE IF NOT EXISTS `SupportConfigs` (
-                    `Id` INT AUTO_INCREMENT PRIMARY KEY,
-                    `SupportPhoneNumber` VARCHAR(50) NOT NULL,
-                    `WorkTimings` VARCHAR(150) NOT NULL,
-                    `SupportEmail` VARCHAR(150) NOT NULL,
-                    `UpdatedAt` DATETIME NOT NULL
-                );";
-            cmd.ExecuteNonQuery();
-
-            // Seed default row if SupportConfigs is empty
-            cmd.CommandText = "SELECT COUNT(*) FROM `SupportConfigs`;";
-            int supportConfigCount = Convert.ToInt32(cmd.ExecuteScalar());
-            if (supportConfigCount == 0)
-            {
-                cmd.CommandText = @"
-                    INSERT INTO `SupportConfigs` (
-                        `SupportPhoneNumber`, `WorkTimings`, `SupportEmail`, `UpdatedAt`
-                    ) VALUES (
-                        '+91 98765 43210', 'Mon-Sat: 10AM - 7PM', 'support@shyamagro.com', NOW()
-                    );";
-                cmd.ExecuteNonQuery();
-            }
-
-            cmd.CommandText = @"
-                CREATE TABLE IF NOT EXISTS `SupportTickets` (
-                    `Id` INT AUTO_INCREMENT PRIMARY KEY,
-                    `Name` VARCHAR(150) NOT NULL,
-                    `Email` VARCHAR(150) NOT NULL,
-                    `Phone` VARCHAR(50) NOT NULL,
-                    `Subject` VARCHAR(250) NOT NULL,
-                    `Message` TEXT NOT NULL,
-                    `Status` VARCHAR(50) NOT NULL DEFAULT 'Open',
-                    `CreatedAt` DATETIME NOT NULL
-                );";
-            cmd.ExecuteNonQuery();
-        }
-
-        using (var cmd = conn.CreateCommand())
-        {
             cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS `Banners` (
                     `Id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -507,151 +425,60 @@ using (var scope = app.Services.CreateScope())
             cmd.ExecuteNonQuery();
         }
 
-        // 3.8.1 Seed default active banners if Banners table is empty
-        using (var cmd = conn.CreateCommand())
+        // Reset Promo & Trust banners to their exact original previous images and text
+        using (var resetCmd = conn.CreateCommand())
         {
-            cmd.CommandText = "SELECT COUNT(*) FROM `Banners`;";
-            var count = Convert.ToInt32(cmd.ExecuteScalar());
-            if (count == 0)
-            {
-                using (var insertCmd = conn.CreateCommand())
-                {
-                    insertCmd.CommandText = @"
-                        INSERT INTO `Banners` (`Title`, `Subtitle`, `ImageUrl`, `TargetUrl`, `BannerType`, `IsActive`, `DisplayOrder`, `CreatedAt`) VALUES
-                        ('Advanced Agriculture Tools', 'High Precision Farm Machinery & Spraying Equipment', 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80', '/categories', 'Hero', 1, 1, NOW()),
-                        ('Modern Power Sprayers & Pumps', 'Heavy Duty Motorized & Battery Operated Sprayers', 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1600&q=80', '/categories', 'Hero', 1, 2, NOW()),
-                        ('Special Discount on Garden Tools', 'Up to 30% Off on Premium Pruning & Shovel Tools', 'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=1600&q=80', '/categories', 'Promo', 1, 1, NOW()),
-                        ('Organic Fertilizers & Soil Care', 'Boost Crop Yield Naturally with Organic Soil Boosters', 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1600&q=80', '/categories', 'Promo', 1, 2, NOW()),
-                        ('Trusted by 50,000+ Indian Farmers', '100% Genuine Quality Guarantee & Doorstep Delivery', 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1600&q=80', '/categories', 'Trust', 1, 1, NOW());";
-                    insertCmd.ExecuteNonQuery();
-                }
-            }
+            resetCmd.CommandText = @"
+                DELETE FROM `Banners` WHERE `BannerType` IN ('Promo', 'Trust');
+
+                INSERT INTO `Banners` (`Title`, `Subtitle`, `ImageUrl`, `TargetUrl`, `BannerType`, `IsActive`, `DisplayOrder`, `CreatedAt`) VALUES
+                ('Premium Farming Tools', 'SPECIAL OFFER • Equip your farm with the best industrial tools at unbeatable prices this season.', '/hero_banner.png', '/offers/40-percent', 'Promo', 1, 1, NOW()),
+                ('Powerful Power Tillers', 'POWER TILLERS • Discover our newly launched range of high-performance industrial power tillers.', '/hero-machinery.png', '/power-tillers', 'Promo', 1, 2, NOW()),
+                ('4.7 OUT OF 5', 'Trusted by 10,000+ customers for reliable agro machinery and support', '/hero_banner.png', '/categories', 'Trust', 1, 1, NOW()),
+                ('4.9 OUT OF 5', 'Heavy duty tractors and power tillers engineered for peak efficiency', '/hero-machinery.png', '/categories', 'Trust', 1, 2, NOW()),
+                ('4.8 OUT OF 5', 'High-pressure crop sprayers trusted by farmers nationwide', '/hero-sprayers.png', '/categories', 'Trust', 1, 3, NOW());";
+            resetCmd.ExecuteNonQuery();
         }
 
-        // 3.9 Ensure extra columns exist in Coupons table
-        var existingCouponCols = new List<string>();
-        using (var cmd = conn.CreateCommand())
+        // Clean up dummy/messy test products and map exact real uploaded image paths
+        using (var cleanProductsCmd = conn.CreateCommand())
         {
-            cmd.CommandText = "SHOW COLUMNS FROM `Coupons`;";
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    existingCouponCols.Add(reader["Field"].ToString().ToLower());
-                }
-            }
-        }
+            cleanProductsCmd.CommandText = @"
+                DELETE FROM `Products` 
+                WHERE `Id` IN (24, 27, 28, 29, 30) 
+                   OR `ProductName` = 'Koramandal'
+                   OR `ProductName` LIKE '%Drip Irrigation Kit%';
 
-        var couponColsToEnsure = new System.Collections.Generic.Dictionary<string, string>
-        {
-            { "Title", "VARCHAR(250) NULL" },
-            { "Description", "TEXT NULL" },
-            { "TermsAndConditions", "TEXT NULL" },
-            { "BackgroundImageUrl", "VARCHAR(500) NULL" },
-            { "BannerImageUrl", "VARCHAR(500) NULL" },
-            { "ThumbnailImageUrl", "VARCHAR(500) NULL" },
-            { "MaxDiscountAmount", "DECIMAL(18,2) NULL" },
-            { "CreatedDate", "DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" },
-            { "UpdatedDate", "DATETIME NULL" }
-        };
-
-        foreach (var c in couponColsToEnsure)
-        {
-            if (!existingCouponCols.Contains(c.Key.ToLower()))
-            {
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = $"ALTER TABLE `Coupons` ADD COLUMN `{c.Key}` {c.Value};";
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        // 3.10 Ensure DisplayOrder column exists in Categories table
-        var existingCatCols = new List<string>();
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = "SHOW COLUMNS FROM `Categories`;";
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    existingCatCols.Add(reader["Field"].ToString().ToLower());
-                }
-            }
-        }
-        if (!existingCatCols.Contains("displayorder"))
-        {
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.CommandText = "ALTER TABLE `Categories` ADD COLUMN `DisplayOrder` INT NOT NULL DEFAULT 0;";
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        // 3.11 Ensure DisplayOrder column exists in Subcategories table
-        var existingSubcatCols = new List<string>();
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = "SHOW COLUMNS FROM `Subcategories`;";
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    existingSubcatCols.Add(reader["Field"].ToString().ToLower());
-                }
-            }
-        }
-        if (!existingSubcatCols.Contains("displayorder"))
-        {
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.CommandText = "ALTER TABLE `Subcategories` ADD COLUMN `DisplayOrder` INT NOT NULL DEFAULT 0;";
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        // 4. Cleanup mismatched foreign keys from orderitems table to avoid FK constraint errors with Orders table
-        var fkNames = new List<string>();
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orderitems' AND CONSTRAINT_NAME <> 'PRIMARY' AND CONSTRAINT_NAME IS NOT NULL;";
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    var fkName = reader[0]?.ToString();
-                    if (!string.IsNullOrEmpty(fkName))
-                    {
-                        fkNames.Add(fkName);
-                    }
-                }
-            }
-        }
-
-        foreach (var fkName in fkNames)
-        {
-            try
-            {
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = $"ALTER TABLE `orderitems` DROP FOREIGN KEY `{fkName}`;";
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch { }
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/cbd9bc55-e9d8-422d-ad81-5bafc2ad63fb.png' WHERE `ProductId` = 5;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/3b800ad7-3766-43ef-8717-9171e4506c43.png' WHERE `ProductId` = 6;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/78a4d353-0554-424d-92d5-3cf0f0aa4277.png' WHERE `ProductId` = 7;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/833984e2-4d41-409a-b7ff-93a700d635d3.png' WHERE `ProductId` = 8;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/416af294-e0b6-4dbe-825d-82fd77a9a673.png' WHERE `ProductId` = 9;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/363e842c-dd8e-4b09-b3b0-2fee1c467bcb.png' WHERE `ProductId` = 10;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/eff6b93d-4898-4bd7-8917-38a564c2bed6.png' WHERE `ProductId` = 12;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/b7a820b5-7110-4342-afb2-affdd37a61da.png' WHERE `ProductId` = 14;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/cab50a2e-61a5-4323-b0cb-9231c9970408.png' WHERE `ProductId` = 15;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/42885a07-74c0-4d50-abc6-7fe4c1925420.png' WHERE `ProductId` = 16;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/a5edb2e7-0b28-4252-8349-7ee134ccdc27.jfif' WHERE `ProductId` = 17;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/a385120c-4585-4317-adb7-8b60a1c597d3.png' WHERE `ProductId` = 18;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/73e1918b-c536-483a-8f0f-02e54c3c389e.png' WHERE `ProductId` = 19;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/13861506-405a-41da-9010-486e5a76cb98.png' WHERE `ProductId` = 20;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/dadca29f-b643-40a6-9d8d-fb89488ab1a8.png' WHERE `ProductId` = 21;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/05f0aadc-df96-4b28-b4fb-cf7a623292da.png' WHERE `ProductId` = 22;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/4208e0c4-214a-4d33-b4f9-59e8235f740d.png' WHERE `ProductId` = 23;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/acf34493-5a93-4cbd-9a0b-943933d69c73.png' WHERE `ProductId` = 25;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/c5c37b91-b771-458f-8cc3-c085e9925f63.jpg' WHERE `ProductId` = 32;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/45ce6a6d-4e96-4e69-b37c-8ce4b3814d50.jpg' WHERE `ProductId` = 34;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/c7cb595f-0ffe-4766-9e1a-0c74caa04a21.jpg' WHERE `ProductId` = 35;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/ecbdb140-7e88-4ac4-bd33-ac3317827681.jpg' WHERE `ProductId` = 36;
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/4f199761-0534-4c8d-9576-d37b078c5f59.jfif' WHERE `ProductId` = 37;";
+            cleanProductsCmd.ExecuteNonQuery();
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Database schema setup warning: " + ex.Message);
+        Console.WriteLine($"[Startup] Database setup warning: {ex.Message}");
     }
-}
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

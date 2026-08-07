@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import '../catalog/adminModule.css';
 import { createCoupon } from './api';
+import { formatDateDMY } from './CouponsList';
 import { Toast } from '../components/Toast';
 
 const initialCoupon = {
@@ -219,7 +220,7 @@ const Coupon = () => {
             <div className="coupon-summary-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '11px', color: '#475569' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Percent size={15} style={{ color: '#059669' }} /> <span>{previewDiscount} discount type: {formData.type}</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldCheck size={15} style={{ color: '#059669' }} /> <span>Min cart {formatCurrency(formData.minSpend)}, cap {formatCurrency(formData.maxDiscount)}</span></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Calendar size={15} style={{ color: '#059669' }} /> <span>{formData.startDate} to {formData.endDate}</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Calendar size={15} style={{ color: '#059669' }} /> <span>{formatDateDMY(formData.startDate)} to {formatDateDMY(formData.endDate)}</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ClipboardList size={15} style={{ color: '#059669' }} /> <span>{formData.usageLimit} total uses, {formData.perCustomerLimit} per customer</span></div>
             </div>
           </section>

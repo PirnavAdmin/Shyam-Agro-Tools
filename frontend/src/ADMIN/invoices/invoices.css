@@ -211,6 +211,9 @@
 .invoice-status-badge.paid { background: #ecfdf5; color: #059669; }
 .invoice-status-badge.unpaid { background: #fffbeb; color: #d97706; }
 .invoice-status-badge.cancelled { background: #fef2f2; color: #ef4444; }
+.invoice-status-badge.payment-not-applicable,
+.invoice-status-badge.payment_not_applicable,
+.invoice-status-badge.na { background: #f1f5f9; color: #64748b; }
 
 .invoice-action-buttons {
   display: flex;
@@ -230,6 +233,16 @@
   border: 1px solid #cbd5e1;
   background: white;
   transition: all 0.2s;
+}
+
+.inv-action-btn:disabled,
+.inv-action-btn.disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  background: #f1f5f9 !important;
+  color: #94a3b8 !important;
+  border-color: #cbd5e1 !important;
+  pointer-events: none !important;
 }
 
 .inv-action-btn.print {

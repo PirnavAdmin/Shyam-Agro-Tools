@@ -589,7 +589,7 @@ const AdminReturns = () => {
               ) : (
                 <div>
                   <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-3">Claim Progress</h4>
-                  <div className="vertical-stepper pl-4 relative space-y-4 text-xs">
+                  <div className="vertical-stepper relative space-y-4 text-xs">
                     <div className="stepper-line"></div>
                     
                     {/* Node 1 */}

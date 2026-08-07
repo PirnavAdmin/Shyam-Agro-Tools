@@ -89,7 +89,12 @@ const SubcategoriesList = () => {
 
         return matchesSearch && matchesCategory;
       })
-      .sort((a, b) => Number(b.id) - Number(a.id));
+      .sort((a, b) => {
+        const orderA = Number(a.displayOrder ?? a.display_order ?? 0);
+        const orderB = Number(b.displayOrder ?? b.display_order ?? 0);
+        if (orderA !== orderB) return orderA - orderB;
+        return Number(a.id) - Number(b.id);
+      });
   }, [subcategories, searchTerm, categories, selectedCategoryId]);
 
   // Reset page when filter/search changes
@@ -206,10 +211,10 @@ const SubcategoriesList = () => {
                   </td>
                 </tr>
               )}
-              {!isLoading && currentSubcategories.map((subcategory) => (
+              {!isLoading && currentSubcategories.map((subcategory, idx) => (
                 <tr key={subcategory.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#64748b' }}>
-                    {filteredSubcategories.indexOf(subcategory) + 1}
+                    {indexOfFirstItem + idx + 1}
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#1e293b' }}>
                     {subcategory.name}

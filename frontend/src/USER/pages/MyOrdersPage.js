@@ -336,12 +336,13 @@ const MyOrdersPage = () => {
       doc.text(`Order Date: ${formatDate(order.createdAt)}`, 110, row1Y + 9);
       doc.text(`Payment Method: ${order.paymentMethod || 'COD'}`, 110, row1Y + 13);
       doc.text(`Payment Status: ${order.paymentStatus || 'Payment Pending'}`, 110, row1Y + 17);
+      doc.text(`Billing Currency: INR Rs. ${(order.totalAmount || order.finalAmount || order.total || 0).toFixed(2)}`, 110, row1Y + 21);
 
       // Horizontal separator line
-      doc.line(15, row1Y + 22, 195, row1Y + 22);
+      doc.line(15, row1Y + 25, 195, row1Y + 25);
 
-      // Row 2: Billing & Shipping Address (y = row1Y + 26 = 68)
-      const row2Y = row1Y + 26;
+      // Row 2: Billing & Shipping Address (y = row1Y + 29 = 71)
+      const row2Y = row1Y + 29;
 
       // Billing Address
       doc.setTextColor(...primaryGreen);
@@ -526,12 +527,12 @@ const MyOrdersPage = () => {
       doc.setTextColor(...primaryGreen);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8.5);
-      doc.text('Terms & Conditions', 15, footerY + 28);
+      doc.text('About Shyam Agro Tools & Terms', 15, footerY + 28);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
+      doc.setFontSize(7);
       doc.setTextColor(...darkText);
-      doc.text('1. Goods once sold will not be returned.', 15, footerY + 33);
-      doc.text('2. Subject to Gujarat jurisdiction.', 15, footerY + 37);
+      doc.text('Leading supplier of professional agricultural tools, machinery & heavy equipment.', 15, footerY + 33);
+      doc.text('1. Goods once sold will not be returned without RMA. 2. Subject to Gujarat jurisdiction.', 15, footerY + 37);
 
       // Right Side: Summary Card
       const summaryX = 135;

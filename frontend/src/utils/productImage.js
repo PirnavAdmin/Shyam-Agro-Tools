@@ -48,5 +48,11 @@ export const getProductImage = (product) => {
 
 export const handleProductImageError = (event) => {
   event.currentTarget.onerror = null;
+  const currentSrc = event.currentTarget.src || '';
+  if (currentSrc.includes('/uploads/')) {
+    const relativePath = currentSrc.substring(currentSrc.indexOf('/uploads/'));
+    event.currentTarget.src = `https://shyamagrotools.com${relativePath}`;
+    return;
+  }
   event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
 };

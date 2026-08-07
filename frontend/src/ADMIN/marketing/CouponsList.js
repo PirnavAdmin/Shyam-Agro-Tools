@@ -17,6 +17,33 @@ import { Toast } from '../components/Toast';
 
 const formatCurrency = (amount) => `INR ${Number(amount || 0).toLocaleString('en-IN')}`;
 
+export const formatDateDMY = (dateStr) => {
+  if (!dateStr) return '';
+  const cleanStr = String(dateStr).trim();
+
+  if (/^\d{2}-\d{2}-\d{4}$/.test(cleanStr)) {
+    return cleanStr;
+  }
+
+  const isoMatch = cleanStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+  }
+
+  try {
+    const d = new Date(cleanStr);
+    if (!isNaN(d.getTime())) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+  } catch {}
+
+  return cleanStr;
+};
+
 const formatDiscount = (coupon) => {
   if (coupon.type === 'Percentage') return `${coupon.discount}%`;
   if (coupon.type === 'Shipping') return 'Free Delivery';
@@ -66,7 +93,7 @@ const CouponEditModal = ({ coupon, onClose, onSave }) => {
           </div>
           <div>
             <span style={{ color: '#64748b', display: 'block' }}>Valid</span>
-            <strong style={{ color: '#1e293b' }}>{formData.endDate}</strong>
+            <strong style={{ color: '#1e293b' }}>{formatDateDMY(formData.endDate)}</strong>
           </div>
           <div>
             <span style={{ color: '#64748b', display: 'block' }}>Status</span>
@@ -168,7 +195,7 @@ const CouponsList = () => {
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
 
   // Toast Notification State
   const [toastMessage, setToastMessage] = useState('');
@@ -363,7 +390,7 @@ const CouponsList = () => {
               </div>
 
               <div className="coupon-meta-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Calendar size={11} /> {coupon.endDate}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Calendar size={11} /> {formatDateDMY(coupon.endDate)}</span>
                 <span>{coupon.maxDiscount ? `Cap ${formatCurrency(coupon.maxDiscount)}` : 'No Cap'}</span>
               </div>
 

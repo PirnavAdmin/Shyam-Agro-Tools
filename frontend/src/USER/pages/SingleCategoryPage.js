@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useCategories } from '../context/CategoryContext';
@@ -34,6 +34,7 @@ const productMatchesSubcategory = (product, subcategory) => {
 
 const SingleCategoryPage = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [priceFilter, setPriceFilter] = useState('all');
@@ -55,10 +56,14 @@ const SingleCategoryPage = () => {
     categoriesError: categoryError,
     subcategoriesError: subcategoryError,
   } = useCategories();
+
+  // Clean raw id parameter in case of malformed URLs containing question marks (e.g., 7??subcategory=3)
+  const cleanId = String(id || '').split('?')[0].trim();
+
   const currentCategory = mappedCategories.find(
-    (category) => String(category.id) === id || category.slug === id
+    (category) => String(category.id) === cleanId || category.slug === cleanId
   );
-  const title = categoryText(currentCategory) || id.replace(/-/g, ' ');
+  const title = categoryText(currentCategory) || cleanId.replace(/-/g, ' ');
   const categoryDescription = categoryText(currentCategory, 'description') || '';
   const subcategoriesForCategory = currentCategory?.subcategories || [];
   const selectedSubcategoryData = subcategoriesForCategory.find(
@@ -66,12 +71,22 @@ const SingleCategoryPage = () => {
   );
 
   useEffect(() => {
-    setSelectedSubcategory('all');
+    // Parse subcategory from query string, sanitizing duplicate question marks if present
+    const rawSearch = window.location.search || searchParams.toString();
+    const sanitizedSearch = rawSearch ? '?' + rawSearch.replace(/^\?+/, '').replace(/\?+/g, '&') : '';
+    const params = new URLSearchParams(sanitizedSearch);
+    const subcatFromUrl = params.get('subcategory');
+
+    if (subcatFromUrl) {
+      setSelectedSubcategory(String(subcatFromUrl));
+    } else {
+      setSelectedSubcategory('all');
+    }
     setPriceFilter('all');
     setPendingStockFilter('all');
     setAppliedStockFilter('all');
     setCurrentPage(1);
-  }, [id]);
+  }, [id, searchParams]);
 
   useEffect(() => {
     let isMounted = true;

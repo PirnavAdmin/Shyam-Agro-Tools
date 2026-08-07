@@ -1005,7 +1005,7 @@
 }
 
 .product-detail-page .product-price {
-  color: var(--product-teal) !important;
+  color: #1e3a8a !important;
   font-size: clamp(2rem, 3vw, 2.75rem);
   font-weight: 800;
   line-height: 1;
@@ -1227,7 +1227,6 @@
 }
 
 .product-detail-page .text-primary,
-.product-detail-page .product-price,
 .product-detail-page .product-discount,
 .product-detail-page .product-service-title,
 .product-detail-page .product-service-title svg {

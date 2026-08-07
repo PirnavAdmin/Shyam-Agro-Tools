@@ -9,18 +9,24 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div role="status" aria-live="polite">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 text-slate-500 font-semibold text-sm">
+        Loading...
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
     const requestedPath = `${location.pathname}${location.search}${location.hash}`;
 
     return (
-      <LoginPopup
-        isOpen
-        onClose={() => navigate('/', { replace: true })}
-        redirectTo={requestedPath}
-      />
+      <div className="min-h-screen bg-slate-900/10 relative">
+        <LoginPopup
+          isOpen
+          onClose={() => navigate('/', { replace: true })}
+          redirectTo={requestedPath}
+        />
+      </div>
     );
   }
 

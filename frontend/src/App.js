@@ -156,11 +156,11 @@ function App() {
                     <Route path="/contact-support" element={protect(<ContactSupport />)} />
                     <Route path="/wallet" element={protect(<WalletPage />)} />
                     <Route path="/track-order" element={protect(<TrackOrder />)} />
-                    <Route path="/my-orders" element={protect(<MyOrdersPage />)} />
+                    <Route path="/my-orders" element={<MyOrdersPage />} />
                     <Route path="/checkout" element={protect(<CheckoutPage />)} />
                     <Route path="/payment" element={protect(<PaymentPage />)} />
                     <Route path="/invoice" element={protect(<InvoicePage />)} />
-                    <Route path="/account" element={protect(<MyOrdersPage />)} />
+                    <Route path="/account" element={<MyOrdersPage />} />
                     <Route path="/faq" element={protect(<FAQPage />)} />
                     <Route path="/help-center" element={protect(<HelpCenterPage />)} />
                     <Route path="/contact-us" element={protect(<ContactUsPage />)} />

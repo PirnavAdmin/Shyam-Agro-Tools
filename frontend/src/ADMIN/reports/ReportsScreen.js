@@ -43,6 +43,7 @@ import {
   updateReportSettings,
   clearReportCache
 } from '../api/reports';
+import { Pagination } from '../components/ActionButtons';
 import './ReportsScreen.css';
 
 const formatCurrency = (value) => `INR ${Number(value || 0).toLocaleString('en-IN')}`;
@@ -90,6 +91,11 @@ const ReportsScreen = () => {
     filterType: ''
   });
   const [drillDownSearch, setDrillDownSearch] = useState('');
+
+  // Pagination states (10 items per page limit)
+  const [catalogPage, setCatalogPage] = useState(1);
+  const [drillPage, setDrillPage] = useState(1);
+  const itemsPerPage = 10;
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
@@ -1043,14 +1049,14 @@ const ReportsScreen = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {products.map(p => {
+                      {products.slice((catalogPage - 1) * itemsPerPage, catalogPage * itemsPerPage).map(p => {
                         const stockVal = Number(p.stock || 0);
                         const statusClass = stockVal === 0 ? 'out' : stockVal <= 5 ? 'low' : 'in';
                         const statusText = stockVal === 0 ? 'Out of Stock' : stockVal <= 5 ? 'Low Stock' : 'In Stock';
                         
                         return (
                           <tr key={p.id}>
-                            <td><code>{p.sku}</code></td>
+                            <td><code>{(p.sku || '').trim()}</code></td>
                             <td><strong>{p.name}</strong></td>
                             <td>{p.categoryId}</td>
                             <td>{p.brand}</td>
@@ -1067,6 +1073,13 @@ const ReportsScreen = () => {
                     </tbody>
                   </table>
                 </div>
+                <Pagination
+                  currentPage={catalogPage}
+                  totalPages={Math.ceil(products.length / itemsPerPage)}
+                  onPageChange={setCatalogPage}
+                  totalItems={products.length}
+                  itemsPerPage={itemsPerPage}
+                />
               </div>
             </div>
           )}
@@ -1208,13 +1221,13 @@ const ReportsScreen = () => {
                         </td>
                       </tr>
                     ) : (
-                      filteredDrillDownData.map((p) => {
+                      filteredDrillDownData.slice((drillPage - 1) * itemsPerPage, drillPage * itemsPerPage).map((p) => {
                         const stockVal = Number(p.stock || 0);
                         const statusClass = stockVal === 0 ? 'out' : stockVal <= (settings.lowStockAlertLimit || 5) ? 'low' : 'in';
                         const statusText = stockVal === 0 ? 'Out of Stock' : stockVal <= (settings.lowStockAlertLimit || 5) ? 'Low Stock' : 'In Stock';
                         return (
                           <tr key={p.id || p.sku}>
-                            <td><code>{p.sku}</code></td>
+                            <td><code>{(p.sku || '').trim()}</code></td>
                             <td><strong>{p.name}</strong></td>
                             <td>{p.categoryId}</td>
                             <td>{p.brand}</td>
@@ -1232,6 +1245,13 @@ const ReportsScreen = () => {
                   </tbody>
                 </table>
               )}
+              <Pagination
+                currentPage={drillPage}
+                totalPages={Math.ceil(filteredDrillDownData.length / itemsPerPage)}
+                onPageChange={setDrillPage}
+                totalItems={filteredDrillDownData.length}
+                itemsPerPage={itemsPerPage}
+              />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
@@ -1280,7 +1300,7 @@ const ReportsScreen = () => {
                   Cancel
                 </button>
                 <button type="submit" className="reports-btn primary" disabled={isSavingSettings}>
-                  {isSavingSettings ? 'Saving...' : 'Save Settings'}
+                  {isSavingSettings ? 'Updating...' : 'Update Settings'}
                 </button>
               </div>
             </form>

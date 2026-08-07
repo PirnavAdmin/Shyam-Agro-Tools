@@ -487,7 +487,7 @@ const BannersList = () => {
                   type="submit"
                   style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#10b981', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                 >
-                  {editingBanner ? 'Save Changes' : 'Create Banner'}
+                  {editingBanner ? 'Update Changes' : 'Create Banner'}
                 </button>
               </div>
             </form>

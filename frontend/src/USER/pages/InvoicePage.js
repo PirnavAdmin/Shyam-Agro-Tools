@@ -150,7 +150,7 @@ const InvoicePage = () => {
           <DetailRow label="Invoice Date" value={invoiceData.invoiceDate} />
           <DetailRow label="Place of Supply" value={invoiceData.placeOfSupply} />
           <DetailRow label="GST Type" value={invoiceData.gstType} />
-          <DetailRow label="Currency" value={invoiceData.currency} />
+          <DetailRow label="Billing Currency" value={`INR ₹${totals.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
         </section>
 
         <section className="invoice-party-grid">
@@ -246,6 +246,16 @@ const InvoicePage = () => {
         </section>
 
         <section className="invoice-bottom-grid">
+          <article className="invoice-card">
+            <h2>About Shyam Agro Tools</h2>
+            <p style={{ fontSize: '12px', color: '#475569', lineHeight: 1.5, marginBottom: '8px' }}>
+              Shyam Agro Tools is a leading manufacturer & supplier of professional agricultural tools, machinery, heavy equipment, and farm supplies across India.
+            </p>
+            <p style={{ fontSize: '11px', color: '#64748b', fontStyle: 'italic' }}>
+              Official Tax & Commercial Invoice issued for recipient commercial use and warranty tracking.
+            </p>
+          </article>
+
           <article className="invoice-card">
             <h2>Warranty Details</h2>
             <ul>

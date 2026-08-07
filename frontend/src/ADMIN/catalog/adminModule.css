@@ -65,12 +65,13 @@
 }
 
 .catalog-inline-actions {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   flex-wrap: nowrap;
   vertical-align: middle;
+  line-height: 1;
 }
 
 .catalog-card {
@@ -2107,6 +2108,8 @@
   text-decoration: none;
   box-sizing: border-box;
   vertical-align: middle;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .outlook-delete-btn:hover {

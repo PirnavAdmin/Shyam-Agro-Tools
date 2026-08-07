@@ -33,16 +33,14 @@ import {
 
 /* ─── Mock Data ─────────────────────────────────────────── */
 const INITIAL_STOCK = [
-  { id: 1, sku: 'SAT-DRP-001', name: 'Drip Irrigation Kit (1 Acre)', category: 'Irrigation Systems', subcategory: 'Drip Systems', supplier: 'AquaFlow Pvt Ltd', currentStock: 142, reorderLevel: 50, unit: 'Sets', costPrice: 3200, sellingPrice: 4500, status: 'In Stock', lastUpdated: '2026-06-28', trend: 'up', change: +18 },
-  { id: 2, sku: 'SAT-SPR-004', name: 'Sprinkler Nozzle Set (10 pcs)', category: 'Irrigation Systems', subcategory: 'Sprinkler Systems', supplier: 'AquaFlow Pvt Ltd', currentStock: 8, reorderLevel: 30, unit: 'Sets', costPrice: 480, sellingPrice: 750, status: 'Low Stock', lastUpdated: '2026-06-28', trend: 'down', change: -22 },
-  { id: 3, sku: 'SAT-HRV-002', name: 'Manual Reaper Binder', category: 'Harvesting Tools', subcategory: 'Manual Tools', supplier: 'Agri Implements Co.', currentStock: 0, reorderLevel: 20, unit: 'Pcs', costPrice: 1200, sellingPrice: 1850, status: 'Out of Stock', lastUpdated: '2026-06-27', trend: 'down', change: -100 },
-  { id: 4, sku: 'SAT-FRT-007', name: 'NPK Fertilizer Spreader', category: 'Fertilizer Equipment', subcategory: 'Spreaders', supplier: 'GreenGrow Solutions', currentStock: 65, reorderLevel: 25, unit: 'Pcs', costPrice: 2800, sellingPrice: 4200, status: 'In Stock', lastUpdated: '2026-06-29', trend: 'up', change: +12 },
-  { id: 5, sku: 'SAT-PMP-003', name: 'Submersible Water Pump (1HP)', category: 'Pumps & Motors', subcategory: 'Submersible Pumps', supplier: 'HydroTech India', currentStock: 34, reorderLevel: 15, unit: 'Pcs', costPrice: 5600, sellingPrice: 8200, status: 'In Stock', lastUpdated: '2026-06-28', trend: 'stable', change: 0 },
-  { id: 6, sku: 'SAT-PES-012', name: 'Backpack Sprayer (16L)', category: 'Pesticide Equipment', subcategory: 'Sprayers', supplier: 'CropShield Ltd', currentStock: 12, reorderLevel: 25, unit: 'Pcs', costPrice: 1450, sellingPrice: 2100, status: 'Low Stock', lastUpdated: '2026-06-26', trend: 'down', change: -38 },
-  { id: 7, sku: 'SAT-SOL-009', name: 'Solar Fence Controller', category: 'Solar Equipment', subcategory: 'Fence Systems', supplier: 'SolarFarm Tech', currentStock: 89, reorderLevel: 20, unit: 'Pcs', costPrice: 3800, sellingPrice: 5500, status: 'In Stock', lastUpdated: '2026-06-29', trend: 'up', change: +45 },
-  { id: 8, sku: 'SAT-SED-005', name: 'Seed Drill Machine (5 Row)', category: 'Seeding Equipment', subcategory: 'Seed Drills', supplier: 'FarmTech Machines', currentStock: 6, reorderLevel: 10, unit: 'Units', costPrice: 18500, sellingPrice: 26000, status: 'Low Stock', lastUpdated: '2026-06-27', trend: 'down', change: -14 },
-  { id: 9, sku: 'SAT-PVC-011', name: 'PVC Irrigation Pipe (50m)', category: 'Irrigation Systems', subcategory: 'Pipes & Fittings', supplier: 'PipeWorks India', currentStock: 210, reorderLevel: 80, unit: 'Rolls', costPrice: 620, sellingPrice: 950, status: 'In Stock', lastUpdated: '2026-06-29', trend: 'up', change: +30 },
-  { id: 10, sku: 'SAT-WHL-008', name: 'Wheelbarrow (180L Capacity)', category: 'Farm Tools', subcategory: 'Material Handling', supplier: 'Agri Implements Co.', currentStock: 0, reorderLevel: 12, unit: 'Pcs', costPrice: 2200, sellingPrice: 3400, status: 'Out of Stock', lastUpdated: '2026-06-25', trend: 'down', change: -100 },
+  { id: 5, sku: 'SAT-FAR-862', name: 'Cultivator', category: 'Cultivators / Tillers / Weeders', subcategory: 'Tillers', supplier: 'Shyam Agro Tools', currentStock: 45, reorderLevel: 10, unit: 'Units', costPrice: 32000, sellingPrice: 43700, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'up', change: +15 },
+  { id: 6, sku: 'SAT-FAR-400', name: 'Heavy Duty Scythe With 23 Inch Blade', category: 'Special Farm Tools', subcategory: 'Harvesting Tools', supplier: 'Shyam Agro Tools', currentStock: 80, reorderLevel: 20, unit: 'Pcs', costPrice: 850, sellingPrice: 1350, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'up', change: +25 },
+  { id: 7, sku: 'SAT-FAR-565', name: 'Heavy-Duty 6 Tooth Spike Harrow', category: 'Special Farm Tools', subcategory: 'Soil Tools', supplier: 'Shyam Agro Tools', currentStock: 60, reorderLevel: 15, unit: 'Pcs', costPrice: 450, sellingPrice: 795, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'stable', change: 0 },
+  { id: 8, sku: 'SAT-FAR-842', name: 'Gramstrong Republic Solar Street Light 120W', category: 'Solar Products', subcategory: 'Solar Lighting', supplier: 'SolarFarm Tech', currentStock: 35, reorderLevel: 10, unit: 'Pcs', costPrice: 2600, sellingPrice: 3995, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'up', change: +18 },
+  { id: 9, sku: 'SAT-FAR-885', name: 'Heavy-Duty Agricultural Impact Sprinkler', category: 'Sprayers', subcategory: 'Irrigation Sprinklers', supplier: 'Shyam Agro Tools', currentStock: 120, reorderLevel: 30, unit: 'Pcs', costPrice: 320, sellingPrice: 523, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'up', change: +30 },
+  { id: 10, sku: 'SAT-FAR-484', name: 'Farmio Grass Cutting Machine', category: 'Garden Tools', subcategory: 'Cutters', supplier: 'Shyam Agro Tools', currentStock: 40, reorderLevel: 10, unit: 'Pcs', costPrice: 890, sellingPrice: 1360, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'stable', change: 0 },
+  { id: 12, sku: 'SAT-FAR-829', name: 'Premium Quality Thermal Fogging Machine, 16 Litre', category: 'Fogging Machine', subcategory: 'Foggers', supplier: 'Shyam Agro Tools', currentStock: 18, reorderLevel: 5, unit: 'Units', costPrice: 12000, sellingPrice: 16501, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'up', change: +10 },
+  { id: 14, sku: 'SAT-FAR-382', name: 'Kisankraft KK-STB-050 Grass Stubble Mower', category: 'Special Farm Tools', subcategory: 'Mowers', supplier: 'Kisankraft', currentStock: 12, reorderLevel: 3, unit: 'Units', costPrice: 82000, sellingPrice: 105020, status: 'In Stock', lastUpdated: '2026-07-28', trend: 'up', change: +8 }
 ];
 
 const STATUSES = ['All', 'In Stock', 'Low Stock', 'Out of Stock'];
@@ -857,21 +855,23 @@ const StockUpdates = () => {
           <table className="catalog-table stock-table">
             <thead>
               <tr style={{ fontSize: '11px' }}>
-                <th style={{ padding: '8px 12px' }}>Product / SKU</th>
-                <th style={{ padding: '8px 12px' }}>Category</th>
-                <th style={{ padding: '8px 12px' }}>Supplier</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Current Stock</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Reorder Level</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Cost Price (₹)</th>
-                <th className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums' }}>Selling Price (₹)</th>
-                <th style={{ padding: '8px 12px' }}>Last Updated</th>
-                <th className="catalog-center-cell" style={{ padding: '8px 12px' }}>Actions</th>
+                <th style={{ width: '24%', padding: '10px 12px' }}>Product / SKU</th>
+                <th style={{ width: '13%', padding: '10px 12px' }}>Category</th>
+                <th style={{ width: '13%', padding: '10px 12px' }}>Supplier</th>
+                <th className="catalog-number-cell" style={{ width: '10%', padding: '10px 12px' }}>Current Stock</th>
+                <th className="catalog-number-cell" style={{ width: '9%', padding: '10px 12px' }}>Reorder Level</th>
+                <th className="catalog-number-cell" style={{ width: '11%', padding: '10px 12px' }}>Cost Price (₹)</th>
+                <th className="catalog-number-cell" style={{ width: '11%', padding: '10px 12px' }}>Selling Price (₹)</th>
+                <th style={{ width: '12%', padding: '10px 12px', textAlign: 'center' }}>Last Updated</th>
+                <th className="catalog-center-cell" style={{ width: '7%', padding: '10px 12px' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {pagedItems.map((item) => {
                 const isOutOfStock = Number(item.currentStock) === 0;
                 const isLowStock = !isOutOfStock && Number(item.currentStock) <= Number(item.reorderLevel);
+                const costVal = item.costPrice > 0 && item.sellingPrice > 0 ? Math.min(item.costPrice, item.sellingPrice) : item.costPrice;
+                const sellVal = item.costPrice > 0 && item.sellingPrice > 0 ? Math.max(item.costPrice, item.sellingPrice) : item.sellingPrice;
                 
                 return (
                 <tr 
@@ -885,32 +885,38 @@ const StockUpdates = () => {
                   }
                   style={{ fontSize: '12px' }}
                 >
-                  <td style={{ padding: '6px 12px' }}>
-                    <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: 600 }}>{item.name}</div>
-                    <div className="catalog-table__muted" style={{ fontSize: '10px' }}>{item.sku} &nbsp;·&nbsp; {item.unit}</div>
+                  <td style={{ padding: '8px 12px' }}>
+                    <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>{item.name}</div>
+                    <div className="catalog-table__muted" style={{ fontSize: '10px', color: '#64748b' }}>{item.sku} &nbsp;·&nbsp; {item.unit}</div>
                   </td>
-                  <td style={{ padding: '6px 12px' }}>
-                    <div className="catalog-table__title" style={{ fontSize: '12px' }}>{item.category}</div>
+                  <td style={{ padding: '8px 12px' }}>
+                    <div className="catalog-table__title" style={{ fontSize: '12px', fontWeight: 600 }}>{item.category}</div>
                     <div className="catalog-table__muted" style={{ fontSize: '10px' }}>{item.subcategory}</div>
                   </td>
-                  <td style={{ padding: '6px 12px' }}>{item.supplier}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>
-                    <span className={`stock-qty ${isOutOfStock ? 'stock-qty--zero' : isLowStock ? 'stock-qty--low' : 'stock-qty--ok'}`} style={{ fontSize: '12px', padding: '2px 8px' }}>
+                  <td style={{ padding: '8px 12px', fontSize: '12px', color: '#334155' }}>{item.supplier}</td>
+                  <td className="catalog-number-cell" style={{ padding: '8px 12px' }}>
+                    <span className={`stock-qty ${isOutOfStock ? 'stock-qty--zero' : isLowStock ? 'stock-qty--low' : 'stock-qty--ok'}`}>
                       {item.currentStock}
                     </span>
                   </td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>{item.reorderLevel}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>{formatNumber(item.costPrice > 0 && item.sellingPrice > 0 ? Math.min(item.costPrice, item.sellingPrice) : item.costPrice)}</td>
-                  <td className="catalog-number-cell" style={{ padding: '6px 12px', fontVariantNumeric: 'tabular-nums' }}>{formatNumber(item.costPrice > 0 && item.sellingPrice > 0 ? Math.max(item.costPrice, item.sellingPrice) : item.sellingPrice)}</td>
-                  <td style={{ padding: '6px 12px' }}>
-                    <div className="catalog-table__muted" style={{ fontSize: '11px' }}>{item.lastUpdated}</div>
+                  <td className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: '#475569' }}>
+                    {item.reorderLevel}
                   </td>
-                  <td className="catalog-center-cell" style={{ padding: '6px 12px' }}>
+                  <td className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: '#0f172a' }}>
+                    ₹{costVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td className="catalog-number-cell" style={{ padding: '8px 12px', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: '#047857' }}>
+                    ₹{sellVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                    <div className="catalog-table__muted" style={{ fontSize: '11px', whiteSpace: 'nowrap' }}>{item.lastUpdated}</div>
+                  </td>
+                  <td className="catalog-center-cell" style={{ padding: '8px 12px' }}>
                     <button
                       className="catalog-btn catalog-btn--icon stock-adjust-btn"
                       title="Adjust stock"
                       onClick={() => setAdjustingItem(item)}
-                      style={{ padding: '4px 6px' }}
+                      style={{ padding: '5px 8px' }}
                     >
                       <Edit3 size={13} />
                     </button>

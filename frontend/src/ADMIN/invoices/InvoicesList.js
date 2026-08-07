@@ -4,6 +4,16 @@ import { Link } from 'react-router-dom';
 import { getApiDomain } from '../../utils/apiConfig';
 import './invoices.css';
 
+const normalizeInvoiceId = (raw) => {
+  if (!raw || typeof raw !== 'string') return '';
+  let clean = raw.trim().replace(/^#+/, '');
+  while (/^(INV-|ORD-|INV|ORD)/i.test(clean)) {
+    clean = clean.replace(/^(INV-|ORD-)/i, '').replace(/^(INV|ORD)[-\s]*/i, '').trim();
+  }
+  if (!clean) return '';
+  return `INV-${clean}`;
+};
+
 const InvoicesList = () => {
   const [invoices, setInvoices] = useState([]);
   const [metrics, setMetrics] = useState({
@@ -34,7 +44,11 @@ const InvoicesList = () => {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       
-      setInvoices(data.invoices || []);
+      const normalizedList = (data.invoices || []).map(inv => ({
+        ...inv,
+        invoiceId: normalizeInvoiceId(inv.invoiceId)
+      }));
+      setInvoices(normalizedList);
       setMetrics({
         totalRevenue: data.totalRevenue || 'Rs. 0',
         paidInvoices: data.paidInvoices || 0,
@@ -118,7 +132,19 @@ const InvoicesList = () => {
       const cgstNum = gstAmountNum / 2;
       const sgstNum = gstAmountNum / 2;
 
-      const printWindow = window.open('', '_blank');
+      let printIframe = document.getElementById('invoice-print-iframe');
+      if (!printIframe) {
+        printIframe = document.createElement('iframe');
+        printIframe.id = 'invoice-print-iframe';
+        printIframe.style.position = 'fixed';
+        printIframe.style.right = '0';
+        printIframe.style.bottom = '0';
+        printIframe.style.width = '0';
+        printIframe.style.height = '0';
+        printIframe.style.border = '0';
+        document.body.appendChild(printIframe);
+      }
+
       const itemsHtml = (order.items || []).map((item, idx) => {
         const itemPrice = item.priceNum !== undefined ? Number(item.priceNum) : parseCurrencyValue(item.price);
         const itemQty = Number(item.quantity || 1);
@@ -161,13 +187,25 @@ const InvoicesList = () => {
       const statusBg = isPaid ? '#ecfdf5' : isCancelled ? '#fef2f2' : '#fffbe5';
       const statusBorder = isPaid ? '#a7f3d0' : isCancelled ? '#fca5a5' : '#fde68a';
 
-      printWindow.document.write(`
+      const printWin = printIframe.contentWindow || printIframe.contentDocument;
+      const doc = printWin.document || printWin;
+
+      doc.open();
+      doc.write(`
         <!DOCTYPE html>
         <html>
           <head>
             <title>${docTitle} - ${order.invoiceId}</title>
             <style>
               @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+              @page {
+                margin: 0;
+                size: auto;
+              }
+              @media print {
+                html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
+                .invoice-container { border: none !important; box-shadow: none !important; padding: 12mm 15mm !important; max-width: 100% !important; width: 100% !important; }
+              }
               * { box-sizing: border-box; margin: 0; padding: 0; }
               body { 
                 font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
@@ -434,7 +472,7 @@ const InvoicesList = () => {
                   <div class="info-block-title">Payment & Settlement Status</div>
                   <div class="info-row"><span class="info-label">Payment Method:</span><span class="info-val">${order.paymentMethod || 'UPI / Bank Transfer'}</span></div>
                   <div class="info-row"><span class="info-label">Payment Status:</span><span class="info-val" style="color: ${statusColor}; font-weight: 800;">${(order.paymentStatus || 'UNPAID').toUpperCase()} ${!isPaid && !isCancelled ? '(Payment Pending)' : ''}</span></div>
-                  <div class="info-row"><span class="info-label">Billing Currency:</span><span class="info-val">INR (₹)</span></div>
+                  <div class="info-row"><span class="info-label">Billing Currency:</span><span class="info-val">INR ₹${finalAmountNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                 </div>
               </div>
 
@@ -453,7 +491,9 @@ const InvoicesList = () => {
                   <div class="address-card-title">Shipped To (Delivery Destination)</div>
                   <p>
                     <strong>${order.client}</strong><br/>
-                    Address: ${(order.shippingAddress || order.address || 'Standard Client Delivery Destination').replace(/\n/g, '<br/>')}
+                    Address: ${(order.shippingAddress || order.address || 'Full Delivery Address Pending / Not Provided').replace(/\n/g, '<br/>')}<br/>
+                    ${order.phone ? `Contact Phone: ${order.phone}<br/>` : ''}
+                    ${order.email && !order.email.includes('N/A') ? `Email: ${order.email.toLowerCase()}<br/>` : ''}
                   </p>
                 </div>
               </div>
@@ -499,12 +539,14 @@ const InvoicesList = () => {
                 </div>
               </div>
 
-              <!-- Footer -->
+              <!-- Footer & About Section -->
               <div class="invoice-footer">
-                <div>
-                  <strong>Terms & Memos:</strong><br/>
-                  1. Goods once sold will not be taken back without valid return approval.<br/>
-                  2. Subject to Rajkot Jurisdiction only.<br/>
+                <div style="flex-grow: 1; max-width: 65%;">
+                  <strong>About Shyam Agro Tools:</strong><br/>
+                  Leading e-commerce marketplace & manufacturer of heavy-duty agricultural tools, equipment, irrigation systems, and farm machinery.<br/><br/>
+                  <strong>About Invoice & Notes:</strong><br/>
+                  ${order.packerName || order.notes || 'Official tax & commercial invoice generated for recipient commercial use. Valid for commercial warranty and tax deduction.'}<br/>
+                  <span style="font-size: 10px; color: #64748b;">1. Goods once sold will not be returned without valid RMA approval. 2. Subject to Gujarat Jurisdiction.</span><br/>
                   <em>This is a computer-generated tax invoice requiring no physical signature.</em>
                 </div>
                 <div class="signatory-box">
@@ -515,12 +557,22 @@ const InvoicesList = () => {
               </div>
             </div>
             <script>
-              window.onload = function() { window.print(); }
+              window.onload = function() {
+                window.focus();
+                window.print();
+              }
             </script>
           </body>
         </html>
       `);
-      printWindow.document.close();
+      doc.close();
+      try {
+        doc.title = `${docTitle} - ${order.invoiceId}`;
+      } catch (e) {}
+      setTimeout(() => {
+        printWin.focus();
+        printWin.print();
+      }, 300);
     } catch (err) {
       alert(`Failed to print invoice: ${err.message}`);
     }
@@ -624,7 +676,7 @@ const InvoicesList = () => {
                     <td>{inv.date}</td>
                     <td style={{ fontWeight: 700, color: '#10b981' }}>{inv.billed}</td>
                     <td>
-                      <span className={`invoice-status-badge ${inv.status.toLowerCase()}`}>
+                      <span className={`invoice-status-badge ${inv.status ? inv.status.toLowerCase().replace(/\s+/g, '-') : 'unpaid'}`}>
                         {inv.status}
                       </span>
                     </td>
@@ -638,13 +690,21 @@ const InvoicesList = () => {
                           <Printer size={14} /> Print
                         </button>
                         {inv.status?.toLowerCase() !== 'cancelled' && (() => {
-                          const isPaid = inv.status?.toLowerCase() === 'paid';
+                          const statusLower = (inv.status || '').toLowerCase();
+                          const isPaymentNotApplicable =
+                            statusLower.includes('not applicable') ||
+                            statusLower.includes('n/a') ||
+                            statusLower.includes('not required') ||
+                            statusLower === 'na';
+                          const isPaid = statusLower === 'paid';
                           const nextTarget = isPaid ? 'Unpaid' : 'Paid';
+
                           return (
                             <button
-                              onClick={() => handleUpdateStatus(inv.id, inv.status, nextTarget)}
-                              className="inv-action-btn toggle"
-                              title="Toggle Status"
+                              onClick={() => !isPaymentNotApplicable && handleUpdateStatus(inv.id, inv.status, nextTarget)}
+                              disabled={isPaymentNotApplicable}
+                              className={`inv-action-btn toggle ${isPaymentNotApplicable ? 'disabled' : ''}`}
+                              title={isPaymentNotApplicable ? 'Payment is not required for this invoice' : `Mark as ${nextTarget}`}
                             >
                               <CheckCircle2 size={14} /> Mark as {nextTarget}
                             </button>

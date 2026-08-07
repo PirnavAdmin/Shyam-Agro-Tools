@@ -76,7 +76,7 @@ const Customer = () => {
         setEditForm({
           name: data.name || '',
           phone: data.phone || '',
-          email: data.email || '',
+          email: (data.email || '').toLowerCase(),
           status: data.status || 'Active',
           address: data.address || '',
           district: data.district || '',
@@ -160,7 +160,7 @@ const Customer = () => {
         ...profile,
         name: editForm.name,
         phone: editForm.phone,
-        email: editForm.email,
+        email: (editForm.email || '').trim().toLowerCase(),
         status: editForm.status,
         address: editForm.address,
         district: editForm.district,
@@ -470,9 +470,9 @@ const Customer = () => {
                 <span className="text-slate-400">Irrigation Source:</span>
                 <span className="font-semibold text-slate-800">{profile.agrarianProfile?.irrigationSource && profile.agrarianProfile.irrigationSource !== 'N/A' ? profile.agrarianProfile.irrigationSource : 'Borewell & Canal'}</span>
               </div>
-              <div>
-                <span className="text-slate-400 block mb-1">Crops Cultivated:</span>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-400 shrink-0">Crops Cultivated:</span>
+                <div className="flex flex-wrap gap-1.5 justify-end">
                   {(() => {
                     const realisticCrops = ['Cotton', 'Paddy', 'Chilli', 'Maize', 'Groundnut', 'Sugarcane', 'Turmeric'];
                     const effectiveCrop = (profile.agrarianProfile?.cropType && profile.agrarianProfile.cropType !== 'N/A')
@@ -641,7 +641,7 @@ const Customer = () => {
                   <input
                     type="email"
                     value={editForm.email}
-                    onChange={e => setEditForm({ ...editForm, email: e.target.value })}
+                    onChange={e => setEditForm({ ...editForm, email: e.target.value.toLowerCase() })}
                     className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-emerald-500"
                   />
                 </div>
@@ -752,7 +752,7 @@ const Customer = () => {
                   type="submit"
                   className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
                 >
-                  Save Changes
+                  Update Changes
                 </button>
               </div>
             </form>

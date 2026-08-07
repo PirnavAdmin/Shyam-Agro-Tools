@@ -59,6 +59,10 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
   const completeLogin = async (authData = {}) => {
     const normalizedPhone = normalizeMobileNumber(phone);
     const apiUser = authData.user || authData.data?.user || authData.data || {};
+    const validToken = authData.token || authData.accessToken || authData.jwtToken || authData.authToken
+      || apiUser?.token || apiUser?.accessToken || apiUser?.jwtToken || apiUser?.authToken
+      || `usr_token_${normalizedPhone || 'session'}_${Date.now()}`;
+
     const user = {
       ...(apiUser || {}),
       phone: apiUser?.phone || apiUser?.mobileNumber || apiUser?.MobileNumber || normalizedPhone,
@@ -66,16 +70,19 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
       isActive: apiUser?.isActive ?? true,
       name: apiUser?.name || apiUser?.fullName || apiUser?.FullName || authData.name || details.name || 'User',
       email: apiUser?.email || apiUser?.Email || details.email || '',
-      token: authData.token || authData.accessToken || authData.jwtToken || authData.authToken
-        || apiUser?.token || apiUser?.accessToken || apiUser?.jwtToken || apiUser?.authToken || '',
+      token: validToken,
       refreshToken: authData.refreshToken || apiUser?.refreshToken || '',
       loggedIn: true,
     };
 
     login(authData, user);
     showToast(`Welcome ${user.name}!`);
-    onClose();
-    navigate(redirectTo || '/account');
+
+    if (redirectTo) {
+      navigate(redirectTo, { replace: true });
+    } else if (onClose) {
+      onClose();
+    }
   };
 
   const autoVerifyAndLogin = async (otpCode, fallbackData = {}) => {
@@ -206,7 +213,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
     setDetails({ name: '', email: '' });
     setLoginApiData({ success: false, isNewUser: false, otp: '' });
     setError('');
-    onClose();
+    if (onClose) onClose();
   };
 
   const backToPhone = () => {

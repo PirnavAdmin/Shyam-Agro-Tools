@@ -76,7 +76,12 @@ const CategoriesList = () => {
           String(category.id).toLowerCase().includes(query)
         );
       })
-      .sort((a, b) => Number(b.id) - Number(a.id));
+      .sort((a, b) => {
+        const orderA = Number(a.displayOrder ?? a.display_order ?? 0);
+        const orderB = Number(b.displayOrder ?? b.display_order ?? 0);
+        if (orderA !== orderB) return orderA - orderB;
+        return Number(a.id) - Number(b.id);
+      });
   }, [categories, searchTerm]);
 
   // Reset page when filter/search changes
@@ -181,10 +186,10 @@ const CategoriesList = () => {
                   </td>
                 </tr>
               )}
-              {!isLoading && currentCategories.map((category) => (
+              {!isLoading && currentCategories.map((category, idx) => (
                 <tr key={category.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#64748b' }}>
-                    {filteredCategories.indexOf(category) + 1}
+                    {indexOfFirstItem + idx + 1}
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#1e293b' }}>
                     {category.name}

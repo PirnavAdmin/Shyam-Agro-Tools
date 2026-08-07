@@ -167,7 +167,14 @@ const normaliseOrder = (o) => {
   
   return {
     id: o.id || o.orderId || '',
-    invoiceNo: o.invoiceNo || o.invoiceNumber || `INV-${o.id}`,
+    invoiceNo: (() => {
+      let raw = String(o.invoiceNo || o.invoiceNumber || o.orderNumber || o.id || '').trim().replace(/^#+/, '');
+      while (/^(INV-|ORD-|INV|ORD)/i.test(raw)) {
+        raw = raw.replace(/^(INV-|ORD-)/i, '').replace(/^(INV|ORD)[-\s]*/i, '').trim();
+      }
+      if (!raw) return `INV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(100000 + Math.random() * 900000)}`;
+      return `INV-${raw}`;
+    })(),
     customer: o.customerName || o.customer || (o.customerDetails?.name) || 'Unknown',
     customerType: o.customerType || o.customerRole || (o.customerDetails?.type) || 'Farmer',
     phone: o.customerPhone || o.phone || (o.customerDetails?.phone) || '',
@@ -229,7 +236,18 @@ const formatDateToDMyLong = (dateStr) => {
 };
 
 const printInvoice = (order) => {
-  const printWindow = window.open('', '_blank');
+  let printIframe = document.getElementById('orders-print-iframe');
+  if (!printIframe) {
+    printIframe = document.createElement('iframe');
+    printIframe.id = 'orders-print-iframe';
+    printIframe.style.position = 'fixed';
+    printIframe.style.right = '0';
+    printIframe.style.bottom = '0';
+    printIframe.style.width = '0';
+    printIframe.style.height = '0';
+    printIframe.style.border = '0';
+    document.body.appendChild(printIframe);
+  }
   
   const isPaid = (order.paymentStatus || order.status || '').toLowerCase() === 'paid';
   const isCancelled = (order.paymentStatus || order.status || '').toLowerCase() === 'cancelled';
@@ -267,13 +285,25 @@ const printInvoice = (order) => {
   const cgst = (order.gstAmount / 2);
   const sgst = (order.gstAmount / 2);
 
-  printWindow.document.write(`
+  const printWin = printIframe.contentWindow || printIframe.contentDocument;
+  const doc = printWin.document || printWin;
+
+  doc.open();
+  doc.write(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>${docTitle} - ${order.invoiceNo}</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+          @page {
+            margin: 0;
+            size: auto;
+          }
+          @media print {
+            html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
+            .invoice-container { border: none !important; box-shadow: none !important; padding: 12mm 15mm !important; max-width: 100% !important; width: 100% !important; }
+          }
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body { 
             font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
@@ -540,7 +570,7 @@ const printInvoice = (order) => {
               <div class="info-block-title">Payment & Settlement Status</div>
               <div class="info-row"><span class="info-label">Payment Method:</span><span class="info-val">${order.payMethod || 'UPI / Bank Transfer'}</span></div>
               <div class="info-row"><span class="info-label">Payment Status:</span><span class="info-val" style="color: ${statusColor};">${(order.paymentStatus || (isPaid ? 'Paid' : 'Unpaid')).toUpperCase()} ${!isPaid && !isCancelled ? '(Payment Pending)' : ''}</span></div>
-              <div class="info-row"><span class="info-label">Billing Currency:</span><span class="info-val">INR (₹)</span></div>
+              <div class="info-row"><span class="info-label">Billing Currency:</span><span class="info-val">INR ₹${(order.totalAmount || order.finalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
             </div>
           </div>
 
@@ -559,7 +589,9 @@ const printInvoice = (order) => {
               <div class="address-card-title">Shipped To (Delivery Destination)</div>
               <p>
                 <strong>${order.customer}</strong><br/>
-                Address: ${(order.shippingAddress || order.billingAddress || order.address || 'Standard Client Delivery Destination').replace(/\n/g, '<br/>')}
+                Address: ${(order.shippingAddress || order.billingAddress || order.address || 'Full Delivery Address Pending / Not Provided').replace(/\n/g, '<br/>')}<br/>
+                ${order.phone ? `Contact Phone: ${order.phone}<br/>` : ''}
+                ${order.email ? `Email: ${order.email.toLowerCase()}<br/>` : ''}
               </p>
             </div>
           </div>
@@ -621,12 +653,22 @@ const printInvoice = (order) => {
           </div>
         </div>
         <script>
-          window.onload = function() { window.print(); }
+          window.onload = function() {
+            window.focus();
+            window.print();
+          }
         </script>
       </body>
     </html>
   `);
-  printWindow.document.close();
+  doc.close();
+  try {
+    doc.title = `${docTitle} - ${order.invoiceNo}`;
+  } catch (e) {}
+  setTimeout(() => {
+    printWin.focus();
+    printWin.print();
+  }, 300);
 };
 
 const formatDateToDMY = (dateStr) => {

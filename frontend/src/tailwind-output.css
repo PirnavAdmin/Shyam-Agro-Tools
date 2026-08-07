@@ -960,28 +960,6 @@ h1, h2, h3, h4, h5, h6 {
   fill: currentColor !important;
 }
 
-.product-stock-badge {
-  width: -moz-fit-content;
-  width: fit-content;
-  padding: 0.25rem 0.5rem;
-  font-size: 9px;
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  box-shadow: 0 8px 18px rgba(15, 61, 46, 0.1);
-}
-
-.product-stock-badge-in {
-  background: #e7f7df;
-  color: #26710f;
-}
-
-.product-stock-badge-out {
-  background: #fff0f0;
-  color: #c62828;
-}
-
 .product-card-stock-line {
   font-size: 10px;
   font-weight: 900;
@@ -1248,10 +1226,6 @@ img.app-line-thumb,
 
 .left-2 {
   left: 0.5rem;
-}
-
-.left-2\.5 {
-  left: 0.625rem;
 }
 
 .left-3 {
@@ -1904,10 +1878,6 @@ img.app-line-thumb,
   max-width: 1440px;
 }
 
-.max-w-\[150px\] {
-  max-width: 150px;
-}
-
 .max-w-\[1600px\] {
   max-width: 1600px;
 }
@@ -1918,6 +1888,10 @@ img.app-line-thumb,
 
 .max-w-\[220px\] {
   max-width: 220px;
+}
+
+.max-w-\[250px\] {
+  max-width: 250px;
 }
 
 .max-w-\[280px\] {
@@ -2279,6 +2253,10 @@ img.app-line-thumb,
   white-space: nowrap;
 }
 
+.whitespace-normal {
+  white-space: normal;
+}
+
 .whitespace-nowrap {
   white-space: nowrap;
 }
@@ -2526,10 +2504,6 @@ img.app-line-thumb,
 .border-slate-100 {
   --tw-border-opacity: 1;
   border-color: rgb(241 245 249 / var(--tw-border-opacity));
-}
-
-.border-slate-100\/80 {
-  border-color: rgb(241 245 249 / 0.8);
 }
 
 .border-slate-200 {
@@ -2834,6 +2808,10 @@ img.app-line-thumb,
 .bg-slate-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(30 41 59 / var(--tw-bg-opacity));
+}
+
+.bg-slate-900\/10 {
+  background-color: rgb(15 23 42 / 0.1);
 }
 
 .bg-slate-900\/40 {
@@ -3376,6 +3354,11 @@ img.app-line-thumb,
   font-style: italic;
 }
 
+.tabular-nums {
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
+}
+
 .leading-4 {
   line-height: 1rem;
 }
@@ -3743,6 +3726,10 @@ img.app-line-thumb,
 
 .opacity-60 {
   opacity: 0.6;
+}
+
+.opacity-70 {
+  opacity: 0.7;
 }
 
 .shadow {

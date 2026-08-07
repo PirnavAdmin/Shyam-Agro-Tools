@@ -10,9 +10,11 @@ const API_URL = `${getApiDomain()}/api`;
 const resolveBannerImage = (url) => {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
-  const apiDomain = getApiDomain();
-  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-  return `${apiDomain}${cleanUrl}`;
+  if (url.startsWith('/uploads')) {
+    const apiDomain = getApiDomain();
+    return `${apiDomain}${url}`;
+  }
+  return url;
 };
 
 const OfferBanners = () => {

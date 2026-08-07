@@ -59,9 +59,14 @@ const SuppliersForm = () => {
     loadSupplierData();
   }, [id]);
 
+  const isValidFieldValue = (val) => {
+    const str = String(val || '').trim();
+    return str.length > 0 && str.toLowerCase() !== 'not specified' && str.toLowerCase() !== 'n/a';
+  };
+
   const completionScore = useMemo(() => {
     const requiredFields = ['name', 'contactPerson', 'email', 'phone', 'city', 'address', 'productLines'];
-    const completed = requiredFields.filter((field) => supplier[field] && String(supplier[field]).trim()).length;
+    const completed = requiredFields.filter((field) => isValidFieldValue(supplier[field])).length;
     return Math.round((completed / requiredFields.length) * 100);
   }, [supplier]);
 
@@ -71,21 +76,12 @@ const SuppliersForm = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    const isInvalid = (val) => {
-      const str = String(val || '').trim();
-      return !str || str.toLowerCase() === 'not specified';
-    };
+    if (event && event.preventDefault) event.preventDefault();
 
-    if (
-      isInvalid(supplier.name) ||
-      isInvalid(supplier.contactPerson) ||
-      isInvalid(supplier.email) ||
-      isInvalid(supplier.phone) ||
-      isInvalid(supplier.city) ||
-      isInvalid(supplier.address) ||
-      isInvalid(supplier.productLines)
-    ) {
+    const requiredFields = ['name', 'contactPerson', 'email', 'phone', 'city', 'address', 'productLines'];
+    const hasInvalidRequired = requiredFields.some((field) => !isValidFieldValue(supplier[field]));
+
+    if (hasInvalidRequired) {
       setToastMessage('Please fill in all required fields (asterisk fields cannot be left blank or "Not specified").');
       setToastType('warning');
       return;

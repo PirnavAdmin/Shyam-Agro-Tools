@@ -23,7 +23,7 @@ const AddInvoice = () => {
     taxAmount: 0,
     discount: 0,
     shippingCharge: 0,
-    notes: ''
+    notes: 'Official tax invoice issued by Shyam Agro Tools for high-quality agricultural equipment, machinery, and farm supplies. Subject to standard commercial warranty and sales terms.'
   });
 
   const [items, setItems] = useState([
@@ -173,14 +173,20 @@ const AddInvoice = () => {
       }
     }
 
-    // 4. Billing & Delivery Address Validation
+    // 4. Full Delivery Address Compliance Validation
     const addressTrim = (formData.address || '').trim();
     if (!addressTrim) {
       setError('Billing & Delivery Address is required.');
       return;
     }
-    if (addressTrim.length < 8) {
-      setError('Please enter a detailed delivery address (minimum 8 characters with street/city details).');
+    if (addressTrim.length < 15) {
+      setError('Please enter a complete delivery address (minimum 15 characters including street, city, state and pincode).');
+      return;
+    }
+    const hasPincode = /\b\d{5,6}\b/.test(addressTrim);
+    const hasAddressStructure = addressTrim.includes(',') || addressTrim.includes('-') || addressTrim.split(/\s+/).length >= 4;
+    if (!hasPincode && !hasAddressStructure) {
+      setError('Improper address format. Please enter a full delivery address with Street, City/District, State, and 6-digit Pincode (e.g. 123 Farm Road, Anand, Gujarat - 388001).');
       return;
     }
 
@@ -338,11 +344,11 @@ const AddInvoice = () => {
               <label>Billing & Delivery Address <span style={{ color: '#ef4444' }}>*</span></label>
               <textarea
                 name="address"
-                placeholder="Enter client full street address, city, state and pincode"
+                placeholder="Enter client full street address, city, state and 6-digit pincode (e.g., 45 Green Park, Station Road, Anand, Gujarat - 388001)"
                 value={formData.address}
                 onChange={handleChange}
                 rows={2}
-                minLength={8}
+                minLength={15}
                 required
               />
             </div>
@@ -380,6 +386,7 @@ const AddInvoice = () => {
               >
                 <option value="Unpaid">Unpaid (Proforma Invoice)</option>
                 <option value="Paid">Paid (Tax Invoice)</option>
+                <option value="Payment Not Applicable">Payment Not Applicable</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
               {formData.paymentStatus === 'Unpaid' && (
@@ -597,13 +604,13 @@ const AddInvoice = () => {
           {/* Grand Total display */}
           <div className="grand-total-invoice-flex">
             <div className="form-input-field" style={{ flexGrow: 1, marginBottom: 0 }}>
-              <label>Administrative Notes</label>
+              <label>About Invoice & Company Memos</label>
               <textarea
                 name="notes"
-                placeholder="Add special delivery instructions or billing memos"
+                placeholder="Company info, special delivery instructions or invoice notes"
                 value={formData.notes}
                 onChange={handleChange}
-                rows={1}
+                rows={2}
               />
             </div>
             <div className="grand-total-amount-box">

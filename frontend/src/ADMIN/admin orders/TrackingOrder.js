@@ -83,6 +83,47 @@ const TrackingOrder = () => {
     }
   };
 
+  const handleRefreshData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      setUpdateMsg({ text: '', isError: false });
+
+      const data = await getOrdersTracking();
+      const list = Array.isArray(data) ? data : (data.orders || data.data || []);
+      const mappedList = list.map(o => ({
+        ...o,
+        status: mapStatus(o.status)
+      }));
+      setOrders(mappedList);
+
+      const currentId = selectedOrderId || (mappedList.length > 0 ? (mappedList[0].id || mappedList[0].orderId) : null);
+      if (currentId) {
+        setDetailsLoading(true);
+        const details = await getOrderTracking(currentId);
+        const mappedDetails = {
+          ...details,
+          id: details.orderId,
+          status: mapStatus(details.currentStatus),
+          timeline: Array.isArray(details.timelineLogs) ? details.timelineLogs.map(t => ({
+            label: t.status,
+            date: `${t.date} ${t.time}`,
+            completed: true,
+            description: t.description
+          })) : []
+        };
+        setActiveOrderDetails(mappedDetails);
+        setTempStatus(mappedDetails.status);
+      }
+      setUpdateMsg({ text: 'Tracking data refreshed successfully!', isError: false });
+    } catch (err) {
+      setError(err.message || 'Failed to refresh tracking data.');
+    } finally {
+      setLoading(false);
+      setDetailsLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -196,11 +237,19 @@ const TrackingOrder = () => {
           <p>Real-time order status updates and customer timeline synchronization.</p>
         </div>
         <button
-          onClick={loadOrders}
+          onClick={handleRefreshData}
+          disabled={loading || detailsLoading}
           className="date-preset-btn"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '8px', 
+            cursor: (loading || detailsLoading) ? 'not-allowed' : 'pointer',
+            opacity: (loading || detailsLoading) ? 0.7 : 1
+          }}
         >
-          <RefreshCw size={14} /> Refresh Data
+          <RefreshCw size={14} style={(loading || detailsLoading) ? { animation: 'spin 1s linear infinite' } : {}} />
+          <span>{(loading || detailsLoading) ? 'Refreshing...' : 'Refresh Data'}</span>
         </button>
       </div>
 

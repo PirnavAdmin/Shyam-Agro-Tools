@@ -291,6 +291,7 @@ const ProductDetailsPage = () => {
   }, [selectedMediaIndex]);
 
   useEffect(() => {
+    setFailedImageUrls(new Set());
     setVisibleMainImage(selectedImageSource);
     setIsMainImageLoaded(loadedDetailImages.has(selectedImageSource));
   }, [selectedImageSource]);
@@ -552,6 +553,12 @@ const ProductDetailsPage = () => {
         }}
         onError={() => {
           console.error('Product detail image failed:', visibleMainImage);
+          if (visibleMainImage && visibleMainImage.includes('/uploads/') && !visibleMainImage.startsWith('https://shyamagrotools.com')) {
+            const relPath = visibleMainImage.substring(visibleMainImage.indexOf('/uploads/'));
+            const prodUrl = `https://shyamagrotools.com${relPath}`;
+            setVisibleMainImage(prodUrl);
+            return;
+          }
           setFailedImageUrls((current) => new Set(current).add(visibleMainImage));
 
           if (visibleMainImage !== FALLBACK_IMAGE) {
@@ -575,12 +582,6 @@ const ProductDetailsPage = () => {
         >
           <section className="product-detail-media-column">
             <div className="product-detail-media-card relative rounded-md">
-              {product.madeInIndia && (
-                <span className="absolute left-4 top-4 z-20 bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
-                  {t('madeInIndia')}
-                </span>
-              )}
-
               <div className="absolute right-4 top-4 z-20 flex gap-2">
                 <button
                   type="button"
@@ -625,7 +626,6 @@ const ProductDetailsPage = () => {
                     type="button"
                     onClick={() => {
                       setSelectedMediaIndex(index);
-                      openImageLightbox(media);
                     }}
                     className={`product-detail-thumb rounded-md border bg-white p-2 text-center transition-all ${
                       isSelected ? 'selected-thumb border-primary shadow-md' : 'border-border hover:border-primary/60'

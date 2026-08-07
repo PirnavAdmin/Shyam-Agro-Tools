@@ -245,10 +245,7 @@ namespace ShyamAgroSuite.Api.Controllers
                     displayRole = o.Customer.User.Role.Equals("Grower", StringComparison.OrdinalIgnoreCase) ? "Farmer" : o.Customer.User.Role;
                 }
 
-                var cleanOrderNum = o.OrderNumber.Replace("#", "").Trim();
-                var invoiceNumber = cleanOrderNum.StartsWith("ORD-") 
-                    ? cleanOrderNum.Replace("ORD-", "INV-") 
-                    : $"INV-{cleanOrderNum}";
+                var invoiceNumber = InvoicesController.NormalizeInvoiceId(o.OrderNumber);
 
                 var displayPaymentStatus = "Pending";
                 if (o.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Canceled", StringComparison.OrdinalIgnoreCase))

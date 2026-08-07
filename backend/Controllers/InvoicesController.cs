@@ -53,10 +53,7 @@ namespace ShyamAgroSuite.Api.Controllers
 
             // Format entries into Invoice models
             var formattedInvoices = ordersList.Select(o => {
-                var cleanOrderNum = o.OrderNumber.Replace("#", "").Trim();
-                var invoiceId = cleanOrderNum.StartsWith("ORD-") 
-                    ? cleanOrderNum.Replace("ORD-", "INV-") 
-                    : $"INV-{cleanOrderNum}";
+                var invoiceId = NormalizeInvoiceId(o.OrderNumber);
 
                 var displayStatus = "Unpaid";
                 if (o.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Canceled", StringComparison.OrdinalIgnoreCase))
@@ -116,15 +113,24 @@ namespace ShyamAgroSuite.Api.Controllers
                 return NotFound(new { Message = "Invoice/Order not found." });
             }
 
-            var cleanOrderNum = order.OrderNumber.Replace("#", "").Trim();
-            var invoiceId = cleanOrderNum.StartsWith("ORD-") 
-                ? cleanOrderNum.Replace("ORD-", "INV-") 
-                : $"INV-{cleanOrderNum}";
+            var invoiceId = NormalizeInvoiceId(order.OrderNumber);
 
             var displayStatus = "Unpaid";
-            if (order.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+            if (order.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) || order.Status.Equals("Canceled", StringComparison.OrdinalIgnoreCase))
             {
-                displayStatus = "Cancelled";
+                bool wasPaid = order.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) ||
+                               order.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) ||
+                               order.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
+                               order.PaymentStatus.Equals("Refunded", StringComparison.OrdinalIgnoreCase);
+                displayStatus = wasPaid ? "Refunded" : "Payment Not Applicable";
+            }
+            else if (order.PaymentStatus.Equals("Refunded", StringComparison.OrdinalIgnoreCase))
+            {
+                displayStatus = "Refunded";
+            }
+            else if (order.PaymentStatus.Equals("Payment Not Applicable", StringComparison.OrdinalIgnoreCase) || order.PaymentStatus.Equals("N/A", StringComparison.OrdinalIgnoreCase))
+            {
+                displayStatus = "Payment Not Applicable";
             }
             else if (order.PaymentStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase) || order.PaymentStatus.Equals("Success", StringComparison.OrdinalIgnoreCase) || order.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase))
             {
@@ -202,6 +208,23 @@ namespace ShyamAgroSuite.Api.Controllers
                 request.EmailAddress = cleanEmail;
             }
 
+            // Validate & normalize Full Delivery Address
+            var rawAddress = (request.ShippingAddress ?? request.Address ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(rawAddress))
+            {
+                return BadRequest(new { Message = "Billing & Delivery Address is required." });
+            }
+            if (rawAddress.Length < 15)
+            {
+                return BadRequest(new { Message = "Please enter a complete delivery address (minimum 15 characters including street, city, state and pincode)." });
+            }
+            var hasPincode = System.Text.RegularExpressions.Regex.IsMatch(rawAddress, @"\b\d{5,6}\b");
+            var hasStructure = rawAddress.Contains(",") || rawAddress.Contains("-") || rawAddress.Split(' ').Length >= 3;
+            if (!hasPincode && !hasStructure)
+            {
+                return BadRequest(new { Message = "Improper address format. Please provide a full delivery address with Street, City/District, State, and 6-digit Pincode (e.g. 123 Farm Road, Anand, Gujarat - 388001)." });
+            }
+
             // 1. Lookup or create customer by phone/email
             var contact = string.IsNullOrEmpty(request.ContactNo) ? Guid.NewGuid().ToString() : request.ContactNo;
             var email = string.IsNullOrEmpty(request.EmailAddress) ? Guid.NewGuid().ToString() : request.EmailAddress;
@@ -239,15 +262,17 @@ namespace ShyamAgroSuite.Api.Controllers
                     statusStr = "Cancelled";
                     payStatusStr = "Failed";
                 }
+                else if (request.PaymentStatus.Equals("Payment Not Applicable", StringComparison.OrdinalIgnoreCase) || request.PaymentStatus.Equals("N/A", StringComparison.OrdinalIgnoreCase))
+                {
+                    payStatusStr = "Payment Not Applicable";
+                }
             }
 
-            var invoiceNumClean = string.IsNullOrEmpty(request.InvoiceNo) 
-                ? $"INV-{new Random().Next(100000, 999999)}"
-                : request.InvoiceNo.Replace("#", "").Trim();
+            var invoiceNumClean = NormalizeInvoiceId(request.InvoiceNo);
 
             // Map back to ORD number format or keep invoice number directly
-            var orderNumber = invoiceNumClean.StartsWith("INV-") 
-                ? invoiceNumClean.Replace("INV-", "ORD-") 
+            var orderNumber = invoiceNumClean.StartsWith("INV-", StringComparison.OrdinalIgnoreCase) 
+                ? $"ORD-{invoiceNumClean.Substring(4)}" 
                 : $"ORD-{invoiceNumClean}";
 
             var order = new Order
@@ -305,7 +330,7 @@ namespace ShyamAgroSuite.Api.Controllers
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            var invoiceId = $"INV-{order.OrderNumber.Replace("ORD-", "")}";
+            var invoiceId = NormalizeInvoiceId(order.OrderNumber);
 
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, new
             {
@@ -338,6 +363,10 @@ namespace ShyamAgroSuite.Api.Controllers
                 else if (request.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
                 {
                     order.Status = "Cancelled";
+                }
+                else if (request.Status.Equals("Payment Not Applicable", StringComparison.OrdinalIgnoreCase) || request.Status.Equals("N/A", StringComparison.OrdinalIgnoreCase))
+                {
+                    order.PaymentStatus = "Payment Not Applicable";
                 }
                 else
                 {
@@ -410,6 +439,33 @@ namespace ShyamAgroSuite.Api.Controllers
         public class InvoiceUpdateRequest
         {
             public string? Status { get; set; } // Paid, Unpaid, Cancelled
+        }
+
+        public static string NormalizeInvoiceId(string? rawOrderOrInvNum)
+        {
+            if (string.IsNullOrWhiteSpace(rawOrderOrInvNum))
+                return $"INV-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(100000, 999999)}";
+
+            var clean = rawOrderOrInvNum.Trim().TrimStart('#');
+            while (clean.StartsWith("INV-", StringComparison.OrdinalIgnoreCase) ||
+                   clean.StartsWith("ORD-", StringComparison.OrdinalIgnoreCase) ||
+                   clean.StartsWith("INV", StringComparison.OrdinalIgnoreCase) ||
+                   clean.StartsWith("ORD", StringComparison.OrdinalIgnoreCase))
+            {
+                if (clean.StartsWith("INV-", StringComparison.OrdinalIgnoreCase) || clean.StartsWith("ORD-", StringComparison.OrdinalIgnoreCase))
+                {
+                    clean = clean.Substring(4).Trim();
+                }
+                else if (clean.StartsWith("INV", StringComparison.OrdinalIgnoreCase) || clean.StartsWith("ORD", StringComparison.OrdinalIgnoreCase))
+                {
+                    clean = clean.Substring(3).TrimStart('-', ' ').Trim();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(clean))
+                return $"INV-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(100000, 999999)}";
+
+            return $"INV-{clean}";
         }
     }
 }

@@ -10,9 +10,11 @@ const API_URL = `${getApiDomain()}/api`;
 const resolveBannerImage = (url) => {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
-  const apiDomain = getApiDomain();
-  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-  return `${apiDomain}${cleanUrl}`;
+  if (url.startsWith('/uploads')) {
+    const apiDomain = getApiDomain();
+    return `${apiDomain}${url}`;
+  }
+  return url;
 };
 
 const defaultTrustSlides = [
@@ -24,13 +26,13 @@ const defaultTrustSlides = [
   },
   {
     id: 2,
-    image: '/product-images/tractor-field-hero.png',
+    image: '/hero-machinery.png',
     rating: '4.9',
     note: 'Heavy duty tractors and power tillers engineered for peak efficiency',
   },
   {
     id: 3,
-    image: '/product-images/sprayer-field-hero.png',
+    image: '/hero-sprayers.png',
     rating: '4.8',
     note: 'High-pressure crop sprayers trusted by farmers nationwide',
   },

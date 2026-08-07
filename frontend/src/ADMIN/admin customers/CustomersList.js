@@ -144,7 +144,7 @@ const CustomersList = () => {
       const payload = {
         name: newCustomer.name,
         phone: newCustomer.phone,
-        email: newCustomer.email,
+        email: (newCustomer.email || '').trim().toLowerCase(),
         status: newCustomer.status,
         address: newCustomer.address,
         district: newCustomer.district,

@@ -239,7 +239,7 @@ const BannerForm = () => {
               style={{ padding: '10px 24px', borderRadius: '8px', border: 'none', background: '#10b981', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
               <Save size={16} />
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? 'Updating...' : 'Update Changes'}
             </button>
           </div>
         </form>

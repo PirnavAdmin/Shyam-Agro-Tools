@@ -11,7 +11,12 @@ namespace ShyamAgroSuite.Api.Models
 
         public string Name { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        private string _email = string.Empty;
+        public string Email
+        {
+            get => _email ?? string.Empty;
+            set => _email = (value ?? string.Empty).Trim().ToLower();
+        }
         public string Status { get; set; } = "Active"; // Active, Inactive
         public DateTime JoinDate { get; set; } = DateTime.UtcNow;
         public int CoinsBalance { get; set; } = 0;

@@ -51,7 +51,7 @@ const FormSettings = () => {
               onClick={handleSubmit} 
               className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors text-sm"
             >
-              <Save size={16} /> Save Settings
+              <Save size={16} /> Update Settings
             </button>
           )}
         </div>

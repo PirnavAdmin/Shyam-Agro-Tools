@@ -405,11 +405,20 @@
 .mini-badge.stock-out { background: #fef2f2; color: #b91c1c; }
 
 .reports-data-table code {
+  display: inline-block;
+  min-width: 115px;
+  text-align: center;
   background: #f1f5f9;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-weight: 600;
+  color: #0f172a;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid #cbd5e1;
+  box-sizing: border-box;
 }
 
 /* Toast Notifications */

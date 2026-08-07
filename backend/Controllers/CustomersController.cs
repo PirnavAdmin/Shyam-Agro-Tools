@@ -248,7 +248,7 @@ namespace ShyamAgroSuite.Api.Controllers
 
             customer.Name = updateData.Name;
             customer.Phone = updateData.Phone;
-            customer.Email = updateData.Email;
+            customer.Email = (updateData.Email ?? string.Empty).Trim().ToLower();
             customer.Status = updateData.Status;
             customer.CoinsBalance = updateData.CoinsBalance;
             customer.Address = updateData.Address;

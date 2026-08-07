@@ -118,22 +118,6 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
           isList ? 'product-card-media-list md:w-64 md:shrink-0' : ''
         }`}
       >
-        <div className="absolute left-2.5 top-2.5 z-10 flex flex-col gap-1.5">
-          {product.madeInIndia && (
-            <span className="product-stock-badge product-made-in-india-badge">
-              {t('madeInIndia')}
-            </span>
-          )}
-          {discountLabel && (
-            <span className="w-fit bg-red-500 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-white shadow-sm">
-              {discountLabel}
-            </span>
-          )}
-          <span className={`product-stock-badge ${isInStock ? 'product-stock-badge-in' : 'product-stock-badge-out'}`}>
-            {stockLabel}
-          </span>
-        </div>
-
         <div className="product-card-actions absolute right-2.5 top-2.5 z-10 flex flex-col gap-1.5">
           <button
             type="button"

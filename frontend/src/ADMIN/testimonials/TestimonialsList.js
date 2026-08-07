@@ -195,8 +195,8 @@ const TestimonialsList = () => {
                     </td>
 
                     {/* Actions */}
-                    <td style={{ padding: '8px' }}>
-                      <div className="catalog-inline-actions" style={{ justifyContent: 'center' }}>
+                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                      <div className="catalog-inline-actions">
                         <AnimatedEditButton
                           to={`/admin/testimonials/add?id=${t.id}`}
                           title="Edit testimonial"
