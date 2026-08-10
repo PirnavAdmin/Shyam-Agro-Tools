@@ -124,8 +124,8 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
           />
           {expanded && (
             <div className="sidebar-brand-info">
-              <h2 className="stroyka-brand">ADMIN</h2>
-              <span className="stroyka-brand-sub">Shyam Agro Tools</span>
+              <h2 className="stroyka-brand">Shyam Agro Tools</h2>
+              <span className="stroyka-brand-sub">(Admin)</span>
             </div>
           )}
         </div>
@@ -188,7 +188,7 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
               <li>
                 <div
                   onClick={() => toggleDropdown('customers', '/admin/customers/list')}
-                  className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/customers') || location.pathname.includes('/admin/users') ? 'active-parent' : ''}`}
+                  className={`stroyka-nav-link dropdown-header ${location.pathname.includes('/admin/customers') || location.pathname.includes('/admin/users') || location.pathname.includes('/admin/call-history') ? 'active-parent' : ''}`}
                   data-tooltip="Customers"
                   title={!expanded ? "Customers" : undefined}
                 >
@@ -204,6 +204,7 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 <ul className={`stroyka-submenu ${openDropdowns.customers && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/customers/list"     className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Customers List</NavLink></li>
                   <li><NavLink to="/admin/customers/customer" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Customer Profile</NavLink></li>
+                  <li><NavLink to="/admin/call-history"       className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>CRM & Call Logs</NavLink></li>
                 </ul>
               </li>
             )}
@@ -294,22 +295,6 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
               </li>
             )}
 
-            {/* Call History */}
-            {hasAccess('call history') && (
-              <li>
-                <NavLink
-                  to="/admin/call-history"
-                  className={({ isActive }) => isActive ? 'stroyka-nav-link active' : 'stroyka-nav-link'}
-                  data-tooltip="Call History"
-                  title={!expanded ? "Call History" : undefined}
-                >
-                  <div className="nav-left">
-                    <div className="icon-box"><PhoneCall size={18} className="nav-icon" /></div>
-                    <span className="nav-label-text">Call History</span>
-                  </div>
-                </NavLink>
-              </li>
-            )}
 
             {/* Stock Updates */}
             {hasAccess('stockupdates') && (

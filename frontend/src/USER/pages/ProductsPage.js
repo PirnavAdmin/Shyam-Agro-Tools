@@ -38,36 +38,47 @@ const productMatchesPowerTillers = (product = {}) => {
 };
 
 const Pagination = ({ currentPage, totalPages, onPageChange, t }) => {
-  if (totalPages <= 1) return null;
+  const page = Number(currentPage) || 1;
+  const maxPages = Number(totalPages) || 1;
 
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
-  const isFirstPage = currentPage === 1;
-  const isLastPage = currentPage === totalPages;
+  if (maxPages <= 1) return null;
+
+  const pages = Array.from({ length: maxPages }, (_, index) => index + 1);
+  const isFirstPage = page <= 1;
+  const isLastPage = page >= maxPages;
 
   return (
     <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-      <button type="button" onClick={() => onPageChange(1)} disabled={isFirstPage} className="pagination-btn">
-        {t('first')}
-      </button>
-      <button type="button" onClick={() => onPageChange(currentPage - 1)} disabled={isFirstPage} className="pagination-btn">
-        {t('previous')}
-      </button>
-      {pages.map((page) => (
+      {!isFirstPage && (
+        <>
+          <button type="button" onClick={() => onPageChange(1)} disabled={isFirstPage} className="pagination-btn">
+            {t('first')}
+          </button>
+          <button type="button" onClick={() => onPageChange(page - 1)} disabled={isFirstPage} className="pagination-btn">
+            {t('previous')}
+          </button>
+        </>
+      )}
+      {pages.map((p) => (
         <button
-          key={page}
+          key={p}
           type="button"
-          onClick={() => onPageChange(page)}
-          className={`pagination-btn min-w-10 ${currentPage === page ? 'pagination-btn-active' : ''}`}
+          onClick={() => onPageChange(p)}
+          className={`pagination-btn min-w-10 ${page === p ? 'pagination-btn-active' : ''}`}
         >
-          {page}
+          {p}
         </button>
       ))}
-      <button type="button" onClick={() => onPageChange(currentPage + 1)} disabled={isLastPage} className="pagination-btn">
-        {t('next')}
-      </button>
-      <button type="button" onClick={() => onPageChange(totalPages)} disabled={isLastPage} className="pagination-btn">
-        {t('last')}
-      </button>
+      {!isLastPage && (
+        <>
+          <button type="button" onClick={() => onPageChange(page + 1)} disabled={isLastPage} className="pagination-btn">
+            {t('next')}
+          </button>
+          <button type="button" onClick={() => onPageChange(maxPages)} disabled={isLastPage} className="pagination-btn">
+            {t('last')}
+          </button>
+        </>
+      )}
     </div>
   );
 };

@@ -14,6 +14,15 @@ const api = axios.create({
   },
 });
 
+// Intercept requests to inject Authorization token if logged in
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('adminToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Resolve a relative image path to a full URL */
@@ -162,8 +171,17 @@ export const mapProductFromApi = (raw = {}, categories = [], subcategories = [])
 // DEL  https://shyamagrotools.com/api/Category/{id}
 
 export const fetchCategories = async () => {
-  const response = await api.get('/api/Category');
-  return unwrapList(response).map(mapCategoryFromApi);
+  try {
+    const response = await api.get('/api/Category');
+    return unwrapList(response).map(mapCategoryFromApi);
+  } catch (primaryErr) {
+    try {
+      const response = await api.get('/api/Categories');
+      return unwrapList(response).map(mapCategoryFromApi);
+    } catch {
+      throw primaryErr;
+    }
+  }
 };
 
 export const fetchCategory = async (id) => {
@@ -275,8 +293,17 @@ export const deleteSubcategory = async (id) => {
 // DEL  https://shyamagrotools.com/api/Catalog/products/{id}
 
 export const fetchProducts = async (categories = [], subcategories = []) => {
-  const response = await api.get('/api/Catalog/products');
-  return unwrapList(response).map((p) => mapProductFromApi(p, categories, subcategories));
+  try {
+    const response = await api.get('/api/Catalog/products');
+    return unwrapList(response).map((p) => mapProductFromApi(p, categories, subcategories));
+  } catch {
+    try {
+      const response = await api.get('/api/Products');
+      return unwrapList(response).map((p) => mapProductFromApi(p, categories, subcategories));
+    } catch {
+      return [];
+    }
+  }
 };
 
 export const fetchProduct = async (id, categories = [], subcategories = []) => {

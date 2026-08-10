@@ -110,7 +110,20 @@ const TicketsScreen = () => {
       try {
         setLoading(true);
         const [ticketsList, ordersList] = await Promise.all([getTickets(), getOrders()]);
-        setTickets(ticketsList);
+        // Bug 4 fix: Post-process tickets to auto-assign agents and enforce priority rules
+        const processedTickets = ticketsList.map(ticket => {
+          let updated = { ...ticket };
+          // Auto-assign 'Support Team' for Open/In Progress tickets with no agent
+          if ((updated.status === 'Open' || updated.status === 'In Progress') && (!updated.assignedTo || updated.assignedTo === 'Unassigned')) {
+            updated.assignedTo = 'Support Team';
+          }
+          // Bug 3 fix: Enforce priority downgrade for Resolved/Closed tickets
+          if ((updated.status === 'Resolved' || updated.status === 'Closed') && updated.priority !== 'Low') {
+            updated.priority = 'Low';
+          }
+          return updated;
+        });
+        setTickets(processedTickets);
         setOrders(ordersList);
       } catch (err) {
         console.error("Failed to load support console data:", err);
@@ -182,7 +195,8 @@ const TicketsScreen = () => {
       setSaving(true);
       const updated = await updateTicket(selectedTicket.id, {
         status: editStatus,
-        priority: editStatus === 'Closed' ? 'Low' : editPriority,
+        // Bug 3 fix: Auto-downgrade priority for Resolved and Closed
+        priority: (editStatus === 'Closed' || editStatus === 'Resolved') ? 'Low' : editPriority,
         assignedTo: editAssignedTo,
         notes: editNotes
       });
@@ -448,6 +462,24 @@ const TicketsScreen = () => {
                         <div>
                           <span>Phone</span>
                           <strong>{selectedTicket.phone || 'N/A'}</strong>
+                          {/* Bug 6 fix: Phone validation warning */}
+                          {selectedTicket.phone && !/^[6-9]\d{9}$/.test(selectedTicket.phone.replace(/[\s\-\+]/g, '').replace(/^91/, '')) && (
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              marginLeft: '8px',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              background: '#fef2f2',
+                              color: '#b91c1c',
+                              border: '1px solid #fecaca'
+                            }}>
+                              ⚠️ Invalid Format
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

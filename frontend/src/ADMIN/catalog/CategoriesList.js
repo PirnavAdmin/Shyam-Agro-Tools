@@ -11,6 +11,8 @@ const CategoriesList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');  // transient success toast
+  const [togglingId, setTogglingId] = useState(null);      // guard against double-click
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,22 +92,32 @@ const CategoriesList = () => {
   }, [searchTerm]);
 
   const toggleStatus = async (id) => {
+    if (togglingId === id) return;  // prevent double-click
     const category = categories.find((item) => item.id === id);
     if (!category) return;
 
-    const updatedCategory = {
-      ...category,
-      status: category.status === 'Active' ? 'Inactive' : 'Active',
-    };
+    const newStatus = category.status === 'Active' ? 'Inactive' : 'Active';
+    const updatedCategory = { ...category, status: newStatus };
     const previousCategories = categories;
+
+    // Optimistic update
+    setTogglingId(id);
     setCategories((current) => current.map((item) => (item.id === id ? updatedCategory : item)));
+    setStatusMessage('');
+    setError('');
 
     try {
-      const savedCategory = await saveCategory(updatedCategory);
-      setCategories((current) => current.map((item) => (item.id === id ? savedCategory : item)));
+      await saveCategory(updatedCategory);
+      // Use our locally-computed status as source of truth — server response
+      // may omit isActive in some API versions, causing a false flip-back.
+      setCategories((current) => current.map((item) => (item.id === id ? updatedCategory : item)));
+      setStatusMessage(`"${category.name}" marked as ${newStatus}.`);
+      setTimeout(() => setStatusMessage(''), 3000);
     } catch (apiError) {
       setCategories(previousCategories);
       setError(apiError.message || 'Unable to update category status.');
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -151,6 +163,11 @@ const CategoriesList = () => {
 
       <section className="catalog-card" style={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', overflow: 'hidden' }}>
         {error && <div className="catalog-alert catalog-alert--danger">{error}</div>}
+        {statusMessage && (
+          <div className="catalog-alert" style={{ background: '#f0fdf4', border: '1px solid #86efac', color: '#166534', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: '600' }}>
+            <Check size={14} /> {statusMessage}
+          </div>
+        )}
         <div className="catalog-filterbar" style={{ padding: '12px 16px', background: '#fff' }}>
           <div className="catalog-search" style={{ maxWidth: '320px' }}>
             <Search size={16} />
@@ -210,7 +227,8 @@ const CategoriesList = () => {
                         category.status === 'Active' ? 'catalog-badge--active' : 'catalog-badge--inactive'
                       }`}
                       onClick={() => toggleStatus(category.id)}
-                      style={{ padding: '2px 8px', fontSize: '11px', borderRadius: '4px', cursor: 'pointer' }}
+                      disabled={togglingId === category.id}
+                      style={{ padding: '2px 8px', fontSize: '11px', borderRadius: '4px', cursor: togglingId === category.id ? 'wait' : 'pointer', opacity: togglingId === category.id ? 0.6 : 1 }}
                     >
                       {category.status === 'Active' ? <Check size={11} /> : <X size={11} />}
                       {category.status}

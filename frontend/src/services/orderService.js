@@ -102,22 +102,40 @@ export const normalizeBackendOrder = (order = {}) => {
 };
 
 export const getOrdersFromApi = async ({ status = '', search = '' } = {}) => {
-  const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/`, {
-    ...requestConfig,
-    params: {
-      ...(status && { status }),
-      ...(search && { search }),
-    },
-  });
-  return getResponseItems(response.data).map(normalizeBackendOrder).filter((order) => order.id);
+  try {
+    const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/`, {
+      ...requestConfig,
+      params: {
+        ...(status && { status }),
+        ...(search && { search }),
+      },
+    });
+    return getResponseItems(response.data).map(normalizeBackendOrder).filter((order) => order.id);
+  } catch (err) {
+    console.warn('Failed to fetch orders from API:', err.message);
+    return [];
+  }
 };
 
 export const getCurrentUserOrdersFromApi = async () => {
-  const response = await axios.get(
-    `${ORDER_API_BASE_URL}/api/Orders/my-orders`,
-    getAuthenticatedRequestConfig()
-  );
-  return getResponseItems(response.data).map(normalizeBackendOrder).filter((order) => order.id);
+  try {
+    if (!getToken()) {
+      return await getOrdersFromApi();
+    }
+    const response = await axios.get(
+      `${ORDER_API_BASE_URL}/api/Orders/my-orders`,
+      getAuthenticatedRequestConfig()
+    );
+    const items = getResponseItems(response.data).map(normalizeBackendOrder).filter((order) => order.id);
+    if (items.length > 0) return items;
+    return await getOrdersFromApi();
+  } catch (error) {
+    try {
+      return await getOrdersFromApi();
+    } catch {
+      return [];
+    }
+  }
 };
 
 export const getSuccessfulOrdersFromApi = async (search = 'success') =>
@@ -228,4 +246,3 @@ export const dispatchOrder = async (id, formData) => {
   });
   return response.data;
 };
-

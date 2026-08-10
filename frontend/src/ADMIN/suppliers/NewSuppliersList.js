@@ -120,23 +120,36 @@ const NewSuppliersList = () => {
   const pagedRegistrations = filteredRegistrations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const getStatusBadge = (status) => {
+    const baseStyle = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '5px',
+      fontSize: '10px',
+      padding: '4px 10px',
+      borderRadius: '9999px',
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      letterSpacing: '0.5px',
+    };
+
     switch (status) {
       case 'Approved':
+      case 'Verified':
         return (
-          <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
-            <CheckCircle size={10} /> Approved
+          <span style={{ ...baseStyle, background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
+            <CheckCircle size={10} /> Verified
           </span>
         );
       case 'Rejected':
         return (
-          <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+          <span style={{ ...baseStyle, background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' }}>
             <XCircle size={10} /> Rejected
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">
-            <Clock size={10} /> Pending Review
+          <span style={{ ...baseStyle, background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' }}>
+            <Clock size={10} /> Pending
           </span>
         );
     }

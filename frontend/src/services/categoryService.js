@@ -14,12 +14,21 @@ const requestConfig = {
 };
 let categoriesRequest;
 
-export const getCategoryImage = (image) => {
+export const getCategoryFallbackImage = (nameOrSlug) => {
+  const normalized = String(nameOrSlug || '').toLowerCase();
+  if (normalized.includes('kitchen')) return '/commercial-kitchen-category.jpg';
+  if (normalized.includes('fertilizer')) return '/fertilizers-category.jpg';
+  if (normalized.includes('sprayer')) return '/product-images/sprayer-field-hero.png';
+  return DEFAULT_CATEGORY_IMAGE;
+};
+
+export const getCategoryImage = (image, nameOrSlug) => {
+  const fallback = getCategoryFallbackImage(nameOrSlug);
   if (!image || typeof image !== 'string' || !image.trim()) {
-    return DEFAULT_CATEGORY_IMAGE;
+    return fallback;
   }
 
-  return normalizeAssetUrl(image, CATEGORY_API_BASE_URL, DEFAULT_CATEGORY_IMAGE);
+  return normalizeAssetUrl(image, CATEGORY_API_BASE_URL, fallback);
 };
 
 export const getCategories = async () => {

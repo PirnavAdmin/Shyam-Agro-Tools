@@ -47,7 +47,10 @@ namespace ShyamAgroSuite.Api.Services
         {
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim("id", user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.MobileNumber),
+                new Claim("mobileNumber", user.MobileNumber),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(ClaimTypes.GivenName, user.FullName ?? ""),
                 new Claim(ClaimTypes.Role, "Grower")

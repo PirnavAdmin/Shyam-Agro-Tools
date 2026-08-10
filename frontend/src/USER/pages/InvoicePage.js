@@ -7,14 +7,14 @@ const invoiceData = {
   companyName: 'Shyam Agro Tools',
   invoiceNo: 'SAT/INV/2026/001',
   invoiceDate: '02-06-2026',
-  placeOfSupply: 'Gujarat',
+  placeOfSupply: 'Andhra Pradesh',
   gstType: 'Intra-state GST',
   currency: 'INR',
   seller: {
     name: 'Shyam Agro Tools',
-    address: 'Sidhpur, Gujarat - 384151',
+    address: 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401',
     gstin: '24DYYPP1677P1Z6',
-    phone: '+91 9912649265',
+    phone: '+91 9912649265, +91 6301275516',
     email: 'sales@shyamagro.com',
   },
   buyer: {

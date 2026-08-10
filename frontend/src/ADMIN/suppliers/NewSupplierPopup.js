@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Mail, Phone, MapPin, Shield, Calendar, Building, FileText, CheckCircle2, XCircle } from 'lucide-react';
+import { X, Mail, Phone, MapPin, Shield, Calendar, Building, FileText, CheckCircle2, XCircle, Clock } from 'lucide-react';
 
 const formatPhoneNumber = (phone) => {
   if (!phone) return '—';
@@ -21,15 +21,27 @@ const NewSupplierPopup = ({ registration, onClose, onStatusChange }) => {
 
   const getCategoryLabel = (cat) => categoryLabels[cat] || cat || 'Unassigned';
 
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case 'Approved':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'Rejected':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+  const getStatusBadge = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'approved' || s === 'verified') {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
+          <CheckCircle2 size={11} /> Approved
+        </span>
+      );
     }
+    if (s.includes('reject')) {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' }}>
+          <XCircle size={11} /> Rejected
+        </span>
+      );
+    }
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' }}>
+        <Clock size={11} /> Pending
+      </span>
+    );
   };
 
   return (
@@ -73,9 +85,7 @@ const NewSupplierPopup = ({ registration, onClose, onStatusChange }) => {
               </strong>
               <div className="mt-2 flex items-center gap-2">
                 <span style={{ fontSize: '10px' }} className="text-slate-400">Status:</span>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${getStatusBadgeClass(registration.status)}`}>
-                  {registration.status || 'Pending'}
-                </span>
+                {getStatusBadge(registration.status)}
               </div>
             </div>
 

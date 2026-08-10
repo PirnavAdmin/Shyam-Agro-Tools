@@ -157,7 +157,7 @@ const OfferBanners = () => {
           }}
         >
           <img 
-            src="/hero_banner.png" 
+            src="/power-tiller-banner.jpg" 
             alt="Offer 2" 
             className="w-full h-full object-cover opacity-60 transition-transform duration-[2000ms] group-hover:scale-110"
           />

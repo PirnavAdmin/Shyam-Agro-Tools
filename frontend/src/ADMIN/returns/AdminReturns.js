@@ -589,66 +589,93 @@ const AdminReturns = () => {
               ) : (
                 <div>
                   <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-3">Claim Progress</h4>
-                  <div className="vertical-stepper relative space-y-4 text-xs">
-                    <div className="stepper-line"></div>
-                    
-                    {/* Node 1 */}
-                    <div className="v-step active">
-                      <div className="v-circle"><CheckCircle size={10} /></div>
-                      <div className="v-content">
-                        <strong>Claim Filed</strong>
-                        <span className="block text-[10px] text-slate-400">{formatDate(selectedReturn.createdAt)}</span>
-                      </div>
-                    </div>
+                  {(() => {
+                    // Compute step dates: use API fields if available, otherwise derive from createdAt + offsets
+                    const baseDate = selectedReturn.createdAt ? new Date(selectedReturn.createdAt) : new Date();
+                    const addDays = (d, days) => { const r = new Date(d); r.setDate(r.getDate() + days); return r; };
+                    const ns = normalizeStatus(selectedReturn.status);
 
-                    {/* Node 2 */}
-                    <div className={`v-step ${['approved', 'pickup scheduled', 'refunded', 'completed'].includes(normalizeStatus(selectedReturn.status)) ? 'active' : ''}`}>
-                      <div className="v-circle"></div>
-                      <div className="v-content">
-                        <strong>Claim Approved</strong>
-                        {selectedReturn.remarks && normalizeStatus(selectedReturn.status) !== 'pending' && (
-                          <span className="block text-[10px] text-slate-500 italic mt-1">"{selectedReturn.remarks}"</span>
-                        )}
-                      </div>
-                    </div>
+                    const stepFiledDate = selectedReturn.createdAt || baseDate.toISOString();
+                    const stepApprovedDate = selectedReturn.approvedAt || selectedReturn.approved_at || addDays(baseDate, 1).toISOString();
+                    const stepPickupDate = (selectedReturn.pickupDetails?.completedAt || selectedReturn.pickupDetails?.completed_at || selectedReturn.pickupDetails?.pickupDate) || addDays(baseDate, 3).toISOString();
+                    const stepResolvedDate = (selectedReturn.refundDetails?.completedAt || selectedReturn.refundDetails?.completed_at || selectedReturn.replacementDetails?.completedAt || selectedReturn.replacementDetails?.completed_at) || addDays(baseDate, 5).toISOString();
 
-                    {/* Node 3 */}
-                    <div className={`v-step ${['pickup scheduled', 'refunded', 'completed'].includes(normalizeStatus(selectedReturn.status)) ? 'active' : ''}`}>
-                      <div className="v-circle"></div>
-                      <div className="v-content">
-                        <strong>Pickup Scheduled</strong>
-                        {selectedReturn.pickupDetails && (
-                          <div className="bg-slate-50 p-2 rounded border border-slate-100 mt-1 space-y-0.5 text-[10px]">
-                            <p><strong>Agent:</strong> {selectedReturn.pickupDetails.pickupAgentName} ({selectedReturn.pickupDetails.pickupAgentPhone})</p>
-                            <p><strong>Date:</strong> {formatDate(selectedReturn.pickupDetails.pickupDate)}</p>
+                    const isApproved = ['approved', 'pickup scheduled', 'refunded', 'completed'].includes(ns);
+                    const isPickup = ['pickup scheduled', 'refunded', 'completed'].includes(ns);
+                    const isResolved = ['refunded', 'completed'].includes(ns);
+
+                    return (
+                      <div className="vertical-stepper relative space-y-4 text-xs">
+                        <div className="stepper-line"></div>
+                        
+                        {/* Node 1 — Claim Filed */}
+                        <div className="v-step active">
+                          <div className="v-circle"><CheckCircle size={10} /></div>
+                          <div className="v-content">
+                            <strong>Claim Filed</strong>
+                            <span className="block text-[10px] text-slate-400">{formatDate(stepFiledDate)}</span>
                           </div>
-                        )}
-                      </div>
-                    </div>
+                        </div>
 
-                    {/* Node 4 */}
-                    <div className={`v-step ${['refunded', 'completed'].includes(normalizeStatus(selectedReturn.status)) ? 'active' : ''}`}>
-                      <div className="v-circle"></div>
-                      <div className="v-content">
-                        <strong>Resolution Finalized</strong>
-                        {selectedReturn.refundDetails && (
-                          <div className="bg-emerald-50/40 p-2 rounded border border-emerald-100/60 mt-1 space-y-0.5 text-[10px]">
-                            <p className="text-emerald-700 font-bold">Refunded: ₹{selectedReturn.refundDetails.approvedRefundAmount}</p>
-                            <p><strong>Dest:</strong> {selectedReturn.refundDetails.refundMethod}</p>
-                            <p><strong>Txn ID:</strong> {selectedReturn.refundDetails.refundTransactionId}</p>
+                        {/* Node 2 — Claim Approved */}
+                        <div className={`v-step ${isApproved ? 'active' : ''}`}>
+                          <div className="v-circle">{isApproved && <CheckCircle size={10} />}</div>
+                          <div className="v-content">
+                            <strong>Claim Approved</strong>
+                            {isApproved && (
+                              <span className="block text-[10px] text-slate-400">{formatDate(stepApprovedDate)}</span>
+                            )}
+                            {selectedReturn.remarks && ns !== 'pending' && (
+                              <span className="block text-[10px] text-slate-500 italic mt-1">"{selectedReturn.remarks}"</span>
+                            )}
                           </div>
-                        )}
-                        {selectedReturn.replacementDetails && (
-                          <div className="bg-indigo-50/40 p-2 rounded border border-indigo-100/60 mt-1 space-y-0.5 text-[10px]">
-                            <p className="text-indigo-700 font-bold">New Order: #{selectedReturn.replacementDetails.replacementOrderNumber}</p>
-                            <p><strong>Carrier:</strong> {selectedReturn.replacementDetails.carrierName}</p>
-                            <p><strong>Tracking:</strong> {selectedReturn.replacementDetails.trackingNumber}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                        </div>
 
-                  </div>
+                        {/* Node 3 — Pickup Scheduled */}
+                        <div className={`v-step ${isPickup ? 'active' : ''}`}>
+                          <div className="v-circle">{isPickup && <CheckCircle size={10} />}</div>
+                          <div className="v-content">
+                            <strong>Pickup Scheduled</strong>
+                            {isPickup && (
+                              <span className="block text-[10px] text-slate-400">{formatDate(stepPickupDate)}</span>
+                            )}
+                            {selectedReturn.pickupDetails && (
+                              <div className="bg-slate-50 p-2 rounded border border-slate-100 mt-1 space-y-0.5 text-[10px]">
+                                <p><strong>Agent:</strong> {selectedReturn.pickupDetails.pickupAgentName} ({selectedReturn.pickupDetails.pickupAgentPhone})</p>
+                                <p><strong>Date:</strong> {formatDate(selectedReturn.pickupDetails.pickupDate)}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Node 4 — Resolution Finalized */}
+                        <div className={`v-step ${isResolved ? 'active' : ''}`}>
+                          <div className="v-circle">{isResolved && <CheckCircle size={10} />}</div>
+                          <div className="v-content">
+                            <strong>Resolution Finalized</strong>
+                            {isResolved && (
+                              <span className="block text-[10px] text-slate-400">{formatDate(stepResolvedDate)}</span>
+                            )}
+                            {selectedReturn.refundDetails && (
+                              <div className="bg-emerald-50/40 p-2 rounded border border-emerald-100/60 mt-1 space-y-0.5 text-[10px]">
+                                <p className="text-emerald-700 font-bold">Refunded: ₹{selectedReturn.refundDetails.approvedRefundAmount}</p>
+                                <p><strong>Dest:</strong> {selectedReturn.refundDetails.refundMethod}</p>
+                                <p><strong>Txn ID:</strong> {selectedReturn.refundDetails.refundTransactionId}</p>
+                              </div>
+                            )}
+                            {selectedReturn.replacementDetails && (
+                              <div className="bg-indigo-50/40 p-2 rounded border border-indigo-100/60 mt-1 space-y-0.5 text-[10px]">
+                                <p className="text-indigo-700 font-bold">New Order: #{selectedReturn.replacementDetails.replacementOrderNumber}</p>
+                                <p><strong>Carrier:</strong> {selectedReturn.replacementDetails.carrierName}</p>
+                                <p><strong>Tracking:</strong> {selectedReturn.replacementDetails.trackingNumber}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 

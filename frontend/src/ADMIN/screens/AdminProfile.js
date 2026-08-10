@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Shield, Mail, Phone, Calendar, BadgeCheck, FileText } from 'lucide-react';
+import { User, Shield, Mail, Phone, BadgeCheck, MapPin } from 'lucide-react';
 import './AdminProfile.css';
 
 const AdminProfile = () => {
@@ -9,8 +9,8 @@ const AdminProfile = () => {
     name: 'Admin User',
     email: 'admin@shyamagro.com',
     role: 'admin',
-    mobile: '9876543210',
-    employeeId: 'AD001',
+    mobile: '9912649265',
+    address: 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401',
     permissions: []
   });
 
@@ -19,8 +19,9 @@ const AdminProfile = () => {
     const storedEmail = localStorage.getItem('adminEmail') || 'admin@shyamagro.com';
     let storedRole = localStorage.getItem('adminRole') || 'admin';
     const storedPerms = localStorage.getItem('adminPermissions');
+    const storedAddress = localStorage.getItem('adminAddress') || 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401';
     
-    // Attempt to match from local staff list to pull phone/employeeId if available
+    // Attempt to match from local staff list to pull phone if available
     const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
     const matched = localAccounts.find(acc => acc.email.toLowerCase() === storedEmail.toLowerCase());
 
@@ -28,8 +29,8 @@ const AdminProfile = () => {
       name: storedName,
       email: storedEmail,
       role: storedRole,
-      mobile: matched?.mobile || '9876543210',
-      employeeId: matched?.employeeId || 'AD001',
+      mobile: matched?.mobile || '9912649265',
+      address: storedAddress || matched?.address || 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401',
       permissions: storedPerms ? JSON.parse(storedPerms) : (matched?.permissions || [])
     });
   }, []);
@@ -57,8 +58,8 @@ const AdminProfile = () => {
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div className="profile-title-details">
-            <span className="profile-kicker">Account Profile</span>
-            <h2>{user.name}</h2>
+            <span className="profile-kicker" style={{ color: '#cbd5e1' }}>Account Profile</span>
+            <h2 style={{ color: '#ffffff', margin: 0, fontWeight: 800 }}>{user.name}</h2>
             <div className="profile-badge-row">
               <span className={`role-badge ${user.role.replace(' ', '-')}`}>
                 <Shield size={12} /> {getRoleLabel(user.role)}
@@ -95,8 +96,8 @@ const AdminProfile = () => {
             <span className="detail-value">{user.mobile ? (user.mobile.startsWith('+91') ? user.mobile : `+91 ${user.mobile.replace(/^\+?91\s*/, '')}`) : 'N/A'}</span>
           </div>
           <div className="detail-item">
-            <span className="detail-label"><FileText size={16} /> Employee ID</span>
-            <span className="detail-value">#{user.employeeId}</span>
+            <span className="detail-label"><MapPin size={16} /> Address</span>
+            <span className="detail-value">{user.address || 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401'}</span>
           </div>
         </div>
 

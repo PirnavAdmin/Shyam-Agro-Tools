@@ -433,7 +433,7 @@ using (var scope = app.Services.CreateScope())
 
                 INSERT INTO `Banners` (`Title`, `Subtitle`, `ImageUrl`, `TargetUrl`, `BannerType`, `IsActive`, `DisplayOrder`, `CreatedAt`) VALUES
                 ('Premium Farming Tools', 'SPECIAL OFFER • Equip your farm with the best industrial tools at unbeatable prices this season.', '/hero_banner.png', '/offers/40-percent', 'Promo', 1, 1, NOW()),
-                ('Powerful Power Tillers', 'POWER TILLERS • Discover our newly launched range of high-performance industrial power tillers.', '/hero-machinery.png', '/power-tillers', 'Promo', 1, 2, NOW()),
+                ('Powerful Power Tillers', 'POWER TILLERS • Discover our newly launched range of high-performance industrial power tillers.', '/power-tiller-banner.jpg', '/power-tillers', 'Promo', 1, 2, NOW()),
                 ('4.7 OUT OF 5', 'Trusted by 10,000+ customers for reliable agro machinery and support', '/hero_banner.png', '/categories', 'Trust', 1, 1, NOW()),
                 ('4.9 OUT OF 5', 'Heavy duty tractors and power tillers engineered for peak efficiency', '/hero-machinery.png', '/categories', 'Trust', 1, 2, NOW()),
                 ('4.8 OUT OF 5', 'High-pressure crop sprayers trusted by farmers nationwide', '/hero-sprayers.png', '/categories', 'Trust', 1, 3, NOW());";
@@ -471,7 +471,10 @@ using (var scope = app.Services.CreateScope())
                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/45ce6a6d-4e96-4e69-b37c-8ce4b3814d50.jpg' WHERE `ProductId` = 34;
                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/c7cb595f-0ffe-4766-9e1a-0c74caa04a21.jpg' WHERE `ProductId` = 35;
                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/ecbdb140-7e88-4ac4-bd33-ac3317827681.jpg' WHERE `ProductId` = 36;
-                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/4f199761-0534-4c8d-9576-d37b078c5f59.jfif' WHERE `ProductId` = 37;";
+                UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/4f199761-0534-4c8d-9576-d37b078c5f59.jfif' WHERE `ProductId` = 37;
+
+                UPDATE `Categories` SET `ImageUrl` = '/uploads/commercial-kitchen-category.jpg' WHERE `Name` LIKE '%Kitchen%' OR `Id` = 12;
+                UPDATE `Categories` SET `ImageUrl` = '/uploads/fertilizers-category.jpg' WHERE `Name` LIKE '%Fertilizer%' OR `Id` IN (17, 19);";
             cleanProductsCmd.ExecuteNonQuery();
         }
     }

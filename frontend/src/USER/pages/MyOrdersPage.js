@@ -634,7 +634,14 @@ const MyOrdersPage = () => {
           {ordersError && <small className="orders-refresh-note warning">{ordersError}</small>}
         </div>
 
-        {backendOrders.length === 0 ? (
+        {!isAuthenticated ? (
+          <section className="my-orders-empty">
+            <span className="my-orders-empty-icon"><Package size={30} /></span>
+            <h2>Sign in to view your orders</h2>
+            <p>Please log in with your mobile number to track and manage your orders.</p>
+            <button type="button" onClick={() => setIsLoginOpen(true)} className="btn-primary">Sign In / Register</button>
+          </section>
+        ) : backendOrders.length === 0 ? (
           <section className="my-orders-empty">
             <span className="my-orders-empty-icon"><Package size={30} /></span>
             <h2>No orders placed yet</h2>
@@ -885,7 +892,7 @@ const MyOrdersPage = () => {
 
       <LoginPopup isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
 
-      {activeReturnItem && (
+      {activeReturnItem && selectedOrder && (
         <ReturnRequestModal
           item={activeReturnItem}
           order={selectedOrder}
@@ -895,12 +902,14 @@ const MyOrdersPage = () => {
           onClose={() => setActiveReturnItem(null)}
           onSubmitSuccess={() => {
             setActiveReturnItem(null);
-            returnsService.getReturnByOrderId(selectedOrder.id)
-              .then(res => {
-                const retList = Array.isArray(res) ? res : (res?.items || [res].filter(Boolean));
-                setOrderReturns(retList);
-              })
-              .catch(err => console.error(err));
+            if (selectedOrder?.id) {
+              returnsService.getReturnByOrderId(selectedOrder.id)
+                .then(res => {
+                  const retList = Array.isArray(res) ? res : (res?.items || [res].filter(Boolean));
+                  setOrderReturns(retList);
+                })
+                .catch(err => console.error(err));
+            }
           }}
         />
       )}
@@ -923,7 +932,7 @@ const ReturnRequestModal = ({ item, order, config, addresses, onAddressCreated, 
   const [newAddress, setNewAddress] = useState({
     firstName: '',
     lastName: '',
-    email: order.billingDetails?.email || '',
+    email: order?.billingDetails?.email || '',
     phoneNumber: '',
     alternatePhoneNumber: '',
     fullAddress: '',

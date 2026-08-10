@@ -223,14 +223,14 @@
   background:
     linear-gradient(180deg, rgba(88, 184, 46, 0.08), transparent 180px),
     #f7f8f6;
-  padding: 1rem 0.9rem;
+  padding: 1.2rem 1.1rem;
 }
 
 .support-z-message {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.6rem;
   min-width: 0;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.95rem;
 }
 
 .support-z-message-user {
@@ -241,8 +241,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   flex: 0 0 auto;
   border-radius: 999px;
   background: #ffffff;
@@ -255,16 +255,16 @@
   max-width: min(100%, 580px);
   min-width: 0;
   border: 1px solid #e8eee8;
-  border-radius: 14px;
+  border-radius: 16px;
   border-top-left-radius: 4px;
   background: #ffffff;
-  padding: 0.65rem 0.95rem;
+  padding: 0.85rem 1.15rem;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
 }
 
 .support-z-message-user .support-z-bubble {
   border-color: #58b82e;
-  border-top-left-radius: 14px;
+  border-top-left-radius: 16px;
   border-top-right-radius: 4px;
   background: #58b82e;
   color: #ffffff;
@@ -274,13 +274,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .support-z-bubble-header p {
   margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.65;
   overflow-wrap: anywhere;
   white-space: pre-line;
 }
@@ -289,61 +289,62 @@
   display: inline-block;
   margin: 0;
   color: currentColor;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  opacity: 0.65;
+  opacity: 0.7;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .support-tracking-card {
   display: grid;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  border: 1px solid rgba(88, 184, 46, 0.2);
-  border-radius: 12px;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  border: 1px solid rgba(88, 184, 46, 0.25);
+  border-radius: 14px;
   background: #f8fbf6;
-  padding: 0.55rem;
+  padding: 0.85rem;
 }
 
 .support-tracking-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0.22rem;
+  gap: 0.4rem;
 }
 
 .support-tracking-grid span {
   color: #66766d;
-  font-size: 0.61rem;
+  font-size: 0.65rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .support-tracking-grid strong {
-  margin-bottom: 0.28rem;
+  margin-bottom: 0.35rem;
   color: #102a18;
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   font-weight: 900;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
 .support-tracking-timeline {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.6rem;
   border-top: 1px solid rgba(15, 61, 46, 0.08);
-  padding-top: 0.6rem;
+  padding-top: 0.75rem;
 }
 
 .support-tracking-route {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.24rem;
+  gap: 0.35rem;
   color: #66766d;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 900;
-  line-height: 1.45;
+  line-height: 1.55;
   overflow-wrap: anywhere;
   text-transform: uppercase;
 }
@@ -354,21 +355,21 @@
 
 .support-tracking-route b {
   color: #a0ad9f;
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   line-height: 1;
 }
 
 .support-tracking-step {
   display: grid;
-  grid-template-columns: 0.85rem minmax(0, 1fr);
+  grid-template-columns: 0.95rem minmax(0, 1fr);
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.55rem;
   color: #7a857f;
 }
 
 .support-tracking-step span {
-  width: 0.65rem;
-  height: 0.65rem;
+  width: 0.75rem;
+  height: 0.75rem;
   border: 2px solid #d5e4d1;
   border-radius: 999px;
   background: #ffffff;
@@ -376,9 +377,9 @@
 
 .support-tracking-step p {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.5;
 }
 
 .support-tracking-step.is-complete span,
@@ -394,25 +395,25 @@
 .support-option-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.32rem;
+  gap: 0.5rem;
   max-width: 100%;
-  margin-top: 0.38rem;
+  margin-top: 0.65rem;
   border-top: 1px solid rgba(15, 61, 46, 0.08);
-  padding-top: 0.38rem;
+  padding-top: 0.65rem;
 }
 
 .support-option-list button {
   max-width: 100%;
-  border: 1px solid rgba(88, 184, 46, 0.28);
+  border: 1px solid rgba(88, 184, 46, 0.32);
   border-radius: 999px;
   background: #f4fbf1;
   color: #1f8a43;
   cursor: pointer;
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.45;
   overflow-wrap: anywhere;
-  padding: 0.35rem 0.6rem;
+  padding: 0.5rem 0.85rem;
   text-align: left;
   text-transform: uppercase;
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;

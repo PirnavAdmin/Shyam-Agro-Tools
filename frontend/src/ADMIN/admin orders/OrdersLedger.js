@@ -126,9 +126,10 @@ export const mapStatus = (status, paymentStatus) => {
   if (s === 'COMPLETED' || s === 'DELIVERED') return 'Completed';
   if (s === 'SHIPPED' || s === 'DISPATCHED') return 'Dispatched';
   if (s === 'PACKED') return 'Packed';
-  if (isPaid && (s === 'PENDING' || s === 'PLACED' || s === 'PROCESSING')) return 'Confirmed';
-  if (s === 'CONFIRMED') return isPendingPay ? 'Pending' : 'Confirmed';
-  if (s === 'PROCESSING') return isPendingPay ? 'Pending' : 'Processing';
+  // Bug 2 fix: If payment is confirmed, promote Pending/Placed/Processing/Confirmed to Confirmed
+  if (isPaid && (s === 'PENDING' || s === 'PLACED' || s === 'PROCESSING' || s === 'CONFIRMED')) return 'Confirmed';
+  if (s === 'CONFIRMED') return 'Confirmed';
+  if (s === 'PROCESSING') return isPendingPay ? 'Processing' : 'Processing';
   return status;
 };
 
@@ -150,19 +151,39 @@ export const normalizePaymentMethod = (pm) => {
   return pm;
 };
 
+// Helper to normalise payment status string consistently (Bug 1 fix)
+const normalizePaymentStatus = (rawPayStatus) => {
+  if (!rawPayStatus) return 'Pending';
+  const ps = rawPayStatus.trim().toUpperCase();
+  // All paid variants → 'Verified'
+  if (ps === 'PAID' || ps === 'VERIFIED PAID' || ps === 'PAID VERIFIED' || ps === 'SUCCESS' || ps === 'VERIFIED') return 'Verified';
+  // All pending variants → 'Pending Verification'
+  if (ps === 'PENDING' || ps === 'UNPAID' || ps === 'PENDING VERIFICATION' || ps === 'PENDINGVERIFICATION') return 'Pending Verification';
+  // Refunded
+  if (ps === 'REFUNDED') return 'Refunded';
+  // Cancelled / N/A
+  if (ps === 'CANCELLED' || ps === 'CANCELED' || ps === 'N/A' || ps === 'PAYMENT NOT APPLICABLE') return 'Payment Not Applicable';
+  return rawPayStatus;
+};
+
 // Helper to normalise order details
 const normaliseOrder = (o) => {
   const totalVal = parseAmount(o.finalAmount || o.totalAmount || o.total);
   let statusMapped = mapStatus(o.fulfillment || o.status, o.paymentStatus);
 
-  let payStatus = o.paymentStatus || 'Pending';
+  // Bug 1 fix: Normalize payment status through a single consistent function
+  let payStatus = normalizePaymentStatus(o.paymentStatus);
   const isCancelled = statusMapped === 'Cancelled' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELLED' || (o.fulfillment || o.status || '').toUpperCase() === 'CANCELED';
-  const isPaid = (o.paymentStatus || '').toUpperCase() === 'PAID' || (o.paymentStatus || '').toUpperCase() === 'VERIFIED PAID' || (o.paymentStatus || '').toUpperCase() === 'REFUNDED';
 
   if (isCancelled) {
-    payStatus = isPaid ? 'Refunded' : 'Payment Not Applicable';
+    payStatus = payStatus === 'Verified' || payStatus === 'Refunded' ? 'Refunded' : 'Payment Not Applicable';
   } else if (statusMapped === 'Completed' || (o.fulfillment || o.status || '').toUpperCase() === 'COMPLETED' || (o.fulfillment || o.status || '').toUpperCase() === 'DELIVERED') {
     payStatus = 'Verified';
+  }
+
+  // Bug 2 fix: If payment is verified but fulfillment is still Pending, promote to Confirmed
+  if (payStatus === 'Verified' && statusMapped === 'Pending') {
+    statusMapped = 'Confirmed';
   }
   
   return {
@@ -546,8 +567,8 @@ const printInvoice = (order) => {
               <div class="company-title">Shyam Agro Tools</div>
               <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
               <div class="company-meta">
-                Plot 42, GIDC Estate, Rajkot, Gujarat - 360002<br/>
-                GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265<br/>
+                Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401, Andhra Pradesh<br/>
+                GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265, +91 6301275516<br/>
                 Email: sales@shyamagro.com | Web: www.shyamagrotools.com
               </div>
             </div>
@@ -564,7 +585,7 @@ const printInvoice = (order) => {
               <div class="info-row"><span class="info-label">Invoice No:</span><span class="info-val">${order.invoiceNo}</span></div>
               <div class="info-row"><span class="info-label">Invoice Date:</span><span class="info-val">${formatDateToDMyLong(order.date)}</span></div>
               <div class="info-row"><span class="info-label">Order Ref ID:</span><span class="info-val">ORD-${order.id}</span></div>
-              <div class="info-row"><span class="info-label">Place of Supply:</span><span class="info-val">Gujarat (24)</span></div>
+              <div class="info-row"><span class="info-label">Place of Supply:</span><span class="info-val">Andhra Pradesh (37)</span></div>
             </div>
             <div class="info-block">
               <div class="info-block-title">Payment & Settlement Status</div>
@@ -642,7 +663,7 @@ const printInvoice = (order) => {
             <div>
               <strong>Terms & Memos:</strong><br/>
               1. Goods once sold will not be taken back without valid return approval.<br/>
-              2. Subject to Rajkot Jurisdiction only.<br/>
+              2. Subject to Nandyal Jurisdiction only.<br/>
               <em>This is a computer-generated tax invoice requiring no physical signature.</em>
             </div>
             <div class="signatory-box">

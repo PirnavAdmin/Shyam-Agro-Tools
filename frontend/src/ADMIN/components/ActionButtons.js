@@ -112,23 +112,29 @@ export const AnimatedViewButton = ({ onClick, to, title = "View", className = ""
 };
 
 export const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
-  if (totalPages <= 1) return null;
+  const page = Number(currentPage) || 1;
+  const maxPages = Number(totalPages) || 1;
 
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+  if (maxPages <= 1) return null;
+
+  const isFirstPage = page <= 1;
+  const isLastPage = page >= maxPages;
+
+  const startItem = (page - 1) * itemsPerPage + 1;
+  const endItem = Math.min(page * itemsPerPage, totalItems);
 
   const getPageNumbers = () => {
     const pages = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    if (maxPages <= 7) {
+      for (let i = 1; i <= maxPages; i++) pages.push(i);
     } else {
       pages.push(1);
-      if (currentPage > 3) pages.push('...');
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
+      if (page > 3) pages.push('...');
+      const start = Math.max(2, page - 1);
+      const end = Math.min(maxPages - 1, page + 1);
       for (let i = start; i <= end; i++) pages.push(i);
-      if (currentPage < totalPages - 2) pages.push('...');
-      pages.push(totalPages);
+      if (page < maxPages - 2) pages.push('...');
+      pages.push(maxPages);
     }
     return pages;
   };
@@ -139,38 +145,42 @@ export const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, 
         Showing {startItem}–{endItem} of {totalItems} entries
       </div>
       <div className="admin-pagination__buttons">
-        <button 
-          className="admin-pagination__btn" 
-          type="button"
-          onClick={() => onPageChange(currentPage - 1)} 
-          disabled={currentPage === 1}
-        >
-          ‹ Prev
-        </button>
+        {!isFirstPage && (
+          <button 
+            className="admin-pagination__btn" 
+            type="button"
+            onClick={() => onPageChange(page - 1)} 
+            disabled={isFirstPage}
+          >
+            ‹ Prev
+          </button>
+        )}
         <div className="admin-pagination__pages">
-          {getPageNumbers().map((page, idx) =>
-            page === '...' ? (
+          {getPageNumbers().map((p, idx) =>
+            p === '...' ? (
               <span key={`ellipsis-${idx}`} className="admin-pagination__ellipsis">…</span>
             ) : (
               <button
-                key={page}
+                key={p}
                 type="button"
-                className={`admin-pagination__page ${currentPage === page ? 'admin-pagination__page--active' : ''}`}
-                onClick={() => onPageChange(page)}
+                className={`admin-pagination__page ${page === p ? 'admin-pagination__page--active' : ''}`}
+                onClick={() => onPageChange(p)}
               >
-                {page}
+                {p}
               </button>
             )
           )}
         </div>
-        <button 
-          className="admin-pagination__btn" 
-          type="button"
-          onClick={() => onPageChange(currentPage + 1)} 
-          disabled={currentPage === totalPages}
-        >
-          Next ›
-        </button>
+        {!isLastPage && (
+          <button 
+            className="admin-pagination__btn" 
+            type="button"
+            onClick={() => onPageChange(page + 1)} 
+            disabled={isLastPage}
+          >
+            Next ›
+          </button>
+        )}
       </div>
     </div>
   );

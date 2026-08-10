@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
   Search, CreditCard, Check, X, Upload, Copy, Info, 
   RefreshCw, CheckCircle, AlertCircle, ArrowUpRight, Activity, Eye,
-  Bell, BellOff, Clock, Calendar
+  Bell, BellOff, Clock, Calendar, Lock
 } from 'lucide-react';
 import { getOrders, updateOrderStatus } from '../api/orders';
 import { Toast } from '../components/Toast';
@@ -165,6 +165,7 @@ const PaymentHistory = () => {
   // Feedback Messages
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
   const [ifscStatus, setIfscStatus] = useState({ type: '', message: '' });
+  const [fetchedBankInfo, setFetchedBankInfo] = useState({ bankName: '', branch: '' });
   
   // Simulator States
   const [smsText, setSmsText] = useState('');
@@ -338,6 +339,7 @@ const PaymentHistory = () => {
       const formattedIfsc = bankDetails.ifscCode.toUpperCase().trim();
       if (formattedIfsc.length !== 11) {
         setIfscStatus({ type: '', message: '' });
+        setFetchedBankInfo({ bankName: '', branch: '' });
         return;
       }
       
@@ -345,18 +347,23 @@ const PaymentHistory = () => {
       try {
         const response = await fetch(`https://ifsc.razorpay.com/${formattedIfsc}`);
         if (!response.ok) {
-          throw new Error('Branch not found for this IFSC code.');
+          throw new Error('Invalid IFSC code. No matching branch found.');
         }
         const data = await response.json();
         
+        const verifiedBank = data.BANK || '';
+        const verifiedBranch = data.BRANCH || '';
+
+        setFetchedBankInfo({ bankName: verifiedBank, branch: verifiedBranch });
         setBankDetails(prev => ({
           ...prev,
-          bankName: data.BANK || prev.bankName,
-          bankBranch: data.BRANCH || prev.bankBranch
+          bankName: verifiedBank || prev.bankName,
+          bankBranch: verifiedBranch || prev.bankBranch
         }));
-        setIfscStatus({ type: 'success', message: `Found: ${data.BANK} - ${data.BRANCH}` });
+        setIfscStatus({ type: 'success', message: `Verified: ${verifiedBank} — ${verifiedBranch}` });
       } catch (err) {
-        setIfscStatus({ type: 'error', message: err.message || 'Failed to auto-fetch branch. Enter branch manually.' });
+        setFetchedBankInfo({ bankName: '', branch: '' });
+        setIfscStatus({ type: 'error', message: err.message || 'Failed to auto-fetch branch. Enter bank details manually.' });
       }
     };
 
@@ -482,9 +489,31 @@ const PaymentHistory = () => {
     }
   };
 
+  const isBankFormValid = (details) => {
+    if (!details) return false;
+    const ifsc = (details.ifscCode || '').trim().toUpperCase();
+    const bankName = (details.bankName || '').trim();
+    const bankBranch = (details.bankBranch || '').trim();
+    const accNum = (details.accountNumber || '').trim();
+    const holderName = (details.accountHolderName || '').trim();
+
+    if (!ifsc || !bankName || !bankBranch || !accNum || !holderName) return false;
+    if (ifsc.length !== 11 || !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) return false;
+    if (!/^\d{9,18}$/.test(accNum)) return false;
+    if (bankName.length < 2 || bankBranch.length < 2 || holderName.length < 2) return false;
+    // Block save if Bank Name doesn't match the IFSC-verified bank
+    if (fetchedBankInfo.bankName && bankName.toLowerCase() !== fetchedBankInfo.bankName.toLowerCase()) return false;
+
+    return true;
+  };
+
   // Save Bank Details settings
   const saveBankSettings = async (e) => {
     e.preventDefault();
+    if (!isBankFormValid(bankDetails)) {
+      showBannerStatus('error', 'Please fill in all mandatory bank details with valid input before saving.');
+      return;
+    }
     localStorage.setItem('shyam_agro_bank_details', JSON.stringify(bankDetails));
     
     try {
@@ -502,11 +531,52 @@ const PaymentHistory = () => {
     }
   };
 
+  // UPI VPA validation: localPart@providerHandle (handle >= 3 alpha chars)
+  // Recognized Indian UPI PSP handles (NPCI-registered)
+  const KNOWN_UPI_HANDLES = new Set([
+    'ybl','oksbi','okaxis','okicici','okhdfcbank','paytm','upi','apl','ibl',
+    'icici','hdfcbank','sbi','axisbank','boi','cnrb','pnb','unionbank','idbi',
+    'kotak','indus','fbl','airtel','jio','nsdl','aubank','mahb','bandhan',
+    'dlb','esaf','fincare','rbl','ubi','utbi','vijb','corp','synd','uco',
+    'allbank','andb','obc','federal','tmb','cub','kvb','dcb','sib','idfc',
+    'barodampay','sc','hsbc','citi','dbs','equitas','abfspay','slice',
+    'gpay','phonepe','amazonpay','mobikwik','axl','waave','ptyes','ptsbi',
+    'pthdfc','ptaxis','ptkotak','icicib','yesbank','idfcfirst','shriramhf',
+    'pingpay','rajgovt','centralbank','indianbank','abhyudaya','saraswat',
+    'cosmos','jkbank','kbk','nkgsb','tjsb','zoho','razorpay','cashfree'
+  ]);
+
+  // UPI VPA validation: localPart@recognizedPSPHandle
+  const isUpiValid = (id) => {
+    if (!id || !id.trim()) return false;
+    const trimmed = id.trim().toLowerCase();
+    const atIdx = trimmed.indexOf('@');
+    if (atIdx < 3) return false;                          // local part must be ≥3 chars
+    const localPart = trimmed.slice(0, atIdx);
+    const handle = trimmed.slice(atIdx + 1);
+    if (!handle || handle.length < 3) return false;
+    if (!/^[a-zA-Z0-9._-]+$/.test(localPart)) return false; // local part charset
+    return KNOWN_UPI_HANDLES.has(handle);                 // handle must be recognized PSP
+  };
+
+  // Returns true if format is structurally OK but handle is unrecognized
+  const isUpiFormatOkButUnknownHandle = (id) => {
+    if (!id || !id.trim()) return false;
+    const trimmed = id.trim().toLowerCase();
+    const atIdx = trimmed.indexOf('@');
+    if (atIdx < 3) return false;
+    const localPart = trimmed.slice(0, atIdx);
+    const handle = trimmed.slice(atIdx + 1);
+    if (!handle || handle.length < 3) return false;
+    if (!/^[a-zA-Z0-9._-]+$/.test(localPart)) return false;
+    return !KNOWN_UPI_HANDLES.has(handle); // format ok but handle not in whitelist
+  };
+
   // Save UPI ID settings
   const saveUpiSettings = async (e) => {
     e.preventDefault();
-    if (!upiId.includes('@')) {
-      showBannerStatus('error', 'Invalid UPI ID format (must contain @).');
+    if (!isUpiValid(upiId)) {
+      showBannerStatus('error', 'Invalid UPI ID. Format must be: yourname@bankhandle (e.g. shyamagro@ybl).');
       return;
     }
     localStorage.setItem('shyam_agro_upi_id', upiId);
@@ -942,46 +1012,108 @@ const PaymentHistory = () => {
             <form onSubmit={saveBankSettings} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">IFSC Code *</label>
+                {(() => {
+                  const ifscVal = (bankDetails.ifscCode || '').trim();
+                  const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+                  const isFormatInvalid = ifscVal.length > 0 && ifscVal.length < 11;
+                  const isPatternInvalid = ifscVal.length === 11 && !ifscRegex.test(ifscVal);
+                  const showRedBorder = isFormatInvalid || isPatternInvalid || ifscStatus.type === 'error';
+                  return (
+                    <>
+                      <input 
+                        type="text" 
+                        className={`w-full px-4 py-2.5 rounded-lg border text-sm uppercase outline-none transition-shadow ${
+                          showRedBorder
+                            ? 'border-rose-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-400'
+                            : ifscStatus.type === 'success'
+                            ? 'border-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-400'
+                            : 'border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'
+                        }`}
+                        placeholder="e.g. SBIN0000001"
+                        required
+                        maxLength={11}
+                        value={bankDetails.ifscCode}
+                        onChange={(e) => setBankDetails({ ...bankDetails, ifscCode: e.target.value.toUpperCase() })}
+                      />
+                      {/* Inline format hint while typing */}
+                      {isFormatInvalid && !ifscStatus.message && (
+                        <div className="flex items-center gap-1.5 mt-2 text-xs font-medium text-amber-600">
+                          <AlertCircle size={12} />
+                          <span>IFSC must be 11 characters: 4 letters + <strong>0</strong> + 6 alphanumeric (e.g. SBIN<strong>0</strong>000001).</span>
+                        </div>
+                      )}
+                      {/* Pattern invalid at exactly 11 chars but wrong format */}
+                      {isPatternInvalid && !ifscStatus.message && (
+                        <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-rose-600">
+                          <AlertCircle size={12} />
+                          <span>Invalid IFSC format. Expected: 4 letters + <strong>0</strong> + 6 alphanumeric (e.g. UBIN<strong>0</strong>802948).</span>
+                        </div>
+                      )}
+                      {/* API response feedback (loading / success / error) */}
+                      {ifscStatus.message && (
+                        <div className={`flex items-center gap-1.5 mt-2 text-xs font-medium ${ifscStatus.type === 'error' ? 'text-rose-600' : ifscStatus.type === 'success' ? 'text-emerald-600' : 'text-slate-500'}`}>
+                          {ifscStatus.type === 'loading' && <RefreshCw size={12} className="animate-spin" />}
+                          {ifscStatus.type === 'success' && <CheckCircle size={12} />}
+                          {ifscStatus.type === 'error' && <AlertCircle size={12} />}
+                          <span>{ifscStatus.message}</span>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>Bank Name *</span>
+                  {fetchedBankInfo.bankName && (
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Lock size={11} /> Auto-verified from IFSC
+                    </span>
+                  )}
+                </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm uppercase focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
-                  placeholder="e.g. SBIN0000001"
+                  className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-shadow ${
+                    fetchedBankInfo.bankName
+                      ? 'bg-slate-100 text-slate-700 border-slate-300 font-semibold cursor-not-allowed'
+                      : 'border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'
+                  }`}
+                  placeholder="e.g. State Bank of India"
                   required
-                  maxLength={11}
-                  value={bankDetails.ifscCode}
-                  onChange={(e) => setBankDetails({ ...bankDetails, ifscCode: e.target.value.toUpperCase() })}
+                  readOnly={Boolean(fetchedBankInfo.bankName)}
+                  value={bankDetails.bankName}
+                  onChange={(e) => !fetchedBankInfo.bankName && setBankDetails({ ...bankDetails, bankName: e.target.value })}
                 />
-                {ifscStatus.message && (
-                  <div className={`flex items-center gap-1.5 mt-2 text-xs font-medium ${ifscStatus.type === 'error' ? 'text-rose-600' : ifscStatus.type === 'success' ? 'text-emerald-600' : 'text-slate-500'}`}>
-                    {ifscStatus.type === 'loading' && <RefreshCw size={12} className="animate-spin" />}
-                    {ifscStatus.type === 'success' && <CheckCircle size={12} />}
-                    {ifscStatus.type === 'error' && <AlertCircle size={12} />}
-                    <span>{ifscStatus.message}</span>
+                {fetchedBankInfo.bankName && bankDetails.bankName.trim().toLowerCase() !== fetchedBankInfo.bankName.trim().toLowerCase() && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', fontSize: '12px', fontWeight: 600, color: '#e11d48' }}>
+                    <AlertCircle size={12} />
+                    <span>Mismatch! IFSC '{bankDetails.ifscCode}' belongs to '{fetchedBankInfo.bankName}'.</span>
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bank Name *</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>Bank Branch *</span>
+                  {fetchedBankInfo.branch && (
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Lock size={11} /> Auto-filled from IFSC
+                    </span>
+                  )}
+                </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
-                  placeholder="e.g. State Bank of India"
-                  required
-                  value={bankDetails.bankName}
-                  onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bank Branch *</label>
-                <input 
-                  type="text" 
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
+                  className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-shadow ${
+                    fetchedBankInfo.branch
+                      ? 'bg-slate-100 text-slate-700 border-slate-300 font-semibold cursor-not-allowed'
+                      : 'border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'
+                  }`}
                   placeholder="e.g. Nagpur Main Branch"
                   required
+                  readOnly={Boolean(fetchedBankInfo.branch)}
                   value={bankDetails.bankBranch}
-                  onChange={(e) => setBankDetails({ ...bankDetails, bankBranch: e.target.value })}
+                  onChange={(e) => !fetchedBankInfo.branch && setBankDetails({ ...bankDetails, bankBranch: e.target.value })}
                 />
               </div>
 
@@ -990,11 +1122,21 @@ const PaymentHistory = () => {
                 <input 
                   type="text" 
                   className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
-                  placeholder="e.g. 38190012934"
+                  placeholder="e.g. 38190012934 (9 to 18 digits)"
                   required
+                  maxLength={18}
                   value={bankDetails.accountNumber}
-                  onChange={(e) => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
+                  onChange={(e) => {
+                    const onlyNums = e.target.value.replace(/\D/g, '').slice(0, 18);
+                    setBankDetails({ ...bankDetails, accountNumber: onlyNums });
+                  }}
                 />
+                {bankDetails.accountNumber && (bankDetails.accountNumber.length < 9 || bankDetails.accountNumber.length > 18) && (
+                  <div className="flex items-center gap-1.5 mt-2 text-xs font-medium text-rose-600">
+                    <AlertCircle size={12} />
+                    <span>Account Number must be between 9 and 18 numeric digits.</span>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -1012,8 +1154,8 @@ const PaymentHistory = () => {
               <div className="pt-2">
                 <button 
                   type="submit" 
-                  disabled={!bankDetails.ifscCode?.trim() || !bankDetails.bankName?.trim() || !bankDetails.bankBranch?.trim() || !bankDetails.accountNumber?.trim() || !bankDetails.accountHolderName?.trim()}
-                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm"
+                  disabled={!isBankFormValid(bankDetails)}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:bg-slate-300 disabled:hover:bg-slate-300 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm"
                 >
                   <Check size={16} /> Save Bank details
                 </button>
@@ -1038,23 +1180,40 @@ const PaymentHistory = () => {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Business UPI ID / VPA *</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow"
+                  className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-shadow ${
+                    upiId && !isUpiValid(upiId)
+                      ? 'border-rose-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-400'
+                      : 'border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'
+                  }`}
                   placeholder="e.g. shyamagro@ybl"
                   required
                   value={upiId}
-                  onChange={(e) => setUpiId(e.target.value)}
+                  onChange={(e) => setUpiId(e.target.value.trim())}
                 />
-                <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500">
-                  <Info size={12} />
-                  <span>Payments made to this VPA will appear in your linked business bank account.</span>
-                </div>
+                {upiId && !isUpiValid(upiId) ? (
+                  <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-rose-600">
+                    <AlertCircle size={12} />
+                    {isUpiFormatOkButUnknownHandle(upiId) ? (
+                      <span>
+                        Unrecognized PSP handle <strong>@{upiId.trim().split('@')[1]}</strong>. Use a valid bank handle (e.g. @ybl, @oksbi, @paytm, @upi, @axisbank).
+                      </span>
+                    ) : (
+                      <span>Invalid format. Use <strong>localpart@bankhandle</strong> (e.g. shyamagro@ybl, business@oksbi).</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500">
+                    <Info size={12} />
+                    <span>Format: <strong>yourname@bankhandle</strong> — handle must be a recognized UPI PSP (e.g. @ybl, @paytm, @oksbi).</span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-2">
                 <button 
                   type="submit" 
-                  disabled={!upiId || !upiId.trim()}
-                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm"
+                  disabled={!isUpiValid(upiId)}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:bg-slate-300 disabled:hover:bg-slate-300 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm"
                 >
                   <Check size={16} /> Update UPI ID
                 </button>

@@ -120,9 +120,13 @@ const mapServerTicketToFrontend = (st) => {
       // Prefer the detailed message over a vague subject
       return msg || (subj && subj !== 'Order Dispute' && subj !== 'Chatbot Handover Request' ? subj : '') || 'No Description';
     })(),
-    priority: st.priority || st.priorityName || 'Medium',
+    // Bug 3 fix: Auto-downgrade priority for Resolved/Closed tickets
+    priority: (status === 'Resolved' || status === 'Closed') ? 'Low' : (st.priority || st.priorityName || 'Medium'),
     status: status,
-    assignedTo: st.assignedAgent || st.assignedTo || 'Unassigned',
+    // Bug 4 fix: Auto-assign 'Support Team' for Open/In Progress tickets that have no agent
+    assignedTo: (st.assignedAgent || st.assignedTo) 
+      ? (st.assignedAgent || st.assignedTo) 
+      : ((status === 'Open' || status === 'In Progress') ? 'Support Team' : 'Unassigned'),
     type: type,
     orderId: orderId,
     notes: st.auditNote || st.notes || 'No notes added',
@@ -154,10 +158,10 @@ export const getTickets = async () => {
       if (!localIds.has(stId)) {
         merged.push(mapped);
       } else {
-        // Update local memory with backend state
+        // Bug 5 fix: Server data takes precedence for priority and status to prevent conflicts
         const idx = merged.findIndex(t => String(t.id) === stId);
         if (idx !== -1) {
-          merged[idx] = { ...merged[idx], ...mapped };
+          merged[idx] = { ...merged[idx], ...mapped, priority: mapped.priority, status: mapped.status, assignedTo: mapped.assignedTo };
         }
       }
     });

@@ -1,7 +1,10 @@
 import { getApiDomain } from "./apiConfig";
+
 const LEGACY_ASSET_HOSTS = [
   'https://wildlife-unwieldy-devotee.ngrok-free.dev',
   'http://wildlife-unwieldy-devotee.ngrok-free.dev',
+  'http://shyamagrotools.com',
+  'https://shyamagrotools.com',
 ];
 
 const INVALID_ASSET_VALUES = new Set(['', 'string', 'null', 'undefined']);

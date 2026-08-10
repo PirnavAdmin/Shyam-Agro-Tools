@@ -424,9 +424,9 @@
 /* Toast Notifications */
 .reports-notification {
   position: fixed;
-  top: 24px;
+  top: 90px;
   right: 24px;
-  z-index: 1000;
+  z-index: 9999;
   min-width: 300px;
   padding: 16px 20px;
   border-radius: 12px;

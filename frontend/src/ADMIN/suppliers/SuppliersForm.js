@@ -216,6 +216,7 @@ const SuppliersForm = () => {
                   <option value="Pending">Pending</option>
                   <option value="Review">Review</option>
                   <option value="Verified">Verified</option>
+                  <option value="Rejected">Rejected</option>
                   <option value="Inactive">Inactive</option>
                 </select>
               </div>

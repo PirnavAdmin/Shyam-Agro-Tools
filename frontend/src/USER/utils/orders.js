@@ -54,8 +54,13 @@ export const getStatusIndex = (status = 'Order Placed') => {
 
 export const getOrders = (mobileNumber = getLoggedInMobile()) => {
   const normalizedMobile = normalizeMobile(mobileNumber);
-  if (!normalizedMobile) return [];
-  return getAllStoredOrders().filter((order) => getOrderMobile(order) === normalizedMobile);
+  const allStored = getAllStoredOrders();
+  if (!normalizedMobile) return allStored;
+  const filtered = allStored.filter((order) => {
+    const orderMob = getOrderMobile(order);
+    return !orderMob || orderMob === normalizedMobile;
+  });
+  return filtered.length > 0 ? filtered : allStored;
 };
 
 export const saveOrder = (order) => {

@@ -140,32 +140,32 @@ function App() {
                   <Routes>
                     {/* User Routes */}
                     <Route path="/" element={<Home />} />
-                    <Route path="/categories" element={protect(<CategoriesPage />)} />
-                    <Route path="/products" element={protect(<ProductsPage />)} />
-                    <Route path="/search" element={protect(<SearchPage />)} />
-                    <Route path="/featured" element={protect(<FeaturedPage />)} />
-                    <Route path="/offers" element={protect(<ProductsPage mode="offers" />)} />
-                    <Route path="/offers/40-percent" element={protect(<ProductsPage mode="forty-percent" />)} />
-                    <Route path="/new-arrivals" element={protect(<ProductsPage mode="new-arrivals" />)} />
-                    <Route path="/category/:id" element={protect(<SingleCategoryPage />)} />
-                    <Route path="/product/:id" element={protect(<ProductDetailsPage />)} />
-                    <Route path="/cart" element={protect(<CartPage />)} />
-                    <Route path="/wishlist" element={protect(<WishlistPage />)} />
-                    <Route path="/become-seller" element={protect(<BecomeSeller />)} />
-                    <Route path="/contact-support" element={protect(<ContactSupport />)} />
+                    <Route path="/categories" element={<CategoriesPage />} />
+                    <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/featured" element={<FeaturedPage />} />
+                    <Route path="/offers" element={<ProductsPage mode="offers" />} />
+                    <Route path="/offers/40-percent" element={<ProductsPage mode="forty-percent" />} />
+                    <Route path="/new-arrivals" element={<ProductsPage mode="new-arrivals" />} />
+                    <Route path="/category/:id" element={<SingleCategoryPage />} />
+                    <Route path="/product/:id" element={<ProductDetailsPage />} />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/become-seller" element={<BecomeSeller />} />
+                    <Route path="/contact-support" element={<ContactSupport />} />
                     <Route path="/wallet" element={protect(<WalletPage />)} />
-                    <Route path="/track-order" element={protect(<TrackOrder />)} />
+                    <Route path="/track-order" element={<TrackOrder />} />
                     <Route path="/my-orders" element={<MyOrdersPage />} />
                     <Route path="/checkout" element={protect(<CheckoutPage />)} />
                     <Route path="/payment" element={protect(<PaymentPage />)} />
-                    <Route path="/invoice" element={protect(<InvoicePage />)} />
+                    <Route path="/invoice" element={<InvoicePage />} />
                     <Route path="/account" element={<MyOrdersPage />} />
-                    <Route path="/faq" element={protect(<FAQPage />)} />
-                    <Route path="/help-center" element={protect(<HelpCenterPage />)} />
-                    <Route path="/contact-us" element={protect(<ContactUsPage />)} />
-                    <Route path="/terms-of-service" element={protect(<TermsOfServicePage />)} />
-                    <Route path="/privacy-policy" element={protect(<PrivacyPolicyPage />)} />
-                    <Route path="/return-refund-policy" element={protect(<ReturnRefundPolicyPage />)} />
+                    <Route path="/faq" element={<FAQPage />} />
+                    <Route path="/help-center" element={<HelpCenterPage />} />
+                    <Route path="/contact-us" element={<ContactUsPage />} />
+                    <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/return-refund-policy" element={<ReturnRefundPolicyPage />} />
                     
                     {/* Admin Routes */}
                     <Route path="/admin/login" element={<AdminLoginPage />} />

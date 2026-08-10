@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, User, Key } from 'lucide-react';
+import { ArrowLeft, Save, User, Key, MapPin } from 'lucide-react';
 import { Toast } from '../components/Toast';
 import './AdminAccountSettings.css';
 
@@ -14,7 +14,7 @@ const AdminAccountSettings = () => {
     name: '',
     email: '',
     mobile: '',
-    employeeId: '',
+    address: '',
     password: '',
     newPassword: '',
     confirmPassword: ''
@@ -26,6 +26,7 @@ const AdminAccountSettings = () => {
     const storedName = localStorage.getItem('adminName') || 'Admin User';
     const storedEmail = localStorage.getItem('adminEmail') || 'admin@shyamagro.com';
     const storedRole = localStorage.getItem('adminRole') || 'admin';
+    const storedAddress = localStorage.getItem('adminAddress') || 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401';
     
     const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
     const matched = localAccounts.find(acc => acc.email.toLowerCase() === storedEmail.toLowerCase());
@@ -34,8 +35,8 @@ const AdminAccountSettings = () => {
       ...prev,
       name: storedName,
       email: storedEmail,
-      mobile: matched?.mobile || '9876543210',
-      employeeId: matched?.employeeId || 'AD001'
+      mobile: matched?.mobile || '9912649265',
+      address: storedAddress || matched?.address || 'Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401'
     }));
   }, []);
 
@@ -54,7 +55,7 @@ const AdminAccountSettings = () => {
     if (!cleanMobile) errs.mobile = 'Mobile number is required';
     else if (cleanMobile.length !== 10) errs.mobile = 'Must be exactly 10 digits';
     else if (!/^[6-9]\d{9}$/.test(cleanMobile)) errs.mobile = 'Must start with 6, 7, 8, or 9';
-    if (!formData.employeeId.trim()) errs.employeeId = 'Employee ID is required';
+    if (!formData.address.trim()) errs.address = 'Address is required';
 
     if (formData.newPassword) {
       if (formData.newPassword.length < 6) {
@@ -85,6 +86,7 @@ const AdminAccountSettings = () => {
       // 1. Update general localStorage
       localStorage.setItem('adminName', formData.name.trim());
       localStorage.setItem('adminEmail', formData.email.trim());
+      localStorage.setItem('adminAddress', formData.address.trim());
       
       // 2. Update within added_staff_accounts if it is a staff account
       const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
@@ -95,7 +97,8 @@ const AdminAccountSettings = () => {
           ...localAccounts[index],
           firstName: formData.name.split(' ')[0],
           lastName: formData.name.split(' ').slice(1).join(' ') || '',
-          mobile: formData.mobile.trim()
+          mobile: formData.mobile.trim(),
+          address: formData.address.trim()
         };
         if (formData.newPassword) {
           updatedUser.password = formData.newPassword;
@@ -105,12 +108,12 @@ const AdminAccountSettings = () => {
       } else if (role !== 'super admin') {
         // If not found in local accounts but is admin/manager/staff, create record so details persist
         const newRecord = {
-          id: formData.employeeId,
+          id: `AD-${Date.now().toString().slice(-4)}`,
           firstName: formData.name.split(' ')[0],
           lastName: formData.name.split(' ').slice(1).join(' ') || '',
           email: formData.email.toLowerCase().trim(),
           mobile: formData.mobile.trim(),
-          employeeId: formData.employeeId.toUpperCase(),
+          address: formData.address.trim(),
           role: role,
           permissions: JSON.parse(localStorage.getItem('adminPermissions') || '[]')
         };
@@ -203,16 +206,27 @@ const AdminAccountSettings = () => {
                 {errors.mobile && <span className="field-error">{errors.mobile}</span>}
               </div>
 
-              <div className="form-field">
-                <label>Employee ID</label>
-                <input 
-                  type="text" 
-                  name="employeeId" 
-                  value={formData.employeeId} 
+              <div className="form-field" style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <MapPin size={13} /> Address
+                </label>
+                <textarea 
+                  name="address" 
+                  value={formData.address} 
                   onChange={handleChange}
-                  placeholder="Enter employee ID"
+                  placeholder="Enter full address, town/taluk, district, pin code"
+                  rows={2}
+                  style={{
+                    padding: '8px 12px',
+                    fontSize: '13px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    color: '#1e293b',
+                    fontFamily: 'inherit',
+                    resize: 'vertical'
+                  }}
                 />
-                {errors.employeeId && <span className="field-error">{errors.employeeId}</span>}
+                {errors.address && <span className="field-error">{errors.address}</span>}
               </div>
             </div>
           </div>

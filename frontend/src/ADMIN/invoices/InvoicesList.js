@@ -448,8 +448,8 @@ const InvoicesList = () => {
                   <div class="company-title">Shyam Agro Tools</div>
                   <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
                   <div class="company-meta">
-                    Plot 42, GIDC Estate, Rajkot, Gujarat - 360002<br/>
-                    GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265<br/>
+                    Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401, Andhra Pradesh<br/>
+                    GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265, +91 6301275516<br/>
                     Email: sales@shyamagro.com | Web: www.shyamagrotools.com
                   </div>
                 </div>
@@ -466,7 +466,7 @@ const InvoicesList = () => {
                   <div class="info-row"><span class="info-label">Invoice No:</span><span class="info-val">${order.invoiceId}</span></div>
                   <div class="info-row"><span class="info-label">Invoice Date:</span><span class="info-val">${formatDate(order.date)}</span></div>
                   <div class="info-row"><span class="info-label">Order Ref ID:</span><span class="info-val">ORD-${order.id}</span></div>
-                  <div class="info-row"><span class="info-label">Place of Supply:</span><span class="info-val">Gujarat (24)</span></div>
+                  <div class="info-row"><span class="info-label">Place of Supply:</span><span class="info-val">Andhra Pradesh (37)</span></div>
                 </div>
                 <div class="info-block">
                   <div class="info-block-title">Payment & Settlement Status</div>
@@ -546,7 +546,7 @@ const InvoicesList = () => {
                   Leading e-commerce marketplace & manufacturer of heavy-duty agricultural tools, equipment, irrigation systems, and farm machinery.<br/><br/>
                   <strong>About Invoice & Notes:</strong><br/>
                   ${order.packerName || order.notes || 'Official tax & commercial invoice generated for recipient commercial use. Valid for commercial warranty and tax deduction.'}<br/>
-                  <span style="font-size: 10px; color: #64748b;">1. Goods once sold will not be returned without valid RMA approval. 2. Subject to Gujarat Jurisdiction.</span><br/>
+                  <span style="font-size: 10px; color: #64748b;">1. Goods once sold will not be returned without valid RMA approval. 2. Subject to Nandyal Jurisdiction only.</span><br/>
                   <em>This is a computer-generated tax invoice requiring no physical signature.</em>
                 </div>
                 <div class="signatory-box">

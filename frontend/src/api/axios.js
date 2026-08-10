@@ -58,13 +58,10 @@ apiClient.interceptors.response.use(
         // Fall through to the shared unauthorized handler.
       }
       clearSession();
-      window.dispatchEvent(new CustomEvent('auth:unauthorized', {
-        detail: { returnTo: `${window.location.pathname}${window.location.search}${window.location.hash}` },
-      }));
+      window.dispatchEvent(new CustomEvent('auth:user-updated', { detail: null }));
     }
     return Promise.reject(error);
   }
 );
 
 export default apiClient;
-

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
   CheckCircle2,
+  Clock,
+  XCircle,
   Eye,
   Mail,
   Phone,
@@ -135,20 +137,38 @@ export const suppliers = [
 export const formatSupplierCurrency = (amount) => `INR ${Number(amount || 0).toLocaleString('en-IN')}`;
 
 const supplierStatusMeta = {
-  Verified: { icon: CheckCircle2, className: 'supplier-status--verified' },
-  Pending: { icon: AlertTriangle, className: 'supplier-status--pending' },
-  Review: { icon: ShieldCheck, className: 'supplier-status--review' },
-  Inactive: { icon: AlertTriangle, className: 'supplier-status--inactive' }
+  Verified: { icon: CheckCircle2, color: '#15803d', bg: '#dcfce7', border: '#bbf7d0' },
+  Approved: { icon: CheckCircle2, color: '#15803d', bg: '#dcfce7', border: '#bbf7d0' },
+  Pending: { icon: Clock, color: '#b45309', bg: '#fef3c7', border: '#fde68a' },
+  Review: { icon: ShieldCheck, color: '#1d4ed8', bg: '#dbeafe', border: '#bfdbfe' },
+  Rejected: { icon: XCircle, color: '#b91c1c', bg: '#fee2e2', border: '#fecaca' },
+  Inactive: { icon: XCircle, color: '#b91c1c', bg: '#fee2e2', border: '#fecaca' }
 };
 
 const SupplierStatusBadge = ({ status }) => {
-  const meta = supplierStatusMeta[status] || supplierStatusMeta.Pending;
+  const meta = supplierStatusMeta[status] || (
+    String(status || '').toLowerCase().includes('reject') ? supplierStatusMeta.Rejected : supplierStatusMeta.Pending
+  );
   const Icon = meta.icon;
 
   return (
-    <span className={`supplier-status ${meta.className}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', padding: '2px 8px', borderRadius: '12px' }}>
-      <Icon size={12} />
-      {status}
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '5px',
+        fontSize: '10px',
+        fontWeight: 700,
+        padding: '3px 9px',
+        borderRadius: '9999px',
+        color: meta.color,
+        backgroundColor: meta.bg,
+        border: `1px solid ${meta.border}`,
+        textTransform: 'capitalize'
+      }}
+    >
+      <Icon size={11} />
+      {status || 'Pending'}
     </span>
   );
 };
@@ -285,6 +305,7 @@ const SuppliersList = () => {
               <option value="All">All statuses</option>
               <option value="Verified">Verified</option>
               <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
               <option value="Review">Review</option>
               <option value="Inactive">Inactive</option>
             </select>

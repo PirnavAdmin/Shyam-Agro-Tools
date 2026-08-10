@@ -76,6 +76,8 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
     };
 
     login(authData, user);
+    localStorage.setItem('hasSignedUp', 'true');
+    localStorage.setItem('isLoggedIn', 'true');
     showToast(`Welcome ${user.name}!`);
 
     if (redirectTo) {

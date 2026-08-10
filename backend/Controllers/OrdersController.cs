@@ -66,33 +66,66 @@ namespace ShyamAgroSuite.Api.Controllers
         public async Task<IActionResult> GetMyOrders()
         {
             var customerIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id" || c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(customerIdClaim) || !int.TryParse(customerIdClaim, out int customerId))
+            var nameClaim = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Name || c.Type == "mobileNumber")?.Value;
+            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+
+            bool hasParsedId = int.TryParse(customerIdClaim, out int customerId);
+
+            var customerIds = await _context.Customers
+                .Where(c => (hasParsedId && c.Id == customerId) || 
+                            (!string.IsNullOrEmpty(nameClaim) && c.Phone == nameClaim) || 
+                            (!string.IsNullOrEmpty(emailClaim) && c.Email == emailClaim))
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (hasParsedId && !customerIds.Contains(customerId))
             {
-                return Unauthorized(new { Message = "User not authenticated." });
+                customerIds.Add(customerId);
             }
 
             var orders = await _context.Orders
                 .Include(o => o.Customer)
                 .Include(o => o.Items)
-                .Where(o => o.CustomerId == customerId)
+                .Where(o => customerIds.Contains(o.CustomerId) || 
+                            (!string.IsNullOrEmpty(nameClaim) && o.Customer != null && o.Customer.Phone == nameClaim) || 
+                            (!string.IsNullOrEmpty(emailClaim) && o.Customer != null && o.Customer.Email == emailClaim))
                 .OrderByDescending(o => o.OrderDate)
                 .Select(o => new
                 {
-                    id = o.Id,
+                    id = o.OrderNumber,
+                    backendId = o.Id,
                     orderNumber = o.OrderNumber.StartsWith("#") ? o.OrderNumber : $"#{o.OrderNumber}",
                     customerId = o.CustomerId,
-                    totalAmount = o.FinalAmount > 0 ? o.FinalAmount : o.TotalAmount,
+                    customerName = o.Customer != null ? o.Customer.Name : "",
+                    customerEmail = o.Customer != null ? o.Customer.Email : "",
+                    customerPhone = o.Customer != null ? o.Customer.Phone : "",
+                    totalAmount = o.TotalAmount,
+                    finalAmount = o.FinalAmount > 0 ? o.FinalAmount : o.TotalAmount,
+                    total = o.FinalAmount > 0 ? o.FinalAmount : o.TotalAmount,
+                    subtotal = o.TotalAmount,
+                    gstAmount = o.GstAmount,
+                    shippingFee = o.ShippingFee,
+                    discountAmount = o.DiscountAmount,
+                    paymentStatus = o.PaymentStatus,
+                    paymentMethod = o.PaymentMethod,
                     status = o.Status,
+                    trackingNumber = o.TrackingNumber ?? "",
+                    carrierName = o.CarrierName ?? "",
+                    shippingAddress = o.ShippingAddress ?? "",
                     createdAt = o.OrderDate,
+                    orderDate = o.OrderDate,
                     items = o.Items.Select(i => new
                     {
                         id = i.Id,
+                        orderItemId = i.Id,
                         productId = i.ProductId,
                         quantity = i.Quantity,
                         price = i.Price,
                         subtotal = i.Subtotal,
+                        total = i.Subtotal > 0 ? i.Subtotal : (i.Quantity * i.Price),
                         productCode = i.ProductCode,
                         productName = i.ProductName,
+                        name = i.ProductName,
                         imageUrl = _context.ProductImages.Where(img => img.ProductId == i.ProductId).OrderBy(img => img.Id).Select(img => img.ImageUrl).FirstOrDefault() ?? ""
                     }).ToList()
                 })

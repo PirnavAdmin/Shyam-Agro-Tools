@@ -1,6 +1,29 @@
 import React from 'react';
-import { X, Mail, Phone, MapPin, Truck, ShieldCheck, DollarSign, Award, FileText } from 'lucide-react';
+import { X, Mail, Phone, MapPin, Truck, ShieldCheck, DollarSign, Award, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { formatSupplierCurrency } from './SuppliersList';
+
+const getStatusBadge = (status) => {
+  const s = String(status || '').toLowerCase();
+  if (s === 'verified' || s === 'approved') {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '9999px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
+        <CheckCircle2 size={10} /> Verified
+      </span>
+    );
+  }
+  if (s.includes('reject') || s === 'inactive') {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '9999px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca' }}>
+        <XCircle size={10} /> {status || 'Rejected'}
+      </span>
+    );
+  }
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '9999px', fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' }}>
+      <Clock size={10} /> {status || 'Pending'}
+    </span>
+  );
+};
 
 const SuppliersPopup = ({ supplier, onClose }) => {
   if (!supplier) return null;
@@ -89,9 +112,9 @@ const SuppliersPopup = ({ supplier, onClose }) => {
                 </div>
                 <div>
                   <span className="text-slate-400 block">Onboarding Status</span>
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold uppercase text-[9px] mt-1 ${supplier.status === 'Verified' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
-                    <ShieldCheck size={10} /> {supplier.status}
-                  </span>
+                  <div className="mt-1">
+                    {getStatusBadge(supplier.status)}
+                  </div>
                 </div>
               </div>
             </div>

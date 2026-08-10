@@ -9,7 +9,7 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
   const navigate = useNavigate();
   const { t, categoryText, subcategoryText } = useLanguage();
   const subcategories = Array.isArray(category.subcategories) ? category.subcategories : [];
-  const categoryImage = getCategoryImage(category.imageUrl);
+  const categoryImage = getCategoryImage(category.imageUrl, category.name || category.slug);
 
   const handleClickCategory = (event) => {
     event?.stopPropagation();
@@ -48,8 +48,9 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
           loading="lazy"
           onError={(event) => {
             event.currentTarget.onerror = null;
-            if (event.currentTarget.src !== getCategoryImage(null)) {
-              event.currentTarget.src = getCategoryImage(null);
+            const fallbackSrc = getCategoryImage(null, category.name || category.slug);
+            if (event.currentTarget.src !== fallbackSrc) {
+              event.currentTarget.src = fallbackSrc;
             }
           }}
         />
