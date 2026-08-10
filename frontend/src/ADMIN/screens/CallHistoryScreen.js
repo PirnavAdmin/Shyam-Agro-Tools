@@ -3,6 +3,52 @@ import { Phone, Search, Filter, Plus, Calendar, ShieldCheck, AlertCircle, Refres
 import { getApiDomain } from '../../utils/apiConfig';
 import '../catalog/adminModule.css';
 
+export const formatFollowUpDate = (dateVal, isLead = false) => {
+  if (!dateVal) {
+    if (isLead) {
+      const nextDay = new Date();
+      nextDay.setDate(nextDay.getDate() + 1);
+      nextDay.setHours(10, 0, 0, 0);
+      return nextDay.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    return '—';
+  }
+
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime()) || d.getFullYear() < 2020) {
+    if (isLead) {
+      const nextDay = new Date();
+      nextDay.setDate(nextDay.getDate() + 1);
+      nextDay.setHours(10, 0, 0, 0);
+      return nextDay.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    return '—';
+  }
+
+  return d.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
 const CallHistoryScreen = () => {
   const [calls, setCalls] = useState([]);
   const [metrics, setMetrics] = useState({
@@ -51,7 +97,18 @@ const CallHistoryScreen = () => {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       
-      setCalls(data.calls || data.Calls || []);
+      const rawCalls = data.calls || data.Calls || [];
+      const formattedCalls = rawCalls.map(c => {
+        const isLead = Boolean(c.isQualifiedLead || c.status === 'Follow-Up');
+        const rawCb = c.callback || c.callbackTime || c.nextFollowUp;
+        return {
+          ...c,
+          isQualifiedLead: isLead,
+          callbackFormatted: formatFollowUpDate(rawCb, isLead)
+        };
+      });
+
+      setCalls(formattedCalls);
       setMetrics({
         totalCalls: data.totalCalls ?? data.TotalCalls ?? 0,
         todayFollowUps: data.todayFollowUps ?? data.TodayFollowUps ?? 0,
@@ -88,6 +145,16 @@ const CallHistoryScreen = () => {
     setFormError('');
 
     try {
+      let finalCallbackIso = null;
+      if (formData.callbackTime) {
+        finalCallbackIso = new Date(formData.callbackTime).toISOString();
+      } else if (formData.isQualifiedLead || formData.status === 'Follow-Up') {
+        const defaultDate = new Date();
+        defaultDate.setDate(defaultDate.getDate() + 1);
+        defaultDate.setHours(10, 0, 0, 0);
+        finalCallbackIso = defaultDate.toISOString();
+      }
+
       const payload = {
         customerName: formData.customerName,
         customerPhone: formData.customerPhone,
@@ -97,7 +164,7 @@ const CallHistoryScreen = () => {
         priority: formData.priority,
         notesSummary: formData.notesSummary,
         lastCallTime: new Date().toISOString(),
-        callbackTime: formData.callbackTime ? new Date(formData.callbackTime).toISOString() : null,
+        callbackTime: finalCallbackIso,
         isQualifiedLead: formData.isQualifiedLead
       };
 
@@ -262,11 +329,13 @@ const CallHistoryScreen = () => {
                     <td style={{ padding: '12px 16px' }} className="font-semibold text-slate-600">{c.calledByRep}</td>
                     <td style={{ padding: '12px 16px' }} className="text-slate-500">{c.lastCall}</td>
                     <td style={{ padding: '12px 16px' }} className="text-slate-500 font-medium">
-                      {c.callback ? (
-                        <span className={c.isTodayFollowUp ? 'text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded' : ''}>
-                          {c.callback}
+                      {c.callbackFormatted && c.callbackFormatted !== '—' ? (
+                        <span className={c.isTodayFollowUp ? 'text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded' : 'text-slate-700 font-semibold'}>
+                          {c.callbackFormatted}
                         </span>
-                      ) : '—'}
+                      ) : (
+                        <span className="text-slate-400 font-normal">—</span>
+                      )}
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <span className={`catalog-badge ${c.priority === 'HIGH' ? 'catalog-badge--low' : (c.priority === 'MEDIUM' ? 'catalog-badge--stock' : 'catalog-badge--out')}`}>

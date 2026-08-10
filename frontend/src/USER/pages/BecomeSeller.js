@@ -70,7 +70,21 @@ const BecomeSeller = () => {
     if (!formData.contactPerson.trim()) nextErrors.contactPerson = 'Full Name is required.';
     if (!formData.companyName.trim()) nextErrors.companyName = 'Business / Shop Name is required.';
     if (!formData.productCategory) nextErrors.productCategory = 'Product Category is required.';
-    if (!/^\d{10}$/.test(formData.mobileNumber)) nextErrors.mobileNumber = 'Mobile Number must be exactly 10 digits.';
+
+    // Strict 10-digit Indian Mobile Validation
+    const cleanMobile = formData.mobileNumber.replace(/\D/g, '');
+    const dummyPatterns = ['0000000000', '1111111111', '1234567890', '0123456789', '5454545454'];
+
+    if (!cleanMobile) {
+      nextErrors.mobileNumber = 'Mobile Number is required.';
+    } else if (cleanMobile.length !== 10) {
+      nextErrors.mobileNumber = 'Mobile Number must be exactly 10 digits.';
+    } else if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+      nextErrors.mobileNumber = 'Mobile Number must start with 6, 7, 8, or 9 (e.g. 9876543210).';
+    } else if (/^(\d)\1{9}$/.test(cleanMobile) || dummyPatterns.includes(cleanMobile)) {
+      nextErrors.mobileNumber = 'Enter a valid 10-digit mobile number (dummy or repetitive digits not allowed).';
+    }
+
     if (!formData.emailAddress.trim()) nextErrors.emailAddress = 'Email Address is required.';
     else if (!emailRegex.test(formData.emailAddress.trim())) nextErrors.emailAddress = 'Enter a valid email address.';
     if (formData.gstNumber && !gstRegex.test(formData.gstNumber)) nextErrors.gstNumber = 'Enter a valid GSTIN number.';

@@ -53,10 +53,14 @@ const ShippingOrder = () => {
       setError('');
       const data = await getOrdersShipping();
       const list = Array.isArray(data) ? data : (data.orders || data.data || []);
-      setOrders(list);
+      const mappedList = list.map(o => ({
+        ...o,
+        status: o.status || o.currentStatus || 'Pending'
+      }));
+      setOrders(mappedList);
       
-      if (list.length > 0 && !selectedOrderId) {
-        setSelectedOrderId(list[0].id || list[0].orderId);
+      if (mappedList.length > 0 && !selectedOrderId) {
+        setSelectedOrderId(mappedList[0].id || mappedList[0].orderId);
       }
     } catch (err) {
       setError(err.message || 'Failed to load shipping ledger.');
@@ -316,7 +320,7 @@ const ShippingOrder = () => {
               let stepLabel = 'To be Packed';
               let stepStyle = { background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' };
               
-              const statusUpper = String(o.status || '').toUpperCase();
+              const statusUpper = String(o.status || o.currentStatus || '').toUpperCase();
               if (statusUpper === 'TO BE SHIPPED' || statusUpper === 'PACKED') {
                 stepLabel = 'To be Shipped';
                 stepStyle = { background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' };

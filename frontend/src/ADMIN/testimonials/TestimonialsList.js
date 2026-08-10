@@ -36,7 +36,15 @@ const TestimonialsList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedItems, setExpandedItems] = useState({});
   const itemsPerPage = 10;
+
+  const toggleExpand = (id) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   // Load testimonials from backend API
   const loadTestimonials = async () => {
@@ -188,9 +196,40 @@ const TestimonialsList = () => {
                     <td style={{ padding: '8px', color: '#475569', maxWidth: 400 }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
                         <MessageSquare size={13} color="#94a3b8" style={{ marginTop: 2, flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', width: '100%' }}>
-                          {t.text || '—'}
-                        </span>
+                        <div style={{ fontSize: '12px', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                          {(() => {
+                            const text = t.text || '—';
+                            const isLong = text.length > 90;
+                            const isExpanded = Boolean(expandedItems[t.id]);
+
+                            if (!isLong) {
+                              return <span>{text}</span>;
+                            }
+
+                            return (
+                              <span>
+                                {isExpanded ? text : `${text.slice(0, 90)}... `}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleExpand(t.id)}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#005F53',
+                                    cursor: 'pointer',
+                                    fontWeight: 700,
+                                    fontSize: '11px',
+                                    padding: '0 4px',
+                                    textDecoration: 'underline',
+                                    marginLeft: '2px'
+                                  }}
+                                >
+                                  {isExpanded ? 'Show Less' : 'Read More'}
+                                </button>
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </div>
                     </td>
 

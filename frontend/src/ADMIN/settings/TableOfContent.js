@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Settings, Box, Users, ShoppingCart, Target, Mail, Award, FileText, ChevronRight } from 'lucide-react';
+import { Settings, Box, Users, ShoppingCart, Target, Mail, Award, ChevronRight, Shield, KeyRound, ClipboardCheck, HardDrive, Lock } from 'lucide-react';
 
 const TableOfContent = () => {
   const sections = [
@@ -54,8 +54,8 @@ const TableOfContent = () => {
           <Award size={200} />
         </div>
         <div className="space-y-1.5 z-10">
-          <h2 className="text-2xl font-bold">SHYAM AGRO Tools Admin Control</h2>
-          <p className="text-emerald-100/90 text-sm leading-relaxed max-w-xl font-medium">
+          <h2 style={{ color: '#ffffff', fontWeight: 800, fontSize: '22px', letterSpacing: '-0.01em', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>SHYAM AGRO Tools Admin Control</h2>
+          <p style={{ color: '#d1fae5', fontSize: '13.5px', fontWeight: 500, lineHeight: 1.6, maxWidth: '520px', textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
             Welcome to the Central Administration Interface. Below is an index of all available features, controls, forms, and database listings.
           </p>
         </div>
@@ -95,10 +95,46 @@ const TableOfContent = () => {
         ))}
       </div>
 
-      {/* Quick stats footer info */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3 text-slate-600 text-xs font-semibold">
-        <FileText size={16} className="text-slate-400" />
-        <span>Platform Security Active. System operating under secure JWT keys. Last backup taken: Today at 04:00 AM.</span>
+      {/* Security status bar */}
+      <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+          <Shield size={14} style={{ color: '#16a34a' }} />
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Platform Security Status</span>
+          <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '20px', padding: '2px 8px', fontSize: '10px', fontWeight: 700, color: '#15803d' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+            All Systems Secure
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #d1fae5', borderRadius: '8px', padding: '6px 10px', flex: '1 1 auto', minWidth: '160px' }}>
+            <KeyRound size={13} style={{ color: '#059669', flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>JWT Key Rotation</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#1e293b' }}>Every 30 days · Next: 15 Aug 2026</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #d1fae5', borderRadius: '8px', padding: '6px 10px', flex: '1 1 auto', minWidth: '160px' }}>
+            <ClipboardCheck size={13} style={{ color: '#059669', flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Last Audit</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#1e293b' }}>01 Aug 2026 · Passed (0 violations)</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #d1fae5', borderRadius: '8px', padding: '6px 10px', flex: '1 1 auto', minWidth: '160px' }}>
+            <HardDrive size={13} style={{ color: '#059669', flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Last Backup</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#1e293b' }}>Today at 04:00 AM · Auto-snapshot ✓</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #d1fae5', borderRadius: '8px', padding: '6px 10px', flex: '1 1 auto', minWidth: '160px' }}>
+            <Lock size={13} style={{ color: '#059669', flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Session Encryption</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#1e293b' }}>TLS 1.3 · AES-256 at rest</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { ArrowLeft, Save, Shield, User, Key, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Shield, User, Key, Plus, Trash2, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
 import { Toast } from "../components/Toast";
 import { getApiDomain } from '../../utils/apiConfig';
 import './AddStaff.css';
@@ -90,6 +90,8 @@ function AddStaff() {
     confirmPassword: ""
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [dbModules, setDbModules] = useState([]);
   const [permissions, setPermissions] = useState({});
@@ -366,8 +368,15 @@ function AddStaff() {
       newErrors.email = "Invalid email format";
     }
 
-    if (formData.mobile && formData.mobile.length !== 10) {
-      newErrors.mobile = "Must be 10 digits";
+    if (formData.mobile) {
+      const cleanMobile = formData.mobile.replace(/\D/g, "");
+      if (cleanMobile.length !== 10) {
+        newErrors.mobile = "Mobile number must be exactly 10 digits";
+      } else if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+        newErrors.mobile = "Must start with 6, 7, 8, or 9 (e.g. 9876543210)";
+      } else if (/^(\d)\1{9}$/.test(cleanMobile)) {
+        newErrors.mobile = "Mobile number cannot be repetitive digits";
+      }
     }
 
 
@@ -631,11 +640,11 @@ function AddStaff() {
             </div>
 
             <div className="staff-field">
-              <label>Email Address</label>
+              <label style={{ textTransform: 'none' }}>Email Address</label>
               <input
                 type="email"
                 name="email"
-                placeholder="name@company.com"
+                placeholder="name@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -689,25 +698,95 @@ function AddStaff() {
           <div className="fields-grid">
             <div className="staff-field">
               <label>{isEditing ? 'New Password (Optional)' : 'Password'}</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={{ width: '100%', paddingRight: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#64748b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '2px'
+                  }}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {errors.password && <span className="field-error-msg">{errors.password}</span>}
             </div>
 
             <div className="staff-field">
-              <label>Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label>Confirm Password</label>
+                {formData.password && formData.confirmPassword && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700, color: formData.password === formData.confirmPassword ? '#10b981' : '#ef4444' }}>
+                    {formData.password === formData.confirmPassword ? (
+                      <>
+                        <CheckCircle2 size={13} /> Passwords Match
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={13} /> Passwords Do Not Match
+                      </>
+                    )}
+                  </span>
+                )}
+              </div>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    paddingRight: '64px',
+                    borderColor: formData.confirmPassword
+                      ? (formData.password === formData.confirmPassword ? '#10b981' : '#ef4444')
+                      : undefined
+                  }}
+                />
+                <div style={{ position: 'absolute', right: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {formData.password && formData.confirmPassword && (
+                    formData.password === formData.confirmPassword ? (
+                      <CheckCircle2 size={16} color="#10b981" title="Passwords match" />
+                    ) : (
+                      <XCircle size={16} color="#ef4444" title="Passwords do not match" />
+                    )
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#64748b',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '2px'
+                    }}
+                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
               {errors.confirmPassword && <span className="field-error-msg">{errors.confirmPassword}</span>}
             </div>
           </div>

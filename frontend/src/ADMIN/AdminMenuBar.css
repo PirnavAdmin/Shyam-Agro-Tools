@@ -43,10 +43,12 @@
 }
 
 .sidebar-brand-logo {
-  height: 32px;
-  max-width: 110px;
+  height: 56px;
+  max-width: 65px;
   object-fit: contain;
   flex-shrink: 0;
+  transform: scale(1.2);
+  transform-origin: center center;
 }
 
 .sidebar-brand-info {

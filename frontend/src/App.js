@@ -77,7 +77,6 @@ import StaffList from './ADMIN/staff/StaffList';
 import AddStaff from './ADMIN/staff/AddStaff';
 import SuppliersList from './ADMIN/suppliers/SuppliersList';
 import SuppliersForm from './ADMIN/suppliers/SuppliersForm';
-import NewSuppliersList from './ADMIN/suppliers/NewSuppliersList';
 import CoinsConverterScreen from './ADMIN/coins/CoinsConverterScreen';
 
 // Admin Settings & Screens
@@ -241,7 +240,6 @@ function App() {
                       <Route path="suppliers/list" element={<SuppliersList />} />
                       <Route path="suppliers/add" element={<SuppliersForm />} />
                       <Route path="suppliers/edit/:id" element={<SuppliersForm />} />
-                      <Route path="suppliers/new" element={<NewSuppliersList />} />
 
                       {/* Coins Converter Routes */}
                       <Route path="coins" element={<CoinsConverterScreen />} />

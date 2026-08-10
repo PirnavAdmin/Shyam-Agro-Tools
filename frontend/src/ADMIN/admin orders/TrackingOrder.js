@@ -69,7 +69,7 @@ const TrackingOrder = () => {
       const list = Array.isArray(data) ? data : (data.orders || data.data || []);
       const mappedList = list.map(o => ({
         ...o,
-        status: mapStatus(o.status)
+        status: mapStatus(o.status || o.currentStatus)
       }));
       setOrders(mappedList);
       
@@ -93,7 +93,7 @@ const TrackingOrder = () => {
       const list = Array.isArray(data) ? data : (data.orders || data.data || []);
       const mappedList = list.map(o => ({
         ...o,
-        status: mapStatus(o.status)
+        status: mapStatus(o.status || o.currentStatus)
       }));
       setOrders(mappedList);
 

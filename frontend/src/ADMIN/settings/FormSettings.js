@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Save, ArrowLeft, Settings, CheckCircle } from 'lucide-react';
 
 const FormSettings = () => {
@@ -11,6 +12,7 @@ const FormSettings = () => {
     platformCurrency: 'INR',
     farmerVerification: 'Auto-Verify'
   });
+  const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSubmit = (e) => {
@@ -32,7 +34,11 @@ const FormSettings = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-5 mb-6">
         <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-slate-50 text-slate-600 rounded-lg transition-colors border border-slate-200">
+          <button
+            aria-label="Go back"
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-slate-50 text-slate-600 rounded-lg transition-colors border border-slate-200"
+          >
             <ArrowLeft size={16} />
           </button>
           <div>
@@ -86,7 +92,7 @@ const FormSettings = () => {
         </div>
 
         {/* GST / Taxes settings */}
-        <div className="bg-slate-55 bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2">
             <Settings className="text-emerald-600 animate-spin-slow" size={16} />
             <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">GST tax levels (%)</h3>
@@ -94,23 +100,39 @@ const FormSettings = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Seeds & propagation tax rate</label>
-              <input
-                type="number"
-                name="seedsGst"
-                value={formData.seedsGst}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 transition-colors bg-white text-slate-700"
-              />
+              <div style={{ display: 'flex', alignItems: 'stretch', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
+                <input
+                  type="number"
+                  name="seedsGst"
+                  value={formData.seedsGst}
+                  onChange={handleInputChange}
+                  className="focus:outline-none focus:border-emerald-500 transition-colors text-slate-700"
+                  style={{ flex: 1, padding: '8px 12px', border: 'none', fontSize: '14px', background: 'transparent', minWidth: 0 }}
+                  min="0"
+                  max="100"
+                />
+                <span style={{ display: 'flex', alignItems: 'center', padding: '0 12px', background: '#f1f5f9', borderLeft: '1px solid #e2e8f0', fontWeight: 700, fontSize: '13px', color: '#475569', userSelect: 'none' }}>
+                  %
+                </span>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Heavy farming machinery tax rate</label>
-              <input
-                type="number"
-                name="machineryGst"
-                value={formData.machineryGst}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 transition-colors bg-white text-slate-700"
-              />
+              <div style={{ display: 'flex', alignItems: 'stretch', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
+                <input
+                  type="number"
+                  name="machineryGst"
+                  value={formData.machineryGst}
+                  onChange={handleInputChange}
+                  className="focus:outline-none focus:border-emerald-500 transition-colors text-slate-700"
+                  style={{ flex: 1, padding: '8px 12px', border: 'none', fontSize: '14px', background: 'transparent', minWidth: 0 }}
+                  min="0"
+                  max="100"
+                />
+                <span style={{ display: 'flex', alignItems: 'center', padding: '0 12px', background: '#f1f5f9', borderLeft: '1px solid #e2e8f0', fontWeight: 700, fontSize: '13px', color: '#475569', userSelect: 'none' }}>
+                  %
+                </span>
+              </div>
             </div>
           </div>
         </div>

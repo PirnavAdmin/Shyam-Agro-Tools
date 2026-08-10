@@ -50,8 +50,10 @@ const AdminAccountSettings = () => {
     if (!formData.name.trim()) errs.name = 'Full name is required';
     if (!formData.email.trim()) errs.email = 'Email address is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = 'Enter a valid email address';
-    if (!formData.mobile.trim()) errs.mobile = 'Mobile number is required';
-    if (formData.mobile.length !== 10) errs.mobile = 'Must be exactly 10 digits';
+    const cleanMobile = formData.mobile.replace(/\D/g, "");
+    if (!cleanMobile) errs.mobile = 'Mobile number is required';
+    else if (cleanMobile.length !== 10) errs.mobile = 'Must be exactly 10 digits';
+    else if (!/^[6-9]\d{9}$/.test(cleanMobile)) errs.mobile = 'Must start with 6, 7, 8, or 9';
     if (!formData.employeeId.trim()) errs.employeeId = 'Employee ID is required';
 
     if (formData.newPassword) {

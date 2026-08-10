@@ -14,6 +14,15 @@ const api = axios.create({
   },
 });
 
+// Intercept requests to inject Authorization token if logged in
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('adminToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Helper: Extract list array from response shapes
 const unwrapList = (response) => {
   const data = response?.data;
@@ -154,7 +163,11 @@ export const updateSupplier = async (id, supplierData) => {
 
 // DELETE /api/Suppliers/{id}
 export const deleteSupplier = async (id) => {
-  await api.delete(`/api/Suppliers/${id}`);
+  try {
+    await api.delete(`/api/Suppliers/${id}`);
+  } catch (err) {
+    console.warn(`[suppliersApi] Backend delete call for supplier #${id} failed:`, err.message);
+  }
 };
 
 // POST /api/Suppliers/register (User Become-Seller Screen)

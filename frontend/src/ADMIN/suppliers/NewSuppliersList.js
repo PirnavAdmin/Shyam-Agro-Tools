@@ -16,6 +16,15 @@ import { fetchSuppliers, updateSupplierStatus } from './suppliersApi';
 
 
 
+const formatPhoneNumber = (phone) => {
+  if (!phone) return '—';
+  const clean = String(phone).replace(/^\+?91\s*/, '').replace(/\D/g, '');
+  if (clean.length === 10) {
+    return `+91 ${clean.slice(0, 5)} ${clean.slice(5)}`;
+  }
+  return String(phone);
+};
+
 const categoryLabels = {
   tools: 'Hand Tools',
   agri: 'Agri Equipment',
@@ -242,7 +251,7 @@ const NewSuppliersList = () => {
                       {reg.contactPerson || reg.name}
                     </div>
                     <div className="supplier-contact-line" style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
-                      <Phone size={10} /> {reg.phone || reg.mobile}
+                      <Phone size={10} /> {formatPhoneNumber(reg.phone || reg.mobile)}
                     </div>
                     <div className="supplier-contact-line" style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#64748b' }}>
                       <Mail size={10} /> {reg.email}
@@ -267,15 +276,37 @@ const NewSuppliersList = () => {
                     {getStatusBadge(reg.status)}
                   </td>
                   <td className="catalog-center-cell" style={{ padding: '8px 12px' }} onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      className="catalog-btn catalog-btn--icon" 
-                      type="button" 
-                      title="View Registration Details"
-                      onClick={() => setActivePopupReg(reg)}
-                      style={{ padding: '4px 6px' }}
-                    >
-                      <Eye size={14} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                      <button 
+                        className="catalog-btn catalog-btn--icon" 
+                        type="button" 
+                        title="View Registration Details"
+                        onClick={() => setActivePopupReg(reg)}
+                        style={{ padding: '6px 8px', borderRadius: '8px', minWidth: '32px', minHeight: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Eye size={15} />
+                      </button>
+                      {reg.status !== 'Approved' && reg.status !== 'Verified' && (
+                        <button
+                          type="button"
+                          title="Approve Supplier"
+                          onClick={() => handleStatusChange(reg.id, 'Approved')}
+                          style={{ padding: '6px 8px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <CheckCircle size={15} />
+                        </button>
+                      )}
+                      {reg.status !== 'Rejected' && (
+                        <button
+                          type="button"
+                          title="Reject Application"
+                          onClick={() => handleStatusChange(reg.id, 'Rejected')}
+                          style={{ padding: '6px 8px', borderRadius: '8px', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <XCircle size={15} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

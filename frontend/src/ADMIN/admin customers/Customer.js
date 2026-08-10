@@ -144,14 +144,22 @@ const Customer = () => {
 
     // 4. District Validation
     const districtVal = (editForm.district || '').trim();
-    if (districtVal && (districtVal.length < 2 || !/^[A-Za-z\s.'\-]{2,50}$/.test(districtVal) || new Set(districtVal.toLowerCase().replace(/[^a-z]/g, '')).size < 2)) {
+    if (!districtVal) {
+      alert('District is a required field.');
+      return;
+    }
+    if (districtVal.length < 2 || !/^[A-Za-z\s.'\-]{2,50}$/.test(districtVal) || new Set(districtVal.toLowerCase().replace(/[^a-z]/g, '')).size < 2) {
       alert('Please enter a valid District name (letters and spaces only).');
       return;
     }
 
     // 5. State Validation
     const stateVal = (editForm.state || '').trim();
-    if (stateVal && (stateVal.length < 2 || !/^[A-Za-z\s.'\-]{2,50}$/.test(stateVal) || new Set(stateVal.toLowerCase().replace(/[^a-z]/g, '')).size < 2)) {
+    if (!stateVal) {
+      alert('State is a required field.');
+      return;
+    }
+    if (stateVal.length < 2 || !/^[A-Za-z\s.'\-]{2,50}$/.test(stateVal) || new Set(stateVal.toLowerCase().replace(/[^a-z]/g, '')).size < 2) {
       alert('Please enter a valid State name (letters and spaces only).');
       return;
     }
@@ -617,7 +625,7 @@ const Customer = () => {
               <h4 className="font-bold text-emerald-700 uppercase tracking-wider">Basic Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-semibold text-slate-500 mb-1">Full Name</label>
+                  <label className="block font-semibold text-slate-500 mb-1">Full Name <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     required
@@ -627,7 +635,7 @@ const Customer = () => {
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-500 mb-1">Phone Number</label>
+                  <label className="block font-semibold text-slate-500 mb-1">Phone Number <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     required
@@ -661,27 +669,60 @@ const Customer = () => {
               <h4 className="font-bold text-emerald-700 uppercase tracking-wider pt-2">Address Details</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-3">
-                  <label className="block font-semibold text-slate-500 mb-1">Street Address</label>
+                  <label className="block font-semibold text-slate-500 mb-1">Street Address <span className="text-red-500">*</span></label>
                   <input
                     type="text"
+                    required
                     value={editForm.address}
-                    onChange={e => setEditForm({ ...editForm, address: e.target.value })}
+                    placeholder="e.g. 12 Main St, Pune, Maharashtra"
+                    onChange={e => {
+                      const addr = e.target.value;
+                      setEditForm(prev => {
+                        const updated = { ...prev, address: addr };
+                        if (addr) {
+                          const parts = addr.split(',').map(p => p.trim()).filter(Boolean);
+                          if (parts.length >= 2) {
+                            const lastPart = parts[parts.length - 1];
+                            const secondLastPart = parts[parts.length - 2];
+                            const statesList = [
+                              'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+                              'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+                              'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+                              'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+                              'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
+                            ];
+                            const matchedState = statesList.find(s => s.toLowerCase() === lastPart.toLowerCase());
+                            if (matchedState) {
+                              updated.state = matchedState;
+                            }
+                            if (secondLastPart && parts.length > 2) {
+                              updated.district = secondLastPart;
+                            } else if (secondLastPart && parts.length === 2 && !matchedState) {
+                              updated.district = secondLastPart;
+                            }
+                          }
+                        }
+                        return updated;
+                      });
+                    }}
                     className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-500 mb-1">District</label>
+                  <label className="block font-semibold text-slate-500 mb-1">District <span className="text-red-500">*</span></label>
                   <input
                     type="text"
+                    required
                     value={editForm.district}
                     onChange={e => setEditForm({ ...editForm, district: e.target.value })}
                     className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-500 mb-1">State</label>
+                  <label className="block font-semibold text-slate-500 mb-1">State <span className="text-red-500">*</span></label>
                   <input
                     type="text"
+                    required
                     value={editForm.state}
                     onChange={e => setEditForm({ ...editForm, state: e.target.value })}
                     className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-emerald-500"

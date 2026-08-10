@@ -7,7 +7,6 @@ import {
   MapPin,
   Phone,
   RotateCcw,
-  Save,
   ShieldCheck,
   Truck,
   Check
@@ -86,6 +85,14 @@ const SuppliersForm = () => {
       setToastType('warning');
       return;
     }
+
+    // Phone / Mobile validation
+    const cleanPhone = String(supplier.phone || '').replace(/^\+?91\s*/, '').replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setToastMessage('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g. 9876543210).');
+      setToastType('warning');
+      return;
+    }
     
     setIsSaving(true);
     try {
@@ -134,11 +141,7 @@ const SuppliersForm = () => {
         <div className="flex items-center gap-2">
           <button className="catalog-btn" type="button" onClick={handleReset} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
             <RotateCcw size={14} style={{ marginRight: '4px' }} />
-            Reset
-          </button>
-          <button className="catalog-btn catalog-btn--primary" onClick={handleSubmit} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
-            <Save size={14} style={{ marginRight: '4px' }} />
-            {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Supplier' : 'Save Supplier')}
+            Reset Form
           </button>
         </div>
       </section>

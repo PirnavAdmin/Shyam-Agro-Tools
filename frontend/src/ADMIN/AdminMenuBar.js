@@ -497,7 +497,6 @@ const AdminMenuBar = ({ expanded = false, onToggleSidebar }) => {
                 <ul className={`stroyka-submenu ${openDropdowns.suppliers && expanded ? 'show-submenu' : ''}`}>
                   <li><NavLink to="/admin/suppliers/list" className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Suppliers List</NavLink></li>
                   <li><NavLink to="/admin/suppliers/add"  className={({ isActive }) => isActive ? 'submenu-link active' : 'submenu-link'}>Add Supplier</NavLink></li>
-
                 </ul>
               </li>
             )}

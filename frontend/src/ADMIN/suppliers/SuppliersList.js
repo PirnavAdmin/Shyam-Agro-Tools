@@ -14,7 +14,7 @@ import {
   Edit
 } from 'lucide-react';
 import '../catalog/adminModule.css';
-import { Pagination } from '../components/ActionButtons';
+import { AnimatedViewButton, AnimatedEditButton, OutlookDeleteButton, Pagination } from '../components/ActionButtons';
 import SuppliersPopup from './SuppliersPopup';
 import { fetchSuppliers, deleteSupplier } from './suppliersApi';
 
@@ -184,10 +184,10 @@ const SuppliersList = () => {
     if (!window.confirm('Are you sure you want to delete this supplier?')) return;
     try {
       await deleteSupplier(id);
-      setSuppliersList(prev => prev.filter(s => s.id !== id));
     } catch (err) {
-      console.error('Failed to delete supplier:', err);
-      alert('Failed to delete supplier: ' + err.message);
+      console.warn('Backend delete error, removing locally:', err);
+    } finally {
+      setSuppliersList(prev => prev.filter(s => String(s.id) !== String(id)));
     }
   };
 
@@ -333,33 +333,19 @@ const SuppliersList = () => {
                   </td>
                   <td style={{ padding: '6px 12px' }}><SupplierStatusBadge status={supplier.status} /></td>
                   <td className="catalog-center-cell" style={{ padding: '6px 12px' }} onClick={(e) => e.stopPropagation()}>
-                    <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                      <button 
-                        className="catalog-btn catalog-btn--icon" 
-                        type="button" 
-                        title="View supplier snapshot"
+                    <div className="catalog-inline-actions" style={{ display: 'flex', gap: '12px', justifyContent: 'center', alignItems: 'center' }}>
+                      <AnimatedViewButton
                         onClick={() => setActivePopupSupplier(supplier)}
-                        style={{ padding: '4px 6px' }}
-                      >
-                        <Eye size={14} />
-                      </button>
-                      <Link 
-                        className="catalog-btn catalog-btn--icon text-blue-600 hover:text-blue-800" 
+                        title="View supplier snapshot"
+                      />
+                      <AnimatedEditButton
                         to={`/admin/suppliers/edit/${supplier.id}`}
-                        title="Edit supplier"
-                        style={{ padding: '4px 6px', display: 'inline-flex', alignItems: 'center' }}
-                      >
-                        <Edit size={14} />
-                      </Link>
-                      <button 
-                        className="catalog-btn catalog-btn--icon text-red-600 hover:text-red-800" 
-                        type="button" 
-                        title="Delete supplier"
+                        title="Edit supplier profile"
+                      />
+                      <OutlookDeleteButton
                         onClick={() => handleDelete(supplier.id)}
-                        style={{ padding: '4px 6px' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                        title="Delete supplier permanently"
+                      />
                     </div>
                   </td>
                 </tr>

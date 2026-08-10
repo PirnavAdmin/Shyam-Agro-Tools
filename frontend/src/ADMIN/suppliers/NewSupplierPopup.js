@@ -1,6 +1,15 @@
 import React from 'react';
 import { X, Mail, Phone, MapPin, Shield, Calendar, Building, FileText, CheckCircle2, XCircle } from 'lucide-react';
 
+const formatPhoneNumber = (phone) => {
+  if (!phone) return '—';
+  const clean = String(phone).replace(/^\+?91\s*/, '').replace(/\D/g, '');
+  if (clean.length === 10) {
+    return `+91 ${clean.slice(0, 5)} ${clean.slice(5)}`;
+  }
+  return String(phone);
+};
+
 const NewSupplierPopup = ({ registration, onClose, onStatusChange }) => {
   if (!registration) return null;
 
@@ -114,7 +123,7 @@ const NewSupplierPopup = ({ registration, onClose, onStatusChange }) => {
                   <div>
                     <span className="text-slate-400 block text-[10px]">Mobile Number</span>
                     <span className="font-semibold text-slate-800 flex items-center gap-1 mt-0.5">
-                      <Phone size={11} className="text-slate-400" /> {registration.mobile || 'N/A'}
+                      <Phone size={11} className="text-slate-400" /> {formatPhoneNumber(registration.mobile || registration.phone)}
                     </span>
                   </div>
                   <div>
@@ -177,7 +186,25 @@ const NewSupplierPopup = ({ registration, onClose, onStatusChange }) => {
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end">
+        <div className="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            {registration.status !== 'Approved' && registration.status !== 'Verified' && (
+              <button 
+                onClick={() => onStatusChange && onStatusChange(registration.id, 'Approved')} 
+                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors text-xs flex items-center gap-1.5 shadow-sm"
+              >
+                <CheckCircle2 size={14} /> Approve Supplier
+              </button>
+            )}
+            {registration.status !== 'Rejected' && (
+              <button 
+                onClick={() => onStatusChange && onStatusChange(registration.id, 'Rejected')} 
+                className="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold transition-colors text-xs flex items-center gap-1.5 shadow-sm"
+              >
+                <XCircle size={14} /> Reject Application
+              </button>
+            )}
+          </div>
           <button 
             onClick={onClose} 
             className="px-5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold transition-colors text-xs"
