@@ -4,23 +4,17 @@ import apiClient from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import headerLogo from '../../asset/header logo.png';
+import headerLogo from '../../asset/headerlogo-new.png';
+import { isValidName } from '../../utils/validation';
 import './LoginPopup.css';
 
-const DIRECT_API_BASE_URL = getApiDomain();
 const API_HEADERS = {
   'Content-Type': 'application/json',
   'ngrok-skip-browser-warning': 'true',
 };
 
 const getAuthApiBaseUrl = () => {
-  const configuredBaseUrl = process.env.REACT_APP_AUTH_API_BASE_URL;
-  if (configuredBaseUrl) return configuredBaseUrl.replace(/\/$/, '');
-
-  const hostname = window.location.hostname;
-  return hostname === 'localhost' || hostname === '127.0.0.1'
-    ? ''
-    : DIRECT_API_BASE_URL;
+  return getApiDomain().replace(/\/$/, '');
 };
 
 const normalizeMobileNumber = (value) => {
@@ -174,6 +168,11 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
       return;
     }
 
+    if (!isValidName(details.name.trim())) {
+      setError("Please enter a valid, meaningful name (no gibberish or invalid characters allowed)");
+      return;
+    }
+
     if (details.email.trim() && !isValidEmail(details.email.trim())) {
       setError("Please enter a valid email address");
       return;
@@ -250,8 +249,17 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
             <img src={headerLogo} alt="Shyam Agro Logo" />
           </div>
 
-          <h2>SIGN UP TO GET OFFERS.</h2>
-          <p>SIGN UP to get the best offers and discount today.</p>
+          {step === 'phone' ? (
+            <>
+              <h2>SIGN IN / SIGN UP</h2>
+              <p>Sign in or create an account to get the best offers.</p>
+            </>
+          ) : (
+            <>
+              <h2>COMPLETE YOUR PROFILE</h2>
+              <p>Please enter your name and email to complete registration.</p>
+            </>
+          )}
 
           {error && (
             <div

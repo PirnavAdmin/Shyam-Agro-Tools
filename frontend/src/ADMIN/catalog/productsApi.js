@@ -521,6 +521,27 @@ export const saveProduct = async (product, imageFiles = [], videoFile = null) =>
   fd.append('DiscountAmount', Number(product.discountValue) || 0);
   fd.append('SellingPrice', Number(product.price) || 0);
 
+  // Reviews & Ratings summary
+  fd.append('AverageRating', Number(product.rating) || 0);
+  fd.append('TotalReviews', Number(product.totalReviews) || 0);
+  fd.append('FiveStar', Number(product.ratingBreakdown?.[5] ?? product.FiveStar ?? product.fiveStar) || 0);
+  fd.append('FourStar', Number(product.ratingBreakdown?.[4] ?? product.FourStar ?? product.fourStar) || 0);
+  fd.append('ThreeStar', Number(product.ratingBreakdown?.[3] ?? product.ThreeStar ?? product.threeStar) || 0);
+  fd.append('TwoStar', Number(product.ratingBreakdown?.[2] ?? product.TwoStar ?? product.twoStar) || 0);
+  fd.append('OneStar', Number(product.ratingBreakdown?.[1] ?? product.OneStar ?? product.oneStar) || 0);
+
+  // Features & Reviews JSON data
+  fd.append('FeaturesJson', JSON.stringify(product.keyFeatures || []));
+
+  const backendReviews = (product.reviews || []).map((r) => ({
+    CustomerName: r.customer || 'Anonymous',
+    Rating: Number(r.rating) || 5,
+    ReviewComment: r.comment || '',
+    VerifiedPurchase: r.verified !== false,
+    ReviewDate: r.date ? `${r.date}-01T00:00:00Z` : new Date().toISOString(),
+  }));
+  fd.append('ReviewsJson', JSON.stringify(backendReviews));
+
   // Inventory & Delivery
   fd.append('StockStatus', product.status || 'In Stock');
   fd.append('CountryOfOrigin', product.countryOfOrigin || 'India');
@@ -561,109 +582,6 @@ export const saveProduct = async (product, imageFiles = [], videoFile = null) =>
 
   const saved = unwrapItem(response);
   const savedId = String(saved.id || product.id || '');
-
-  if (isEditing) {
-    // ── Update Features ──────────────────────────────────────────────────────
-    try {
-      const existingFeatures = await fetchProductFeatures(savedId);
-      const activeFeatures = (product.keyFeatures || []).map((f) => f.trim()).filter(Boolean);
-
-      // Delete features that are no longer present
-      const featuresToDelete = existingFeatures.filter((ef) => !activeFeatures.includes(ef.feature));
-      for (const ef of featuresToDelete) {
-        try {
-          await deleteProductFeature(ef.id);
-        } catch (err) {
-          console.error(`Error deleting feature ${ef.id}:`, err?.message);
-        }
-      }
-
-      // Add features that are new
-      const existingFeatureTexts = existingFeatures.map((ef) => ef.feature);
-      const featuresToAdd = activeFeatures.filter((af) => !existingFeatureTexts.includes(af));
-      for (const feat of featuresToAdd) {
-        try {
-          await createProductFeature(savedId, feat);
-        } catch (err) {
-          console.error('Error saving feature:', feat, err?.message);
-        }
-      }
-    } catch (err) {
-      console.error('Error syncing features:', err?.message);
-    }
-
-    // ── Update Reviews ───────────────────────────────────────────────────────
-    try {
-      const existingReviews = await fetchProductReviews(savedId);
-      const activeReviews = (product.reviews || []).filter((r) => r.customer || r.comment);
-
-      // Reviews to delete: any in existingReviews whose ID is not in activeReviews
-      const activeReviewIds = activeReviews.map((r) => String(r.id || '')).filter(Boolean);
-      const reviewsToDelete = existingReviews.filter((er) => !activeReviewIds.includes(String(er.id)));
-
-      for (const er of reviewsToDelete) {
-        try {
-          await deleteProductReview(er.id);
-        } catch (err) {
-          console.error(`Error deleting review ${er.id}:`, err?.message);
-        }
-      }
-
-      // Reviews to add/recreate
-      for (const rev of activeReviews) {
-        const revIdStr = String(rev.id || '');
-        if (!revIdStr) {
-          // New review
-          try {
-            await createProductReview(savedId, rev);
-          } catch (err) {
-            console.error('Error saving new review:', rev, err?.message);
-          }
-        } else {
-          // Check if it exists and has changed
-          const er = existingReviews.find((item) => String(item.id) === revIdStr);
-          if (er) {
-            const hasChanged =
-              er.customerName !== (rev.customer || 'Anonymous') ||
-              Number(er.rating) !== (Number(rev.rating) || 5) ||
-              (er.reviewComment || '') !== (rev.comment || '') ||
-              er.verifiedPurchase !== (rev.verified !== false);
-
-            if (hasChanged) {
-              // Delete and recreate
-              try {
-                await deleteProductReview(er.id);
-                await createProductReview(savedId, rev);
-              } catch (err) {
-                console.error(`Error updating review ${er.id}:`, err?.message);
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Error syncing reviews:', err?.message);
-    }
-  } else {
-    // ── Create Features & Reviews ────────────────────────────────────────────
-    const activeFeatures = (product.keyFeatures || []).filter((f) => f && f.trim());
-    for (const feat of activeFeatures) {
-      try {
-        await createProductFeature(savedId, feat);
-      } catch (err) {
-        console.error('Error saving feature:', feat, err?.message);
-      }
-    }
-
-    const activeReviews = (product.reviews || []).filter((r) => r.customer || r.comment);
-    for (const rev of activeReviews) {
-      try {
-        await createProductReview(savedId, rev);
-      } catch (err) {
-        console.error('Error saving review:', rev, err?.message);
-      }
-    }
-  }
 
   // Return fully populated product (features + reviews included)
   return fetchProduct(savedId);

@@ -491,42 +491,51 @@ namespace ShyamAgroSuite.Api.Controllers
             product.OneStar = oneStar;
             product.IsActive = dto.IsActive;
 
-            // Handle images update if new images are uploaded
-            if (dto.Images != null && dto.Images.Count > 0)
+            // Handle images update
+            if (dto.ExistingImages != null || (dto.Images != null && dto.Images.Count > 0))
             {
-                string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-                foreach (var image in dto.Images)
-                {
-                    var extension = Path.GetExtension(image.FileName).ToLower();
-                    if (!allowedExtensions.Contains(extension))
-                        continue; // Skip invalid format
-                }
-
-                // Delete old physical image files
+                var keepUrls = dto.ExistingImages ?? new List<string>();
                 var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
-                foreach (var img in product.Images)
+
+                // Remove images that are not in ExistingImages
+                var imagesToRemove = product.Images.Where(img => !keepUrls.Contains(img.ImageUrl)).ToList();
+                foreach (var img in imagesToRemove)
                 {
                     var relativePath = img.ImageUrl.TrimStart('/');
                     var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath.Replace('/', Path.DirectorySeparatorChar));
                     if (System.IO.File.Exists(fullPath))
                     {
-                        System.IO.File.Delete(fullPath);
+                        try { System.IO.File.Delete(fullPath); } catch { }
+                    }
+                    product.Images.Remove(img);
+                }
+
+                // Add new images
+                if (dto.Images != null && dto.Images.Count > 0)
+                {
+                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+                    Directory.CreateDirectory(imagesFolder);
+
+                    foreach (var image in dto.Images)
+                    {
+                        var extension = Path.GetExtension(image.FileName).ToLower();
+                        if (!allowedExtensions.Contains(extension))
+                            continue; // Skip invalid format
+
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                        var filePath = Path.Combine(imagesFolder, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                            await image.CopyToAsync(stream);
+
+                        product.Images.Add(new ProductImage { ImageUrl = "/uploads/images/" + fileName });
                     }
                 }
 
-                // Clear existing records and add new ones
-                product.Images.Clear();
-                Directory.CreateDirectory(imagesFolder);
-
-                foreach (var image in dto.Images)
+                // If no images left, add placeholder
+                if (product.Images.Count == 0)
                 {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-                    var filePath = Path.Combine(imagesFolder, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                        await image.CopyToAsync(stream);
-
-                    product.Images.Add(new ProductImage { ImageUrl = "/uploads/images/" + fileName });
+                    product.Images.Add(new ProductImage { ImageUrl = "/uploads/images/placeholder.png" });
                 }
             }
 

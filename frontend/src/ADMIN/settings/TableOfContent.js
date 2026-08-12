@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Settings, Box, Users, ShoppingCart, Target, Mail, Award, ChevronRight, Shield, KeyRound, ClipboardCheck, HardDrive, Lock } from 'lucide-react';
+import { Settings, Box, Users, ShoppingCart, Target, Mail, Award, ChevronRight, Shield, KeyRound, ClipboardCheck, HardDrive, Lock, RefreshCw } from 'lucide-react';
 
 const TableOfContent = () => {
   const sections = [
@@ -28,9 +28,10 @@ const TableOfContent = () => {
       title: 'Order Processing & Shipments',
       desc: 'Process payments, monitor dispatch shipments, track AC-Docket numbers, and print agricultural bills.',
       links: [
-        { name: 'Orders Ledger', path: '/admin/orders/list', icon: <ShoppingCart size={16} /> },
+        { name: 'Orders List', path: '/admin/orders/list', icon: <ShoppingCart size={16} /> },
         { name: 'Tracking Order', path: '/admin/orders/tracking', icon: <ShoppingCart size={16} /> },
-        { name: 'Shipping Order', path: '/admin/orders/shipping', icon: <ShoppingCart size={16} /> }
+        { name: 'Shipping Order', path: '/admin/orders/shipping', icon: <ShoppingCart size={16} /> },
+        { name: 'Returns & Refunds', path: '/admin/returns', icon: <RefreshCw size={16} /> }
       ]
     },
     {

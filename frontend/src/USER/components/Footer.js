@@ -88,7 +88,6 @@ const Footer = () => {
           <ul className="flex flex-col gap-3 text-gray-400 text-sm">
             <li><Link to="/" className="hover:text-primary transition-colors">{t('home')}</Link></li>
             <li><Link to="/categories" className="hover:text-primary transition-colors">{t('agricultureStore')}</Link></li>
-            <li><Link to="/become-seller" className="hover:text-primary transition-colors">{t('becomeSeller')}</Link></li>
             <li><Link to="/track-order" className="hover:text-primary transition-colors">{t('orderTracking')}</Link></li>
             <li><Link to="/blog" className="hover:text-primary transition-colors">{t('agricultureBlog')}</Link></li>
           </ul>

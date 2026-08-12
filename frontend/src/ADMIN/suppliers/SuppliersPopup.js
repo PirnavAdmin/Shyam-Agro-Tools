@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Mail, Phone, MapPin, Truck, ShieldCheck, DollarSign, Award, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { X, Mail, Phone, MapPin, Truck, DollarSign, Award, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { formatSupplierCurrency } from './SuppliersList';
 
 const getStatusBadge = (status) => {
@@ -29,14 +29,29 @@ const SuppliersPopup = ({ supplier, onClose }) => {
   if (!supplier) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in" onClick={onClose}>
+    <div 
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 animate-fade-in" 
+      onClick={onClose}
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        padding: '16px',
+        overflowY: 'auto'
+      }}
+    >
       <div 
-        className="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-100 animate-slide-up"
+        className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden border border-slate-100 animate-slide-up"
         onClick={(e) => e.stopPropagation()}
-        style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        style={{ 
+          fontFamily: 'Inter, system-ui, sans-serif',
+          marginTop: '40px',
+          marginBottom: '40px',
+          flexShrink: 0
+        }}
       >
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5 text-white flex justify-between items-start relative">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5 text-white flex justify-between items-start relative flex-shrink-0">
           <div>
             <span className="text-[10px] uppercase font-bold tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
               {supplier.category || 'General'}
@@ -54,7 +69,7 @@ const SuppliersPopup = ({ supplier, onClose }) => {
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto text-xs">
+        <div className="p-6 space-y-6 flex-1 overflow-y-auto text-xs">
           
           {/* Quick Metrics Row */}
           <div className="grid grid-cols-3 gap-4 border-b border-slate-100 pb-5">
@@ -143,7 +158,7 @@ const SuppliersPopup = ({ supplier, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end">
+        <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end flex-shrink-0">
           <button 
             onClick={onClose} 
             className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold transition-colors"

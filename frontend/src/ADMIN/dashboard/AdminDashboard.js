@@ -302,9 +302,10 @@ const AdminDashboard = () => {
         { name: 'Pending', value: 2, color: '#f59e0b' }
       ];
     }
-    const counts = { Completed: 0, Processing: 0, Dispatched: 0, Packed: 0, Pending: 0, 'On Hold': 0, Canceled: 0 };
+    const counts = { Completed: 0, Processing: 0, Dispatched: 0, Packed: 0, Pending: 0, 'On Hold': 0, Canceled: 0, Placed: 0, Shipped: 0 };
     orders.forEach(o => {
-      const status = o.status || 'Pending';
+      let status = o.status || 'Pending';
+      if (status === 'Cancelled') status = 'Canceled';
       if (counts[status] !== undefined) {
         counts[status]++;
       } else {
@@ -312,7 +313,7 @@ const AdminDashboard = () => {
       }
     });
 
-    const colors = { Completed: '#10b981', Processing: '#2563eb', Dispatched: '#0284c7', Packed: '#8b5cf6', Pending: '#f59e0b', 'On Hold': '#6b7280', Canceled: '#ef4444' };
+    const colors = { Completed: '#16a34a', Processing: '#2563eb', Dispatched: '#f97316', Packed: '#db2777', Pending: '#eab308', 'On Hold': '#4b5563', Canceled: '#dc2626', Placed: '#9333ea', Shipped: '#06b6d4' };
     return Object.entries(counts)
       .map(([name, value]) => ({ name, value, color: colors[name] }))
       .filter(item => item.value > 0);

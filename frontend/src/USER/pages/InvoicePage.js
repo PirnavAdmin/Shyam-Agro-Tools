@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Download, Printer } from 'lucide-react';
-import headerLogo from '../../asset/header logo.png';
+import headerLogo from '../../asset/headerlogo-new.png';
 import './InvoicePage.css';
 
 const invoiceData = {

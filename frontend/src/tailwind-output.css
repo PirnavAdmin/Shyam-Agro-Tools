@@ -1713,6 +1713,10 @@ img.app-line-thumb,
   max-height: 75vh;
 }
 
+.max-h-\[80vh\] {
+  max-height: 80vh;
+}
+
 .max-h-\[90vh\] {
   max-height: 90vh;
 }
@@ -5609,10 +5613,6 @@ section + .brand-slider-section {
 
   .sm\:inline-block {
     display: inline-block;
-  }
-
-  .sm\:inline {
-    display: inline;
   }
 
   .sm\:flex {

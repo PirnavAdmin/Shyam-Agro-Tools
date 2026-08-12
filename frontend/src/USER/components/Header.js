@@ -19,6 +19,7 @@ import {
 import { getWallet } from '../../services/walletService';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
 import { getAuthSession, setAuthSession } from '../../utils/auth';
+import { isValidName } from '../../utils/validation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Check, ShoppingBag, Heart, User, Search, Phone, Mail, LogOut, Package, Wallet, Menu, X, FileText, MapPin } from 'lucide-react';
 import { buildSearchResults } from '../utils/searchIndex';
@@ -552,6 +553,10 @@ const Header = ({ onLoginClick }) => {
       showToast(t('nameRequired'), 'error');
       return;
     }
+    if (!isValidName(nextForm.name.trim())) {
+      showToast(t('nameInvalidFormat') || 'Please enter a valid, meaningful name (no gibberish or invalid characters allowed)', 'error');
+      return;
+    }
     if (nextForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextForm.email)) {
       showToast(t('validEmailAddress'), 'error');
       return;
@@ -771,9 +776,6 @@ const Header = ({ onLoginClick }) => {
               <span className="icon-shade icon-grey icon-shade-sm"><Mail size={12} /></span>
               <Link to="/contact-support" className="top-header-contact-link">Support@shyamagrotools.com</Link>
             </div>
-            <Link to="/become-seller" className="top-header-seller-link hidden sm:inline">
-              {t('becomeSeller')}
-            </Link>
           </div>
           <div className="top-header-promo hidden md:block text-center flex-1">
             {topBarAnnouncements.map((announcement, index) => (

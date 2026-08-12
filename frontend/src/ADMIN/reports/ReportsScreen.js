@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Bar,
   BarChart,
@@ -29,7 +29,6 @@ import {
   ExternalLink,
   X,
   Search,
-  Eye,
   ArrowUpRight,
   Settings,
   Trash2
@@ -61,6 +60,19 @@ const formatOrderId = (rawId) => {
 };
 
 const REPORTS_COLORS = ['#10b981', '#6366f1', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6', '#14b8a6', '#f43f5e'];
+
+const STATUS_COLORS = {
+  Completed: '#16a34a',   // Green
+  Cancelled: '#dc2626',   // Red
+  Canceled: '#dc2626',    // Red (fallback)
+  Dispatched: '#f97316',  // Orange
+  Processing: '#2563eb',  // Blue
+  Pending: '#eab308',     // Yellow
+  Placed: '#9333ea',      // Purple
+  Packed: '#db2777',      // Pink
+  Shipped: '#06b6d4',     // Cyan
+  'On Hold': '#4b5563'    // Gray
+};
 
 const ReportsScreen = () => {
   const navigate = useNavigate();
@@ -767,14 +779,14 @@ const ReportsScreen = () => {
                 {/* Pie Chart: Fulfillment breakdown */}
                 <div className="chart-card-widget">
                   <h3>Order fulfillment States</h3>
-                  <div className="chart-container-inner">
-                    <ResponsiveContainer width="100%" height={280}>
+                  <div className="chart-container-inner" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <ResponsiveContainer width="100%" height={210}>
                       <PieChart>
                         <Pie
                           data={statusPieData}
                           cx="50%"
-                          cy="45%"
-                          innerRadius={40}
+                          cy="50%"
+                          innerRadius={45}
                           outerRadius={80}
                           paddingAngle={2}
                           dataKey="value"
@@ -792,9 +804,10 @@ const ReportsScreen = () => {
                             );
                           }}
                         >
-                          {statusPieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={REPORTS_COLORS[index % REPORTS_COLORS.length]} />
-                          ))}
+                          {statusPieData.map((entry, index) => {
+                            const color = STATUS_COLORS[entry.name] || REPORTS_COLORS[index % REPORTS_COLORS.length];
+                            return <Cell key={`cell-${index}`} fill={color} />;
+                          })}
                         </Pie>
                         <Tooltip
                           formatter={(val, name) => {
@@ -803,20 +816,47 @@ const ReportsScreen = () => {
                             return [`${val} orders (${pct}%)`, name];
                           }}
                         />
-                        <Legend
-                          verticalAlign="bottom"
-                          height={48}
-                          iconType="circle"
-                          formatter={(value, entry) => {
-                            const val = entry.payload?.value ?? 0;
-                            const total = statusPieData.reduce((s, i) => s + (Number(i.value) || 0), 0);
-                            const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
-                            return `${value}: ${val} (${pct}%)`;
-                          }}
-                          wrapperStyle={{ fontSize: '11px', fontWeight: '600', color: '#334155' }}
-                        />
                       </PieChart>
                     </ResponsiveContainer>
+
+                    {/* Custom Non-overlapping Legend */}
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '8px 12px',
+                      justifyContent: 'center',
+                      marginTop: '16px',
+                      padding: '0 8px',
+                      width: '100%'
+                    }}>
+                      {statusPieData.map((entry, index) => {
+                        const color = STATUS_COLORS[entry.name] || REPORTS_COLORS[index % REPORTS_COLORS.length];
+                        const val = entry.value;
+                        const total = statusPieData.reduce((s, i) => s + (Number(i.value) || 0), 0);
+                        const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;
+                        return (
+                          <div key={index} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            color: '#334155',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            <span style={{
+                              display: 'inline-block',
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              backgroundColor: color,
+                              flexShrink: 0
+                            }} />
+                            <span>{entry.name}: {val} ({pct}%)</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 

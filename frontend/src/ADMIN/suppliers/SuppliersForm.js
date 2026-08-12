@@ -163,7 +163,7 @@ const SuppliersForm = () => {
       </section>
 
       {/* Grid Layout: Form and Sidebar */}
-      <form className="supplier-form-layout" onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px', alignItems: 'start' }}>
+      <form className="supplier-form-layout" onSubmit={handleSubmit}>
         <main className="catalog-stack" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Company Information */}
