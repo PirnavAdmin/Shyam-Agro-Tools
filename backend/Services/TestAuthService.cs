@@ -114,23 +114,31 @@ namespace ShyamAgroSuite.Api.Services
                     phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
                 }
 
-                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
-                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                var customerList = await _context.Customers
+                    .Select(c => new { c.Id, c.Phone, c.Email })
+                    .ToListAsync();
+
+                var matched = customerList.FirstOrDefault(c => 
+                    (c.Phone != null && new string(c.Phone.Where(char.IsDigit).ToArray()).EndsWith(phoneDigits)) ||
                     (!string.IsNullOrEmpty(request.Email) && c.Email == request.Email));
 
-                if (customer != null)
+                if (matched != null)
                 {
-                    customer.Name = request.FullName ?? customer.Name;
-                    customer.Email = request.Email ?? customer.Email;
-                    
-                    var parts = new List<string>();
-                    if (!string.IsNullOrWhiteSpace(request.DoorNo)) parts.Add(request.DoorNo.Trim());
-                    if (!string.IsNullOrWhiteSpace(request.StreetArea)) parts.Add(request.StreetArea.Trim());
-                    if (!string.IsNullOrWhiteSpace(request.Pincode)) parts.Add(request.Pincode.Trim());
-                    customer.Address = parts.Count > 0 ? string.Join(", ", parts) : customer.Address;
-                    
-                    customer.District = request.City ?? customer.District;
-                    customer.State = request.State ?? customer.State;
+                    var customer = await _context.Customers.FindAsync(matched.Id);
+                    if (customer != null)
+                    {
+                        customer.Name = request.FullName ?? customer.Name;
+                        customer.Email = request.Email ?? customer.Email;
+                        
+                        var parts = new List<string>();
+                        if (!string.IsNullOrWhiteSpace(request.DoorNo)) parts.Add(request.DoorNo.Trim());
+                        if (!string.IsNullOrWhiteSpace(request.StreetArea)) parts.Add(request.StreetArea.Trim());
+                        if (!string.IsNullOrWhiteSpace(request.Pincode)) parts.Add(request.Pincode.Trim());
+                        customer.Address = parts.Count > 0 ? string.Join(", ", parts) : customer.Address;
+                        
+                        customer.District = request.City ?? customer.District;
+                        customer.State = request.State ?? customer.State;
+                    }
                 }
             }
 
@@ -310,23 +318,31 @@ namespace ShyamAgroSuite.Api.Services
                     phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
                 }
 
-                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
-                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                var customerList = await _context.Customers
+                    .Select(c => new { c.Id, c.Phone, c.Email })
+                    .ToListAsync();
+
+                var matched = customerList.FirstOrDefault(c => 
+                    (c.Phone != null && new string(c.Phone.Where(char.IsDigit).ToArray()).EndsWith(phoneDigits)) ||
                     (!string.IsNullOrEmpty(request.Email) && c.Email == request.Email));
 
-                if (customer != null)
+                if (matched != null)
                 {
-                    customer.Name = request.FullName ?? customer.Name;
-                    customer.Email = request.Email ?? customer.Email;
-                    
-                    var parts = new List<string>();
-                    if (!string.IsNullOrWhiteSpace(request.DoorNo)) parts.Add(request.DoorNo.Trim());
-                    if (!string.IsNullOrWhiteSpace(request.StreetArea)) parts.Add(request.StreetArea.Trim());
-                    if (!string.IsNullOrWhiteSpace(request.Pincode)) parts.Add(request.Pincode.Trim());
-                    customer.Address = parts.Count > 0 ? string.Join(", ", parts) : customer.Address;
-                    
-                    customer.District = request.City ?? customer.District;
-                    customer.State = request.State ?? customer.State;
+                    var customer = await _context.Customers.FindAsync(matched.Id);
+                    if (customer != null)
+                    {
+                        customer.Name = request.FullName ?? customer.Name;
+                        customer.Email = request.Email ?? customer.Email;
+                        
+                        var parts = new List<string>();
+                        if (!string.IsNullOrWhiteSpace(request.DoorNo)) parts.Add(request.DoorNo.Trim());
+                        if (!string.IsNullOrWhiteSpace(request.StreetArea)) parts.Add(request.StreetArea.Trim());
+                        if (!string.IsNullOrWhiteSpace(request.Pincode)) parts.Add(request.Pincode.Trim());
+                        customer.Address = parts.Count > 0 ? string.Join(", ", parts) : customer.Address;
+                        
+                        customer.District = request.City ?? customer.District;
+                        customer.State = request.State ?? customer.State;
+                    }
                 }
             }
 

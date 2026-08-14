@@ -114,15 +114,23 @@ namespace ShyamAgroSuite.Api.Controllers
                     phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
                 }
 
-                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
-                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                var customerList = await _context.Customers
+                    .Select(c => new { c.Id, c.Phone, c.Email })
+                    .ToListAsync();
+
+                var matched = customerList.FirstOrDefault(c => 
+                    (c.Phone != null && new string(c.Phone.Where(char.IsDigit).ToArray()).EndsWith(phoneDigits)) ||
                     (!string.IsNullOrEmpty(address.Email) && c.Email == address.Email));
 
-                if (customer != null)
+                if (matched != null)
                 {
-                    customer.Address = address.FullAddress;
-                    customer.District = address.City;
-                    customer.State = address.State;
+                    var customer = await _context.Customers.FindAsync(matched.Id);
+                    if (customer != null)
+                    {
+                        customer.Address = address.FullAddress;
+                        customer.District = address.City;
+                        customer.State = address.State;
+                    }
                 }
             }
 
@@ -185,15 +193,23 @@ namespace ShyamAgroSuite.Api.Controllers
                     phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
                 }
 
-                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
-                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                var customerList = await _context.Customers
+                    .Select(c => new { c.Id, c.Phone, c.Email })
+                    .ToListAsync();
+
+                var matched = customerList.FirstOrDefault(c => 
+                    (c.Phone != null && new string(c.Phone.Where(char.IsDigit).ToArray()).EndsWith(phoneDigits)) ||
                     (!string.IsNullOrEmpty(address.Email) && c.Email == address.Email));
 
-                if (customer != null)
+                if (matched != null)
                 {
-                    customer.Address = address.FullAddress;
-                    customer.District = address.City;
-                    customer.State = address.State;
+                    var customer = await _context.Customers.FindAsync(matched.Id);
+                    if (customer != null)
+                    {
+                        customer.Address = address.FullAddress;
+                        customer.District = address.City;
+                        customer.State = address.State;
+                    }
                 }
             }
 
