@@ -105,6 +105,27 @@ namespace ShyamAgroSuite.Api.Controllers
 
             _context.CustomerAddresses.Add(address);
 
+            // Synchronize address details to Customer profile
+            if (!string.IsNullOrEmpty(address.PhoneNumber))
+            {
+                var phoneDigits = new string(address.PhoneNumber.Where(char.IsDigit).ToArray());
+                if (phoneDigits.Length > 10)
+                {
+                    phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
+                }
+
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
+                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                    (!string.IsNullOrEmpty(address.Email) && c.Email == address.Email));
+
+                if (customer != null)
+                {
+                    customer.Address = address.FullAddress;
+                    customer.District = address.City;
+                    customer.State = address.State;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok(new
@@ -154,6 +175,27 @@ namespace ShyamAgroSuite.Api.Controllers
             existing.State = address.State;
             existing.Pincode = address.Pincode;
             existing.AddressType = address.AddressType;
+
+            // Synchronize address details to Customer profile
+            if (!string.IsNullOrEmpty(address.PhoneNumber))
+            {
+                var phoneDigits = new string(address.PhoneNumber.Where(char.IsDigit).ToArray());
+                if (phoneDigits.Length > 10)
+                {
+                    phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
+                }
+
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
+                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                    (!string.IsNullOrEmpty(address.Email) && c.Email == address.Email));
+
+                if (customer != null)
+                {
+                    customer.Address = address.FullAddress;
+                    customer.District = address.City;
+                    customer.State = address.State;
+                }
+            }
 
             await _context.SaveChangesAsync();
 

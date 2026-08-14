@@ -255,6 +255,13 @@ namespace ShyamAgroSuite.Api.Controllers
 
                 if (customer != null)
                 {
+                    if (address != null)
+                    {
+                        customer.Address = address.FullAddress;
+                        customer.District = address.City;
+                        customer.State = address.State;
+                    }
+
                     // Deduct redeemed coins
                     if (coinsRedeemed > 0)
                     {

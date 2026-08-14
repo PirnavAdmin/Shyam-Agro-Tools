@@ -2410,7 +2410,7 @@ const PaymentPage = () => {
                   <h3>{t('otpVerification')}</h3>
                   <p>{t('enterOtpSentTo') || 'Enter the OTP sent to'} {cardOtpFlow.maskedPhone}</p>
                   <div className="bank-input-group otp-field">
-                    <label>{t('otp')} * <span style={{fontSize: '11px', color: 'var(--eco-muted)'}}>(Test OTP: 123456)</span></label>
+                    <label>{t('otp')} *</label>
                     <input
                       type="text"
                       name="otp"

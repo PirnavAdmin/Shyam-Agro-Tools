@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using ShyamAgroSuite.Api.Data;
 using ShyamAgroSuite.Api.Models;
 using ShyamAgroSuite.Api.Repositories;
 using ShyamAgroSuite.Api.Services.Interfaces;
@@ -14,15 +17,18 @@ namespace ShyamAgroSuite.Api.Services
         private readonly ITestUserRepository _repository;
         private readonly IWebHostEnvironment _environment;
         private readonly IJwtService _jwtService;
+        private readonly ApplicationDbContext _context;
 
         public TestAuthService(
             ITestUserRepository repository,
             IWebHostEnvironment environment,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            ApplicationDbContext context)
         {
             _repository = repository;
             _environment = environment;
             _jwtService = jwtService;
+            _context = context;
         }
 
         // LOGIN / RESEND OTP
@@ -98,6 +104,37 @@ namespace ShyamAgroSuite.Api.Services
             user.Pincode = request.Pincode;
 
             await _repository.UpdateAsync(user);
+
+            // Synchronize name, email, and address to Customer profile
+            if (!string.IsNullOrEmpty(request.MobileNumber))
+            {
+                var phoneDigits = new string(request.MobileNumber.Where(char.IsDigit).ToArray());
+                if (phoneDigits.Length > 10)
+                {
+                    phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
+                }
+
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
+                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                    (!string.IsNullOrEmpty(request.Email) && c.Email == request.Email));
+
+                if (customer != null)
+                {
+                    customer.Name = request.FullName ?? customer.Name;
+                    customer.Email = request.Email ?? customer.Email;
+                    
+                    var parts = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(request.DoorNo)) parts.Add(request.DoorNo.Trim());
+                    if (!string.IsNullOrWhiteSpace(request.StreetArea)) parts.Add(request.StreetArea.Trim());
+                    if (!string.IsNullOrWhiteSpace(request.Pincode)) parts.Add(request.Pincode.Trim());
+                    customer.Address = parts.Count > 0 ? string.Join(", ", parts) : customer.Address;
+                    
+                    customer.District = request.City ?? customer.District;
+                    customer.State = request.State ?? customer.State;
+                }
+            }
+
+            await _context.SaveChangesAsync();
 
             return true;
         }
@@ -263,6 +300,37 @@ namespace ShyamAgroSuite.Api.Services
             user.Pincode = request.Pincode;
 
             await _repository.UpdateAsync(user);
+
+            // Synchronize name, email, and address to Customer profile
+            if (!string.IsNullOrEmpty(mobileNumber))
+            {
+                var phoneDigits = new string(mobileNumber.Where(char.IsDigit).ToArray());
+                if (phoneDigits.Length > 10)
+                {
+                    phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
+                }
+
+                var customer = await _context.Customers.FirstOrDefaultAsync(c => 
+                    c.Phone.Replace(" ", "").Replace("-", "").Replace("+91", "").EndsWith(phoneDigits) ||
+                    (!string.IsNullOrEmpty(request.Email) && c.Email == request.Email));
+
+                if (customer != null)
+                {
+                    customer.Name = request.FullName ?? customer.Name;
+                    customer.Email = request.Email ?? customer.Email;
+                    
+                    var parts = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(request.DoorNo)) parts.Add(request.DoorNo.Trim());
+                    if (!string.IsNullOrWhiteSpace(request.StreetArea)) parts.Add(request.StreetArea.Trim());
+                    if (!string.IsNullOrWhiteSpace(request.Pincode)) parts.Add(request.Pincode.Trim());
+                    customer.Address = parts.Count > 0 ? string.Join(", ", parts) : customer.Address;
+                    
+                    customer.District = request.City ?? customer.District;
+                    customer.State = request.State ?? customer.State;
+                }
+            }
+
+            await _context.SaveChangesAsync();
 
             return true;
         }

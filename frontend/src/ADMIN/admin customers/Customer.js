@@ -356,7 +356,6 @@ const Customer = () => {
   // Derivations
   const totalSpent = profile.orders?.reduce((sum, o) => sum + (o.finalAmount || o.totalAmount || 0), 0) || 0;
   const customerType = profile.type || 'Farmer';
-  const cropList = profile.agrarianProfile?.cropType ? [profile.agrarianProfile.cropType] : [];
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -441,16 +440,7 @@ const Customer = () => {
                 <span className="text-slate-500 leading-relaxed">
                   {(() => {
                     const parts = [profile.address, profile.district, profile.state].filter(p => p && p.trim() && p !== 'string' && p !== 'N/A');
-                    if (parts.length > 0) return parts.join(', ');
-                    const realisticAddrs = [
-                      'H.No 4-12, Main Road, Guntur, Andhra Pradesh',
-                      'Door No. 12-4, Collectorate Road, Nandyal, Andhra Pradesh',
-                      'Rythu Bazar Street, Tenali, Guntur, Andhra Pradesh',
-                      'Plot 45, Agricultural Market Yard, Khammam, Telangana',
-                      'D.No 5-88, Miryalaguda, Nalgonda, Telangana',
-                      'H.No 2-90, Bypass Road, Eluru, Andhra Pradesh'
-                    ];
-                    return realisticAddrs[(profile.id || 0) % realisticAddrs.length];
+                    return parts.length > 0 ? parts.join(', ') : '—';
                   })()}
                 </span>
               </div>
@@ -467,32 +457,18 @@ const Customer = () => {
               <div className="flex justify-between">
                 <span className="text-slate-400">Total Land Area:</span>
                 <span className="font-semibold text-slate-800">
-                  {profile.agrarianProfile?.farmSizeAcres ? `${profile.agrarianProfile.farmSizeAcres} Acres` : '5.5 Acres'}
+                  {profile.agrarianProfile?.farmSizeAcres ? `${profile.agrarianProfile.farmSizeAcres} Acres` : '—'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Soil Condition:</span>
-                <span className="font-semibold text-slate-800">{profile.agrarianProfile?.soilType && profile.agrarianProfile.soilType !== 'N/A' ? profile.agrarianProfile.soilType : 'Black Cotton Soil'}</span>
+                <span className="font-semibold text-slate-800">{profile.agrarianProfile?.soilType && profile.agrarianProfile.soilType !== 'N/A' ? profile.agrarianProfile.soilType : '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Irrigation Source:</span>
-                <span className="font-semibold text-slate-800">{profile.agrarianProfile?.irrigationSource && profile.agrarianProfile.irrigationSource !== 'N/A' ? profile.agrarianProfile.irrigationSource : 'Borewell & Canal'}</span>
+                <span className="font-semibold text-slate-800">{profile.agrarianProfile?.irrigationSource && profile.agrarianProfile.irrigationSource !== 'N/A' ? profile.agrarianProfile.irrigationSource : '—'}</span>
               </div>
-              <div className="flex justify-between items-start gap-2">
-                <span className="text-slate-400 shrink-0">Crops Cultivated:</span>
-                <div className="flex flex-wrap gap-1.5 justify-end">
-                  {(() => {
-                    const realisticCrops = ['Cotton', 'Paddy', 'Chilli', 'Maize', 'Groundnut', 'Sugarcane', 'Turmeric'];
-                    const effectiveCrop = (profile.agrarianProfile?.cropType && profile.agrarianProfile.cropType !== 'N/A')
-                      ? profile.agrarianProfile.cropType 
-                      : realisticCrops[(profile.id || 0) % realisticCrops.length];
-                    const activeCrops = cropList.length > 0 ? cropList : [effectiveCrop];
-                    return activeCrops.map((crop, idx) => (
-                      <span key={idx} className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-semibold">{crop}</span>
-                    ));
-                  })()}
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -746,15 +722,7 @@ const Customer = () => {
                     <option value="Laterite">Laterite</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block font-semibold text-slate-500 mb-1">Crop Type</label>
-                  <input
-                    type="text"
-                    value={editForm.cropType}
-                    onChange={e => setEditForm({ ...editForm, cropType: e.target.value })}
-                    className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
+
                 <div>
                   <label className="block font-semibold text-slate-500 mb-1">Farm Size (Acres)</label>
                   <input

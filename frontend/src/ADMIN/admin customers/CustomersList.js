@@ -290,7 +290,6 @@ const CustomersList = () => {
               <th className="px-4 py-2">Customer Name</th>
               <th className="px-4 py-2">Phone Number</th>
               <th className="px-4 py-2">Address</th>
-              <th className="px-4 py-2">Crop</th>
               <th className="px-4 py-2 text-center">Orders</th>
               <th className="px-4 py-2 text-right">Total Spent</th>
               <th className="px-4 py-2 text-right">Actions</th>
@@ -298,23 +297,11 @@ const CustomersList = () => {
           </thead>
           <tbody className="divide-y divide-slate-100">
             {currentCustomers.map((cust) => {
-              const realisticCrops = ['Cotton', 'Paddy', 'Chilli', 'Maize', 'Groundnut', 'Sugarcane', 'Turmeric'];
-              const cropType = (cust.agrarianProfile?.cropType && cust.agrarianProfile.cropType !== 'N/A')
-                ? cust.agrarianProfile.cropType 
-                : realisticCrops[cust.id % realisticCrops.length];
+
 
               const formatAddr = () => {
                 const parts = [cust.address, cust.district, cust.state].filter(p => p && p.trim() && p !== 'string' && p !== 'N/A');
-                if (parts.length > 0) return parts.join(', ');
-                const realisticAddrs = [
-                  'H.No 4-12, Main Road, Guntur, Andhra Pradesh',
-                  'Door No. 12-4, Collectorate Road, Nandyal, Andhra Pradesh',
-                  'Rythu Bazar Street, Tenali, Guntur, Andhra Pradesh',
-                  'Plot 45, Agricultural Market Yard, Khammam, Telangana',
-                  'D.No 5-88, Miryalaguda, Nalgonda, Telangana',
-                  'H.No 2-90, Bypass Road, Eluru, Andhra Pradesh'
-                ];
-                return realisticAddrs[cust.id % realisticAddrs.length];
+                return parts.length > 0 ? parts.join(', ') : '—';
               };
               const displayAddress = formatAddr();
               const orderCount = cust.orders?.length || 0;
@@ -339,9 +326,7 @@ const CustomersList = () => {
                       <span className="truncate max-w-[220px]" title={displayAddress}>{displayAddress}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-2">
-                    <span className="text-slate-700 font-semibold text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-md">{cropType}</span>
-                  </td>
+
                   <td className="px-4 py-2 text-center font-semibold text-slate-700">{orderCount}</td>
                   <td className="px-4 py-2 text-right font-bold text-slate-800">₹{totalSpent.toLocaleString('en-IN')}</td>
                   <td className="px-4 py-2 text-right">
@@ -355,7 +340,7 @@ const CustomersList = () => {
             })}
             {filteredCustomers.length === 0 && (
               <tr>
-                <td colSpan="8" className="text-center py-6 text-slate-400">No customers found.</td>
+                <td colSpan="7" className="text-center py-6 text-slate-400">No customers found.</td>
               </tr>
             )}
           </tbody>
@@ -523,16 +508,7 @@ const CustomersList = () => {
                     <option value="Laterite">Laterite</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">Main Crop Type</label>
-                  <input
-                    type="text"
-                    value={newCustomer.cropType}
-                    onChange={e => setNewCustomer({ ...newCustomer, cropType: e.target.value })}
-                    className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. Wheat, Cotton, Grapes"
-                  />
-                </div>
+
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1">Farm Size (Acres)</label>
                   <input

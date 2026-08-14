@@ -1,0 +1,42 @@
+# Build output
+bin/
+obj/
+ 
+# Visual Studio
+.vs/
+*.user
+*.suo
+ 
+# VS Code
+.vscode/
+ 
+# Logs
+*.log
+logs/
+ 
+# Environment / secrets
+.env
+.env.*
+!.env.example
+ 
+# Temporary files
+tmp/
+temp/
+ 
+# OS files
+.DS_Store
+Thumbs.db
+ 
+# Database backups
+*.sql
+*.sql.gz
+*.bak
+ 
+# Certificates / private keys
+*.pfx
+*.pem
+*.key
+ 
+# Node/frontend artifacts if accidentally inside backend
+node_modules/
+ 

@@ -178,7 +178,7 @@ using (var cleanupScope = app.Services.CreateScope())
                     SELECT c.Id, 'Black Cotton', CASE (c.Id % 6) WHEN 0 THEN 'Cotton' WHEN 1 THEN 'Paddy' WHEN 2 THEN 'Chilli' WHEN 3 THEN 'Maize' WHEN 4 THEN 'Groundnut' ELSE 'Sugarcane' END, 5.5, 'Borewell'
                     FROM Customers c
                     LEFT JOIN CustomerAgrarians ca ON c.Id = ca.CustomerId
-                    WHERE ca.Id IS NULL;
+                    WHERE ca.Id IS NULL AND c.Id <= 44;
 
                     UPDATE CustomerAgrarians SET CropType = 'Cotton' WHERE CropType IS NULL OR TRIM(CropType) = '' OR CropType = 'N/A';
 
@@ -448,29 +448,6 @@ using (var scope = app.Services.CreateScope())
                 WHERE `Id` IN (24, 27, 28, 29, 30) 
                    OR `ProductName` = 'Koramandal'
                    OR `ProductName` LIKE '%Drip Irrigation Kit%';
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/cbd9bc55-e9d8-422d-ad81-5bafc2ad63fb.png' WHERE `ProductId` = 5 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/3b800ad7-3766-43ef-8717-9171e4506c43.png' WHERE `ProductId` = 6 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/78a4d353-0554-424d-92d5-3cf0f0aa4277.png' WHERE `ProductId` = 7 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/833984e2-4d41-409a-b7ff-93a700d635d3.png' WHERE `ProductId` = 8 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/416af294-e0b6-4dbe-825d-82fd77a9a673.png' WHERE `ProductId` = 9 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/363e842c-dd8e-4b09-b3b0-2fee1c467bcb.png' WHERE `ProductId` = 10 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/eff6b93d-4898-4bd7-8917-38a564c2bed6.png' WHERE `ProductId` = 12 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/b7a820b5-7110-4342-afb2-affdd37a61da.png' WHERE `ProductId` = 14 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/cab50a2e-61a5-4323-b0cb-9231c9970408.png' WHERE `ProductId` = 15 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/42885a07-74c0-4d50-abc6-7fe4c1925420.png' WHERE `ProductId` = 16 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/a5edb2e7-0b28-4252-8349-7ee134ccdc27.jfif' WHERE `ProductId` = 17 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/a385120c-4585-4317-adb7-8b60a1c597d3.png' WHERE `ProductId` = 18 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/73e1918b-c536-483a-8f0f-02e54c3c389e.png' WHERE `ProductId` = 19 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/13861506-405a-41da-9010-486e5a76cb98.png' WHERE `ProductId` = 20 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/dadca29f-b643-40a6-9d8d-fb89488ab1a8.png' WHERE `ProductId` = 21 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/05f0aadc-df96-4b28-b4fb-cf7a623292da.png' WHERE `ProductId` = 22 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/4208e0c4-214a-4d33-b4f9-59e8235f740d.png' WHERE `ProductId` = 23 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/acf34493-5a93-4cbd-9a0b-943933d69c73.png' WHERE `ProductId` = 25 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/c5c37b91-b771-458f-8cc3-c085e9925f63.jpg' WHERE `ProductId` = 32 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/45ce6a6d-4e96-4e69-b37c-8ce4b3814d50.jpg' WHERE `ProductId` = 34 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/c7cb595f-0ffe-4766-9e1a-0c74caa04a21.jpg' WHERE `ProductId` = 35 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/ecbdb140-7e88-4ac4-bd33-ac3317827681.jpg' WHERE `ProductId` = 36 LIMIT 1;
-                 UPDATE `ProductImages` SET `ImageUrl` = '/uploads/images/4f199761-0534-4c8d-9576-d37b078c5f59.jfif' WHERE `ProductId` = 37 LIMIT 1;
 
                 UPDATE `Categories` SET `ImageUrl` = '/uploads/commercial-kitchen-category.jpg' WHERE `Name` LIKE '%Kitchen%' OR `Id` = 12;
                 UPDATE `Categories` SET `ImageUrl` = '/uploads/fertilizers-category.jpg' WHERE `Name` LIKE '%Fertilizer%' OR `Id` IN (17, 19);";

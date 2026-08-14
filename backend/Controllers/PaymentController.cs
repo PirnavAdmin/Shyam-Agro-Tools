@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using ShyamAgroSuite.Api.Data;
 using ShyamAgroSuite.Api.Models;
 using System;
@@ -15,10 +16,12 @@ namespace ShyamAgroSuite.Api.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public PaymentController(ApplicationDbContext context)
+        public PaymentController(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         public class InitiatePaymentRequest
@@ -73,11 +76,11 @@ namespace ShyamAgroSuite.Api.Controllers
             {
                 if (int.TryParse(request.OrderId, out int numericId))
                 {
-                    dbOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id == numericId);
+                    dbOrder = await _context.Orders.Include(o => o.Customer).FirstOrDefaultAsync(o => o.Id == numericId);
                 }
                 if (dbOrder == null)
                 {
-                    dbOrder = await _context.Orders.FirstOrDefaultAsync(o => o.OrderNumber == request.OrderId);
+                    dbOrder = await _context.Orders.Include(o => o.Customer).FirstOrDefaultAsync(o => o.OrderNumber == request.OrderId);
                 }
             }
 
@@ -209,6 +212,17 @@ namespace ShyamAgroSuite.Api.Controllers
                     orderSuccess.ExpiryDate = request.ExpiryDate;
                     await _context.SaveChangesAsync();
                 }
+                
+                string phone = dbOrder?.Customer?.Phone;
+                if (string.IsNullOrEmpty(phone)) phone = "9999999999";
+                string masked = phone.Length >= 4 ? new string('*', phone.Length - 4) + phone.Substring(phone.Length - 4) : new string('*', 6) + phone;
+                
+                string otp = new Random().Next(100000, 999999).ToString();
+                _cache.Set(transactionId + "_OTP", otp, TimeSpan.FromMinutes(10));
+                
+                Console.WriteLine($"\n=======================================================");
+                Console.WriteLine($"[SMS MOCK] Sent Card Verification OTP {otp} to {phone}");
+                Console.WriteLine($"=======================================================\n");
 
                 return Ok(new
                 {
@@ -221,7 +235,7 @@ namespace ShyamAgroSuite.Api.Controllers
                     amount = finalAmount,
                     currency = currency,
                     requiresOtp = true,
-                    maskedPhone = "******7890",
+                    maskedPhone = masked,
                     paymentStatus = "OtpPending",
                     message = "OTP sent to your registered mobile number for card verification."
                 });
@@ -310,7 +324,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 return NotFound(new { Success = false, Message = "Transaction not found." });
             }
 
-            if (request.Otp != "123456")
+            if (!_cache.TryGetValue(request.TransactionId + "_OTP", out string? expectedOtp) || request.Otp != expectedOtp)
             {
                 return BadRequest(new { Success = false, Message = "Invalid or expired OTP. Please try again." });
             }
