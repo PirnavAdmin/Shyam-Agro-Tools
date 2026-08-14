@@ -175,18 +175,35 @@ const CartPage = () => {
   }, [appliedCoupon?.code, cartItems, cartSubtotal, couponStatus, isCartLoading, waitForCartSync]);
 
   const summarySubtotal = Number(cartSummary?.subTotal ?? 0);
-  const itemSubtotal = summarySubtotal > 0 ? summarySubtotal : cartSubtotal;
+  const isSummaryOutdated = cartSummary ? Number(cartSummary.subTotal) !== cartSubtotal : true;
+
+  const itemSubtotal = isSummaryOutdated ? cartSubtotal : (summarySubtotal > 0 ? summarySubtotal : cartSubtotal);
   const deliveryCharge = Number(cartSummary?.shippingCharges ?? 0);
   const taxableAmount = itemSubtotal;
-  const gst = Number(cartSummary?.tax ?? 0);
+  
+  // Calculate tax (18%) optimistically if the summary is outdated
+  const gst = isSummaryOutdated
+    ? Math.round(itemSubtotal * 0.18 * 100) / 100
+    : Number(cartSummary?.tax ?? 0);
+    
   const cgst = gst / 2;
   const sgst = gst - cgst;
-  const coinsUsed = Math.max(Number(cartSummary?.coinsDiscount ?? 0), 0);
-  const couponDiscount = Math.max(Number(cartSummary?.couponDiscount ?? 0), 0);
-  const backendGrandTotal = Number(cartSummary?.grandTotal ?? 0);
-  const grandTotal = backendGrandTotal > 0
-    ? backendGrandTotal
-    : Math.max(itemSubtotal + deliveryCharge + gst - coinsUsed - couponDiscount, 0);
+  
+  // Scale coupon discount optimistically if outdated
+  let couponDiscount = Math.max(Number(cartSummary?.couponDiscount ?? 0), 0);
+  if (isSummaryOutdated && couponDiscount > 0 && summarySubtotal > 0) {
+    const discountRatio = couponDiscount / summarySubtotal;
+    couponDiscount = Math.round(itemSubtotal * discountRatio * 100) / 100;
+  }
+  
+  // Scale coins discount optimistically if outdated
+  let coinsUsed = Math.max(Number(cartSummary?.coinsDiscount ?? 0), 0);
+  if (isSummaryOutdated && coinsUsed > 0 && summarySubtotal > 0) {
+    const coinsRatio = coinsUsed / summarySubtotal;
+    coinsUsed = Math.round(itemSubtotal * coinsRatio * 100) / 100;
+  }
+
+  const grandTotal = Math.max(itemSubtotal + deliveryCharge + gst - coinsUsed - couponDiscount, 0);
 
   const handleCouponChange = (event) => {
     setCoupon(event.target.value.toUpperCase());

@@ -370,6 +370,20 @@ textarea.payment-input {
   box-shadow: 0 10px 24px rgba(67, 137, 32, 0.24);
 }
 
+.bank-input-group input {
+  background: #ffffff !important;
+  border-color: #cfe8c8 !important;
+  box-shadow: 0 8px 20px rgba(15, 61, 46, 0.04) !important;
+  color: #1a1a1a !important;
+}
+
+.bank-input-group input:focus {
+  background: #ffffff !important;
+  border-color: #58B82E !important;
+  box-shadow: 0 0 0 4px rgba(88, 184, 46, 0.12) !important;
+  color: #1a1a1a !important;
+}
+
 .payment-primary-btn:hover {
   background: linear-gradient(135deg, #6dc33a 0%, #39791b 100%);
   box-shadow: 0 13px 30px rgba(67, 137, 32, 0.3);

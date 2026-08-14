@@ -32,19 +32,35 @@ const getProductId = (item) =>
 const getResponseItems = (data) => {
   if (Array.isArray(data)) return data;
   return data?.wishlistItems || data?.items || data?.wishlist || data?.value || [];
-};
-
-const normalizeItems = (items) => {
+};const normalizeItems = (items) => {
+  console.log('[normalizeItems] Input items:', items);
   const seen = new Set();
-  return items.flatMap((entry) => {
+  const result = items.flatMap((entry) => {
     const source = getProductSource(entry);
     const id = getProductId(entry);
     if (id === undefined || id === null || seen.has(String(id))) return [];
     seen.add(String(id));
-    return [normalizeProduct({ ...source, id, productId: id })];
-  });
-};
 
+    const merged = {
+      ...source,
+      id,
+      productId: id,
+      name: source.name || source.productName || source.ProductName || source.displayName || '',
+      productName: source.productName || source.ProductName || source.name || '',
+      displayName: source.displayName || source.productName || source.ProductName || source.name || '',
+      price: Number(source.price || source.sellingPrice || source.SellingPrice || source.mrp || source.MRP || 0),
+      sellingPrice: Number(source.sellingPrice || source.SellingPrice || source.price || source.mrp || source.MRP || 0),
+      mrp: Number(source.mrp || source.MRP || source.price || source.sellingPrice || 0),
+      sku: source.sku || source.SKU || source.Sku || '',
+    };
+
+    const normalized = normalizeProduct(merged);
+    console.log('[normalizeItems] Normalized single item:', normalized);
+    return [normalized];
+  });
+  console.log('[normalizeItems] Output items:', result);
+  return result;
+};
 const getErrorStatus = (error) => error?.response?.status;
 
 export const useWishlist = () => useContext(WishlistContext);
@@ -68,19 +84,27 @@ export const WishlistProvider = ({ children }) => {
   const hydrateWishlist = useCallback(async (rawItems) => {
     const normalized = normalizeItems(rawItems);
     const needsProducts = normalized.some((item) => (
-      (!item.name && !item.displayName) ||
+      (!item.name && !item.displayName && !item.productName) ||
       Number(item.price ?? item.sellingPrice ?? 0) <= 0 ||
-      !item.sku
+      (!item.sku && !item.SKU)
     ));
     if (!needsProducts) return normalized;
 
-    const products = await getProducts();
-    const productsById = new Map(products.map((product) => [String(product.id), product]));
-    return normalized.map((item) => {
-      const product = productsById.get(String(item.id));
-      if (!product) return item;
-      return normalizeProduct({ ...item, ...product, id: item.id, productId: item.productId });
-    });
+    try {
+      const products = await getProducts();
+      const productsById = new Map(products.map((product) => [String(product.id), product]));
+      return normalized.map((item) => {
+        // If item already has valid data, don't overwrite with possibly stale catalog data
+        const hasValidData = (item.name || item.displayName) &&
+          Number(item.price ?? item.sellingPrice ?? 0) > 0;
+        if (hasValidData) return item;
+        const product = productsById.get(String(item.id));
+        if (!product) return item;
+        return normalizeProduct({ ...item, ...product, id: item.id, productId: item.productId });
+      });
+    } catch {
+      return normalized;
+    }
   }, []);
 
   const refreshWishlist = useCallback(async () => {
@@ -90,11 +114,19 @@ export const WishlistProvider = ({ children }) => {
     }
 
     setLoading(true);
+    // Clear stale localStorage cache before fetching fresh data
+    localStorage.removeItem(STORAGE_KEY);
     try {
+      console.log('[refreshWishlist] Fetching wishlist for user:', userPhone);
       const response = await getWishlist(userPhone);
+      console.log('[refreshWishlist] Raw response from API:', response);
       const items = await hydrateWishlist(getResponseItems(response));
+      console.log('[refreshWishlist] Hydrated items:', items);
       if (mountedRef.current) setWishlistItems(items);
       return items;
+    } catch (err) {
+      console.error('[refreshWishlist] Fetch error:', err);
+      throw err;
     } finally {
       if (mountedRef.current) setLoading(false);
     }

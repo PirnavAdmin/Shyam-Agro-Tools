@@ -98,6 +98,7 @@ export const CartProvider = ({ children }) => {
   const cartItemsRef = useRef([]);
   const mutationQueueRef = useRef(Promise.resolve());
   const cartReadyPromiseRef = useRef(Promise.resolve());
+  const mutationCountRef = useRef(0);
 
   const setLiveCartItems = useCallback((itemsOrUpdater) => {
     const nextItems = typeof itemsOrUpdater === 'function'
@@ -160,7 +161,9 @@ export const CartProvider = ({ children }) => {
   const refreshCart = useCallback(async () => {
     try {
       const items = await getCart();
-      setLiveCartItems(mapCartItems(items, productsRef.current));
+      if (mutationCountRef.current === 0) {
+        setLiveCartItems(mapCartItems(items, productsRef.current));
+      }
       setCartError('');
       return items;
     } catch (error) {
@@ -189,11 +192,49 @@ export const CartProvider = ({ children }) => {
 
     const amount = Math.max(1, Number(quantityToAdd) || 1);
 
+    const previousItems = cartItemsRef.current;
+    const existingItem = previousItems.find((item) => item.id === String(product.id));
+    let optimisticItems;
+    if (existingItem) {
+      optimisticItems = previousItems.map((item) => {
+        if (item.id === String(product.id)) {
+          const nextQty = item.quantity + amount;
+          return {
+            ...item,
+            quantity: nextQty,
+            lineTotal: item.price * nextQty,
+            totalAmount: item.price * nextQty,
+          };
+        }
+        return item;
+      });
+    } else {
+      const newCartItem = {
+        ...product,
+        cartId: 0,
+        productId: Number(product.id),
+        id: String(product.id),
+        quantity: amount,
+        price: Number(product.sellingPrice || product.price || 0),
+        lineTotal: Number(product.sellingPrice || product.price || 0) * amount,
+        totalAmount: Number(product.sellingPrice || product.price || 0) * amount,
+        name: product.name || product.productName,
+        displayName: product.displayName || product.productName || product.name,
+        image: getProductImage(product),
+        sku: product.sku || String(product.id),
+      };
+      optimisticItems = [...previousItems, newCartItem];
+    }
+
+    setLiveCartItems(optimisticItems);
+    mutationCountRef.current++;
+
     return queueCartMutation(async () => {
       await cartReadyPromiseRef.current;
       setIsCartMutating(true);
       try {
         await addCartItem({ productId: Number(product.id), quantity: amount });
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
         await refreshCart();
         setCartError('');
         showToast(t('addedToCartStandalone'));
@@ -202,6 +243,10 @@ export const CartProvider = ({ children }) => {
         console.error('Unable to add product to cart.', error.response?.data || error);
         setCartError('Unable to add this product. Please try again.');
         showToast('Unable to add product to cart.', 'error');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
         return false;
       } finally {
         setIsCartMutating(false);
@@ -210,20 +255,29 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    return queueCartMutation(async () => {
-      const previousItems = cartItemsRef.current;
-      const itemToRemove = previousItems.find((item) => item.id === String(productId));
-      if (!itemToRemove) return false;
+    const previousItems = cartItemsRef.current;
+    const itemToRemove = previousItems.find((item) => item.id === String(productId));
+    if (!itemToRemove) return Promise.resolve(false);
 
+    const optimisticItems = previousItems.filter((item) => item.id !== String(productId));
+    setLiveCartItems(optimisticItems);
+    mutationCountRef.current++;
+
+    return queueCartMutation(async () => {
       setIsCartMutating(true);
       try {
         await deleteCartItem(itemToRemove.cartId);
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
         await refreshCart();
         setCartError('');
         return true;
       } catch (error) {
         console.error('Unable to remove cart item.', error);
         setCartError('Unable to remove this item. Please try again.');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
         return false;
       } finally {
         setIsCartMutating(false);
@@ -233,23 +287,48 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = (productId, delta) => {
     const amount = Number(delta) || 0;
+    const previousItems = cartItemsRef.current;
+    const itemToUpdate = previousItems.find((item) => item.id === String(productId));
+    if (!itemToUpdate) return Promise.resolve(false);
+
+    const nextQuantity = itemToUpdate.quantity + amount;
+
+    const optimisticItems = previousItems.map((item) => {
+      if (item.id === String(productId)) {
+        if (nextQuantity < 1) return null;
+        const newTotal = item.price * nextQuantity;
+        return {
+          ...item,
+          quantity: nextQuantity,
+          lineTotal: newTotal,
+          totalAmount: newTotal,
+        };
+      }
+      return item;
+    }).filter(Boolean);
+
+    setLiveCartItems(optimisticItems);
+    mutationCountRef.current++;
 
     return queueCartMutation(async () => {
-      const previousItems = cartItemsRef.current;
-      const itemToUpdate = previousItems.find((item) => item.id === String(productId));
-      if (!itemToUpdate) return false;
-
-      const quantity = itemToUpdate.quantity + amount;
       setIsCartMutating(true);
       try {
-        if (quantity < 1) await deleteCartItem(itemToUpdate.cartId);
-        else await updateCartItem(itemToUpdate.cartId, toCartPayload(itemToUpdate, quantity));
+        if (nextQuantity < 1) {
+          await deleteCartItem(itemToUpdate.cartId);
+        } else {
+          await updateCartItem(itemToUpdate.cartId, toCartPayload(itemToUpdate, nextQuantity));
+        }
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
         await refreshCart();
         setCartError('');
         return true;
       } catch (error) {
         console.error('Unable to update cart quantity.', error);
         setCartError('Unable to update quantity. Please try again.');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
         return false;
       } finally {
         setIsCartMutating(false);
@@ -258,14 +337,23 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = () => {
+    const previousItems = cartItemsRef.current;
+    setLiveCartItems([]);
+    mutationCountRef.current++;
     setIsCartMutating(true);
+
     queueCartMutation(async () => {
       await clearCartItems();
+      mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
       await refreshCart();
     })
       .catch((error) => {
         console.error('Unable to clear the server cart.', error);
         setCartError('Unable to clear cart. Please try again.');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
       })
       .finally(() => setIsCartMutating(false));
   };

@@ -1,0 +1,12 @@
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\publish\web.config
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\web.config
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\appsettings.Development.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\appsettings.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\publish\appsettings.Development.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\publish\appsettings.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\publish\ShyamAgroSuite.Api.deps.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\publish\ShyamAgroSuite.Api.runtimeconfig.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\publish\ShyamAgroSuite.Api.staticwebassets.endpoints.json
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\ShyamAgroSuite.Api.pdb
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\aspnetcorev2_inprocess.dll
+C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\bin\Debug\net8.0\win-x64\publish\ShyamAgroSuite.Api.exe

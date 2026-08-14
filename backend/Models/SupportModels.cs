@@ -9,9 +9,9 @@ namespace ShyamAgroSuite.Api.Models
     {
         [Key]
         public int Id { get; set; }
-        public string SupportPhoneNumber { get; set; } = "+91 98765 43210";
+        public string SupportPhoneNumber { get; set; } = "+91 9912649265";
         public string WorkTimings { get; set; } = "Mon-Sat: 10AM - 7PM";
-        public string SupportEmail { get; set; } = "support@shyamagro.com";
+        public string SupportEmail { get; set; } = "support@shyamagrotools.com";
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 

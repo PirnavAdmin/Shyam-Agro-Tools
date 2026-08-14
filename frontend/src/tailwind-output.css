@@ -957,7 +957,7 @@ h1, h2, h3, h4, h5, h6 {
 .product-card-actions .icon-shade.text-primary svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 .product-card-stock-line {
@@ -1466,6 +1466,14 @@ img.app-line-thumb,
 
 .ml-2 {
   margin-left: 0.5rem;
+}
+
+.mr-1 {
+  margin-right: 0.25rem;
+}
+
+.mr-1\.5 {
+  margin-right: 0.375rem;
 }
 
 .mr-2 {
@@ -2075,10 +2083,6 @@ img.app-line-thumb,
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.grid-cols-\[1fr_120px_260px\] {
-  grid-template-columns: 1fr 120px 260px;
-}
-
 .grid-cols-\[44px_1fr_36px\] {
   grid-template-columns: 44px 1fr 36px;
 }
@@ -2625,6 +2629,11 @@ img.app-line-thumb,
 .bg-\[\#e1f6f3\] {
   --tw-bg-opacity: 1;
   background-color: rgb(225 246 243 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#f4f5f7\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 245 247 / var(--tw-bg-opacity));
 }
 
 .bg-\[\#f7f8f4\] {
@@ -4369,7 +4378,7 @@ header {
 [data-theme="dark"] .product-card-actions .icon-shade.text-primary svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 [data-theme="dark"] .product-cod-available-badge,
@@ -4975,7 +4984,7 @@ header ::-webkit-scrollbar {
 .product-card-actions .icon-shade.swiper-button-next svg,.product-card-actions .icon-shade .swiper-button-prev svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 .swiper-button-next, .swiper-button-prev {
@@ -4998,7 +5007,7 @@ header ::-webkit-scrollbar {
 [data-theme="dark"] .product-card-actions .icon-shade.swiper-button-next svg,[data-theme="dark"] .product-card-actions .icon-shade .swiper-button-prev svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 [data-theme="dark"] .swiper-button-next,[data-theme="dark"]  .swiper-button-prev {
@@ -5092,13 +5101,13 @@ section + .brand-slider-section {
 .product-card-actions .hover\:text-primary:hover.icon-shade svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 .product-card-actions .group:hover .group-hover\:text-primary.icon-shade svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 .last\:border-0:last-child {
@@ -5785,10 +5794,6 @@ section + .brand-slider-section {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .md\:grid-cols-\[1fr_120px_260px\] {
-    grid-template-columns: 1fr 120px 260px;
-  }
-
   .md\:grid-cols-\[240px_1fr\] {
     grid-template-columns: 240px 1fr;
   }
@@ -5867,6 +5872,11 @@ section + .brand-slider-section {
     padding-bottom: 2.5rem;
   }
 
+  .md\:py-12 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
   .md\:py-7 {
     padding-top: 1.75rem;
     padding-bottom: 1.75rem;
@@ -5879,10 +5889,6 @@ section + .brand-slider-section {
 
   .md\:pt-0 {
     padding-top: 0px;
-  }
-
-  .md\:text-center {
-    text-align: center;
   }
 
   .md\:text-right {

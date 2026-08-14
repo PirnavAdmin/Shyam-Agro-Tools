@@ -10,7 +10,7 @@ import './ContactSupport.css';
 const SUPPORT_TICKETS_STORAGE_KEY = 'shyamAgro:supportTickets';
 
 const defaultSupportConfig = {
-  supportPhoneNumber: '+91 9398649798',
+  supportPhoneNumber: '+91 9912649265',
   supportEmail: 'support@shyamagrotools.com',
   workTimings: 'Mon-Sat: 10AM - 7PM',
 };
@@ -191,12 +191,12 @@ const ContactSupport = () => {
               <div className="support-section-title">
                 <MessageSquareText size={22} />
                 <div>
-                  <span>{t('supportChat.latestTracking') || 'Dynamic Data'}</span>
-                  <h2>{t('myOrders') || 'Submitted Tickets'}</h2>
+                  <span>{t('supportChat_trackTickets')}</span>
+                  <h2>{t('supportChat_submittedTickets')}</h2>
                 </div>
               </div>
               {tickets.length === 0 ? (
-                <div className="support-empty-state">{t('supportChat.fallback') || 'No tickets submitted yet. Your latest ticket details will appear here after submission.'}</div>
+                <div className="support-empty-state">{t('supportChat_noTicketsFallback')}</div>
               ) : (
                 <div className="support-ticket-list">
                   {tickets.map((ticket) => (

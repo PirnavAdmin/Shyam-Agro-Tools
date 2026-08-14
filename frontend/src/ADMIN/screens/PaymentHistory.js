@@ -503,6 +503,8 @@ const PaymentHistory = () => {
     if (bankName.length < 2 || bankBranch.length < 2 || holderName.length < 2) return false;
     // Block save if Bank Name doesn't match the IFSC-verified bank
     if (fetchedBankInfo.bankName && bankName.toLowerCase() !== fetchedBankInfo.bankName.toLowerCase()) return false;
+    // Block save if Bank Branch doesn't match the IFSC-verified branch
+    if (fetchedBankInfo.branch && bankBranch.toLowerCase() !== fetchedBankInfo.branch.toLowerCase()) return false;
 
     return true;
   };
@@ -1083,7 +1085,7 @@ const PaymentHistory = () => {
                   required
                   readOnly={Boolean(fetchedBankInfo.bankName)}
                   value={bankDetails.bankName}
-                  onChange={(e) => !fetchedBankInfo.bankName && setBankDetails({ ...bankDetails, bankName: e.target.value })}
+                  onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
                 />
                 {fetchedBankInfo.bankName && bankDetails.bankName.trim().toLowerCase() !== fetchedBankInfo.bankName.trim().toLowerCase() && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', fontSize: '12px', fontWeight: 600, color: '#e11d48' }}>
@@ -1113,8 +1115,14 @@ const PaymentHistory = () => {
                   required
                   readOnly={Boolean(fetchedBankInfo.branch)}
                   value={bankDetails.bankBranch}
-                  onChange={(e) => !fetchedBankInfo.branch && setBankDetails({ ...bankDetails, bankBranch: e.target.value })}
+                  onChange={(e) => setBankDetails({ ...bankDetails, bankBranch: e.target.value })}
                 />
+                {fetchedBankInfo.branch && bankDetails.bankBranch.trim().toLowerCase() !== fetchedBankInfo.branch.trim().toLowerCase() && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', fontSize: '12px', fontWeight: 600, color: '#e11d48' }}>
+                    <AlertCircle size={12} />
+                    <span>Mismatch! IFSC '{bankDetails.ifscCode}' belongs to '{fetchedBankInfo.branch}' branch.</span>
+                  </div>
+                )}
               </div>
 
               <div>

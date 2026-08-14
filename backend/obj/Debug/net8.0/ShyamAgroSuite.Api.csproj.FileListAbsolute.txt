@@ -158,19 +158,3 @@ C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\net8.0\ShyamAgroSuite.Api.pdb
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\net8.0\ShyamAgroSuite.Api.genruntimeconfig.cache
 C:\Users\ADMIN\OneDrive\Desktop\Project Code\Shyam-Agro-Tools\backend\obj\Debug\net8.0\ref\ShyamAgroSuite.Api.dll
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\publish\web.config
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\web.config
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\appsettings.Development.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\appsettings.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\publish\appsettings.Development.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\publish\appsettings.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\publish\ShyamAgroSuite.Api.deps.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\publish\ShyamAgroSuite.Api.runtimeconfig.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\publish\ShyamAgroSuite.Api.staticwebassets.endpoints.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.staticwebassets.runtime.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.staticwebassets.endpoints.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.exe
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.deps.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.runtimeconfig.json
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.dll
-C:\Users\ADMIN\AppData\Local\Temp\ShyamApi\ShyamAgroSuite.Api.pdb

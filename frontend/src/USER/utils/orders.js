@@ -48,8 +48,23 @@ const getAllStoredOrders = () => {
 };
 
 export const getStatusIndex = (status = 'Order Placed') => {
-  const index = orderStatusSteps.findIndex((step) => step.toLowerCase() === String(status).toLowerCase());
-  return index >= 0 ? index : 0;
+  const s = String(status || '').toLowerCase();
+  if (s === 'completed' || s === 'delivered') {
+    return 5; // Delivered
+  }
+  if (s === 'out for delivery') {
+    return 4; // Out for Delivery
+  }
+  if (s === 'shipped' || s === 'dispatched') {
+    return 3; // Shipped
+  }
+  if (s === 'packed') {
+    return 2; // Packed
+  }
+  if (s === 'confirmed' || s === 'processing' || s === 'processed') {
+    return 1; // Confirmed
+  }
+  return 0; // Order Placed
 };
 
 export const getOrders = (mobileNumber = getLoggedInMobile()) => {
@@ -86,13 +101,21 @@ export const getOrderTracking = (order) => {
     status,
     activeIndex,
     progressPercent,
-    steps: orderStatusSteps.map((label, index) => ({
-      label,
-      date: index <= activeIndex
-        ? new Date(order?.createdAt || Date.now()).toLocaleDateString('en-IN')
-        : '-',
-      completed: index <= activeIndex,
-      active: index === activeIndex,
-    })),
+    steps: orderStatusSteps.map((label, index) => {
+      let dateValue = '-';
+      if (index <= activeIndex) {
+        const baseDate = new Date(order?.createdAt || Date.now());
+        if (index > 0) {
+          baseDate.setDate(baseDate.getDate() + index);
+        }
+        dateValue = baseDate.toLocaleDateString('en-IN');
+      }
+      return {
+        label,
+        date: dateValue,
+        completed: index <= activeIndex,
+        active: index === activeIndex,
+      };
+    }),
   };
 };

@@ -494,11 +494,26 @@ namespace ShyamAgroSuite.Api.Controllers
             // Handle images update
             if (dto.ExistingImages != null || (dto.Images != null && dto.Images.Count > 0))
             {
-                var keepUrls = dto.ExistingImages ?? new List<string>();
+                string GetRelativeImagePath(string url)
+                {
+                    if (string.IsNullOrEmpty(url)) return string.Empty;
+                    int idx = url.IndexOf("/uploads/", StringComparison.OrdinalIgnoreCase);
+                    if (idx >= 0)
+                    {
+                        return url.Substring(idx);
+                    }
+                    return url.StartsWith("/") ? url : "/" + url;
+                }
+
+                var keepUrls = (dto.ExistingImages ?? new List<string>())
+                    .Select(GetRelativeImagePath)
+                    .Where(url => !string.IsNullOrEmpty(url))
+                    .ToList();
+
                 var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
 
                 // Remove images that are not in ExistingImages
-                var imagesToRemove = product.Images.Where(img => !keepUrls.Contains(img.ImageUrl)).ToList();
+                var imagesToRemove = product.Images.Where(img => !keepUrls.Contains(img.ImageUrl, StringComparer.OrdinalIgnoreCase)).ToList();
                 foreach (var img in imagesToRemove)
                 {
                     var relativePath = img.ImageUrl.TrimStart('/');

@@ -114,6 +114,12 @@ export const verifyNetBankingOtp = async ({ transactionId, otp }) =>
     otp,
   });
 
+export const verifyCardOtp = async ({ transactionId, otp }) =>
+  postPayment('/api/Payment/card/verify-otp', {
+    transactionId: requireTransactionId(transactionId),
+    otp,
+  });
+
 export const getPaymentStatus = async (transactionId) => {
   const normalizedTransactionId = requireTransactionId(transactionId);
   try {

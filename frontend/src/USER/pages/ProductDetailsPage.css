@@ -1878,3 +1878,23 @@
 [data-theme="dark"] .product-detail-page .review-field textarea::placeholder {
   color: #d1d5db !important;
 }
+
+/* Fix wishlist heart icon styling and fill when wishlisted */
+.product-detail-page .product-icon-button svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+.product-detail-page .product-icon-button.text-primary svg {
+  color: #58B82E !important;
+  stroke: #58B82E !important;
+  fill: #58B82E !important;
+}
+
+[data-theme="dark"] .product-detail-page .product-icon-button.text-primary svg {
+  color: #58B82E !important;
+  stroke: #58B82E !important;
+  fill: #58B82E !important;
+}
+

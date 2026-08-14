@@ -85,22 +85,30 @@ namespace ShyamAgroSuite.Api.Controllers
             var items = await _context.WishlistItems
                 .Include(w => w.Product)
                     .ThenInclude(p => p.Images)
-                .Where(w => w.UserPhone == userPhone)
+                .Where(w => w.UserPhone == userPhone && w.Product != null)
                 .ToListAsync();
 
             var response = items.Select(w => new
             {
+                id = w.ProductId,
                 wishlistId = w.Id,
                 productId = w.ProductId,
-                productName = w.Product?.ProductName,
-                sku = w.Product?.SKU,
-                imageUrl = w.Product?.Images.FirstOrDefault()?.ImageUrl,
-                mrp = w.Product?.MRP ?? 0,
-                sellingPrice = w.Product?.SellingPrice ?? w.Product?.MRP ?? 0,
-                stock = w.Product?.Stock ?? 0,
-                stockStatus = w.Product?.StockStatus,
+                productName = w.Product!.ProductName,
+                name = w.Product!.ProductName,
+                sku = w.Product!.SKU,
+                imageUrl = w.Product!.Images.FirstOrDefault() != null
+                    ? w.Product!.Images.FirstOrDefault()!.ImageUrl
+                    : (string?)null,
+                mrp = w.Product!.MRP,
+                sellingPrice = w.Product!.SellingPrice > 0 ? w.Product!.SellingPrice : w.Product!.MRP,
+                price = w.Product!.SellingPrice > 0 ? w.Product!.SellingPrice : w.Product!.MRP,
+                stock = w.Product!.Stock,
+                stockStatus = w.Product!.StockStatus,
+                brand = w.Product!.Brand,
                 createdDate = w.CreatedDate
-            });
+            }).ToList();
+
+            Console.WriteLine($"[GetWishlist] UserPhone: {userPhone}, Response JSON: {System.Text.Json.JsonSerializer.Serialize(response)}");
 
             return Ok(response);
         }
@@ -116,7 +124,7 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             var count = await _context.WishlistItems
-                .CountAsync(w => w.UserPhone == userPhone);
+                .CountAsync(w => w.UserPhone == userPhone && w.Product != null);
 
             return Ok(new { count });
         }

@@ -37,9 +37,9 @@ namespace ShyamAgroSuite.Api.Controllers
 
             return Ok(new
             {
-                supportPhoneNumber = "+91 98765 43210",
+                supportPhoneNumber = "+91 9912649265",
                 workTimings = "Mon-Sat: 10AM - 7PM",
-                supportEmail = "support@shyamagro.com"
+                supportEmail = "support@shyamagrotools.com"
             });
         }
 

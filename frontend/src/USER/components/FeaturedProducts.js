@@ -31,9 +31,10 @@ const FeaturedProducts = ({ title = "FEATURED ITEMS", subtitle = "Special Produc
   const [products, setProducts] = useState([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [productError, setProductError] = useState('');
-  const featured = products.filter((product) => product.featured).length
-    ? products.filter((product) => product.featured).slice(0, limit)
-    : products.slice(0, limit);
+  const featured = useMemo(() => {
+    const list = products.filter((product) => product.featured);
+    return list.length ? list.slice(0, limit) : products.slice(0, limit);
+  }, [products, limit]);
   const productSlides = useMemo(() => chunkArray(featured, itemsPerSlide), [featured, itemsPerSlide]);
 
   useEffect(() => {
@@ -99,8 +100,8 @@ const FeaturedProducts = ({ title = "FEATURED ITEMS", subtitle = "Special Produc
                 navigation={false}
                 autoplay={{
                   delay: 3000,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: false,
+                  disableOnInteraction: true,
+                  pauseOnMouseEnter: true,
                 }}
                 loop={productSlides.length > 1}
                 onSwiper={(swiper) => {
@@ -115,7 +116,15 @@ const FeaturedProducts = ({ title = "FEATURED ITEMS", subtitle = "Special Produc
                       style={{ gridTemplateColumns: `repeat(${itemsPerSlide}, minmax(0, 1fr))` }}
                     >
                       {slideProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          onInteraction={() => {
+                            if (swiperRef.current?.autoplay) {
+                              swiperRef.current.autoplay.stop();
+                            }
+                          }}
+                        />
                       ))}
                     </div>
                   </SwiperSlide>

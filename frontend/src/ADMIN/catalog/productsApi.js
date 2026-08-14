@@ -559,11 +559,14 @@ export const saveProduct = async (product, imageFiles = [], videoFile = null) =>
 
   // Existing images to keep (case-insensitive keys for maximum compatibility)
   if (Array.isArray(product.images)) {
-    product.images.forEach((url) => {
-      fd.append('ExistingImages', url);
-      fd.append('existingImages', url);
-      fd.append('RemainingImages', url);
-      fd.append('remainingImages', url);
+    product.images.forEach((img) => {
+      const url = typeof img === 'string' ? img : img?.imageUrl || img?.image || img?.url || '';
+      if (url) {
+        fd.append('ExistingImages', url);
+        fd.append('existingImages', url);
+        fd.append('RemainingImages', url);
+        fd.append('remainingImages', url);
+      }
     });
   }
 

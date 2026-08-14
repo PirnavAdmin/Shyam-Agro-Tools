@@ -444,39 +444,179 @@ const TrackingOrder = () => {
               </h3>
 
               <div className="modern-timeline" style={{ paddingLeft: '20px' }}>
-                {activeOrderDetails.timeline && activeOrderDetails.timeline.map((event, idx) => (
-                  <div key={idx} className="timeline-event completed">
-                    <span className="timeline-dot" />
-                    <div className="timeline-info">
-                      <span className="timeline-title" style={{ color: '#0f172a' }}>{event.label}</span>
-                      <span className="timeline-time">{event.date}</span>
-                      {event.description && (
-                        <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#64748b', background: '#f8fafc', padding: '4px 8px', borderRadius: '4px' }}>
-                          {event.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Initial Timeline Items if empty */}
-                {(!activeOrderDetails.timeline || activeOrderDetails.timeline.length === 0) && (
-                  <>
-                    <div className="timeline-event completed">
+                {activeOrderDetails.timeline && activeOrderDetails.timeline.length > 0 ? (
+                  activeOrderDetails.timeline.map((event, idx) => (
+                    <div key={idx} className="timeline-event completed">
                       <span className="timeline-dot" />
                       <div className="timeline-info">
-                        <span className="timeline-title">Order Placed</span>
-                        <span className="timeline-time">{activeOrderDetails.orderDate?.slice(0, 10) || 'Date Placed'}</span>
+                        <span className="timeline-title" style={{ color: '#0f172a' }}>{event.label}</span>
+                        <span className="timeline-time">{event.date}</span>
+                        {event.description && (
+                          <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#64748b', background: '#f8fafc', padding: '4px 8px', borderRadius: '4px' }}>
+                            {event.description}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <div className="timeline-event completed">
-                      <span className="timeline-dot" />
-                      <div className="timeline-info">
-                        <span className="timeline-title">Payment Verified</span>
-                        <span className="timeline-time">Verified Success</span>
-                      </div>
-                    </div>
-                  </>
+                  ))
+                ) : (
+                  (() => {
+                    const status = String(activeOrderDetails.status || '').toLowerCase();
+                    const orderDateStr = activeOrderDetails.orderDate?.slice(0, 10) || 'Date Placed';
+
+                    if (status === 'cancelled' || status === 'canceled') {
+                      return (
+                        <>
+                          <div className="timeline-event completed">
+                            <span className="timeline-dot" />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#0f172a' }}>Order Placed</span>
+                              <span className="timeline-time">{orderDateStr}</span>
+                            </div>
+                          </div>
+                          <div className="timeline-event" style={{ color: '#ef4444' }}>
+                            <span className="timeline-dot" style={{ backgroundColor: '#ef4444' }} />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#ef4444' }}>Order Cancelled</span>
+                              <span className="timeline-time">Cancelled</span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+
+                    if (status === 'placed' || status === 'pending') {
+                      return (
+                        <>
+                          <div className="timeline-event completed">
+                            <span className="timeline-dot" />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#0f172a' }}>Order Placed</span>
+                              <span className="timeline-time">{orderDateStr}</span>
+                            </div>
+                          </div>
+                          <div className="timeline-event">
+                            <span className="timeline-dot" />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#64748b' }}>Payment Verification</span>
+                              <span className="timeline-time" style={{ color: '#94a3b8' }}>Awaiting Payment</span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+
+                    if (status === 'processing' || status === 'processed') {
+                      return (
+                        <>
+                          <div className="timeline-event completed">
+                            <span className="timeline-dot" />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#0f172a' }}>Order Placed</span>
+                              <span className="timeline-time">{orderDateStr}</span>
+                            </div>
+                          </div>
+                          <div className="timeline-event active">
+                            <span className="timeline-dot" />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#0f172a' }}>Payment Verification</span>
+                              <span className="timeline-time" style={{ color: '#3b82f6' }}>Processing</span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+
+                    // For Packed, Shipped, Dispatched, Completed, etc.
+                    return (
+                      <>
+                        <div className="timeline-event completed">
+                          <span className="timeline-dot" />
+                          <div className="timeline-info">
+                            <span className="timeline-title" style={{ color: '#0f172a' }}>Order Placed</span>
+                            <span className="timeline-time">{orderDateStr}</span>
+                          </div>
+                        </div>
+                        <div className="timeline-event completed">
+                          <span className="timeline-dot" />
+                          <div className="timeline-info">
+                            <span className="timeline-title" style={{ color: '#0f172a' }}>Payment Verified</span>
+                            <span className="timeline-time">Verified Success</span>
+                          </div>
+                        </div>
+                        {status === 'packed' && (
+                          <div className="timeline-event completed">
+                            <span className="timeline-dot" />
+                            <div className="timeline-info">
+                              <span className="timeline-title" style={{ color: '#0f172a' }}>Order Packed</span>
+                              <span className="timeline-time">Packed Success</span>
+                            </div>
+                          </div>
+                        )}
+                        {status === 'shipped' && (
+                          <>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Packed</span>
+                                <span className="timeline-time">Packed Success</span>
+                              </div>
+                            </div>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Shipped</span>
+                                <span className="timeline-time">Shipped Success</span>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {status === 'dispatched' && (
+                          <>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Packed</span>
+                                <span className="timeline-time">Packed Success</span>
+                              </div>
+                            </div>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Dispatched</span>
+                                <span className="timeline-time">Dispatched Success</span>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {(status === 'completed' || status === 'delivered') && (
+                          <>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Packed</span>
+                                <span className="timeline-time">Packed Success</span>
+                              </div>
+                            </div>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Dispatched</span>
+                                <span className="timeline-time">Dispatched Success</span>
+                              </div>
+                            </div>
+                            <div className="timeline-event completed">
+                              <span className="timeline-dot" />
+                              <div className="timeline-info">
+                                <span className="timeline-title" style={{ color: '#0f172a' }}>Order Delivered</span>
+                                <span className="timeline-time">Delivered Success</span>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </>
+                    );
+                  })()
                 )}
               </div>
             </div>

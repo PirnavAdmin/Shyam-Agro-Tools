@@ -476,6 +476,27 @@ using (var scope = app.Services.CreateScope())
                 UPDATE `Categories` SET `ImageUrl` = '/uploads/fertilizers-category.jpg' WHERE `Name` LIKE '%Fertilizer%' OR `Id` IN (17, 19);";
             cleanProductsCmd.ExecuteNonQuery();
         }
+
+        // Reset Support config details to the official contact info
+        using (var resetSupportCmd = conn.CreateCommand())
+        {
+            resetSupportCmd.CommandText = @"
+                DELETE FROM `SupportConfigs`;
+                INSERT INTO `SupportConfigs` (`Id`, `SupportPhoneNumber`, `WorkTimings`, `SupportEmail`, `UpdatedAt`)
+                VALUES (1, '+91 9912649265', 'Mon-Sat: 10AM - 7PM', 'support@shyamagrotools.com', NOW());";
+            resetSupportCmd.ExecuteNonQuery();
+        }
+
+        // Clean up orphaned WishlistItems and CartItems referencing deleted products
+        using (var cleanOrphanedCmd = conn.CreateCommand())
+        {
+            cleanOrphanedCmd.CommandText = @"
+                DELETE FROM `WishlistItems` WHERE `ProductId` NOT IN (SELECT `Id` FROM `Products`);
+                DELETE FROM `CartItems` WHERE `ProductId` NOT IN (SELECT `Id` FROM `Products`);
+                UPDATE `BankDetailsConfigs` SET `BankName` = 'Union Bank of India' WHERE `IfscCode` = 'UBIN0802948';";
+            cleanOrphanedCmd.ExecuteNonQuery();
+        }
+
     }
     catch (Exception ex)
     {

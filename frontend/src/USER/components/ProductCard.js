@@ -14,7 +14,7 @@ const formatPrice = (value) => {
   return `\u20B9${Number(value).toLocaleString('en-IN')}`;
 };
 
-const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
+const ProductCard = ({ product, layout = 'grid', animateOnView = true, onInteraction }) => {
   const navigate = useNavigate();
   const { addToCart, isInCart } = useCart();
   const { t, productText } = useLanguage();
@@ -56,6 +56,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
 
   const handleWishlistClick = async (event) => {
     event.stopPropagation();
+    onInteraction?.();
     const result = await toggleWishlist(product);
 
     if (result === 'added') showToast(t('addedToWishlist'));
@@ -65,6 +66,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
 
   const handleShareClick = async (event) => {
     event.stopPropagation();
+    onInteraction?.();
 
     try {
       const result = await shareProduct({ product, productName });
@@ -77,6 +79,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
 
   const handleCartButtonClick = async (event) => {
     event.stopPropagation();
+    onInteraction?.();
     if (inCart) {
       navigate('/cart');
       return;
@@ -109,6 +112,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true }) => {
       }}
       role="button"
       tabIndex={0}
+      data-product-id={product.id}
       className={`product-card-static flex h-full cursor-pointer overflow-hidden border border-border bg-white ${
         isList ? 'flex-col md:flex-row' : 'flex-col'
       } ${isInStock ? '' : 'out-of-stock'}`}

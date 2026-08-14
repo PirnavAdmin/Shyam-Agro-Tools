@@ -47,6 +47,12 @@ namespace ShyamAgroSuite.Api.Controllers
             public string Otp { get; set; }
         }
 
+        public class CardOtpRequest
+        {
+            public string TransactionId { get; set; }
+            public string Otp { get; set; }
+        }
+
         public class CompletePaymentRequest
         {
             public string TransactionId { get; set; }
@@ -108,25 +114,12 @@ namespace ShyamAgroSuite.Api.Controllers
             string bankDisplayName = upiConfig?.BankDisplayName ?? "Andhra Bank - 0863";
             string currency = upiConfig?.Currency ?? "INR";
 
+            string formattedAmount = finalAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
             string note = "Order Payment";
-            string upiLink = $"upi://pay?pa={merchantUpi}&pn={Uri.EscapeDataString(merchantName)}&am={finalAmount}&cu={currency}&tn={Uri.EscapeDataString(note)}&tr={transactionId}";
+            string upiLink = $"upi://pay?pa={merchantUpi}&pn={Uri.EscapeDataString(merchantName)}&am={formattedAmount}&cu={currency}&tn={Uri.EscapeDataString(note)}&tr={transactionId}";
 
-            // Retrieve QR Image settings
-            var qrConfig = await _context.QrCodeConfigs.FirstOrDefaultAsync();
-            string qrImageUrl = "";
-            if (qrConfig != null && !string.IsNullOrEmpty(qrConfig.QrImageUrl))
-            {
-                qrImageUrl = qrConfig.QrImageUrl;
-                if (qrImageUrl.StartsWith("/"))
-                {
-                    var httpReq = HttpContext.Request;
-                    qrImageUrl = $"{httpReq.Scheme}://{httpReq.Host}{qrImageUrl}";
-                }
-            }
-            else
-            {
-                qrImageUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={Uri.EscapeDataString(upiLink)}";
-            }
+            // For dynamic order-specific payment, generate QR image encoding the exact order upiLink
+            string qrImageUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(upiLink)}";
 
             if (request.PaymentMethod.Equals("NetBanking", StringComparison.OrdinalIgnoreCase))
             {
@@ -190,7 +183,8 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             if (request.PaymentMethod.Equals("DebitCard", StringComparison.OrdinalIgnoreCase) ||
-                request.PaymentMethod.Equals("CreditCard", StringComparison.OrdinalIgnoreCase))
+                request.PaymentMethod.Equals("CreditCard", StringComparison.OrdinalIgnoreCase) ||
+                request.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase))
             {
                 if (string.IsNullOrEmpty(request.CardNumber) || request.CardNumber.Replace(" ", "").Length < 16)
                 {
@@ -207,8 +201,8 @@ namespace ShyamAgroSuite.Api.Controllers
 
                 if (orderSuccess != null)
                 {
-                    orderSuccess.PaymentStatus = "Success";
-                    orderSuccess.OrderStatus = "Placed";
+                    orderSuccess.PaymentStatus = "OtpPending";
+                    orderSuccess.OrderStatus = "AwaitingVerification";
                     string cleaned = request.CardNumber.Replace(" ", "");
                     orderSuccess.CardNumber = "**** **** **** " + cleaned.Substring(cleaned.Length - 4);
                     orderSuccess.NameOnCard = request.NameOnCard;
@@ -226,10 +220,10 @@ namespace ShyamAgroSuite.Api.Controllers
                     bankDisplayName = bankDisplayName,
                     amount = finalAmount,
                     currency = currency,
-                    upiDeepLink = upiLink,
-                    qrPayload = upiLink,
-                    paymentStatus = "Success",
-                    message = $"{request.PaymentMethod} Payment authorized successfully."
+                    requiresOtp = true,
+                    maskedPhone = "******7890",
+                    paymentStatus = "OtpPending",
+                    message = "OTP sent to your registered mobile number for card verification."
                 });
             }
 
@@ -304,6 +298,33 @@ namespace ShyamAgroSuite.Api.Controllers
                 TransactionId = request.TransactionId,
                 Status = "Success",
                 Message = "Net Banking Payment successful."
+            });
+        }
+
+        [HttpPost("card/verify-otp")]
+        public async Task<IActionResult> CardVerifyOtp([FromBody] CardOtpRequest request)
+        {
+            var order = await _context.OrderSuccesses.FirstOrDefaultAsync(o => o.TransactionId == request.TransactionId);
+            if (order == null)
+            {
+                return NotFound(new { Success = false, Message = "Transaction not found." });
+            }
+
+            if (request.Otp != "123456")
+            {
+                return BadRequest(new { Success = false, Message = "Invalid or expired OTP. Please try again." });
+            }
+
+            order.PaymentStatus = "Success";
+            order.OrderStatus = "Placed";
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                Success = true,
+                TransactionId = request.TransactionId,
+                Status = "Success",
+                Message = "Card payment verified successfully."
             });
         }
 
@@ -435,7 +456,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 (dbOrder != null && o.OrderId == dbOrder.Id.ToString()) || 
                 (dbOrder != null && o.OrderId == dbOrder.OrderNumber));
             
-            decimal resolvedAmount = orderSuccess?.TotalAmount ?? finalAmount;
+            decimal resolvedAmount = orderSuccess?.TotalAmount ?? (dbOrder != null && dbOrder.FinalAmount > 0 ? dbOrder.FinalAmount : (amount.HasValue && amount.Value > 0 ? amount.Value : 0.0m));
             if (resolvedAmount == 0.0m)
             {
                 resolvedAmount = 2183.0m; // Fallback default amount
@@ -450,24 +471,11 @@ namespace ShyamAgroSuite.Api.Controllers
             string currency = upiConfig?.Currency ?? "INR";
             string note = "Order Payment";
             
-            string upiPayload = $"upi://pay?pa={merchantUpi}&pn={Uri.EscapeDataString(merchantName)}&am={resolvedAmount}&cu={currency}&tn={Uri.EscapeDataString(note)}&tr={transactionId}";
+            string formattedAmount = resolvedAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+            string upiPayload = $"upi://pay?pa={merchantUpi}&pn={Uri.EscapeDataString(merchantName)}&am={formattedAmount}&cu={currency}&tn={Uri.EscapeDataString(note)}&tr={transactionId}";
 
-            // Custom QR code image URL
-            var qrConfig = await _context.QrCodeConfigs.FirstOrDefaultAsync();
-            string qrImageUrl = "";
-            if (qrConfig != null && !string.IsNullOrEmpty(qrConfig.QrImageUrl))
-            {
-                qrImageUrl = qrConfig.QrImageUrl;
-                if (qrImageUrl.StartsWith("/"))
-                {
-                    var request = HttpContext.Request;
-                    qrImageUrl = $"{request.Scheme}://{request.Host}{qrImageUrl}";
-                }
-            }
-            else
-            {
-                qrImageUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={Uri.EscapeDataString(upiPayload)}";
-            }
+            // Dynamic QR code image URL encoding exact order upiPayload
+            string qrImageUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(upiPayload)}";
 
             return Ok(new
             {

@@ -492,7 +492,7 @@ header {
   .product-card-actions .icon-shade.text-primary svg {
     color: #58B82E !important;
     stroke: #58B82E !important;
-    fill: currentColor !important;
+    fill: #58B82E !important;
   }
 
   .product-stock-badge {
@@ -1048,7 +1048,7 @@ header {
 [data-theme="dark"] .product-card-actions .icon-shade.text-primary svg {
   color: #58B82E !important;
   stroke: #58B82E !important;
-  fill: currentColor !important;
+  fill: #58B82E !important;
 }
 
 [data-theme="dark"] .product-cod-available-badge,

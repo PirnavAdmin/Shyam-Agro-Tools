@@ -28,6 +28,7 @@ import {
   initiatePayment,
   netBankingLogin,
   verifyNetBankingOtp,
+  verifyCardOtp,
   watchPaymentStatus,
 } from '../../services/paymentService';
 import { updateLocalWalletAfterOrder } from '../../services/walletService';
@@ -57,6 +58,48 @@ const netBankingSteps = [
 ];
 
 const upiRegex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
+
+const GPayIcon = () => (
+  <svg className="upi-app-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+  </svg>
+);
+
+const PhonePeIcon = () => (
+  <svg className="upi-app-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <rect width="24" height="24" rx="12" fill="#5F259F"/>
+    <path d="M15.5 7.5H11.8C10.5 7.5 9.5 8.5 9.5 9.8V16.5H12V13.2H14C15.9 13.2 17.5 11.6 17.5 9.7C17.5 8.5 16.6 7.5 15.5 7.5ZM13.8 11.2H12V9.5H13.8C14.3 9.5 14.8 9.9 14.8 10.4C14.8 10.8 14.3 11.2 13.8 11.2Z" fill="#FFFFFF"/>
+  </svg>
+);
+
+const PaytmIcon = () => (
+  <svg className="upi-app-icon" width="22" height="18" viewBox="0 0 38 24" fill="none">
+    <path d="M2.2 4h4.4c2.2 0 3.8 1.4 3.8 3.4 0 2.1-1.6 3.4-3.8 3.4H4.5v5.2H2.2V4zm2.3 2v2.8h2.1c1.1 0 1.8-.7 1.8-1.4 0-.8-.7-1.4-1.8-1.4H4.5z" fill="#002E6E"/>
+    <path d="M12.5 7.5h2.1v1.4h-2.1v4.3c0 .8.4 1.2 1.1 1.2.4 0 .7-.1.9-.2v1.8c-.4.2-1 .3-1.6.3-1.9 0-2.6-1.1-2.6-2.8V8.9H9.1V7.5h1.2V5.7l2.2-.8v2.6z" fill="#002E6E"/>
+    <path d="M15.4 7.5h2.2v1.3c.5-1 1.5-1.5 2.5-1.5.3 0 .6 0 .8.1v2.1c-.3-.1-.6-.1-.9-.1-1.3 0-2.4.9-2.4 2.5V16h-2.2V7.5z" fill="#002E6E"/>
+    <path d="M21.2 4h2.4l2.8 7.3L29.2 4h2.4l-4.2 10.2c-.7 1.7-1.6 2.3-3.2 2.3-.5 0-1 0-1.4-.2v-1.9c.3.1.6.1.9.1.8 0 1.3-.3 1.6-1.1l.3-.7L21.2 4z" fill="#00BAF2"/>
+  </svg>
+);
+
+const BhimIcon = () => (
+  <svg className="upi-app-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <rect width="24" height="24" rx="12" fill="#008B44"/>
+    <path d="M6 6h4.5c1.4 0 2.4.7 2.4 1.8 0 .8-.5 1.4-1.2 1.6 1 .3 1.5 1 1.5 2 0 1.3-1.1 2.1-2.7 2.1H6V6zm2 1.6v1.8h2.4c.5 0 .8-.3.8-.9 0-.6-.3-.9-.8-.9H8zm0 3.1v2h2.7c.6 0 1-.3 1-1 0-.7-.4-1-1-1H8z" fill="#FFFFFF"/>
+    <path d="M14 6h2v3h3V6h2v7.5h-2v-3h-3v3h-2V6z" fill="#F26522"/>
+  </svg>
+);
+
+const AmazonPayIcon = () => (
+  <svg className="upi-app-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <rect width="24" height="24" rx="12" fill="#232F3E"/>
+    <path d="M14.5 15.2c-2.4 1.8-5.9 2.7-8.9.9-.3-.2 0-.5.3-.4 3.2 1.1 6.7.2 8.9-.9.3-.2.6.2.3.4z" fill="#FF9900"/>
+    <path d="M15.5 14.1c.3-.3.9-.2.9.2 0 .9-.5 2-1.2 2.6-.2.2-.4 0-.3-.2.3-.6.6-1.7.6-2.6z" fill="#FF9900"/>
+  </svg>
+);
+
 const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
 const nameRegex = /^[A-Za-z\s]+$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -83,6 +126,15 @@ const netBankingInitialState = {
   errors: {},
 };
 
+const cardOtpInitialState = {
+  isOpen: false,
+  step: 'otp',
+  otp: '',
+  maskedPhone: '',
+  errors: {},
+  isLoading: false,
+};
+
 const qrPaymentInitialState = {
   isVisible: false,
   isLoading: false,
@@ -104,7 +156,25 @@ const getStoredPayment = () => {
 };
 
 const getQrSource = (paymentQr = {}) => {
+  const nested = paymentQr.data || paymentQr.value || {};
+  const upiPayload =
+    paymentQr.qrPayload ||
+    paymentQr.upiPayload ||
+    paymentQr.upiLink ||
+    paymentQr.upiDeepLink ||
+    nested.qrPayload ||
+    nested.upiPayload ||
+    nested.upiLink ||
+    nested.upiDeepLink;
+
+  if (upiPayload && typeof upiPayload === 'string' && upiPayload.includes('am=')) {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
+  }
+
   if (paymentQr.qrCodeUrl || paymentQr.qrImageUrl || paymentQr.qrUrl) {
+    if (upiPayload && typeof upiPayload === 'string') {
+      return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
+    }
     return paymentQr.qrCodeUrl || paymentQr.qrImageUrl || paymentQr.qrUrl;
   }
   if (paymentQr.qrBase64) {
@@ -233,6 +303,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
   const [paymentErrors, setPaymentErrors] = useState({});
   const [placedOrder, setPlacedOrder] = useState(null);
   const [netBankingFlow, setNetBankingFlow] = useState(netBankingInitialState);
+  const [cardOtpFlow, setCardOtpFlow] = useState(cardOtpInitialState);
   const [availableBanks, setAvailableBanks] = useState(defaultBankOptions);
   const [isAddingBank, setIsAddingBank] = useState(false);
   const [newBankName, setNewBankName] = useState('');
@@ -936,7 +1007,14 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
         orderId: preparedOrder.orderId,
         amount: grandTotal,
       });
-      const qrSource = getQrSource(paymentQr);
+      let qrSource = getQrSource(paymentQr);
+      if (!qrSource || !qrSource.includes('am=')) {
+        const pa = '9177758571@ybl';
+        const pn = 'Shyam Agro Tools';
+        const am = grandTotal ? Number(grandTotal).toFixed(2) : '0.00';
+        const dynamicPayload = `upi://pay?pa=${pa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=${encodeURIComponent('Order Payment')}&tr=${preparedOrder.orderId}`;
+        qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(dynamicPayload)}`;
+      }
       if (!qrSource) throw new Error('The payment gateway did not return a valid QR code.');
       const transactionId = paymentQr.transactionId || initiationResult.transactionId;
       persistPaymentTransaction({
@@ -1109,6 +1187,58 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     }
   };
 
+  const handleCardOtpSubmit = async () => {
+    const errors = {};
+
+    if (!cardOtpFlow.otp.trim()) errors.otp = t('otpRequired') || 'OTP is required';
+    else if (!/^\d{6}$/.test(cardOtpFlow.otp)) errors.otp = t('otpInvalid') || 'Enter a valid 6-digit OTP';
+
+    if (Object.keys(errors).length > 0) {
+      setCardOtpFlow((current) => ({ ...current, errors }));
+      return;
+    }
+
+    setCardOtpFlow((current) => ({ ...current, isLoading: true, errors: {} }));
+    try {
+      await verifyCardOtp({
+        transactionId: paymentTransaction.transactionId,
+        otp: cardOtpFlow.otp,
+      });
+      persistPaymentTransaction({
+        otpVerified: true,
+        otpVerificationStatus: 'Verified',
+        paymentGatewayStatus: 'OtpVerified',
+      });
+      const result = await completePayment({ transactionId: paymentTransaction.transactionId });
+      const statusResult = await getPaymentStatus(paymentTransaction.transactionId);
+      const transaction = {
+        ...paymentTransaction,
+        paymentStatus: statusResult?.status || result?.status || 'Success',
+        paymentGatewayStatus: statusResult?.status || result?.status || 'Success',
+        paymentCompleted: true,
+        otpVerified: true,
+        otpVerificationStatus: 'Verified',
+        message: statusResult?.message || result?.message || 'Payment completed successfully.',
+      };
+      persistPaymentTransaction(transaction);
+      setCardOtpFlow((current) => ({ ...current, step: 'success', isLoading: false, errors: {} }));
+      
+      const paymentMethodStr = formData.paymentMethod === 'cod' ? t('cashOnDelivery') : onlinePaymentLabels[onlinePaymentType];
+      const backendPaymentMethod = getBackendPaymentMethod(formData.paymentMethod, onlinePaymentType);
+      const orderCompleted = await completeOrder(paymentMethodStr, paymentTransaction.orderId, backendPaymentMethod, transaction, paymentTransaction.backendOrder);
+      if (orderCompleted) {
+        setCardOtpFlow({ ...cardOtpInitialState, errors: {} });
+      }
+    } catch (error) {
+      setCardOtpFlow((current) => ({
+        ...current,
+        step: error.paymentFailed ? 'failed' : current.step,
+        isLoading: false,
+        errors: { api: getApiErrorMessage(error, 'OTP verification failed.') },
+      }));
+    }
+  };
+
   const handleConfirmNetBankingPayment = () => {
     const selectedBank = paymentDetails.bankName;
     setNetBankingFlow((current) => ({ ...current, step: 'success', errors: {} }));
@@ -1141,6 +1271,15 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
 
   const closeNetBankingFlow = () => {
     setNetBankingFlow({ ...netBankingInitialState, errors: {} });
+  };
+
+  const closeCardOtpFlow = () => {
+    setCardOtpFlow({ ...cardOtpInitialState, errors: {} });
+  };
+
+  const handleCardOtpFieldChange = (event) => {
+    const { name, value } = event.target;
+    setCardOtpFlow((current) => ({ ...current, [name]: value, errors: { ...current.errors, [name]: '' } }));
   };
 
   const handleSubmit = async (event) => {
@@ -1204,6 +1343,17 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
       const preparedOrder = await createOrderForPayment(backendPaymentMethod);
       const { orderId, backendOrder } = preparedOrder;
       const initiationResult = await startPayment(orderId, { backendOrder });
+      
+      if (initiationResult.requiresOtp) {
+        setCardOtpFlow({
+          ...cardOtpInitialState,
+          isOpen: true,
+          maskedPhone: initiationResult.maskedPhone || '******7890'
+        });
+        setIsPlacingOrder(false);
+        return; // Stop here, wait for OTP
+      }
+
       const completionResult = await completePayment({ transactionId: initiationResult.transactionId });
       const statusResult = await getPaymentStatus(initiationResult.transactionId);
       const transaction = {
@@ -1777,7 +1927,20 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                             </div>
                             <div className="payment-qr-apps">
                               <span>{t('scanUsing')}</span>
-                              <p>{t('phonePePaytmBhimUpi')}</p>
+                              <div className="upi-apps-grid">
+                                {[
+                                  { id: 'gpay', label: 'Google Pay', IconComponent: GPayIcon },
+                                  { id: 'phonepe', label: 'PhonePe', IconComponent: PhonePeIcon },
+                                  { id: 'paytm', label: 'Paytm', IconComponent: PaytmIcon },
+                                  { id: 'bhim', label: 'BHIM', IconComponent: BhimIcon },
+                                  { id: 'amazonpay', label: 'Amazon Pay', IconComponent: AmazonPayIcon },
+                                ].map((app) => (
+                                  <div key={app.id} className="upi-app-chip">
+                                    <app.IconComponent />
+                                    <span>{app.label}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </>
                         ) : qrPayment.error ? (
@@ -1799,7 +1962,20 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                             </div>
                             <div className="payment-qr-apps">
                               <span>{t('supportedApps')}</span>
-                              <p>{t('phonePePaytmBhimUpi')}</p>
+                              <div className="upi-apps-grid">
+                                {[
+                                  { id: 'gpay', label: 'Google Pay', IconComponent: GPayIcon },
+                                  { id: 'phonepe', label: 'PhonePe', IconComponent: PhonePeIcon },
+                                  { id: 'paytm', label: 'Paytm', IconComponent: PaytmIcon },
+                                  { id: 'bhim', label: 'BHIM', IconComponent: BhimIcon },
+                                  { id: 'amazonpay', label: 'Amazon Pay', IconComponent: AmazonPayIcon },
+                                ].map((app) => (
+                                  <div key={app.id} className="upi-app-chip">
+                                    <app.IconComponent />
+                                    <span>{app.label}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </>
                         )}
@@ -2138,6 +2314,89 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
         </div>
       )}
 
+      {cardOtpFlow.isOpen && (
+        <div className="bank-payment-overlay" role="dialog" aria-modal="true" aria-labelledby="card-otp-title">
+          <div className="bank-payment-modal">
+            <div className="bank-payment-header">
+              <div>
+                <span className="bank-payment-kicker">{t('secureCardVerification') || 'Secure Card Verification'}</span>
+                <h2 id="card-otp-title">{onlinePaymentType === 'debit-card' ? 'Debit Card' : 'Credit Card'}</h2>
+              </div>
+              {cardOtpFlow.step !== 'success' && (
+                <button type="button" className="bank-modal-close" onClick={closeCardOtpFlow} aria-label={t('closePaymentFlow')}>
+                  <i className="fas fa-times"></i>
+                </button>
+              )}
+            </div>
+
+            <div className="bank-payment-body">
+              {cardOtpFlow.step === 'otp' && (
+                <div className="bank-payment-screen">
+                  <div className="bank-payment-icon">
+                    <i className="fas fa-mobile-alt"></i>
+                  </div>
+                  <h3>{t('otpVerification')}</h3>
+                  <p>{t('enterOtpSentTo') || 'Enter the OTP sent to'} {cardOtpFlow.maskedPhone}</p>
+                  <div className="bank-input-group otp-field">
+                    <label>{t('otp')} *</label>
+                    <input
+                      type="text"
+                      name="otp"
+                      value={cardOtpFlow.otp}
+                      onChange={handleCardOtpFieldChange}
+                      placeholder="123456"
+                      maxLength="6"
+                      inputMode="numeric"
+                    />
+                    {cardOtpFlow.errors.otp && <span className="field-error">{cardOtpFlow.errors.otp}</span>}
+                  </div>
+                  <div className="bank-payment-actions">
+                    {cardOtpFlow.errors.api && <span className="field-error">{cardOtpFlow.errors.api}</span>}
+                    <button type="button" className="bank-primary-btn" onClick={handleCardOtpSubmit} disabled={cardOtpFlow.isLoading}>
+                      {cardOtpFlow.isLoading ? t('pleaseWait') : t('verifyOtp')}
+                    </button>
+                    <button
+                      type="button"
+                      className="bank-secondary-btn"
+                      onClick={closeCardOtpFlow}
+                    >
+                      {t('cancel')}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {cardOtpFlow.step === 'success' && (
+                <div className="bank-payment-screen success-screen">
+                  <div className="bank-payment-icon success">
+                    <i className="fas fa-check-circle"></i>
+                  </div>
+                  <h3>{t('paymentSuccessful')}</h3>
+                  <p>{t('redirectingToOrderConfirmation')}</p>
+                </div>
+              )}
+
+              {cardOtpFlow.step === 'failed' && (
+                <div className="bank-payment-screen failed-screen">
+                  <div className="bank-payment-icon error">
+                    <i className="fas fa-times-circle"></i>
+                  </div>
+                  <h3>{t('paymentFailed')}</h3>
+                  <p>{cardOtpFlow.errors.api || t('unableToProcessPayment')}</p>
+                  <div className="bank-payment-actions">
+                    <button type="button" className="bank-primary-btn" onClick={() => setCardOtpFlow((current) => ({ ...current, step: 'otp', errors: {} }))}>
+                      {t('tryAgain')}
+                    </button>
+                    <button type="button" className="bank-secondary-btn" onClick={closeCardOtpFlow}>
+                      {t('useAnotherMethod')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

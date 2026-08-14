@@ -212,9 +212,9 @@ namespace ShyamAgroSuite.Api.Controllers
         // ====================================================
         [HttpGet("track")]
         [HttpGet("track/{orderId}")]
-        public async Task<IActionResult> TrackOrder([FromQuery] string? orderId = null, [FromRoute] string? orderIdRoute = null)
+        public async Task<IActionResult> TrackOrder([FromQuery(Name = "orderId")] string? queryId = null, [FromRoute(Name = "orderId")] string? routeId = null)
         {
-            var searchId = !string.IsNullOrWhiteSpace(orderId) ? orderId : orderIdRoute;
+            var searchId = !string.IsNullOrWhiteSpace(queryId) ? queryId : routeId;
             searchId = searchId?.Trim();
 
             if (string.IsNullOrEmpty(searchId))

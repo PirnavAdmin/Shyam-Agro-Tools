@@ -100,6 +100,14 @@ const calculateDiscountPercent = ({ price, mrp, discountType, discountAmount }) 
 
 export const normalizeProduct = (product = {}) => {
   const backendImages = Array.isArray(product.images) ? product.images : Array.isArray(product.Images) ? product.Images : [];
+  const labelKeys = [
+    'media.front',
+    'media.side',
+    'media.back',
+    'media.topView',
+    'media.left',
+    'media.right',
+  ];
   const imageItems = backendImages
     .map((image, index) => {
       const source = image?.imageUrl || image?.url || image;
@@ -109,6 +117,7 @@ export const normalizeProduct = (product = {}) => {
         type: 'image',
         id: image?.id ?? `image-${index + 1}`,
         productId: image?.productId ?? product.id ?? product.productId,
+        labelKey: labelKeys[index] || 'media.closeup',
         label: image?.label || image?.title || (index === 0 ? 'Front' : `Image ${index + 1}`),
         url: getProductAssetUrl(source),
         imageUrl: source,

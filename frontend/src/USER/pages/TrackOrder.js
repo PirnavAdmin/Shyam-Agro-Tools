@@ -156,24 +156,29 @@ const TrackOrder = () => {
   };
 
   return (
-    <div className="track-order-page-wrapper">
+    <div className="track-page-shell">
       <Header />
-      <div className="track-order-container">
-        <div className="track-order-card">
-          <h1>{t('trackYourOrder')}</h1>
-          <p className="track-subhead">{t('enterOrderIdMsg')}</p>
+      <div className="track-page-container">
+        {/* Animated decorative eco leaves */}
+        <div className="track-leaf track-leaf-one"></div>
+        <div className="track-leaf track-leaf-two"></div>
+
+        <div className="track-card">
+          <span className="track-eyebrow">{t('orderTracking') || 'Order Tracking'}</span>
+          <h1>{t('trackYourShipment') || 'Track Your Shipment'}</h1>
+          <p>{t('trackingEnterDetails') || 'Enter your Order ID or Tracking Number to see real-time updates.'}</p>
 
           {!queryOrderId && (
-            <form onSubmit={handleTrack} className="track-input-group">
+            <form onSubmit={handleTrack} className="track-form">
               <input
                 type="text"
-                placeholder={t('orderIdPlaceholder')}
+                placeholder={t('orderIdPlaceholder') || 'Enter Order ID'}
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
                 required
               />
-              <button type="submit" className="track-submit-btn" disabled={isTrackingLoading}>
-                {isTrackingLoading ? t('trackingInProgress') : t('trackOrder')}
+              <button type="submit" className="track-btn" disabled={isTrackingLoading}>
+                {isTrackingLoading ? t('trackingInProgress') || 'Tracking...' : t('trackOrder') || 'Track Order'}
               </button>
             </form>
           )}
