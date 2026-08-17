@@ -102,6 +102,7 @@ const CartPage = () => {
     isCartLoading,
     isCartMutating,
     cartError,
+    setCartError,
     clearCart,
     refreshCart,
     waitForCartSync,
@@ -329,14 +330,26 @@ const CartPage = () => {
       </section>
 
       <main className="cart-wishlist-main mx-auto w-full max-w-[1440px] flex-grow px-3 py-5 md:px-6 md:py-8 lg:px-10">
+        {cartError && (
+          <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center justify-between shadow-sm">
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <i className="fas fa-exclamation-circle text-red-500" />
+              {cartError}
+            </span>
+            <button 
+              onClick={() => setCartError('')} 
+              className="text-red-500 hover:text-red-700 font-black text-lg focus:outline-none"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px' }}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {isCartLoading ? (
             <div className="border border-border bg-white px-5 py-8 text-center text-sm font-bold text-gray-500 shadow-sm">
               Loading your cart...
-            </div>
-          ) : cartError ? (
-            <div className="border border-border bg-white px-5 py-8 text-center text-sm font-bold text-red-500 shadow-sm">
-              {cartError}
             </div>
           ) : cartItems.length === 0 ? (
             <motion.div 
@@ -380,7 +393,7 @@ const CartPage = () => {
                       >
                         <div className="cart-product-details flex min-w-0 items-start gap-4">
                           <div className="app-line-thumb bg-light p-2 border border-gray-100 shrink-0">
-                            <img src={getProductImage(item)} alt={productText(item, 'name')} loading="lazy" onError={handleProductImageError} />
+                            <img src={getProductImage(item)} alt={productText(item, 'name')} onError={handleProductImageError} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="cart-product-title mb-1 font-bold text-dark uppercase tracking-wide">{productText(item, 'name')}</h3>
@@ -408,7 +421,6 @@ const CartPage = () => {
                           <div className="flex h-9 items-center overflow-hidden rounded-sm border border-border bg-white">
                             <button 
                               onClick={() => updateQuantity(item.id, -1)}
-                              disabled={isCartMutating}
                               className="flex w-9 items-center justify-center transition-colors hover:bg-gray-50"
                             >
                               <Minus size={14} />
@@ -416,7 +428,6 @@ const CartPage = () => {
                             <span className="w-10 border-x border-border text-center text-sm font-bold">{item.quantity}</span>
                             <button 
                               onClick={() => updateQuantity(item.id, 1)}
-                              disabled={isCartMutating}
                               className="flex w-9 items-center justify-center transition-colors hover:bg-gray-50"
                             >
                               <Plus size={14} />

@@ -445,6 +445,26 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     let isActive = true;
 
     const loadCheckoutPage = async () => {
+      if (!user) {
+        if (isActive) {
+          setAddresses([]);
+          setSelectedAddressId(null);
+          setFormData((current) => ({
+            ...current,
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            alternatePhone: '',
+            address: '',
+            city: '',
+            state: '',
+            zip: '',
+          }));
+        }
+        return;
+      }
+
       try {
         const savedAddresses = await getAddresses();
         if (isActive) {
@@ -461,6 +481,25 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
               ...current,
               ...mapAddressToForm(latestAddress),
             }));
+          } else {
+            const nameParts = (user.name || '').trim().split(/\s+/);
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            const phone = user.phone || user.mobileNumber || user.MobileNumber || '';
+            const email = user.email || user.Email || '';
+            setSelectedAddressId(null);
+            setFormData((current) => ({
+              ...current,
+              firstName,
+              lastName,
+              email,
+              phone,
+              alternatePhone: '',
+              address: '',
+              city: '',
+              state: '',
+              zip: '',
+            }));
           }
         }
       } catch (error) {
@@ -476,7 +515,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
     };
     // This effect owns page-entry loading; coupon and coin refreshes are handled separately.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (previousCoinsRedeemRef.current === coinsRedeem) {
@@ -1482,21 +1521,45 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                                 .filter(Boolean)
                                 .join(', ')}
                             </span>
-                            <button
-                              type="button"
-                              className="save-address-btn"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleDeleteAddress(addressId);
-                              }}
-                              disabled={isSavingAddress || isPlacingOrder}
-                            >
-                              {t('delete')}
-                            </button>
+                            <div className="address-action-btns">
+                              <button
+                                type="button"
+                                className="save-address-btn address-edit-btn"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  selectAddress(address);
+                                  const formRow = document.querySelector('.form-row');
+                                  if (formRow) formRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }}
+                                disabled={isSavingAddress || isPlacingOrder}
+                              >
+                                <i className="fas fa-edit" /> {t('edit') || 'EDIT'}
+                              </button>
+                              <button
+                                type="button"
+                                className="save-address-btn address-delete-btn"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDeleteAddress(addressId);
+                                }}
+                                disabled={isSavingAddress || isPlacingOrder}
+                              >
+                                <i className="fas fa-trash-alt" /> {t('delete')}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
                     })}
+                  </div>
+                )}
+                {addresses.length === 0 && (
+                  <div className="new-user-address-hint">
+                    <i className="fas fa-map-marker-alt" />
+                    <div>
+                      <strong>Enter your delivery address</strong>
+                      <span>Fill in the details below. Your address will be saved for future orders.</span>
+                    </div>
                   </div>
                 )}
                 <div className="form-row">
@@ -1686,7 +1749,6 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                         key={`${language}-checkout-cod`}
                         src={checkoutPaymentAsset('cod')}
                         alt={t('cashOnDelivery')}
-                        loading="lazy"
                       />
                     </div>
                     <div className="pay-text">
@@ -1707,7 +1769,6 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                         key={`${language}-checkout-online`}
                         src={checkoutPaymentAsset('upi')}
                         alt={t('netBankingUpi')}
-                        loading="lazy"
                       />
                     </div>
                     <div className="pay-text">
@@ -1753,7 +1814,6 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                             className="checkout-payment-type-asset"
                             src={checkoutPaymentAsset(option.asset)}
                             alt={option.label}
-                            loading="lazy"
                           />
                           {option.label}
                         </button>
@@ -2020,7 +2080,7 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
                 {cartItems.map((item) => (
                   <div key={item.cartId} className="summary-item">
                     <div className="s-item-img app-line-thumb-sm">
-                      <img src={getProductImage(item)} alt={productText(item, 'displayName')} loading="lazy" onError={handleProductImageError} />
+                      <img src={getProductImage(item)} alt={productText(item, 'displayName')} onError={handleProductImageError} />
                       <span className="s-item-qty">{item.quantity}</span>
                     </div>
                     <div className="s-item-info">

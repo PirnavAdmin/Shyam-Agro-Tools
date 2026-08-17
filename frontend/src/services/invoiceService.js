@@ -53,7 +53,7 @@ export const mapOrderToInvoice = (order) => {
 
   return {
     invoiceNo: order.orderNumber || String(order.id),
-    date: order.createdAt || new Date().toISOString(),
+    date: order.createdAt || order.orderDate || order.OrderDate || order.createdDate || order.CreatedDate || new Date().toISOString(),
     paymentStatus: order.paymentStatus || 'Pending',
     clientName: billingName,
     emailAddress: billingEmail,
@@ -82,25 +82,37 @@ export const mapOrderToInvoice = (order) => {
 };
 
 export const getOrCreateInvoiceForOrder = async (order) => {
-  if (!order || !order.id) return null;
-  const orderId = String(order.id);
+  if (!order || (!order.id && !order.backendId)) return null;
+  const orderId = String(order.id || order.backendId);
   const orderNo = order.orderNumber || orderId;
 
-  // 1. Try to fetch invoice directly by ID
-  try {
-    const invoice = await getInvoiceById(orderId);
-    if (invoice && (String(invoice.invoiceNo) === orderNo || String(invoice.id) === orderId)) {
-      return invoice;
+  // 1. Try to fetch invoice directly by backendId or ID
+  const directId = order.backendId || (isNaN(Number(order.id)) ? null : Number(order.id));
+  if (directId) {
+    try {
+      const invoice = await getInvoiceById(directId);
+      if (invoice) {
+        return invoice;
+      }
+    } catch (err) {
+      console.warn(`Could not fetch invoice directly by ID ${directId}:`, err.message);
     }
-  } catch (err) {
-    console.warn(`Could not fetch invoice directly by ID ${orderId}:`, err.message);
   }
 
   // 2. Try to fetch all invoices and filter by invoiceNo
   try {
     const invoices = await getInvoices();
     const invoiceList = Array.isArray(invoices) ? invoices : (invoices.value || invoices.items || invoices.data || []);
-    const matching = invoiceList.find(inv => String(inv?.invoiceNo) === orderNo || String(inv?.id) === orderId);
+    const matching = invoiceList.find(inv => {
+      const invNo = String(inv?.invoiceNo || inv?.invoiceId || inv?.InvoiceNo || inv?.InvoiceId || '').trim();
+      const invId = String(inv?.id || inv?.backendId || inv?.Id || '').trim();
+      
+      const cleanOrderNo = String(orderNo || '').trim().replace(/^#+/, '');
+      const cleanOrderId = String(orderId || '').trim().replace(/^#+/, '');
+      const cleanInvNo = invNo.replace(/^INV-/, '').replace(/^ORD-/, '');
+      
+      return cleanInvNo === cleanOrderNo || cleanInvNo === cleanOrderId || invId === cleanOrderId || invId === String(order.backendId || '');
+    });
     if (matching) return matching;
   } catch (err) {
     console.warn('Could not fetch or search invoices list:', err.message);

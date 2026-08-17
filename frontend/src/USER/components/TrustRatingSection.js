@@ -91,7 +91,6 @@ const TrustRatingSection = () => {
               src={activeSlide.image}
               alt="Agro Machinery"
               className="w-full h-full object-cover object-center"
-              loading="lazy"
               onError={(e) => {
                 if (e.target.src !== '/hero_banner.png') {
                   e.target.src = '/hero_banner.png';

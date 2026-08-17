@@ -88,6 +88,7 @@ builder.Services.AddScoped<ITestUserRepository, TestUserRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 
 // Services
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -204,9 +205,9 @@ using (var cleanupScope = app.Services.CreateScope())
                         ) keep ON c_dup.Phone = keep.Phone AND c_dup.Id > keep.MinId
                     );
 
-                    -- Deduplicate Orders table by OrderNumber
+                    -- Deduplicate Orders table by OrderNumber (keep latest record with highest Id)
                     DELETE o1 FROM Orders o1
-                    INNER JOIN Orders o2 ON o1.OrderNumber = o2.OrderNumber AND o1.Id > o2.Id;
+                    INNER JOIN Orders o2 ON o1.OrderNumber = o2.OrderNumber AND o1.Id < o2.Id;
 
                     -- Standardize OrderNumber strings
                     UPDATE Orders SET OrderNumber = REPLACE(OrderNumber, '#', '');
@@ -215,6 +216,7 @@ using (var cleanupScope = app.Services.CreateScope())
 
                     -- Synchronize PaymentStatus for completed, delivered, and cancelled orders
                     UPDATE Orders SET PaymentStatus = 'Paid' WHERE Status IN ('Completed', 'Delivered') AND PaymentStatus IN ('Pending', 'Pending Verification');
+                    UPDATE Orders SET PaymentStatus = 'Pending' WHERE PaymentMethod IN ('COD', 'Cash on Delivery') AND Status NOT IN ('Completed', 'Delivered') AND PaymentStatus = 'Paid';
                     UPDATE Orders SET PaymentStatus = 'Cancelled', Status = 'Cancelled' WHERE FinalAmount = 0 OR TotalAmount = 0;
                     UPDATE Orders SET PaymentStatus = 'Cancelled', Status = 'Cancelled' WHERE Status = 'Pending' AND PaymentStatus = 'Pending' AND OrderDate < DATE_SUB(NOW(), INTERVAL 7 DAY);
                     UPDATE Orders SET PaymentStatus = 'Cancelled' WHERE Status = 'Cancelled';

@@ -69,13 +69,12 @@ export const getStatusIndex = (status = 'Order Placed') => {
 
 export const getOrders = (mobileNumber = getLoggedInMobile()) => {
   const normalizedMobile = normalizeMobile(mobileNumber);
+  if (!normalizedMobile) return [];
   const allStored = getAllStoredOrders();
-  if (!normalizedMobile) return allStored;
-  const filtered = allStored.filter((order) => {
+  return allStored.filter((order) => {
     const orderMob = getOrderMobile(order);
-    return !orderMob || orderMob === normalizedMobile;
+    return orderMob === normalizedMobile;
   });
-  return filtered.length > 0 ? filtered : allStored;
 };
 
 export const saveOrder = (order) => {
@@ -90,26 +89,57 @@ export const getOrderById = (orderId, mobileNumber = getLoggedInMobile()) => (
   getOrders(mobileNumber).find((order) => order.id === orderId) || null
 );
 
-export const getOrderTracking = (order) => {
-  const status = order?.status || 'Order Placed';
-  const activeIndex = getStatusIndex(status);
+const formatDateToSlash = (value) => {
+  if (!value) return '-';
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const [_, y, m, d] = match;
+      return `${parseInt(d, 10)}/${parseInt(m, 10)}/${y}`;
+    }
+    if (value.includes('/')) {
+      return value;
+    }
+  }
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return String(value);
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+};
+
+export const getOrderTracking = (order, trackingDetails = null) => {
+  const currentStatus = trackingDetails?.currentStatus || trackingDetails?.CurrentStatus || order?.status || 'Order Placed';
+  const activeIndex = getStatusIndex(currentStatus);
   const progressPercent = orderStatusSteps.length > 1
     ? (activeIndex / (orderStatusSteps.length - 1)) * 100
     : 0;
 
+  const logs = trackingDetails?.timelineLogs || trackingDetails?.TimelineLogs || [];
+  const logsByStatus = new Map();
+  logs.forEach((log) => {
+    if (log?.status) {
+      logsByStatus.set(String(log.status).toLowerCase(), log);
+    }
+  });
+
   return {
-    status,
+    status: currentStatus,
     activeIndex,
     progressPercent,
     steps: orderStatusSteps.map((label, index) => {
       let dateValue = '-';
-      if (index <= activeIndex) {
-        const baseDate = new Date(order?.createdAt || Date.now());
+      const matchingLog = logsByStatus.get(label.toLowerCase());
+
+      if (matchingLog) {
+        const rawDate = matchingLog.date || matchingLog.createdAt;
+        dateValue = formatDateToSlash(rawDate);
+      } else if (index <= activeIndex) {
+        const baseDate = new Date(order?.createdAt || order?.createdDate || order?.orderDate || order?.OrderDate || Date.now());
         if (index > 0) {
           baseDate.setDate(baseDate.getDate() + index);
         }
-        dateValue = baseDate.toLocaleDateString('en-IN');
+        dateValue = formatDateToSlash(baseDate);
       }
+
       return {
         label,
         date: dateValue,

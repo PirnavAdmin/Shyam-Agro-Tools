@@ -235,7 +235,6 @@ const BlogSection = () => {
                       key={imageFailureKey}
                       src={withBlogImageVersion(blogImageUrl, blog.id, languageCode)}
                       alt={title}
-                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       onError={() => markImageAsFailed(blog, imageFailureKey)}
                     />
@@ -332,7 +331,7 @@ const BlogSection = () => {
                         key={product.id}
                         className="blog-related-card"
                       >
-                        <img src={getProductImage(product)} alt={productText(product, 'name')} loading="lazy" onError={handleProductImageError} />
+                        <img src={getProductImage(product)} alt={productText(product, 'name')} onError={handleProductImageError} />
                         <div>
                           <h5>{productText(product, 'name')}</h5>
                           <p>{product.price}</p>

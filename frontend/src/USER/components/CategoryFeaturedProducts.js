@@ -75,7 +75,6 @@ const CategoryFeaturedProducts = ({ products = [] }) => {
               <img
                 src={getProductImage(product.imageUrl || product.image)}
                 alt={product.name || 'Product'}
-                loading="lazy"
                 onError={handleProductImageError}
                 className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
               />

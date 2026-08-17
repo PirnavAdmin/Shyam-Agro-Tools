@@ -26,6 +26,8 @@ namespace ShyamAgroSuite.Api.Models
         public string? Pincode { get; set; }
 
         public string? AddressType { get; set; }
+        
+        public string? UserIdentifier { get; set; }
 
         public DateTime CreatedDate { get; set; }
     }

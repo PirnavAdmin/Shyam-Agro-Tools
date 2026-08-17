@@ -1854,7 +1854,6 @@ const PaymentPage = () => {
                       className="payment-option-asset"
                       src={paymentVisualSrc(option.id)}
                       alt={paymentMethodLabel(option.id)}
-                      loading="lazy"
                     />
                     <span>{paymentMethodLabel(option.id)}</span>
                   </button>
@@ -1873,7 +1872,6 @@ const PaymentPage = () => {
                       className="payment-method-hero-asset"
                       src={paymentVisualSrc('upi')}
                       alt={t('upi')}
-                      loading="lazy"
                     />
                     <div className="manual-payment-details">
                       <div className="manual-payment-detail-row">
@@ -1959,7 +1957,6 @@ const PaymentPage = () => {
                       className="payment-method-hero-asset"
                       src={paymentVisualSrc('bankTransfer')}
                       alt={t('bankTransfer')}
-                      loading="lazy"
                     />
 
                     <div className="manual-payment-details bank-details">
@@ -2020,7 +2017,6 @@ const PaymentPage = () => {
                       className="payment-method-hero-asset"
                       src={paymentVisualSrc('cards')}
                       alt={paymentMethodLabel('debitCard')}
-                      loading="lazy"
                     />
                     <div className="payment-form-group">
                       <label>{t('cardHolderName')} *</label>
@@ -2136,7 +2132,6 @@ const PaymentPage = () => {
                       className="payment-method-hero-asset"
                       src={paymentVisualSrc('cards')}
                       alt={paymentMethodLabel('creditCard')}
-                      loading="lazy"
                     />
                     <div className="payment-form-group">
                       <label>{t('cardHolderName')} *</label>
@@ -2272,7 +2267,6 @@ const PaymentPage = () => {
                         className="cod-payment-asset"
                         src={paymentVisualSrc('cod')}
                         alt={t('cashOnDelivery')}
-                        loading="lazy"
                       />
                       <div>
                         <strong>{t('cashOnDelivery')}</strong>
@@ -2298,7 +2292,6 @@ const PaymentPage = () => {
                       className="payment-method-hero-asset"
                       src={paymentVisualSrc('qr')}
                       alt={t('qrPayment')}
-                      loading="lazy"
                     />
                     
                     <div className="qr-image-wrapper">
@@ -2404,35 +2397,41 @@ const PaymentPage = () => {
             <div className="bank-payment-body">
               {cardOtpFlow.step === 'otp' && (
                 <div className="bank-payment-screen">
-                  <div className="bank-payment-icon">
-                    <i className="fas fa-mobile-alt"></i>
+                  <div className="otp-icon-ring">
+                    <i className="fas fa-shield-alt" />
                   </div>
-                  <h3>{t('otpVerification')}</h3>
-                  <p>{t('enterOtpSentTo') || 'Enter the OTP sent to'} {cardOtpFlow.maskedPhone}</p>
+                  <h3 className="otp-title">OTP Verification</h3>
+                  <p className="otp-subtitle">
+                    Enter the 6-digit code sent to&nbsp;
+                    <strong>{cardOtpFlow.maskedPhone}</strong>
+                  </p>
+
+                  <div className="otp-hint-box">
+                    <i className="fas fa-info-circle" />
+                    <span>Test OTP: <strong>123456</strong></span>
+                  </div>
+
                   <div className="bank-input-group otp-field">
-                    <label>{t('otp')} *</label>
                     <input
                       type="text"
                       name="otp"
                       value={cardOtpFlow.otp}
                       onChange={handleCardOtpFieldChange}
-                      placeholder="123456"
+                      placeholder="_ _ _ _ _ _"
                       maxLength="6"
                       inputMode="numeric"
+                      className="otp-input-box"
                     />
                     {cardOtpFlow.errors.otp && <span className="field-error">{cardOtpFlow.errors.otp}</span>}
                   </div>
+
                   <div className="bank-payment-actions">
                     {cardOtpFlow.errors.api && <span className="field-error">{cardOtpFlow.errors.api}</span>}
                     <button type="button" className="bank-primary-btn" onClick={handleCardOtpSubmit} disabled={cardOtpFlow.isLoading}>
-                      {cardOtpFlow.isLoading ? t('pleaseWait') : t('verifyOtp')}
+                      {cardOtpFlow.isLoading ? 'Verifying…' : 'Verify OTP'}
                     </button>
-                    <button
-                      type="button"
-                      className="bank-secondary-btn"
-                      onClick={closeCardOtpFlow}
-                    >
-                      {t('cancel')}
+                    <button type="button" className="bank-secondary-btn" onClick={closeCardOtpFlow}>
+                      Cancel
                     </button>
                   </div>
                 </div>

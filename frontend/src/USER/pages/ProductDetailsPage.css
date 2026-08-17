@@ -1623,7 +1623,10 @@
 }
 
 .review-star-picker button svg {
-  fill: currentColor !important;
+  fill: #D1D5DB !important;
+  stroke: #D1D5DB !important;
+  color: #D1D5DB !important;
+  transition: fill 0.2s ease, stroke 0.2s ease, color 0.2s ease;
 }
 
 .review-star-picker button.selected {
@@ -1632,11 +1635,23 @@
   color: #FFC107;
 }
 
+.review-star-picker button.selected svg {
+  fill: #FFC107 !important;
+  stroke: #FFC107 !important;
+  color: #FFC107 !important;
+}
+
 .review-star-picker button:hover {
   border-color: #FFB300;
   background: #fff8e1;
   color: #FFB300;
   transform: scale(1.1);
+}
+
+.review-star-picker button:hover svg {
+  fill: #FFB300 !important;
+  stroke: #FFB300 !important;
+  color: #FFB300 !important;
 }
 
 .review-modal-actions {
@@ -1896,5 +1911,23 @@
   color: #58B82E !important;
   stroke: #58B82E !important;
   fill: #58B82E !important;
+}
+
+[data-theme="dark"] .product-detail-page .review-star-picker button svg {
+  fill: #4B6354 !important;
+  stroke: #4B6354 !important;
+  color: #4B6354 !important;
+}
+
+[data-theme="dark"] .product-detail-page .review-star-picker button.selected svg {
+  fill: #FACC15 !important;
+  stroke: #FACC15 !important;
+  color: #FACC15 !important;
+}
+
+[data-theme="dark"] .product-detail-page .review-star-picker button:hover svg {
+  fill: #FFB300 !important;
+  stroke: #FFB300 !important;
+  color: #FFB300 !important;
 }
 

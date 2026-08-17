@@ -156,6 +156,8 @@ namespace ShyamAgroSuite.Api.Controllers
                               o.PaymentStatus.Equals("Verified Paid", StringComparison.OrdinalIgnoreCase) ||
                               o.PaymentStatus.Equals("Paid Verified", StringComparison.OrdinalIgnoreCase) ||
                               o.PaymentStatus.Equals("Refunded", StringComparison.OrdinalIgnoreCase);
+                bool isCod = o.PaymentMethod.Equals("COD", StringComparison.OrdinalIgnoreCase) || 
+                             o.PaymentMethod.Equals("Cash on Delivery", StringComparison.OrdinalIgnoreCase);
 
                 if (isCancelled)
                 {
@@ -164,6 +166,25 @@ namespace ShyamAgroSuite.Api.Controllers
                     {
                         o.PaymentStatus = targetPayStatus;
                         statusAutoUpdated = true;
+                    }
+                }
+                else if (isCod)
+                {
+                    if (o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || o.Status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!isPaid)
+                        {
+                            o.PaymentStatus = "Paid";
+                            statusAutoUpdated = true;
+                        }
+                    }
+                    else
+                    {
+                        if (isPaid)
+                        {
+                            o.PaymentStatus = "Pending";
+                            statusAutoUpdated = true;
+                        }
                     }
                 }
                 else if (o.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) || 
@@ -266,7 +287,8 @@ namespace ShyamAgroSuite.Api.Controllers
                 }
             }
 
-            var ordersList = await query.OrderByDescending(o => o.OrderDate).ToListAsync();
+            var rawList = await query.OrderByDescending(o => o.Id).ToListAsync();
+            var ordersList = rawList.GroupBy(o => o.OrderNumber).Select(g => g.First()).OrderByDescending(o => o.OrderDate).ToList();
             await PopulateItemImagesAsync(ordersList);
 
             // Format results for UI presentation
@@ -465,11 +487,15 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // GET: api/Orders/tracking/{id}
         [HttpGet("tracking/{id}")]
-        public async Task<IActionResult> GetTrackingDetails(int id)
+        public async Task<IActionResult> GetTrackingDetails(string id)
         {
+            bool isNumeric = int.TryParse(id, out int numericId);
             var order = await _context.Orders
                 .Include(o => o.Customer)
-                .FirstOrDefaultAsync(o => o.Id == id);
+                .FirstOrDefaultAsync(o => (isNumeric && o.Id == numericId) || 
+                                          o.OrderNumber == id || 
+                                          o.OrderNumber == $"#{id}" ||
+                                          (id.StartsWith("#") && o.OrderNumber == id.Substring(1)));
 
             if (order == null)
             {
@@ -477,7 +503,7 @@ namespace ShyamAgroSuite.Api.Controllers
             }
 
             var timelineLogs = await _context.OrderTrackingLogs
-                .Where(log => log.OrderId == id)
+                .Where(log => log.OrderId == order.Id)
                 .OrderBy(log => log.CreatedAt)
                 .Select(log => new
                 {
@@ -554,7 +580,7 @@ namespace ShyamAgroSuite.Api.Controllers
             order.Status = newStatus;
 
             // Generate standard description if notes are left blank
-            var description = request.Notes;
+            var description = !string.IsNullOrEmpty(request.Notes) ? request.Notes : request.Description;
             if (string.IsNullOrEmpty(description))
             {
                 description = request.Status.ToLower() switch
@@ -602,6 +628,7 @@ namespace ShyamAgroSuite.Api.Controllers
         {
             public string Status { get; set; } = string.Empty;
             public string? Notes { get; set; }
+            public string? Description { get; set; }
         }
 
         // GET: api/Orders/shipping?search=

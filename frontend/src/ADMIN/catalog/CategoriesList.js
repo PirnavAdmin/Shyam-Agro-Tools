@@ -206,7 +206,7 @@ const CategoriesList = () => {
               {!isLoading && currentCategories.map((category, idx) => (
                 <tr key={category.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#64748b' }}>
-                    {indexOfFirstItem + idx + 1}
+                    {category.id}
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#1e293b' }}>
                     {category.name}

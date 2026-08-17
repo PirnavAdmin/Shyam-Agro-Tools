@@ -5,9 +5,9 @@ import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { formatCurrency, getOrderTracking, getOrders } from '../utils/orders';
+import { formatCurrency, getOrderTracking, getOrders, saveOrder } from '../utils/orders';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
-import { getCurrentUserOrdersFromApi } from '../../services/orderService';
+import { getCurrentUserOrdersFromApi, cancelOrder, getUserOrderTrackingById } from '../../services/orderService';
 import { getOrCreateInvoiceForOrder } from '../../services/invoiceService';
 import * as returnsService from '../../services/returnsService';
 import { getAddresses, createAddress } from '../../services/customerAddressService';
@@ -16,6 +16,18 @@ import './MyOrdersPage.css';
 
 const formatDate = (value) => {
   if (!value) return '-';
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const [_, y, m, d] = match;
+      const date = new Date(Number(y), Number(m) - 1, Number(d));
+      return date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+    }
+  }
   return new Date(value).toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
@@ -25,11 +37,28 @@ const formatDate = (value) => {
 
 const getUserMobile = (user) => user?.phone || user?.mobileNumber || user?.MobileNumber || '';
 
+const normalizeOrderIdKey = (id) => {
+  if (!id) return '';
+  return String(id).toUpperCase().trim().replace(/^#+/, '');
+};
+
 const mergeOrders = (apiOrders = [], localOrders = []) => {
   const merged = new Map();
 
-  [...localOrders, ...apiOrders].forEach((order) => {
-    if (order?.id) merged.set(String(order.id), order);
+  localOrders.forEach((order) => {
+    const key = normalizeOrderIdKey(order?.id || order?.orderNumber);
+    if (key) merged.set(key, order);
+  });
+
+  apiOrders.forEach((order) => {
+    const key = normalizeOrderIdKey(order?.id || order?.orderNumber);
+    if (key) {
+      const existing = merged.get(key);
+      merged.set(key, {
+        ...existing,
+        ...order,
+      });
+    }
   });
 
   return Array.from(merged.values()).sort((a, b) => (
@@ -43,6 +72,9 @@ const MyOrdersPage = () => {
   const [backendOrders, setBackendOrders] = useState([]);
   const [isOrdersLoading, setIsOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
+  const [refreshCount, setRefreshCount] = useState(0);
+  const [selectedOrderTracking, setSelectedOrderTracking] = useState(null);
+  const [cancellingOrder, setCancellingOrder] = useState(null);
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { t } = useLanguage();
@@ -97,7 +129,8 @@ const MyOrdersPage = () => {
 
   const orders = filteredOrders;
   const selectedOrder = orders.find((order) => order.id === selectedOrderId) || orders[0] || null;
-  const tracking = selectedOrder ? getOrderTracking(selectedOrder) : null;
+  const tracking = selectedOrder ? getOrderTracking(selectedOrder, selectedOrderTracking) : null;
+  const canCancel = selectedOrder && !['cancelled', 'canceled', 'delivered', 'completed', 'shipped', 'dispatched', 'out for delivery'].includes(selectedOrder.status?.toLowerCase() || '');
   const ordersHeaderText = orders.length > 0 ? 'Here are your orders' : 'No orders placed yet';
 
   const [invoice, setInvoice] = useState(null);
@@ -188,6 +221,23 @@ const MyOrdersPage = () => {
     navigate(`/contact-support?orderId=${encodeURIComponent(orderId)}&issue=${encodeURIComponent(issueType)}#contact-us`);
   };
 
+  const handleCancelOrderLocal = (orderId, reason) => {
+    try {
+      const localOrders = getOrders(mobileNumber);
+      const localOrder = localOrders.find((o) => String(o.id) === String(orderId));
+      if (localOrder) {
+        const updatedOrder = {
+          ...localOrder,
+          status: 'Cancelled',
+          paymentStatus: 'Cancelled'
+        };
+        saveOrder(updatedOrder);
+      }
+    } catch (e) {
+      console.warn('Failed to update local order status:', e);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
     const fetchInvoiceData = async () => {
@@ -221,7 +271,7 @@ const MyOrdersPage = () => {
     };
   }, [selectedOrder]);
 
-  const handleDownloadPdf = (order, inv) => {
+  const handleDownloadPdf = async (order, inv) => {
     if (!order || !inv) return;
 
     try {
@@ -238,22 +288,69 @@ const MyOrdersPage = () => {
       const grayText = [113, 128, 150];      // Slate gray for labels
       const borderLine = [226, 232, 240];    // Light border color
 
+      // Load logo image as base64 dynamically
+      let logoBase64 = null;
+      let logoWidth = 12;
+      let logoHeight = 12;
+      try {
+        const logoData = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            resolve({ dataURL, width: img.width, height: img.height });
+          };
+          img.onerror = (err) => reject(err);
+          img.src = '/logo.png';
+        });
+        logoBase64 = logoData.dataURL;
+        const aspectRatio = logoData.width / logoData.height;
+        logoHeight = 16;
+        logoWidth = logoHeight * aspectRatio;
+        if (logoWidth > 40) {
+          logoWidth = 40;
+          logoHeight = logoWidth / aspectRatio;
+        }
+      } catch (err) {
+        console.warn('Failed to load logo image for PDF:', err);
+      }
+
       // 1. Accent Line at the top
       doc.setFillColor(...primaryGreen);
       doc.rect(15, 12, 180, 2, 'F');
 
       // 2. Header Row
-      // Brand Text "SHYAM AGRO TOOLS"
-      doc.setTextColor(...primaryGreen);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      doc.text('SHYAM AGRO TOOLS', 15, 24);
+      // Brand logo and text
+      if (logoBase64) {
+        doc.addImage(logoBase64, 'PNG', 15, 16, logoWidth, logoHeight);
+        const textX = 15 + logoWidth + 4; // 4mm spacing
+        
+        doc.setTextColor(...primaryGreen);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('SHYAM AGRO TOOLS', textX, 23);
 
-      // Sub-brand / Tagline
-      doc.setTextColor(...grayText);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.text('High-Quality Agricultural Tools & Equipment', 15, 28);
+        doc.setTextColor(...grayText);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text('High-Quality Agricultural Tools & Equipment', textX, 27);
+      } else {
+        // Fallback text-only header
+        doc.setTextColor(...primaryGreen);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('SHYAM AGRO TOOLS', 15, 24);
+
+        doc.setTextColor(...grayText);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text('High-Quality Agricultural Tools & Equipment', 15, 28);
+      }
 
       // TAX / PROFORMA INVOICE Header on the right
       const isPaidOrder = (order.paymentStatus || order.paymentMethod || '').toLowerCase().includes('paid') || (order.paymentStatus || '').toLowerCase() === 'paid';
@@ -278,7 +375,7 @@ const MyOrdersPage = () => {
       // Horizontal separator line
       doc.setDrawColor(...borderLine);
       doc.setLineWidth(0.3);
-      doc.line(15, 37, 195, 37);
+      doc.line(15, 39, 195, 39);
 
       // Helper to split address beautifully into wrapped lines
       const formatAddressLines = (addrObj) => {
@@ -303,8 +400,8 @@ const MyOrdersPage = () => {
       };
 
       // 3. Grid Sections
-      // Row 1: Sold By & Order Details (y = 42)
-      const row1Y = 42;
+      // Row 1: Sold By & Order Details (y = 44)
+      const row1Y = 44;
       
       // Sold By
       doc.setTextColor(...primaryGreen);
@@ -617,7 +714,27 @@ const MyOrdersPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [authLoading, isAuthenticated, mobileNumber]);
+  }, [authLoading, isAuthenticated, mobileNumber, refreshCount]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const trackingTargetId = selectedOrder?.backendId || selectedOrder?.id;
+    if (!selectedOrder || !trackingTargetId) {
+      setSelectedOrderTracking(null);
+      return;
+    }
+    getUserOrderTrackingById(trackingTargetId)
+      .then((data) => {
+        if (isMounted) setSelectedOrderTracking(data);
+      })
+      .catch((err) => {
+        console.warn('Failed to load tracking logs:', err);
+        if (isMounted) setSelectedOrderTracking(null);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedOrder, refreshCount]);
 
   return (
     <div className="my-orders-shell flex min-h-screen flex-col bg-light">
@@ -734,12 +851,15 @@ const MyOrdersPage = () => {
                     <h2>{selectedOrder.id}</h2>
                   </div>
                   <div className="order-detail-actions">
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/track-order?orderId=${encodeURIComponent(selectedOrder.id)}`)}
-                    >
-                      <Truck size={16} /> Track
-                    </button>
+                    {canCancel && (
+                      <button
+                        type="button"
+                        onClick={() => setCancellingOrder(selectedOrder)}
+                        className="cancel-order-btn"
+                      >
+                        <X size={16} /> Cancel Order
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => openSupportForOrder(selectedOrder.id)}
@@ -763,7 +883,7 @@ const MyOrdersPage = () => {
                     return (
                       <div key={`${selectedOrder.id}-${item.id}`} className="ordered-product-row flex-wrap">
                         <span className="ordered-product-image">
-                          <img src={getProductImage(item)} alt={item.name} loading="lazy" onError={handleProductImageError} />
+                           <img src={getProductImage(item)} alt={item.name} onError={handleProductImageError} />
                         </span>
                         <span className="flex-1">
                           <strong>{item.name}</strong>
@@ -864,26 +984,65 @@ const MyOrdersPage = () => {
                    </div>
                  </div>
 
-                {tracking && (
-                  <div className="my-order-tracking" style={{ '--order-progress': `${tracking.progressPercent}%` }}>
-                    <div className="tracking-title">
-                      <h3>Order Tracking</h3>
-                      <span>{tracking.status}</span>
-                    </div>
-                    <div className="tracking-progress" aria-hidden="true">
-                      <span></span>
-                    </div>
-                    <div className="tracking-step-grid">
-                      {tracking.steps.map((step, index) => (
-                        <div key={step.label} className={`tracking-step-card ${step.completed ? 'completed' : ''} ${step.active ? 'active' : ''}`}>
-                          <span>{step.completed ? <i className="fas fa-check"></i> : index + 1}</span>
-                          <strong>{step.label}</strong>
-                          <small>{step.date}</small>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                 {selectedOrder.status?.toLowerCase() === 'cancelled' || selectedOrder.status?.toLowerCase() === 'canceled' ? (
+                   <div className="my-order-cancelled-banner">
+                     <div className="cancelled-banner-icon">
+                       <AlertTriangle size={24} />
+                     </div>
+                     <div className="cancelled-banner-text">
+                       <h3>This order has been cancelled</h3>
+                       <p>
+                         Reason for cancellation:&nbsp;
+                         <strong>
+                           {selectedOrderTracking?.timelineLogs?.find(l => l.status === 'Cancelled')?.description?.replace('Cancelled: ', '') ||
+                            selectedOrderTracking?.TimelineLogs?.find(l => l.status === 'Cancelled')?.description?.replace('Cancelled: ', '') ||
+                            'Requested by customer'}
+                         </strong>
+                       </p>
+                     </div>
+                   </div>
+                 ) : tracking ? (
+                   <div className="my-order-tracking" style={{ '--order-progress': `${tracking.progressPercent}%` }}>
+                     <div className="tracking-title">
+                       <h3>Order Tracking</h3>
+                       <span>{tracking.status}</span>
+                     </div>
+                     <div className="tracking-progress" aria-hidden="true">
+                       <span></span>
+                     </div>
+                     <div className="tracking-step-grid">
+                       {tracking.steps.map((step, index) => (
+                         <div key={step.label} className={`tracking-step-card ${step.completed ? 'completed' : ''} ${step.active ? 'active' : ''}`}>
+                           <span>{step.completed ? <i className="fas fa-check"></i> : index + 1}</span>
+                           <strong>{step.label}</strong>
+                           <small>{step.date}</small>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 ) : null}
+
+                 {((selectedOrderTracking?.timelineLogs || selectedOrderTracking?.TimelineLogs)?.length > 0) && (
+                   <div className="order-timeline-activity">
+                     <h3>Fulfillment History</h3>
+                     <div className="timeline-activity-list">
+                       {(selectedOrderTracking?.timelineLogs || selectedOrderTracking?.TimelineLogs).map((log) => (
+                         <div key={log.id || log.Id} className={`timeline-activity-item ${String(log.status || log.Status).toLowerCase() === 'cancelled' ? 'cancelled' : ''}`}>
+                           <div className="activity-marker">
+                             <i className="fas fa-check" style={{ fontSize: '9px', color: '#ffffff' }}></i>
+                           </div>
+                           <div className="activity-details">
+                             <div className="activity-meta">
+                               <strong>{log.status || log.Status}</strong>
+                               <span>{formatDate(log.date || log.Date || log.createdAt || log.CreatedAt)} {log.time || log.Time}</span>
+                             </div>
+                             <p>{log.description || log.Description}</p>
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 )}
               </section>
             )}
           </div>
@@ -910,6 +1069,25 @@ const MyOrdersPage = () => {
                 })
                 .catch(err => console.error(err));
             }
+          }}
+        />
+      )}
+
+      {cancellingOrder && (
+        <CancelOrderModal
+          order={cancellingOrder}
+          onClose={() => setCancellingOrder(null)}
+          onSubmitSuccess={(cancelledOrderId) => {
+            setBackendOrders(prevOrders => 
+              prevOrders.map(o => 
+                String(o.id) === String(cancelledOrderId) 
+                  ? { ...o, status: 'Cancelled', paymentStatus: 'Cancelled' } 
+                  : o
+              )
+            );
+            handleCancelOrderLocal(cancelledOrderId, 'User cancelled');
+            setRefreshCount(prev => prev + 1);
+            setCancellingOrder(null);
           }}
         />
       )}
@@ -1272,6 +1450,169 @@ const ReturnRequestModal = ({ item, order, config, addresses, onAddressCreated, 
             </button>
             <button type="submit" className="return-submit-btn" disabled={submitting}>
               {submitting ? 'Submitting...' : 'Submit Request'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const CANCEL_REASONS = [
+  { code: 'CHANGED_MIND', text: 'Changed my mind / No longer needed' },
+  { code: 'ORDERED_MISTAKE', text: 'Ordered by mistake' },
+  { code: 'PRICE_DROP', text: 'Found a better price elsewhere' },
+  { code: 'SHIPPING_DELAY', text: 'Delivery is taking too long' },
+  { code: 'INCORRECT_ADDRESS', text: 'Incorrect shipping address' },
+  { code: 'OTHER', text: 'Other (Please specify below)' }
+];
+
+const CancelOrderModal = ({ order, onClose, onSubmitSuccess }) => {
+  const [reasonCode, setReasonCode] = useState('CHANGED_MIND');
+  const [customReason, setCustomReason] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    let finalReason = CANCEL_REASONS.find(r => r.code === reasonCode)?.text || '';
+    if (reasonCode === 'OTHER') {
+      if (!customReason.trim()) {
+        setErrorMsg('Please specify your reason for cancellation.');
+        return;
+      }
+      finalReason = customReason.trim();
+    } else if (customReason.trim()) {
+      finalReason = `${finalReason} - ${customReason.trim()}`;
+    }
+
+    setSubmitting(true);
+    try {
+      const isNumericBackendId = order.backendId && !isNaN(Number(order.backendId));
+      if (isNumericBackendId) {
+        await cancelOrder(Number(order.backendId), finalReason);
+      } else {
+        console.warn('Local or legacy order detected. Simulating local cancellation.');
+      }
+      alert('Order cancelled successfully!');
+      onSubmitSuccess(order.id);
+    } catch (err) {
+      console.error('Failed to cancel order:', err);
+      setErrorMsg(err.response?.data?.message || 'Unable to cancel order. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="return-modal-overlay" role="dialog" aria-modal="true">
+      <div className="return-modal-content" style={{ width: 'min(500px, 100%)' }}>
+        <div className="return-modal-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.2rem', padding: '1.2rem 1.5rem' }}>
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-color, #0F3D2E)', textTransform: 'none' }}>Cancel Order</h2>
+            <button type="button" onClick={onClose} className="return-modal-close-btn">
+              <X size={18} />
+            </button>
+          </div>
+          <span style={{ fontSize: '13px', color: 'var(--muted-text, #526158)', fontWeight: '600' }}>#{order.id}</span>
+        </div>
+
+        <form onSubmit={handleSubmit} className="return-modal-form">
+          {errorMsg && (
+            <div className="return-form-error">
+              <AlertTriangle size={14} /> {errorMsg}
+            </div>
+          )}
+
+          <p style={{ fontSize: '14.5px', color: 'var(--text-color, #2d3748)', marginBottom: '0.5rem', lineHeight: '1.5' }}>
+            We're sorry to hear that you want to cancel your order. Please tell us why you are cancelling:
+          </p>
+
+          <div className="return-form-group">
+            <label style={{ display: 'block', marginBottom: '0.45rem', fontSize: '13px', fontWeight: 'bold', color: 'var(--text-color, #2d3748)' }}>
+              Reason for Cancellation *
+            </label>
+            <select
+              value={reasonCode}
+              onChange={(e) => setReasonCode(e.target.value)}
+              className="return-select-field"
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border-color, #cbd5e0)',
+                fontSize: '14px',
+                outline: 'none',
+                background: 'var(--card-bg, #fff)',
+                color: 'var(--text-color, #2d3748)'
+              }}
+            >
+              {CANCEL_REASONS.map(r => (
+                <option key={r.code} value={r.code}>{r.text}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="return-form-group" style={{ marginTop: '1rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.45rem', fontSize: '13px', fontWeight: 'bold', color: 'var(--text-color, #2d3748)' }}>
+              {reasonCode === 'OTHER' ? 'Please specify reason *' : 'Additional Comments (Optional)'}
+            </label>
+            <textarea
+              value={customReason}
+              onChange={(e) => setCustomReason(e.target.value)}
+              placeholder={reasonCode === 'OTHER' ? 'Type your reason here...' : 'Add any additional notes...'}
+              rows={4}
+              required={reasonCode === 'OTHER'}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border-color, #cbd5e0)',
+                fontSize: '14px',
+                outline: 'none',
+                resize: 'vertical',
+                background: 'var(--card-bg, #fff)',
+                color: 'var(--text-color, #2d3748)'
+              }}
+            />
+          </div>
+
+          <div className="return-modal-actions" style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="return-cancel-btn"
+              disabled={submitting}
+              style={{
+                padding: '0.75rem 1.25rem',
+                borderRadius: '999px',
+                border: '1px solid var(--border-color, #cbd5e0)',
+                background: 'var(--card-bg, #fff)',
+                color: 'var(--text-color, #2d3748)',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              Keep Order
+            </button>
+            <button
+              type="submit"
+              className="return-submit-btn"
+              disabled={submitting}
+              style={{
+                padding: '0.75rem 1.25rem',
+                borderRadius: '999px',
+                border: '0',
+                background: '#e53e3e',
+                color: '#fff',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              {submitting ? 'Cancelling...' : 'Cancel Order'}
             </button>
           </div>
         </form>

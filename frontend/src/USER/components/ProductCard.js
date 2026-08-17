@@ -157,7 +157,6 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true, onInterac
         <img
           src={productImage}
           alt={productName}
-          loading="lazy"
           onLoad={(event) => {
             event.currentTarget.classList.add('product-card-media-image-loaded');
           }}

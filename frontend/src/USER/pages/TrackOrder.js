@@ -122,16 +122,23 @@ const TrackOrder = () => {
     try {
       const apiTracking = await getOrderSuccessTracking(trimmedOrderId);
       if (apiTracking) {
-        const status = getCanonicalStatus(apiTracking.status || apiTracking.orderStatus || 'Order Placed');
-        const tracking = getOrderTracking({ status });
+        const status = getCanonicalStatus(
+          apiTracking.status || 
+          apiTracking.Status || 
+          apiTracking.orderStatus || 
+          apiTracking.OrderStatus || 
+          'Order Placed'
+        );
+        const createdAt = apiTracking.createdAt || apiTracking.CreatedAt || apiTracking.orderDate || apiTracking.OrderDate;
+        const tracking = getOrderTracking({ status, createdAt }, apiTracking);
         setTrackingData({
-          orderId: apiTracking.orderId || apiTracking.orderNumber || trimmedOrderId,
+          orderId: apiTracking.orderId || apiTracking.OrderId || apiTracking.orderNumber || apiTracking.OrderNumber || trimmedOrderId,
           status,
           activeIndex: tracking.activeIndex,
           progressPercent: tracking.progressPercent,
-          total: apiTracking.totalAmount ?? apiTracking.finalAmount ?? null,
-          paymentMethod: apiTracking.paymentMethod || '',
-          estDelivery: apiTracking.estimatedDelivery || apiTracking.estDelivery || '3-7 business days',
+          total: apiTracking.totalAmount ?? apiTracking.TotalAmount ?? apiTracking.finalAmount ?? apiTracking.FinalAmount ?? null,
+          paymentMethod: apiTracking.paymentMethod || apiTracking.PaymentMethod || '',
+          estDelivery: apiTracking.estimatedDelivery || apiTracking.EstimatedDelivery || apiTracking.estDelivery || apiTracking.EstDelivery || '3-7 business days',
           carrierName: apiTracking.carrierName || apiTracking.CarrierName || '',
           trackingNumber: apiTracking.trackingNumber || apiTracking.TrackingNumber || '',
           steps: tracking.steps,

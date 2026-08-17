@@ -66,12 +66,20 @@ const ContactSupport = () => {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setTicketForm((current) => ({
+        ...current,
+        name: '',
+        phone: '',
+        email: '',
+      }));
+      return;
+    }
     setTicketForm((current) => ({
       ...current,
-      name: current.name || user.name || user.fullName || '',
-      phone: current.phone || user.phone || user.mobileNumber || user.MobileNumber || '',
-      email: current.email || user.email || user.Email || '',
+      name: user.name || user.fullName || '',
+      phone: user.phone || user.mobileNumber || user.MobileNumber || '',
+      email: user.email || user.Email || '',
     }));
   }, [user]);
 

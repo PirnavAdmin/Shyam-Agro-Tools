@@ -214,7 +214,7 @@ const SubcategoriesList = () => {
               {!isLoading && currentSubcategories.map((subcategory, idx) => (
                 <tr key={subcategory.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#64748b' }}>
-                    {indexOfFirstItem + idx + 1}
+                    {subcategory.id}
                   </td>
                   <td style={{ padding: '10px 16px', fontWeight: '600', color: '#1e293b' }}>
                     {subcategory.name}

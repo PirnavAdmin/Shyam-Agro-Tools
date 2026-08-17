@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import OrderSuccessAnimation from '../components/OrderSuccessAnimation';
 import { getOrderSuccessDetails } from '../../services/orderService';
+import orderSuccessImg from '../assets/order-success-img.jpg';
 import './OrderSuccessPage.css';
 
-const SUCCESS_ANIMATION_WAIT_MS = 5000;
-const SUCCESS_DETAILS_DISPLAY_MS = 5000;
+const SUCCESS_DETAILS_DISPLAY_MS = 7000;
 
 const OrderSuccessPage = ({
   order,
@@ -12,54 +11,22 @@ const OrderSuccessPage = ({
   onTrackOrder,
   onContinueShopping,
 }) => {
-  const [showDetails, setShowDetails] = useState(false);
   const [backendSuccessDetails, setBackendSuccessDetails] = useState(null);
-  const revealTimerRef = useRef(null);
   const closeTimerRef = useRef(null);
 
-  const revealDetails = useCallback(() => {
-    if (revealTimerRef.current) {
-      window.clearTimeout(revealTimerRef.current);
-      revealTimerRef.current = null;
-    }
-    setShowDetails(true);
-  }, []);
-
   useEffect(() => {
-    setShowDetails(false);
     setBackendSuccessDetails(null);
-    if (revealTimerRef.current) {
-      window.clearTimeout(revealTimerRef.current);
-    }
     if (closeTimerRef.current) {
       window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
 
-    revealTimerRef.current = window.setTimeout(() => {
-      setShowDetails(true);
-      revealTimerRef.current = null;
-    }, SUCCESS_ANIMATION_WAIT_MS);
-
-    return () => {
-      if (revealTimerRef.current) {
-        window.clearTimeout(revealTimerRef.current);
-        revealTimerRef.current = null;
-      }
-      if (closeTimerRef.current) {
-        window.clearTimeout(closeTimerRef.current);
+    if (typeof onContinueShopping === 'function') {
+      closeTimerRef.current = window.setTimeout(() => {
         closeTimerRef.current = null;
-      }
-    };
-  }, [order?.id]);
-
-  useEffect(() => {
-    if (!showDetails || typeof onContinueShopping !== 'function') return undefined;
-
-    closeTimerRef.current = window.setTimeout(() => {
-      closeTimerRef.current = null;
-      onContinueShopping();
-    }, SUCCESS_DETAILS_DISPLAY_MS);
+        onContinueShopping();
+      }, SUCCESS_DETAILS_DISPLAY_MS);
+    }
 
     return () => {
       if (closeTimerRef.current) {
@@ -67,7 +34,7 @@ const OrderSuccessPage = ({
         closeTimerRef.current = null;
       }
     };
-  }, [onContinueShopping, showDetails]);
+  }, [order?.id, onContinueShopping]);
 
   useEffect(() => {
     let isMounted = true;
@@ -103,7 +70,6 @@ const OrderSuccessPage = ({
       onTrackOrder();
       return;
     }
-
     window.location.href = `/track-order?orderId=${encodeURIComponent(displayOrder.id)}`;
   };
 
@@ -112,71 +78,62 @@ const OrderSuccessPage = ({
       onContinueShopping();
       return;
     }
-
     window.location.href = '/products';
   };
 
   return (
     <div className="order-success-overlay" role="dialog" aria-modal="true" aria-labelledby="order-success-title">
-      <div className={`order-success-modal ${showDetails ? 'order-success-modal-details' : 'order-success-modal-animation'}`}>
-        <OrderSuccessAnimation
-          key={displayOrder.id}
-          className={showDetails ? 'order-success-lottie-complete' : ''}
-          speed={1.35}
-        />
+      <div className="order-success-modal order-success-modal-details">
 
-        {!showDetails && (
-          <button type="button" className="order-success-done-btn" onClick={revealDetails} aria-label="Skip animation and show order details">
-            DONE
-          </button>
-        )}
+        {/* Professional success image */}
+        <div className="order-success-img-wrap">
+          <img src={orderSuccessImg} alt="Order Confirmed" className="order-success-img" />
+          <div className="order-success-badge">
+            <i className="fas fa-check-circle" />
+          </div>
+        </div>
 
-        {showDetails && (
-          <div className="order-success-content">
-            <h2 id="order-success-title">Order Placed Successfully!</h2>
-            <div className="order-success-details">
+        <div className="order-success-content">
+          <h2 id="order-success-title" className="order-success-title">Order Placed Successfully!</h2>
+          <p className="order-success-subtitle">Thank you for your order. We'll deliver it soon.</p>
+
+          <div className="order-success-details">
+            {displayOrder.id && (
               <div>
                 <span>Order ID</span>
-                <strong>{displayOrder.id}</strong>
+                <strong>#{displayOrder.id}</strong>
               </div>
+            )}
+            {displayOrder.total != null && (
               <div>
                 <span>Total Amount</span>
                 <strong>{formatCurrency(displayOrder.total)}</strong>
               </div>
+            )}
+            {displayOrder.paymentMethod && (
               <div>
-                <span>Payment Method</span>
+                <span>Payment</span>
                 <strong>{displayOrder.paymentMethod}</strong>
               </div>
-              {displayOrder.transactionId && (
-                <div>
-                  <span>Transaction ID</span>
-                  <strong>{displayOrder.transactionId}</strong>
-                </div>
-              )}
-              {displayOrder.paymentStatus && (
-                <div>
-                  <span>Payment Status</span>
-                  <strong>{displayOrder.paymentStatus}</strong>
-                </div>
-              )}
-              {displayOrder.paymentMessage && (
-                <div>
-                  <span>Message</span>
-                  <strong>{displayOrder.paymentMessage}</strong>
-                </div>
-              )}
-            </div>
-            <div className="order-success-actions">
-              <button type="button" onClick={handleTrackOrder} className="track-order-success-btn">
-                <i className="fas fa-route" aria-hidden="true"></i>
-                Track Order
-              </button>
-              <button type="button" onClick={handleContinueShopping} className="continue-shopping-btn">
-                Continue Shopping
-              </button>
-            </div>
+            )}
+            {displayOrder.paymentStatus && (
+              <div>
+                <span>Status</span>
+                <strong className="status-success">{displayOrder.paymentStatus}</strong>
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="order-success-actions">
+            <button type="button" onClick={handleTrackOrder} className="track-order-success-btn">
+              <i className="fas fa-route" aria-hidden="true" /> Track Order
+            </button>
+            <button type="button" onClick={handleContinueShopping} className="continue-shopping-btn">
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );

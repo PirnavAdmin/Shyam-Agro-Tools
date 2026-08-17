@@ -13,6 +13,7 @@ import {
   UploadCloud,
   X,
   Eye,
+  RefreshCw,
 } from 'lucide-react';
 import {
   getCategoryName,
@@ -24,6 +25,14 @@ import { getApiDomain } from '../../utils/apiConfig';
 import { Toast } from '../components/Toast';
 import './adminModule.css';
 import './ProductsForm.css';
+
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  return `${getApiDomain().replace(/\/$/, '')}/${url.replace(/^\/+/, '')}`;
+};
 
 const createReview = () => ({
   customer: '',
@@ -169,6 +178,7 @@ const ProductsForm = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [showImagePreview, setShowImagePreview] = useState(false);
@@ -184,8 +194,8 @@ const ProductsForm = () => {
   useEffect(() => {
     let isMounted = true;
     Promise.all([
-      fetchCategories(),
-      fetchSubcategories(),
+      fetchCategories().catch(() => []),
+      fetchSubcategories().catch(() => []),
       fetch(`${getApiDomain()}/api/Brand`, {
         headers: { 'ngrok-skip-browser-warning': 'true' }
       }).then(res => res.json()).catch(() => []),
@@ -203,7 +213,11 @@ const ProductsForm = () => {
         brand: current.brand || '',
         supplier: current.supplier || '',
       }));
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("Error loading products metadata:", err);
+    }).finally(() => {
+      if (isMounted) setIsLoadingMetadata(false);
+    });
     return () => { isMounted = false; };
   }, []);
 
@@ -591,6 +605,18 @@ const ProductsForm = () => {
     await saveProduct();
   };
 
+
+  if (isLoadingMetadata) {
+    return (
+      <div className="catalog-page">
+        <section className="catalog-empty-state">
+          <RefreshCw className="animate-spin" size={34} style={{ color: '#005F53' }} />
+          <h3>Loading catalog options...</h3>
+          <p>Please wait while we fetch category and subcategory options from the API.</p>
+        </section>
+      </div>
+    );
+  }
 
   if (!categories.length) {
     return (
@@ -1204,7 +1230,7 @@ const ProductsForm = () => {
                     {/* Render saved existing images */}
                     {formData.images && formData.images.map((url, idx) => (
                       <div key={`existing-${idx}`} className="product-media-thumb-wrap" style={{ position: 'relative', width: '65px', height: '65px', border: '1px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden' }}>
-                        <img src={url} alt="saved preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={resolveImageUrl(url)} alt="saved preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         <button
                           type="button"
                           onClick={(e) => {
@@ -1355,7 +1381,7 @@ const ProductsForm = () => {
             <div className="catalog-modal-body" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
               {formData.images && formData.images.map((url, idx) => (
                 <div key={`modal-existing-${idx}`} style={{ position: 'relative' }}>
-                  <img src={url} alt="saved preview" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
+                  <img src={resolveImageUrl(url)} alt="saved preview" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
                   <span style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '10px', padding: '2px 6px', borderRadius: '4px' }}>Saved Image</span>
                 </div>
               ))}

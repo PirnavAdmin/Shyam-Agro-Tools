@@ -71,10 +71,18 @@ const TrackingOrder = () => {
         ...o,
         status: mapStatus(o.status || o.currentStatus)
       }));
-      setOrders(mappedList);
+      const deduplicatedMap = new Map();
+      mappedList.forEach(item => {
+        const key = (item.orderNumber || item.orderId || item.id || '').toUpperCase().trim();
+        if (key && !deduplicatedMap.has(key)) {
+          deduplicatedMap.set(key, item);
+        }
+      });
+      const uniqueList = Array.from(deduplicatedMap.values());
+      setOrders(uniqueList);
       
-      if (mappedList.length > 0 && !selectedOrderId) {
-        setSelectedOrderId(mappedList[0].id || mappedList[0].orderId);
+      if (uniqueList.length > 0 && !selectedOrderId) {
+        setSelectedOrderId(uniqueList[0].id || uniqueList[0].orderId);
       }
     } catch (err) {
       setError(err.message || 'Failed to fetch orders.');
@@ -95,9 +103,17 @@ const TrackingOrder = () => {
         ...o,
         status: mapStatus(o.status || o.currentStatus)
       }));
-      setOrders(mappedList);
+      const deduplicatedMap = new Map();
+      mappedList.forEach(item => {
+        const key = (item.orderNumber || item.orderId || item.id || '').toUpperCase().trim();
+        if (key && !deduplicatedMap.has(key)) {
+          deduplicatedMap.set(key, item);
+        }
+      });
+      const uniqueList = Array.from(deduplicatedMap.values());
+      setOrders(uniqueList);
 
-      const currentId = selectedOrderId || (mappedList.length > 0 ? (mappedList[0].id || mappedList[0].orderId) : null);
+      const currentId = selectedOrderId || (uniqueList.length > 0 ? (uniqueList[0].id || uniqueList[0].orderId) : null);
       if (currentId) {
         setDetailsLoading(true);
         const details = await getOrderTracking(currentId);
@@ -188,6 +204,7 @@ const TrackingOrder = () => {
       // Sync via tracking post API (JSON format)
       await postOrderTracking(selectedOrderId, {
         status: tempStatus,
+        notes: notesInput || STATUS_DESCRIPTIONS[tempStatus] || '',
         description: notesInput || STATUS_DESCRIPTIONS[tempStatus] || ''
       });
 

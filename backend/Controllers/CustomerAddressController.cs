@@ -20,7 +20,14 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            var identifier = GetUserIdentifier();
+            if (string.IsNullOrEmpty(identifier))
+            {
+                return Ok(new List<CustomerAddress>());
+            }
+
             var data = await _context.CustomerAddresses
+                .Where(x => x.UserIdentifier == identifier)
                 .OrderByDescending(x => x.AddressId)
                 .ToListAsync();
 
@@ -31,13 +38,49 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            var identifier = GetUserIdentifier();
+            if (string.IsNullOrEmpty(identifier))
+            {
+                return Unauthorized();
+            }
+
             var address = await _context.CustomerAddresses
-                .FindAsync(id);
+                .FirstOrDefaultAsync(x => x.AddressId == id && x.UserIdentifier == identifier);
 
             if (address == null)
                 return NotFound("Address not found.");
 
             return Ok(address);
+        }
+
+        private string GetUserIdentifier()
+        {
+            if (User?.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(User.Identity.Name))
+            {
+                return User.Identity.Name;
+            }
+
+            var idHeaderKeys = new[] { "email", "useremail", "user-email", "x-email", "x-user-email", "mobile", "mobilenumber", "phone" };
+            foreach (var key in idHeaderKeys)
+            {
+                var headerVal = Request.Headers.FirstOrDefault(h => h.Key.Equals(key, StringComparison.OrdinalIgnoreCase)).Value;
+                if (!string.IsNullOrEmpty(headerVal))
+                {
+                    return headerVal.ToString();
+                }
+            }
+
+            var idQueryKeys = new[] { "email", "useremail", "mobile", "mobilenumber", "phone" };
+            foreach (var key in idQueryKeys)
+            {
+                var val = Request.Query.FirstOrDefault(h => h.Key.Equals(key, StringComparison.OrdinalIgnoreCase)).Value;
+                if (!string.IsNullOrEmpty(val))
+                {
+                    return val.ToString();
+                }
+            }
+
+            return string.Empty;
         }
 
         private static bool IsValidName(string? name)
@@ -101,6 +144,8 @@ namespace ShyamAgroSuite.Api.Controllers
                 return BadRequest(new { Message = "Invalid Address. Street address must be at least 5 characters long and cannot be random gibberish." });
             }
 
+            var identifier = GetUserIdentifier();
+            address.UserIdentifier = identifier;
             address.CreatedDate = DateTime.Now;
 
             _context.CustomerAddresses.Add(address);
@@ -166,11 +211,17 @@ namespace ShyamAgroSuite.Api.Controllers
                 return BadRequest(new { Message = "Invalid Address. Street address must be at least 5 characters long and cannot be random gibberish." });
             }
 
+            var identifier = GetUserIdentifier();
             var existing =
                 await _context.CustomerAddresses.FindAsync(id);
 
             if (existing == null)
                 return NotFound("Address not found.");
+
+            if (existing.UserIdentifier != identifier)
+            {
+                return Unauthorized("You are not authorized to update this address.");
+            }
 
             existing.FirstName = address.FirstName;
             existing.LastName = address.LastName;
@@ -222,11 +273,17 @@ namespace ShyamAgroSuite.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            var identifier = GetUserIdentifier();
             var address =
                 await _context.CustomerAddresses.FindAsync(id);
 
             if (address == null)
                 return NotFound("Address not found.");
+
+            if (address.UserIdentifier != identifier)
+            {
+                return Unauthorized("You are not authorized to delete this address.");
+            }
 
             _context.CustomerAddresses.Remove(address);
 

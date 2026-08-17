@@ -101,12 +101,16 @@ namespace ShyamAgroSuite.Api.Controllers
 
         // GET: api/Invoices/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(string id)
         {
+            bool isNumeric = int.TryParse(id, out int numericId);
             var order = await _context.Orders
                 .Include(o => o.Customer)
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.Id == id);
+                .FirstOrDefaultAsync(o => (isNumeric && o.Id == numericId) || 
+                                          o.OrderNumber == id || 
+                                          o.OrderNumber == $"#{id}" ||
+                                          (id.StartsWith("#") && o.OrderNumber == id.Substring(1)));
 
             if (order == null)
             {
@@ -275,59 +279,83 @@ namespace ShyamAgroSuite.Api.Controllers
                 ? $"ORD-{invoiceNumClean.Substring(4)}" 
                 : $"ORD-{invoiceNumClean}";
 
-            var order = new Order
-            {
-                CustomerId = customer.Id,
-                OrderNumber = orderNumber,
-                OrderDate = request.Date ?? DateTime.UtcNow,
-                TotalAmount = request.SubTotal,
-                FinalAmount = request.TotalAmount,
-                DiscountAmount = request.Discount,
-                ShippingFee = request.ShippingCharge,
-                GstAmount = request.TaxAmount,
-                Status = statusStr,
-                PaymentStatus = payStatusStr,
-                PaymentMethod = request.PaymentMethod ?? "COD",
-                ShippingAddress = request.ShippingAddress ?? request.Address ?? string.Empty,
-                TrackingNumber = request.TaxNumber ?? string.Empty,
-                PackerName = request.Notes
-            };
+            // Check if the backing order already exists to avoid creating duplicate orders
+            var existingOrder = await _context.Orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
 
-            // Map items from request or create fallback if none provided
-            order.Items = new List<OrderItem>();
-            if (request.Items != null && request.Items.Count > 0)
+            Order order;
+            if (existingOrder != null)
             {
-                foreach (var item in request.Items)
+                order = existingOrder;
+                // Update properties if blank
+                if (string.IsNullOrEmpty(order.PackerName))
                 {
-                    if (string.IsNullOrWhiteSpace(item.ProductName)) continue;
+                    order.PackerName = request.Notes;
+                }
+                if (payStatusStr == "Paid" && order.PaymentStatus != "Paid")
+                {
+                    order.PaymentStatus = "Paid";
+                    order.Status = "Processing";
+                }
+            }
+            else
+            {
+                order = new Order
+                {
+                    CustomerId = customer.Id,
+                    OrderNumber = orderNumber,
+                    OrderDate = request.Date ?? DateTime.UtcNow,
+                    TotalAmount = request.SubTotal,
+                    FinalAmount = request.TotalAmount,
+                    DiscountAmount = request.Discount,
+                    ShippingFee = request.ShippingCharge,
+                    GstAmount = request.TaxAmount,
+                    Status = statusStr,
+                    PaymentStatus = payStatusStr,
+                    PaymentMethod = request.PaymentMethod ?? "COD",
+                    ShippingAddress = request.ShippingAddress ?? request.Address ?? string.Empty,
+                    TrackingNumber = request.TaxNumber ?? string.Empty,
+                    PackerName = request.Notes,
+                    Items = new List<OrderItem>()
+                };
+
+                // Map items from request or create fallback if none provided
+                if (request.Items != null && request.Items.Count > 0)
+                {
+                    foreach (var item in request.Items)
+                    {
+                        if (string.IsNullOrWhiteSpace(item.ProductName)) continue;
+                        order.Items.Add(new OrderItem
+                        {
+                            ProductId = 1,
+                            ProductName = item.ProductName,
+                            ProductCode = string.IsNullOrWhiteSpace(item.ProductCode) ? "PROD-GEN" : item.ProductCode,
+                            CategoryName = "General",
+                            Price = item.Price,
+                            Quantity = item.Quantity > 0 ? item.Quantity : 1,
+                            Subtotal = item.Price * (item.Quantity > 0 ? item.Quantity : 1)
+                        });
+                    }
+                }
+
+                if (order.Items.Count == 0)
+                {
                     order.Items.Add(new OrderItem
                     {
                         ProductId = 1,
-                        ProductName = item.ProductName,
-                        ProductCode = string.IsNullOrWhiteSpace(item.ProductCode) ? "PROD-GEN" : item.ProductCode,
-                        CategoryName = "General",
-                        Price = item.Price,
-                        Quantity = item.Quantity > 0 ? item.Quantity : 1,
-                        Subtotal = item.Price * (item.Quantity > 0 ? item.Quantity : 1)
+                        ProductName = "Manual Invoice Charge",
+                        ProductCode = "SERV-001",
+                        CategoryName = "Services",
+                        Price = request.SubTotal,
+                        Quantity = 1,
+                        Subtotal = request.SubTotal
                     });
                 }
+
+                _context.Orders.Add(order);
             }
 
-            if (order.Items.Count == 0)
-            {
-                order.Items.Add(new OrderItem
-                {
-                    ProductId = 1,
-                    ProductName = "Manual Invoice Charge",
-                    ProductCode = "SERV-001",
-                    CategoryName = "Services",
-                    Price = request.SubTotal,
-                    Quantity = 1,
-                    Subtotal = request.SubTotal
-                });
-            }
-
-            _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
             var invoiceId = NormalizeInvoiceId(order.OrderNumber);

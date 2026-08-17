@@ -324,7 +324,8 @@ export const CartProvider = ({ children }) => {
         return true;
       } catch (error) {
         console.error('Unable to update cart quantity.', error);
-        setCartError('Unable to update quantity. Please try again.');
+        const serverMsg = error.response?.data?.message || error.response?.data?.Message || error.message;
+        setCartError(serverMsg || 'Unable to update quantity. Please try again.');
         mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
         if (mutationCountRef.current === 0) {
           setLiveCartItems(previousItems);
@@ -384,6 +385,7 @@ export const CartProvider = ({ children }) => {
       isCartLoading,
       isCartMutating,
       cartError,
+      setCartError,
       refreshCart,
       waitForCartSync,
     }}>

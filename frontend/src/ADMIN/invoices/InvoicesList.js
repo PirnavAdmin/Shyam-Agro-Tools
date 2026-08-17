@@ -444,13 +444,16 @@ const InvoicesList = () => {
             <div class="invoice-container">
               <!-- Header -->
               <div class="invoice-header">
-                <div>
-                  <div class="company-title">Shyam Agro Tools</div>
-                  <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
-                  <div class="company-meta">
-                    Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401, Andhra Pradesh<br/>
-                    GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265, +91 6301275516<br/>
-                    Email: sales@shyamagro.com | Web: www.shyamagrotools.com
+                <div style="display: flex; align-items: flex-start; gap: 18px;">
+                  <img src="/logo.png" style="height: 70px; width: auto; object-fit: contain; margin-top: 4px;" alt="Logo" onerror="this.src='/logo.svg'" />
+                  <div>
+                    <div class="company-title">Shyam Agro Tools</div>
+                    <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
+                    <div class="company-meta">
+                      Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401, Andhra Pradesh<br/>
+                      GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265, +91 6301275516<br/>
+                      Email: sales@shyamagro.com | Web: www.shyamagrotools.com
+                    </div>
                   </div>
                 </div>
                 <div class="badge-tax-invoice">

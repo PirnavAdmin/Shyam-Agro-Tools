@@ -45,7 +45,6 @@ const CategoryCard = ({ category, onExplore, className = '' }) => {
           src={categoryImage}
           alt={categoryText(category)}
           className="app-category-cover-image"
-          loading="lazy"
           onError={(event) => {
             event.currentTarget.onerror = null;
             const fallbackSrc = getCategoryImage(null, category.name || category.slug);

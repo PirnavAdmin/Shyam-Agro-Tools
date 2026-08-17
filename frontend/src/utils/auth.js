@@ -63,7 +63,15 @@ export const setAuthSession = (session) => {
 export const removeToken = () => setToken('');
 
 export const clearSession = () => {
-  [AUTH_SESSION_KEY, 'refreshToken', 'isLoggedIn', ...TOKEN_KEYS, ...USER_KEYS].forEach((key) => {
+  [
+    AUTH_SESSION_KEY,
+    'refreshToken',
+    'isLoggedIn',
+    'augro:selectedCustomerAddressId',
+    'augro:paymentTransaction',
+    ...TOKEN_KEYS,
+    ...USER_KEYS
+  ].forEach((key) => {
     localStorage.removeItem(key);
     sessionStorage.removeItem(key);
   });

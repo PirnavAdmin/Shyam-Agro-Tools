@@ -66,7 +66,7 @@ export const normalizeBackendOrder = (order = {}) => {
 
   return {
     id: orderId,
-    backendId: order.id ?? order.Id ?? '',
+    backendId: order.backendId ?? order.BackendId ?? order.id ?? order.Id ?? '',
     customerId: order.customerId ?? order.CustomerId ?? '',
     items: (order.items || order.Items || []).map((item) => ({
       id: String(item.productId ?? item.ProductId ?? item.id ?? item.Id ?? ''),
@@ -120,21 +120,16 @@ export const getOrdersFromApi = async ({ status = '', search = '' } = {}) => {
 export const getCurrentUserOrdersFromApi = async () => {
   try {
     if (!getToken()) {
-      return await getOrdersFromApi();
+      return [];
     }
     const response = await axios.get(
       `${ORDER_API_BASE_URL}/api/Orders/my-orders`,
       getAuthenticatedRequestConfig()
     );
-    const items = getResponseItems(response.data).map(normalizeBackendOrder).filter((order) => order.id);
-    if (items.length > 0) return items;
-    return await getOrdersFromApi();
+    return getResponseItems(response.data).map(normalizeBackendOrder).filter((order) => order.id);
   } catch (error) {
-    try {
-      return await getOrdersFromApi();
-    } catch {
-      return [];
-    }
+    console.warn('Failed to fetch user orders from API:', error.message);
+    return [];
   }
 };
 
@@ -246,3 +241,33 @@ export const dispatchOrder = async (id, formData) => {
   });
   return response.data;
 };
+
+export const cancelOrder = async (id, reason) => {
+  const response = await axios.post(
+    `${ORDER_API_BASE_URL}/api/Orders/tracking/${id}`,
+    { status: 'Cancelled', notes: `Cancelled: ${reason}` },
+    {
+      headers: {
+        'ngrok-skip-browser-warning': 'true',
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getUserOrderTrackingById = async (id) => {
+  const authConfig = getAuthenticatedRequestConfig();
+  const response = await axios.get(`${ORDER_API_BASE_URL}/api/Orders/tracking/${encodeURIComponent(id)}`, {
+    ...authConfig,
+    headers: {
+      ...(authConfig?.headers || {}),
+      'ngrok-skip-browser-warning': 'true',
+      Accept: 'application/json',
+    }
+  });
+  return response.data;
+};
+
+

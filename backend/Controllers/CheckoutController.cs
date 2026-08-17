@@ -186,6 +186,35 @@ namespace ShyamAgroSuite.Api.Controllers
                 // Attempt to retrieve customer for the Orders table
                 var customerForOrder = await _context.Customers.FirstOrDefaultAsync(c => c.Email == userEmail || c.Phone == userEmail);
 
+                if (customerForOrder == null && address != null)
+                {
+                    // Fallback lookup using address Email/Phone
+                    customerForOrder = await _context.Customers.FirstOrDefaultAsync(c => 
+                        (!string.IsNullOrEmpty(address.Email) && c.Email == address.Email) || 
+                        (!string.IsNullOrEmpty(address.PhoneNumber) && c.Phone == address.PhoneNumber));
+                }
+
+                if (customerForOrder == null && address != null)
+                {
+                    // Create a new Customer profile dynamically so they aren't mapped to tharun kumar
+                    string fullName = $"{address.FirstName} {address.LastName}".Trim();
+                    if (string.IsNullOrEmpty(fullName)) fullName = "Guest Customer";
+
+                    customerForOrder = new Customer
+                    {
+                        Name = fullName,
+                        Email = address.Email ?? userEmail ?? string.Empty,
+                        Phone = address.PhoneNumber ?? string.Empty,
+                        Address = address.FullAddress ?? string.Empty,
+                        District = address.City ?? string.Empty,
+                        State = address.State ?? string.Empty,
+                        Status = "Active",
+                        JoinDate = DateTime.UtcNow
+                    };
+                    _context.Customers.Add(customerForOrder);
+                    await _context.SaveChangesAsync();
+                }
+
                 // 5a. Create full Order in Orders table for Admin Ledger visibility
                 var mainOrder = new Order
                 {

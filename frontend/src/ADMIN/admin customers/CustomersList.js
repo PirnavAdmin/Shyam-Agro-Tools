@@ -203,9 +203,11 @@ const CustomersList = () => {
     return customers.filter(c => {
       const nameVal = c.name ? c.name.toLowerCase() : '';
       const idVal = c.id ? String(c.id).toLowerCase() : '';
+      const phoneVal = c.phone ? String(c.phone).toLowerCase() : '';
       const matchesSearch =
         nameVal.includes(searchTerm.toLowerCase()) ||
-        idVal.includes(searchTerm.toLowerCase());
+        idVal.includes(searchTerm.toLowerCase()) ||
+        phoneVal.includes(searchTerm.toLowerCase());
       
       const customerType = c.type || 'Farmer';
       const matchesType = typeFilter === 'All' || customerType === typeFilter;

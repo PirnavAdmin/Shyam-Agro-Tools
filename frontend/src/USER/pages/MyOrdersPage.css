@@ -657,7 +657,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 200000;
   padding: 1rem;
 }
 
@@ -1087,5 +1087,206 @@
 [data-theme="dark"] .evidence-preview-card .file-name {
   color: #ffffff;
 }
+
+/* Cancel Order Button Styles */
+.cancel-order-btn {
+  background: #fff5f5 !important;
+  color: #e53e3e !important;
+  border: 1px solid #fed7d7 !important;
+  transition: all 0.2s ease;
+}
+
+.cancel-order-btn:hover {
+  background: #e53e3e !important;
+  color: #ffffff !important;
+  border-color: #e53e3e !important;
+}
+
+/* Cancelled Order Banner */
+.my-order-cancelled-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  color: #c53030;
+}
+
+.cancelled-banner-icon {
+  background: #fed7d7;
+  color: #e53e3e;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cancelled-banner-text h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #9b2c2c;
+}
+
+.cancelled-banner-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #c53030;
+}
+
+/* Fulfillment History Timeline */
+.order-timeline-activity {
+  margin-top: 2rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.order-timeline-activity h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0 0 1.25rem;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 0.75rem;
+}
+
+.timeline-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.timeline-activity-list::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #cbd5e0;
+}
+
+.timeline-activity-item {
+  display: flex;
+  gap: 1.25rem;
+  position: relative;
+}
+
+.activity-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #58B82E;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #58B82E;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.timeline-activity-item .activity-marker {
+  background: #58B82E;
+  box-shadow: 0 0 0 2px #58B82E;
+}
+
+.timeline-activity-item.cancelled .activity-marker {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px #ef4444;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.activity-meta strong {
+  font-size: 0.95rem;
+  color: #2d3748;
+}
+
+.activity-meta span {
+  font-size: 0.8rem;
+  color: #a0aec0;
+}
+
+.activity-details p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #718096;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .cancel-order-btn {
+  background: rgba(229, 62, 62, 0.1) !important;
+  color: #fc8181 !important;
+  border-color: rgba(229, 62, 62, 0.2) !important;
+}
+
+[data-theme="dark"] .cancel-order-btn:hover {
+  background: #e53e3e !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .my-order-cancelled-banner {
+  background: rgba(229, 62, 62, 0.1);
+  border-color: rgba(229, 62, 62, 0.2);
+  color: #fc8181;
+}
+
+[data-theme="dark"] .cancelled-banner-icon {
+  background: rgba(229, 62, 62, 0.2);
+  color: #fc8181;
+}
+
+[data-theme="dark"] .cancelled-banner-text h3 {
+  color: #feb2b2;
+}
+
+[data-theme="dark"] .cancelled-banner-text p {
+  color: #feb2b2;
+}
+
+[data-theme="dark"] .order-timeline-activity {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .order-timeline-activity h3 {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .activity-meta strong {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .activity-details p {
+  color: #a0aec0;
+}
+
 
 

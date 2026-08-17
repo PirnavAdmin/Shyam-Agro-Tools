@@ -24,6 +24,14 @@ import { getApiDomain } from '../../utils/apiConfig';
 import { Pagination } from '../components/ActionButtons';
 import './adminOrders.css';
 
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  return `${getApiDomain().replace(/\/$/, '')}/${url.replace(/^\/+/, '')}`;
+};
+
 export const formatCurrency = (amount) => {
   if (amount === null || amount === undefined) return 'INR 0';
   if (typeof amount === 'string' && amount.trim().startsWith('INR')) return amount;
@@ -220,11 +228,11 @@ const normaliseOrder = (o) => {
     // Packer / Shipper Details added
     isPacked: !!(o.packerName && o.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()) || !!(o.carrierName || o.trackingNumber),
     packerName: (o.packerName && o.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") ? o.packerName : (!!(o.carrierName || o.trackingNumber) || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()) ? 'Warehouse Team' : ''),
-    packerImage: o.packerPhotoUrl || o.packerImage || '',
+    packerImage: resolveImageUrl(o.packerPhotoUrl || o.packerImage || ''),
     packedDate: o.packedDate || (o.packerName || !!(o.carrierName || o.trackingNumber) || ['PACKED', 'DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()) ? 'Verified' : ''),
     isShipped: !!(o.carrierName || o.trackingNumber) || ['DISPATCHED', 'SHIPPED', 'COMPLETED'].includes((o.fulfillment || o.status || '').toUpperCase()),
     shipperName: o.shipperName || o.carrierName || 'Warehouse Team',
-    packageImage: o.packagePhotoUrl || o.packageImage || '',
+    packageImage: resolveImageUrl(o.packagePhotoUrl || o.packageImage || ''),
     shippedDate: o.shippedDate || (o.carrierName || o.trackingNumber ? 'Verified' : ''),
     items: Array.isArray(o.items) ? o.items.map(i => ({
       sku: i.sku || i.productCode || '',
@@ -563,13 +571,16 @@ const printInvoice = (order) => {
         <div class="invoice-container">
           <!-- Header -->
           <div class="invoice-header">
-            <div>
-              <div class="company-title">Shyam Agro Tools</div>
-              <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
-              <div class="company-meta">
-                Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401, Andhra Pradesh<br/>
-                GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265, +91 6301275516<br/>
-                Email: sales@shyamagro.com | Web: www.shyamagrotools.com
+            <div style="display: flex; align-items: flex-start; gap: 18px;">
+              <img src="/logo.png" style="height: 70px; width: auto; object-fit: contain; margin-top: 4px;" alt="Logo" onerror="this.src='/logo.svg'" />
+              <div>
+                <div class="company-title">Shyam Agro Tools</div>
+                <div class="company-subtitle">EQUIPMENTS & INDUSTRIAL MACHINERY</div>
+                <div class="company-meta">
+                  Opposite New Bustand, Nandikotkur (TQ), Nandyal (DT) - 518401, Andhra Pradesh<br/>
+                  GSTIN: <strong>24DYYPP1677P1Z6</strong> | Phone: +91 9912649265, +91 6301275516<br/>
+                  Email: sales@shyamagro.com | Web: www.shyamagrotools.com
+                </div>
               </div>
             </div>
             <div class="badge-tax-invoice">
@@ -771,7 +782,15 @@ const OrdersLedger = () => {
             }
             return normalized;
           });
-          setOrders(normalizedList);
+
+          const deduplicatedMap = new Map();
+          normalizedList.forEach((order) => {
+            const key = (order.invoiceNo || order.id || '').toUpperCase().trim();
+            if (key && !deduplicatedMap.has(key)) {
+              deduplicatedMap.set(key, order);
+            }
+          });
+          setOrders(Array.from(deduplicatedMap.values()));
         }
       } catch (err) {
         if (isMounted) setError(err.message || 'Failed to load orders.');
@@ -805,10 +824,15 @@ const OrdersLedger = () => {
 
     return verifiedOrders.filter((order) => {
       // 1. Search filter
-      const matchesSearch = [String(order.id), order.customer, order.invoiceNo, order.phone]
-        .join(' ')
-        .toLowerCase()
-        .includes(normalizedSearch);
+      const matchesSearch = [
+        order.id, 
+        order.customer, 
+        order.invoiceNo, 
+        order.phone, 
+        order.utr
+      ]
+        .filter(Boolean)
+        .some(val => String(val).toLowerCase().includes(normalizedSearch));
 
       // 2. Date filter
       let matchesDate = true;

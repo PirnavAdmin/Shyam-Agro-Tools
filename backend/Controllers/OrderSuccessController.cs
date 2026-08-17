@@ -220,14 +220,33 @@ namespace ShyamAgroSuite.Api.Controllers
             if (string.IsNullOrEmpty(searchId))
                 return BadRequest(new { Message = "Order ID is required." });
 
+            bool isNumeric = int.TryParse(searchId, out int numericId);
+
             // Check primary Orders table first for live admin status & tracking updates
             var dbOrder = await _context.Orders
                 .AsNoTracking()
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(x => x.OrderNumber == searchId || x.Id.ToString() == searchId);
+                .FirstOrDefaultAsync(o => (isNumeric && o.Id == numericId) || 
+                                          o.OrderNumber == searchId || 
+                                          o.OrderNumber == $"#{searchId}" ||
+                                          (searchId.StartsWith("#") && o.OrderNumber == searchId.Substring(1)));
 
             if (dbOrder != null)
             {
+                var timelineLogs = await _context.OrderTrackingLogs
+                    .AsNoTracking()
+                    .Where(log => log.OrderId == dbOrder.Id)
+                    .OrderBy(log => log.CreatedAt)
+                    .Select(log => new
+                    {
+                        log.Id,
+                        log.Status,
+                        log.Description,
+                        Date = log.CreatedAt.ToString("yyyy-MM-dd"),
+                        Time = log.CreatedAt.ToString("HH:mm:ss")
+                    })
+                    .ToListAsync();
+
                 return Ok(new
                 {
                     OrderId = dbOrder.OrderNumber,
@@ -241,6 +260,8 @@ namespace ShyamAgroSuite.Api.Controllers
                     EstimatedDelivery = "3-7 business days",
                     PackerName = dbOrder.PackerName,
                     PackagePhotoUrl = dbOrder.PackagePhotoUrl,
+                    CreatedAt = dbOrder.OrderDate,
+                    TimelineLogs = timelineLogs,
                     Items = dbOrder.Items.Select(i => new {
                         i.ProductId,
                         i.ProductName,
@@ -253,12 +274,25 @@ namespace ShyamAgroSuite.Api.Controllers
 
             var order = await _context.OrderSuccesses
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.OrderId == searchId);
+                .FirstOrDefaultAsync(o => o.OrderId == searchId || 
+                                          o.OrderId == $"#{searchId}" ||
+                                          (searchId.StartsWith("#") && o.OrderId == searchId.Substring(1)));
 
             if (order == null)
                 return NotFound(new { Message = "Order not found." });
 
-            return Ok(order);
+            return Ok(new
+            {
+                OrderId = order.OrderId,
+                OrderStatus = order.OrderStatus,
+                Status = order.OrderStatus,
+                TotalAmount = order.TotalAmount,
+                PaymentMethod = order.PaymentMethod,
+                PaymentStatus = order.PaymentStatus,
+                EstimatedDelivery = "3-7 business days",
+                CreatedAt = order.OrderDate,
+                TimelineLogs = new List<object>()
+            });
         }
 
         // ====================================================

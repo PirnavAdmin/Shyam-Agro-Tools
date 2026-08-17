@@ -10,7 +10,16 @@ import {
 } from 'lucide-react';
 import { getOrdersShipping, getOrderShipping, packOrder, dispatchOrder, updateOrderStatus } from '../api/orders';
 import { OrderStatusBadge, mapStatus } from './OrdersLedger';
+import { getApiDomain } from '../../utils/apiConfig';
 import './adminOrders.css';
+
+const resolveImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  return `${getApiDomain().replace(/\/$/, '')}/${url.replace(/^\/+/, '')}`;
+};
 
 // Preset avatar list for packers
 const PRESET_PACKERS = [
@@ -57,10 +66,18 @@ const ShippingOrder = () => {
         ...o,
         status: o.status || o.currentStatus || 'Pending'
       }));
-      setOrders(mappedList);
+      const deduplicatedMap = new Map();
+      mappedList.forEach(item => {
+        const key = (item.orderNumber || item.orderId || item.id || '').toUpperCase().trim();
+        if (key && !deduplicatedMap.has(key)) {
+          deduplicatedMap.set(key, item);
+        }
+      });
+      const uniqueList = Array.from(deduplicatedMap.values());
+      setOrders(uniqueList);
       
-      if (mappedList.length > 0 && !selectedOrderId) {
-        setSelectedOrderId(mappedList[0].id || mappedList[0].orderId);
+      if (uniqueList.length > 0 && !selectedOrderId) {
+        setSelectedOrderId(uniqueList[0].id || uniqueList[0].orderId);
       }
     } catch (err) {
       setError(err.message || 'Failed to load shipping ledger.');
@@ -98,9 +115,9 @@ const ShippingOrder = () => {
             isShipped,
             destination: details.destination || 'Self Pickup',
             packerName: (details.packerName && details.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") ? details.packerName : '',
-            packerImage: details.packerPhotoUrl || '',
+            packerImage: resolveImageUrl(details.packerPhotoUrl || ''),
             shipperName: details.shipperName || details.carrierName || '',
-            packageImage: details.packagePhotoUrl || '',
+            packageImage: resolveImageUrl(details.packagePhotoUrl || ''),
             logistics: details.carrierName || '',
             trackingNo: details.trackingNumber || '',
             items: Array.isArray(details.packageContent) ? details.packageContent.map(i => ({
@@ -192,9 +209,9 @@ const ShippingOrder = () => {
         isShipped,
         destination: details.destination || 'Self Pickup',
         packerName: (details.packerName && details.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") ? details.packerName : '',
-        packerImage: details.packerPhotoUrl || '',
+        packerImage: resolveImageUrl(details.packerPhotoUrl || ''),
         shipperName: details.shipperName || details.carrierName || '',
-        packageImage: details.packagePhotoUrl || '',
+        packageImage: resolveImageUrl(details.packagePhotoUrl || ''),
         logistics: details.carrierName || '',
         trackingNo: details.trackingNumber || '',
         items: Array.isArray(details.packageContent) ? details.packageContent.map(i => ({
@@ -255,9 +272,9 @@ const ShippingOrder = () => {
         isShipped,
         destination: details.destination || 'Self Pickup',
         packerName: (details.packerName && details.packerName !== "Thank you for shopping with Shyam Agro Tools & Equipment!") ? details.packerName : '',
-        packerImage: details.packerPhotoUrl || '',
+        packerImage: resolveImageUrl(details.packerPhotoUrl || ''),
         shipperName: details.shipperName || details.carrierName || '',
-        packageImage: details.packagePhotoUrl || '',
+        packageImage: resolveImageUrl(details.packagePhotoUrl || ''),
         logistics: details.carrierName || '',
         trackingNo: details.trackingNumber || '',
         items: Array.isArray(details.packageContent) ? details.packageContent.map(i => ({

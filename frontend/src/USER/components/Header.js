@@ -147,17 +147,20 @@ const compressImageToDataUrl = (file, maxWidth = 300, maxHeight = 300, quality =
   });
 };
 
-const getAccountFieldsFromUser = (source = {}, fallback = {}) => ({
-  name: source.name || source.fullName || source.FullName || fallback.name || '',
-  phone: source.phone || source.mobileNumber || source.MobileNumber || fallback.phone || '',
-  email: source.email || source.Email || fallback.email || '',
-  profileImage: getResolvedProfileImage(source, fallback) || '',
-  doorNo: source.doorNo || source.DoorNo || source.address?.doorNo || fallback.doorNo || '',
-  street: source.street || source.streetArea || source.StreetArea || source.address?.street || fallback.street || '',
-  city: source.city || source.City || source.address?.city || fallback.city || '',
-  state: source.state || source.State || source.address?.state || fallback.state || '',
-  pincode: source.pincode || source.Pincode || source.address?.pincode || fallback.pincode || '',
-});
+const getAccountFieldsFromUser = (source, fallback = {}) => {
+  const src = source || {};
+  return {
+    name: src.name || src.fullName || src.FullName || fallback.name || '',
+    phone: src.phone || src.mobileNumber || src.MobileNumber || fallback.phone || '',
+    email: src.email || src.Email || fallback.email || '',
+    profileImage: getResolvedProfileImage(src, fallback) || '',
+    doorNo: src.doorNo || src.DoorNo || src.address?.doorNo || fallback.doorNo || '',
+    street: src.street || src.streetArea || src.StreetArea || src.address?.street || fallback.street || '',
+    city: src.city || src.City || src.address?.city || fallback.city || '',
+    state: src.state || src.State || src.address?.state || fallback.state || '',
+    pincode: src.pincode || src.Pincode || src.address?.pincode || fallback.pincode || '',
+  };
+};
 
 const UserAvatar = ({ user }) => {
   const [hasError, setHasError] = useState(false);
@@ -379,7 +382,11 @@ const Header = ({ onLoginClick }) => {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setAccountForm(getAccountFieldsFromUser(null));
+      setProfileImageFile(null);
+      return;
+    }
     if (accountInfoOpen) return;
     setAccountForm(getAccountFieldsFromUser(user));
     setProfileImageFile(null);
@@ -719,7 +726,6 @@ const Header = ({ onLoginClick }) => {
                           <img
                             src={item.image}
                             alt={item.title}
-                            loading="lazy"
                             onError={handleProductImageError}
                             className="h-10 w-10 shrink-0 rounded-sm border border-gray-100 object-contain"
                           />
@@ -923,7 +929,7 @@ const Header = ({ onLoginClick }) => {
                       {cartItems.map((item) => (
                         <div key={item.id} className="flex gap-4 items-center pb-5 border-b border-gray-50 last:border-0 last:pb-0">
                           <span className="app-line-thumb-sm rounded-sm border border-gray-100 p-1">
-                            <img src={getProductImage(item)} alt={item.name} loading="lazy" onError={handleProductImageError} />
+                            <img src={getProductImage(item)} alt={item.name} onError={handleProductImageError} />
                           </span>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-[11px] font-black text-dark uppercase truncate">{productText(item, 'name')}</h4>

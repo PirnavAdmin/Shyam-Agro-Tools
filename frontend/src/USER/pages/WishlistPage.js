@@ -195,7 +195,6 @@ const WishlistPage = () => {
                             <img
                               src={getProductImage(item)}
                               alt={name}
-                              loading="lazy"
                               onError={handleProductImageError}
                             />
                           </button>
