@@ -57,3 +57,37 @@ export const isValidName = (name) => {
 
   return true;
 };
+
+/**
+ * Validates if a phone number is a valid, real Indian mobile number.
+ * 
+ * @param {string} phone - The phone number to validate
+ * @returns {boolean} - True if phone number is valid
+ */
+export const isValidMobileNumber = (phone) => {
+  if (!phone) return false;
+  const trimmed = phone.trim().replace(/\s/g, "").replace(/-/g, "").replace(/^\+91/, "");
+  
+  // 1. Must match the Indian mobile number format: 10 digits starting with 6, 7, 8, or 9
+  if (!/^[6-9]\d{9}$/.test(trimmed)) return false;
+  
+  // 2. Must have at least 3 distinct digits
+  const distinctDigits = new Set(trimmed).size;
+  if (distinctDigits < 3) return false;
+
+  // 3. Reject 5 or more consecutive repeating digits (e.g. 9888881234)
+  if (/(\d)\1{4,}/.test(trimmed)) return false;
+
+  // 4. Reject repeating 2-digit pairs (e.g. 5454545454, 9898989898)
+  if (/(\d{2})\1{3,}/.test(trimmed)) return false;
+
+  // 5. Reject blacklisted invalid numbers
+  const invalidPhones = [
+    "1234567890", "0123456789", "9876543210", "1234567891", "6789012345",
+    "9876543211", "9999999999", "8888888888", "7777777777", "6666666666",
+    "5454545454", "9898989898", "9123456789", "6543210987", "0000000000"
+  ];
+  if (invalidPhones.includes(trimmed)) return false;
+
+  return true;
+};

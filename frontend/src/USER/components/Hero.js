@@ -6,6 +6,7 @@ import axios from 'axios';
 import { getApiDomain } from '../../utils/apiConfig';
 import heroMachinery from '../../asset/hero-machinery.png';
 import heroSprayers from '../../asset/hero-sprayers.png';
+import heroNetsurf from '../../asset/hero-netsurf.jpg';
 
 const API_URL = `${getApiDomain()}/api`;
 
@@ -20,6 +21,12 @@ const defaultSlides = [
     id: 2,
     image: heroSprayers,
     alt: 'Advanced & Reliable Sprayers - Powerful Performance & Better Farming',
+    targetPath: '/categories',
+  },
+  {
+    id: 3,
+    image: heroNetsurf,
+    alt: 'Retailer Agriculture Biofit Product Information - Telugu',
     targetPath: '/categories',
   },
 ];

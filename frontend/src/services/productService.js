@@ -59,8 +59,8 @@ const toFormData = (data = {}) => {
 };
 
 export const getProductAssetUrl = (url) => {
-  if (typeof url === 'string' && (url.startsWith('data:video') || /\.(mp4|webm|ogg)(\?.*)?$/i.test(url))) {
-    if (url.startsWith('http') || url.startsWith('data:video')) return url;
+  if (typeof url === 'string' && (url.startsWith('data:') || /\.(mp4|webm|ogg|html)(\?.*)?$/i.test(url))) {
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
     return `${PRODUCT_API_BASE_URL}/${url.replace(/^\/+/, '')}`;
   }
   return getProductImage({ image: url });

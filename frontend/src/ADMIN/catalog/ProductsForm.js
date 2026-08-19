@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CheckCircle,
+  FileText,
   PackagePlus,
   Plus,
   Save,
@@ -176,6 +177,8 @@ const ProductsForm = () => {
   });
   const [imageFiles, setImageFiles] = useState([]);
   const [videoFile, setVideoFile] = useState(null);
+  const [posterFile, setPosterFile] = useState(null);
+  const [posterPreview, setPosterPreview] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(true);
@@ -485,6 +488,34 @@ const ProductsForm = () => {
     setFormData((current) => ({ ...current, videoPreview: URL.createObjectURL(file) }));
   };
 
+  const handlePosterChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 25 * 1024 * 1024) {
+      alert("Poster image file is too large. Please select an image under 25MB.");
+      return;
+    }
+
+    setPosterFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPosterPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePoster = () => {
+    setPosterFile(null);
+    setPosterPreview(null);
+    setFormData((current) => ({
+      ...current,
+      posterUrl: '',
+      posterImage: '',
+      poster: '',
+    }));
+  };
+
   const validateForm = () => {
     if (!formData.categoryId) {
       setToast({ message: 'Category is required. Please select a category.', type: 'warning' });
@@ -572,11 +603,13 @@ const ProductsForm = () => {
     setToast(null);
 
     try {
-      const savedProduct = await saveProductApi(preparedProduct, imageFiles, videoFile);
+      const savedProduct = await saveProductApi(preparedProduct, imageFiles, videoFile, posterFile);
 
       setFormData(normalizeProduct(savedProduct));
       setImageFiles([]);
       setVideoFile(null);
+      setPosterFile(null);
+      setPosterPreview(null);
       setIsSaved(true);
       setToast({ message: `Product ${isEditing ? 'updated' : 'saved'} successfully!`, type: 'success' });
       setTimeout(() => {
@@ -1349,6 +1382,34 @@ const ProductsForm = () => {
                 </span>
                 <input id="product-video" type="file" accept="video/mp4" onChange={handleVideoChange} />
               </label>
+
+              <label className="catalog-upload" htmlFor="product-poster" style={{ marginTop: '16px', cursor: 'pointer', border: '2px dashed #10b981', backgroundColor: '#f0fdf4' }}>
+                <span className="catalog-upload__box" style={{ height: '180px', backgroundColor: '#ecfdf5' }}>
+                  {posterPreview ? (
+                    <img src={posterPreview} alt="Poster Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  ) : formData.posterUrl || formData.posterImage || formData.poster ? (
+                    <img src={resolveImageUrl(formData.posterUrl || formData.posterImage || formData.poster)} alt="Poster Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  ) : (
+                    <FileText size={28} style={{ color: '#059669' }} />
+                  )}
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
+                  <strong style={{ color: '#047857' }}>Detailed Poster / Info Graphic (Optional)</strong>
+                  <span style={{ fontSize: '11px', color: '#059669', textAlign: 'center' }}>
+                    HD full-screen PDF view for user. Leave empty if not required.
+                  </span>
+                </span>
+                <input id="product-poster" type="file" accept="image/*" onChange={handlePosterChange} />
+              </label>
+              {(posterPreview || formData.posterUrl || formData.posterImage || formData.poster) && (
+                <button
+                  type="button"
+                  onClick={handleRemovePoster}
+                  style={{ marginTop: '6px', fontSize: '12px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', width: '100%', textAlign: 'center' }}
+                >
+                  Remove Poster
+                </button>
+              )}
             </section>
 
             <div className="product-assurance">

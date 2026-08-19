@@ -292,6 +292,7 @@ export const mapProductFromApi = (
     video: mainVideoUrl,
     videoUrl: raw.videos?.[0]?.videoUrl || raw.videoUrl || '',
     videos,
+    posterUrl: resolveImageUrl(raw.posterUrl || raw.posterImage || raw.poster || raw.PosterUrl || raw.PosterImage || ''),
   };
 };
 
@@ -493,7 +494,7 @@ export const fetchProduct = async (id, categories = [], subcategories = []) => {
 // POST /api/features  (per feature)
 // POST /api/reviews   (per review)
 
-export const saveProduct = async (product, imageFiles = [], videoFile = null) => {
+export const saveProduct = async (product, imageFiles = [], videoFile = null, posterFile = null) => {
   const isEditing = Boolean(product.id);
 
   const fd = new FormData();
@@ -573,6 +574,17 @@ export const saveProduct = async (product, imageFiles = [], videoFile = null) =>
   // Video
   if (videoFile) {
     fd.append('Video', videoFile);
+  }
+
+  // Poster / Info Graphic (Optional)
+  if (posterFile) {
+    fd.append('Poster', posterFile);
+    fd.append('posterFile', posterFile);
+    fd.append('PosterFile', posterFile);
+  } else if (product.posterUrl || product.posterImage || product.poster) {
+    const existingPoster = product.posterUrl || product.posterImage || product.poster;
+    fd.append('PosterUrl', existingPoster);
+    fd.append('posterUrl', existingPoster);
   }
 
   // ── POST or PUT product ────────────────────────────────────────────────────

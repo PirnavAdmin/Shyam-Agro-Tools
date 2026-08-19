@@ -5,10 +5,12 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  FileText,
   Heart,
   Loader2,
   Minus,
   Plus,
+  RotateCcw,
   Share2,
   ShieldCheck,
   ShoppingCart,
@@ -16,6 +18,8 @@ import {
   Truck,
   X,
   Zap,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
@@ -35,7 +39,19 @@ import './ProductDetailsPage.css';
 const FALLBACK_IMAGE = PRODUCT_IMAGE_FALLBACK;
 const loadedDetailImages = new Set();
 
-const normalizeDetailImageUrl = (url) => getProductImage({ image: url });
+const normalizeDetailImageUrl = (url) => {
+  if (!url) return FALLBACK_IMAGE;
+  if (typeof url === 'string') {
+    const raw = url.trim();
+    if (raw.includes('biofit_detailed_info')) {
+      return '/biofit_detailed_info.png';
+    }
+    if (raw.startsWith('/biofit') || raw.startsWith('data:') || raw.startsWith('blob:')) {
+      return raw;
+    }
+  }
+  return getProductImage({ image: url });
+};
 
 const mapProductForCart = (product) => ({
   ...product,
@@ -135,11 +151,23 @@ const ProductDetailsPage = () => {
   const [reviewErrors, setReviewErrors] = useState({});
   const [isImageLightboxOpen, setIsImageLightboxOpen] = useState(false);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
+  const [lightboxZoom, setLightboxZoom] = useState(1);
   const { addToCart, cartItems, removeFromCart } = useCart();
   const { t, productText, productListText, productSpecLabel, productSpecValue, reviewText, categoryText, dynamicText } = useLanguage();
   const { showToast } = useToast();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { mappedCategories } = useCategories();
+
+  const posterGraphicUrl = useMemo(() => {
+    if (product?.posterUrl) return normalizeDetailImageUrl(product.posterUrl);
+    if (product?.posterImage) return normalizeDetailImageUrl(product.posterImage);
+    if (product?.poster) return normalizeDetailImageUrl(product.poster);
+
+    const productNameStr = `${product?.name || ''} ${product?.productName || ''} ${product?.displayName || ''}`.toLowerCase();
+    if (productNameStr.includes('larvicide')) return '/biofit_larvicide_detailed_info.png';
+    if (productNameStr.includes('antiviral') || productNameStr.includes('biofit')) return '/biofit_detailed_info.png';
+    return null;
+  }, [product]);
 
   const category = useMemo(
     () => mappedCategories.find((item) => (
@@ -147,13 +175,44 @@ const ProductDetailsPage = () => {
     )),
     [mappedCategories, product]
   );
-  const mediaItems = product?.media?.length
-    ? product.media.map((media) => (
-        media.type === 'image'
-          ? { ...media, url: normalizeDetailImageUrl(media.url || media.fallbackUrl) }
-          : media
-      ))
-    : [{ type: 'image', labelKey: 'media.front', url: getProductImage(product) }];
+
+  const mediaItems = useMemo(() => {
+    let items = product?.media?.length
+      ? product.media.map((media) => (
+          media.type === 'image'
+            ? { ...media, url: normalizeDetailImageUrl(media.url || media.fallbackUrl) }
+            : media
+        ))
+      : [{ type: 'image', labelKey: 'media.front', url: getProductImage(product) }];
+
+    if (posterGraphicUrl) {
+      const hasInfoGraphic = items.some(
+        (m) => m.url === posterGraphicUrl || m.labelKey === 'media.info'
+      );
+
+      if (!hasInfoGraphic) {
+        const detailedInfoItem = {
+          type: 'image',
+          id: 'detailed-info-graphic',
+          labelKey: 'media.info',
+          label: 'Detailed Info',
+          url: posterGraphicUrl,
+        };
+        items = [detailedInfoItem, ...items];
+      } else {
+        const infoIndex = items.findIndex(
+          (m) => m.url === posterGraphicUrl || m.labelKey === 'media.info'
+        );
+        if (infoIndex > 0) {
+          const infoItem = items[infoIndex];
+          items = [infoItem, ...items.filter((_, idx) => idx !== infoIndex)];
+        }
+      }
+    }
+
+    return items;
+  }, [product, posterGraphicUrl]);
+
   const selectedMedia = mediaItems[selectedMediaIndex] || mediaItems[0];
   const lightboxMediaItems = mediaItems;
   const lightboxMedia = lightboxMediaItems[lightboxImageIndex] || lightboxMediaItems[0];
@@ -203,7 +262,8 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    setSelectedMediaIndex(0);
+    // Default page hero view to front bottle image as before (index 1 if detailed info poster is index 0)
+    setSelectedMediaIndex(mediaItems.length > 1 ? 1 : 0);
     setQuantity(1);
     setVideoError(false);
     setReviewList([]);
@@ -215,7 +275,7 @@ const ProductDetailsPage = () => {
     setReviewErrors({});
     setIsImageLightboxOpen(false);
     setLightboxImageIndex(0);
-  }, [id]);
+  }, [id, mediaItems.length]);
 
   useEffect(() => {
     if (!isImageLightboxOpen) return undefined;
@@ -362,10 +422,15 @@ const ProductDetailsPage = () => {
   };
 
   const openImageLightbox = (media = selectedMedia) => {
-    const currentImageIndex = lightboxMediaItems.findIndex(
-      (lightboxItem) => lightboxItem.url === media?.url
-    );
-    setLightboxImageIndex(Math.max(0, currentImageIndex));
+    if (!media || media === selectedMedia) {
+      // Clicking the main product image opens HD Detailed Info Poster full screen first (Index 0)
+      setLightboxImageIndex(0);
+    } else {
+      const currentImageIndex = lightboxMediaItems.findIndex(
+        (lightboxItem) => lightboxItem.url === media?.url
+      );
+      setLightboxImageIndex(Math.max(0, currentImageIndex));
+    }
     setIsImageLightboxOpen(true);
   };
 
@@ -493,6 +558,7 @@ const ProductDetailsPage = () => {
     if (selectedMedia?.type === 'video') {
       const videoUrl = selectedMedia.url;
       const isYoutube = /youtube\.com|youtu\.be/.test(videoUrl || '') || selectedMedia.videoType === 'youtube';
+      const isHtml = typeof videoUrl === 'string' && (videoUrl.includes('.html') || videoUrl.startsWith('data:text/html'));
 
       if (!videoUrl || videoError) {
         return (
@@ -502,12 +568,12 @@ const ProductDetailsPage = () => {
         );
       }
 
-      if (isYoutube) {
+      if (isYoutube || isHtml) {
         return (
           <iframe
             title={selectedMedia.title || productName}
             src={videoUrl}
-            className="product-detail-main-video"
+            className="product-detail-main-video w-full h-full min-h-[360px] border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             onError={() => setVideoError(true)}
@@ -935,77 +1001,152 @@ const ProductDetailsPage = () => {
         </motion.div>
       </main>
 
-      {isImageLightboxOpen && lightboxMedia && (
-        <div
-          className="product-image-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${productName} image gallery`}
-          onClick={() => setIsImageLightboxOpen(false)}
-        >
-          <button
-            type="button"
-            className="product-image-lightbox-close"
+      {isImageLightboxOpen && lightboxMedia && (() => {
+        const isDetailedInfoScreen = Boolean(
+          posterGraphicUrl && (
+            lightboxMedia?.labelKey === 'media.info' ||
+            lightboxMedia?.url === posterGraphicUrl ||
+            (typeof lightboxMedia?.url === 'string' && lightboxMedia.url.includes('biofit_detailed_info'))
+          )
+        );
+
+        return (
+          <div
+            className={`product-image-lightbox ${isDetailedInfoScreen ? 'is-detailed-info-mode' : 'is-normal-view-mode'}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${productName} image viewer`}
             onClick={() => setIsImageLightboxOpen(false)}
-            aria-label="Close image gallery"
           >
-            <X size={24} />
-          </button>
+            {isDetailedInfoScreen ? (
+              <div className="pdf-toolbar" onClick={(e) => e.stopPropagation()}>
+                <div className="pdf-toolbar-title">
+                  <FileText size={18} className="text-emerald-400" />
+                  <span className="font-bold">{productName} — Detailed Product Guide (HD)</span>
+                  <span className="text-xs bg-emerald-950 text-emerald-300 px-2.5 py-1 rounded border border-emerald-700/50 flex items-center gap-1.5">
+                    📜 Scroll down to read
+                  </span>
+                </div>
 
-          <div className="product-image-lightbox-content" onClick={(event) => event.stopPropagation()}>
-            {lightboxMedia.type === 'video' ? (
-              /youtube\.com|youtu\.be/.test(lightboxMedia.url || '') || lightboxMedia.videoType === 'youtube' ? (
-                <iframe
-                  title={`${productName} video`}
-                  src={lightboxMedia.url}
-                  className="product-image-lightbox-video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <video className="product-image-lightbox-video" controls autoPlay>
-                  <source src={lightboxMedia.url} type="video/mp4" />
-                  {t('noProductVideo')}
-                </video>
-              )
+                <div className="pdf-toolbar-actions">
+                  <button
+                    type="button"
+                    className="pdf-zoom-btn"
+                    onClick={() => setLightboxZoom((z) => Math.max(0.7, z - 0.15))}
+                    title="Zoom Out"
+                  >
+                    <ZoomOut size={16} />
+                  </button>
+                  <span className="text-xs font-bold w-12 text-center text-slate-300">
+                    {Math.round(lightboxZoom * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    className="pdf-zoom-btn"
+                    onClick={() => setLightboxZoom((z) => Math.min(2.2, z + 0.15))}
+                    title="Zoom In"
+                  >
+                    <ZoomIn size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    className="pdf-zoom-btn"
+                    onClick={() => setLightboxZoom(1)}
+                    title="Reset Zoom"
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className="pdf-zoom-btn bg-red-600/80 hover:bg-red-600 border-red-500 ml-2"
+                    onClick={() => setIsImageLightboxOpen(false)}
+                    title="Close"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
             ) : (
-              <img
-                src={normalizeDetailImageUrl(lightboxMedia.url || lightboxMedia.fallbackUrl)}
-                alt={`${productName} ${lightboxMedia.label || lightboxImageIndex + 1}`}
-                onError={(event) => {
-                  event.currentTarget.onerror = null;
-                  event.currentTarget.src = FALLBACK_IMAGE;
-                }}
-              />
+              <button
+                type="button"
+                className="product-image-lightbox-close"
+                onClick={() => setIsImageLightboxOpen(false)}
+                aria-label="Close image gallery"
+              >
+                <X size={24} />
+              </button>
             )}
 
-            {lightboxMediaItems.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  className="product-image-lightbox-nav previous"
-                  onClick={selectPreviousLightboxImage}
-                  aria-label="Previous product image"
-                >
-                  <ChevronLeft size={28} />
-                </button>
-                <button
-                  type="button"
-                  className="product-image-lightbox-nav next"
-                  onClick={selectNextLightboxImage}
-                  aria-label="Next product image"
-                >
-                  <ChevronRight size={28} />
-                </button>
-              </>
-            )}
+            <div
+              className={`product-image-lightbox-content ${isDetailedInfoScreen ? 'is-detailed-info-content' : 'is-normal-view-content'}`}
+              onClick={(event) => event.stopPropagation()}
+              style={isDetailedInfoScreen ? { '--lightbox-zoom': lightboxZoom } : undefined}
+            >
+              {lightboxMedia.type === 'video' ? (
+                /youtube\.com|youtu\.be/.test(lightboxMedia.url || '') || lightboxMedia.videoType === 'youtube' || (typeof lightboxMedia.url === 'string' && lightboxMedia.url.includes('.html')) ? (
+                  <iframe
+                    title={`${productName} video`}
+                    src={lightboxMedia.url}
+                    className="product-image-lightbox-video w-full h-[500px] border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video className="product-image-lightbox-video" controls autoPlay>
+                    <source src={lightboxMedia.url} type="video/mp4" />
+                    {t('noProductVideo')}
+                  </video>
+                )
+              ) : (
+                <img
+                  src={normalizeDetailImageUrl(lightboxMedia.url || lightboxMedia.fallbackUrl)}
+                  alt={`${productName} ${lightboxMedia.label || lightboxImageIndex + 1}`}
+                  className={isDetailedInfoScreen ? 'pdf-document-image' : 'normal-lightbox-image'}
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = FALLBACK_IMAGE;
+                  }}
+                />
+              )}
 
-            <span className="product-image-lightbox-count">
-              {lightboxImageIndex + 1} / {lightboxMediaItems.length}
-            </span>
+              {lightboxMediaItems.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="product-image-lightbox-nav previous"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxZoom(1);
+                      selectPreviousLightboxImage();
+                    }}
+                    aria-label="Previous product image"
+                  >
+                    <ChevronLeft size={28} />
+                  </button>
+                  <button
+                    type="button"
+                    className="product-image-lightbox-nav next"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxZoom(1);
+                      selectNextLightboxImage();
+                    }}
+                    aria-label="Next product image"
+                  >
+                    <ChevronRight size={28} />
+                  </button>
+                </>
+              )}
+
+              {!isDetailedInfoScreen && (
+                <span className="product-image-lightbox-count">
+                  {lightboxImageIndex + 1} / {lightboxMediaItems.length}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {isReviewModalOpen && (
         <div className="review-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="review-modal-title">

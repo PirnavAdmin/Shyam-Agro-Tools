@@ -427,13 +427,16 @@ using (var scope = app.Services.CreateScope())
             cmd.ExecuteNonQuery();
         }
 
-        // Reset Promo & Trust banners to their exact original previous images and text
+        // Reset Banners to their exact original previous images and text plus the new professional Netsurf hero banner
         using (var resetCmd = conn.CreateCommand())
         {
             resetCmd.CommandText = @"
-                DELETE FROM `Banners` WHERE `BannerType` IN ('Promo', 'Trust');
+                DELETE FROM `Banners`;
 
                 INSERT INTO `Banners` (`Title`, `Subtitle`, `ImageUrl`, `TargetUrl`, `BannerType`, `IsActive`, `DisplayOrder`, `CreatedAt`) VALUES
+                ('Featured Machinery', 'Explore Powerful Farming Equipment at Best Prices', '/uploads/banners/banner_82ffc6da23b9435da97cee6c93db3ff9.png', '/categories', 'Hero', 1, 1, NOW()),
+                ('Advanced & Reliable Sprayers', 'Powerful Performance & Better Farming Solutions', '/uploads/banners/banner_6f54d651af704244a2bcf39bbb5d7cea.png', '/categories', 'Hero', 1, 2, NOW()),
+                ('Retailer Agriculture Biofit', 'Biofit Product Information - Telugu', '/hero-netsurf.jpg', '/categories', 'Hero', 1, 3, NOW()),
                 ('Premium Farming Tools', 'SPECIAL OFFER • Equip your farm with the best industrial tools at unbeatable prices this season.', '/hero_banner.png', '/offers/40-percent', 'Promo', 1, 1, NOW()),
                 ('Powerful Power Tillers', 'POWER TILLERS • Discover our newly launched range of high-performance industrial power tillers.', '/power-tiller-banner.jpg', '/power-tillers', 'Promo', 1, 2, NOW()),
                 ('4.7 OUT OF 5', 'Trusted by 10,000+ customers for reliable agro machinery and support', '/hero_banner.png', '/categories', 'Trust', 1, 1, NOW()),
