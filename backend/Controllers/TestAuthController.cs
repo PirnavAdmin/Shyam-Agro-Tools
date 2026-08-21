@@ -24,10 +24,15 @@ namespace ShyamAgroSuite.Api.Controllers
         public async Task<IActionResult> Login(
             LoginRequest request)
         {
-            var result =
-                await _service.LoginAsync(request);
-
-            return Ok(result);
+            try
+            {
+                var result = await _service.LoginAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         // SAVE PROFILE
@@ -36,13 +41,15 @@ namespace ShyamAgroSuite.Api.Controllers
         public async Task<IActionResult> SaveName(
             SaveNameRequest request)
         {
-            var result =
-                await _service.SaveNameAsync(request);
-
-            return Ok(new
+            try
             {
-                success = result
-            });
+                var result = await _service.SaveNameAsync(request);
+                return Ok(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         // VERIFY OTP
@@ -51,10 +58,15 @@ namespace ShyamAgroSuite.Api.Controllers
         public async Task<IActionResult> VerifyOtp(
             VerifyOtpRequest request)
         {
-            var result =
-                await _service.VerifyOtpAsync(request);
-
-            return Ok(result);
+            try
+            {
+                var result = await _service.VerifyOtpAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         // UPLOAD PROFILE IMAGE

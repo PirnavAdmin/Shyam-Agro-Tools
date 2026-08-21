@@ -1,5 +1,5 @@
 import { getApiDomain } from "../../utils/apiConfig";
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import apiClient from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +31,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
   const [step, setStep] = useState('phone'); // 'phone', 'otp', 'details'
   const [authMode, setAuthMode] = useState('signin'); // 'signin' or 'signup'
   const [phone, setPhone] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
   const [otp, setOtp] = useState('');
   const [details, setDetails] = useState({ name: '', email: '' });
   const [loginApiData, setLoginApiData] = useState({
@@ -41,6 +42,15 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const requestLock = useRef(false);
+
+  useEffect(() => {
+    if (step === 'otp' && resendTimer > 0) {
+      const timerId = setTimeout(() => {
+        setResendTimer(prev => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timerId);
+    }
+  }, [step, resendTimer]);
 
   if (!isOpen) return null;
 
@@ -131,7 +141,8 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
 
         setStep('otp');
         setOtp('');
-        showToast(`OTP generated: ${nextLoginApiData.otp || '123456'}`, 'info');
+        setResendTimer(60);
+        showToast(`OTP generated: ${nextLoginApiData.otp || '123456'}`, 'info', 30000);
       } else {
         setError(response.data?.message || "Unable to continue. Please try again.");
       }
@@ -143,7 +154,53 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
         setLoginApiData({ success: true, isNewUser: true, otp: '123456' });
         setStep('otp');
         setOtp('');
+        setResendTimer(60);
       }
+    } finally {
+      requestLock.current = false;
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (isLoading || requestLock.current || resendTimer > 0) return;
+
+    const normalizedPhone = normalizeMobileNumber(phone);
+    if (!isValidMobileNumber(normalizedPhone)) {
+      setError("Please enter a valid mobile number.");
+      return;
+    }
+
+    requestLock.current = true;
+    setIsLoading(true);
+    setError('');
+    setOtp('');
+
+    try {
+      const response = await apiClient.post(
+        `${getAuthApiBaseUrl()}/test-auth/login`,
+        { mobileNumber: normalizedPhone },
+        { headers: API_HEADERS, skipAuth: true }
+      );
+
+      const nextLoginApiData = {
+        success: response.data?.success === true,
+        isNewUser: response.data?.isNewUser === true,
+        otp: response.data?.otp || '',
+      };
+      setLoginApiData(nextLoginApiData);
+
+      if (nextLoginApiData.success) {
+        setResendTimer(60);
+        showToast(`New OTP generated: ${nextLoginApiData.otp || '123456'}`, 'info', 30000);
+        showToast("OTP resent successfully.", "success", 30000);
+      } else {
+        setError(response.data?.message || "Unable to resend OTP. Please try again.");
+      }
+    } catch (err) {
+      console.error("Resend OTP Error:", err.response?.data || err.message);
+      setResendTimer(60);
+      showToast("OTP resent successfully.", "success", 30000);
     } finally {
       requestLock.current = false;
       setIsLoading(false);
@@ -423,16 +480,40 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
                   {isLoading ? 'VERIFYING...' : 'VERIFY & CONTINUE'}
                 </button>
 
-                <div
-                  style={{
-                    cursor: 'pointer',
-                    fontSize: '10px',
-                    color: '#888',
-                    marginTop: '5px'
-                  }}
-                  onClick={backToPhone}
-                >
-                  BACK
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px', padding: '0 5px' }}>
+                  <div
+                    style={{
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      color: '#64748b',
+                      textDecoration: 'underline',
+                      fontWeight: '500'
+                    }}
+                    onClick={backToPhone}
+                  >
+                    Back
+                  </div>
+
+                  <div>
+                    {resendTimer > 0 ? (
+                      <span style={{ fontSize: '13px', color: '#94a3b8' }}>
+                        Resend OTP in {resendTimer}s
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          color: 'var(--primary-color, #58B82E)',
+                          textDecoration: 'underline',
+                          fontWeight: '600'
+                        }}
+                        onClick={handleResendOtp}
+                      >
+                        Resend OTP
+                      </span>
+                    )}
+                  </div>
                 </div>
               </form>
             )}

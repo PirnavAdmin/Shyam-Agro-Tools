@@ -15,6 +15,9 @@ namespace ShyamAgroSuite.Api.DTOs
         public int SubcategoryId { get; set; }
         public List<IFormFile> Images { get; set; }
         public IFormFile? Video { get; set; }
+        public IFormFile? Poster { get; set; }
+        public IFormFile? PosterFile { get; set; }
+        public string? PosterUrl { get; set; }
         public string ShortDescription { get; set; }
         public string ProductDetails { get; set; }
         public string PackageIncludes { get; set; }

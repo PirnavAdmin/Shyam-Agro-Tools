@@ -141,7 +141,7 @@ using (var cleanupScope = app.Services.CreateScope())
                 Console.WriteLine($"[Startup] Removed {deleted} legacy supplier record(s).");
         }
 
-        // 1b. Ensure ProductReviews.Rating column is DECIMAL(5,2)
+        // 1b. Ensure ProductReviews.Rating column is DECIMAL(5,2) and Products.PosterUrl column exists
         using (var cmd = conn.CreateCommand())
         {
             try
@@ -153,6 +153,26 @@ using (var cleanupScope = app.Services.CreateScope())
             catch (Exception ex)
             {
                 Console.WriteLine($"[Startup] ProductReviews.Rating column alter info: {ex.Message}");
+            }
+
+            try
+            {
+                cmd.CommandText = "ALTER TABLE Products ADD COLUMN PosterUrl VARCHAR(500) NULL";
+                cmd.ExecuteNonQuery();
+                Console.WriteLine("[Startup] Added PosterUrl column to Products table.");
+            }
+            catch { }
+
+            try
+            {
+                cmd.CommandText = "DELETE FROM ProductImages WHERE ImageUrl LIKE '%370ef329%' AND ProductId IN (44, 45, 46)";
+                int removedPosters = cmd.ExecuteNonQuery();
+                if (removedPosters > 0)
+                    Console.WriteLine($"[Startup] Removed {removedPosters} default poster image(s) from ProductImages table.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Startup] Poster cleanup info: {ex.Message}");
             }
         }
 

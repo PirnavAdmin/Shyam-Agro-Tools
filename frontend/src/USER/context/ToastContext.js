@@ -8,7 +8,7 @@ export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState(null);
   const timerRef = useRef(null);
 
-  const showToast = useCallback((message, type = 'success') => {
+  const showToast = useCallback((message, type = 'success', duration = 2200) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -21,7 +21,7 @@ export const ToastProvider = ({ children }) => {
 
     timerRef.current = setTimeout(() => {
       setToast(null);
-    }, 2200);
+    }, duration);
   }, []);
 
   useEffect(() => {

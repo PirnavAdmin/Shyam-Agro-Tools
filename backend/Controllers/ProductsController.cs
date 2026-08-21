@@ -145,6 +145,23 @@ namespace ShyamAgroSuite.Api.Controllers
                 videoPath = "/uploads/videos/" + videoFileName;
             }
 
+            // Handle Poster (optional)
+            string? posterPath = dto.PosterUrl;
+            var posterFile = dto.Poster ?? dto.PosterFile;
+            if (posterFile != null)
+            {
+                var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
+                Directory.CreateDirectory(imagesFolder);
+
+                var posterFileName = "poster_" + Guid.NewGuid().ToString() + Path.GetExtension(posterFile.FileName);
+                var posterFilePath = Path.Combine(imagesFolder, posterFileName);
+
+                using (var stream = new FileStream(posterFilePath, FileMode.Create))
+                    await posterFile.CopyToAsync(stream);
+
+                posterPath = "/uploads/images/" + posterFileName;
+            }
+
             // Handle Features
             var featuresList = new List<ProductFeature>();
             if (dto.Features != null && dto.Features.Count > 0)
@@ -258,6 +275,7 @@ namespace ShyamAgroSuite.Api.Controllers
                 CountryOfOrigin = dto.CountryOfOrigin,
                 EstimatedDelivery = dto.EstimatedDelivery,
                 DeliveryReturn = dto.DeliveryReturn,
+                PosterUrl = posterPath,
                 AverageRating = averageRating,
                 TotalReviews = totalReviews,
                 FiveStar = fiveStar,
@@ -482,6 +500,27 @@ namespace ShyamAgroSuite.Api.Controllers
             product.CountryOfOrigin = dto.CountryOfOrigin;
             product.EstimatedDelivery = dto.EstimatedDelivery;
             product.DeliveryReturn = dto.DeliveryReturn;
+            
+            // Handle Poster (optional)
+            var updatePosterFile = dto.Poster ?? dto.PosterFile;
+            if (updatePosterFile != null)
+            {
+                var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
+                Directory.CreateDirectory(imagesFolder);
+
+                var posterFileName = "poster_" + Guid.NewGuid().ToString() + Path.GetExtension(updatePosterFile.FileName);
+                var posterFilePath = Path.Combine(imagesFolder, posterFileName);
+
+                using (var stream = new FileStream(posterFilePath, FileMode.Create))
+                    await updatePosterFile.CopyToAsync(stream);
+
+                product.PosterUrl = "/uploads/images/" + posterFileName;
+            }
+            else if (dto.PosterUrl != null)
+            {
+                product.PosterUrl = dto.PosterUrl;
+            }
+
             product.AverageRating = averageRating;
             product.TotalReviews = totalReviews;
             product.FiveStar = fiveStar;

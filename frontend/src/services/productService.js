@@ -201,6 +201,9 @@ export const normalizeProduct = (product = {}) => {
     countryOfOrigin: firstValue(product.countryOfOrigin, product.CountryOfOrigin, ''),
     brand: firstValue(product.brand, product.Brand, ''),
     sku: firstValue(product.sku, product.SKU, product.Sku, ''),
+    posterUrl: firstValue(product.posterUrl, product.PosterUrl, product.posterImage, product.PosterImage, product.poster, product.Poster, '')
+      ? getProductAssetUrl(firstValue(product.posterUrl, product.PosterUrl, product.posterImage, product.PosterImage, product.poster, product.Poster, ''))
+      : '',
     madeInIndia: String(firstValue(product.countryOfOrigin, product.CountryOfOrigin, '')).toLowerCase() === 'india',
   };
 };

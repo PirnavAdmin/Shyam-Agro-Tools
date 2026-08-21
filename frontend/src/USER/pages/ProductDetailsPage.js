@@ -43,10 +43,7 @@ const normalizeDetailImageUrl = (url) => {
   if (!url) return FALLBACK_IMAGE;
   if (typeof url === 'string') {
     const raw = url.trim();
-    if (raw.includes('biofit_detailed_info')) {
-      return '/biofit_detailed_info.png';
-    }
-    if (raw.startsWith('/biofit') || raw.startsWith('data:') || raw.startsWith('blob:')) {
+    if (raw.startsWith('data:') || raw.startsWith('blob:')) {
       return raw;
     }
   }
@@ -159,13 +156,10 @@ const ProductDetailsPage = () => {
   const { mappedCategories } = useCategories();
 
   const posterGraphicUrl = useMemo(() => {
-    if (product?.posterUrl) return normalizeDetailImageUrl(product.posterUrl);
-    if (product?.posterImage) return normalizeDetailImageUrl(product.posterImage);
-    if (product?.poster) return normalizeDetailImageUrl(product.poster);
-
-    const productNameStr = `${product?.name || ''} ${product?.productName || ''} ${product?.displayName || ''}`.toLowerCase();
-    if (productNameStr.includes('larvicide')) return '/biofit_larvicide_detailed_info.png';
-    if (productNameStr.includes('antiviral') || productNameStr.includes('biofit')) return '/biofit_detailed_info.png';
+    const rawPoster = product?.posterUrl || product?.posterImage || product?.poster;
+    if (rawPoster && typeof rawPoster === 'string' && rawPoster.trim()) {
+      return normalizeDetailImageUrl(rawPoster.trim());
+    }
     return null;
   }, [product]);
 
@@ -262,8 +256,7 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    // Default page hero view to front bottle image as before (index 1 if detailed info poster is index 0)
-    setSelectedMediaIndex(mediaItems.length > 1 ? 1 : 0);
+    setSelectedMediaIndex(0);
     setQuantity(1);
     setVideoError(false);
     setReviewList([]);

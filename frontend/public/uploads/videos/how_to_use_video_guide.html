@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biofit Antiviral - Product Views & Animated Usage Video</title>
+  <style>
+    :root {
+      --primary: #d92525;
+      --primary-dark: #a31515;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-yellow: #eab308;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      padding: 0.25rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    /* Video Player Container */
+    .video-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+      margin-bottom: 3rem;
+    }
+
+    .video-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .video-header h2 {
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .video-player {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .slide-stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      pointer-events: none;
+    }
+
+    .slide-stage.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .slide-stage img {
+      max-height: 85%;
+      max-width: 90%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+    }
+
+    .step-overlay {
+      position: absolute;
+      bottom: 70px;
+      left: 20px;
+      right: 20px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+    }
+
+    .step-number {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .step-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 0.1rem;
+    }
+
+    .step-desc {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      margin-top: 0.25rem;
+    }
+
+    /* Video Controls */
+    .controls-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4));
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+      z-index: 10;
+    }
+
+    .play-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .play-btn:hover {
+      background: #ef4444;
+      transform: scale(1.08);
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.1s linear;
+    }
+
+    .step-markers {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--accent);
+    }
+
+    /* Gallery Views Grid */
+    .views-section {
+      margin-top: 2rem;
+    }
+
+    .views-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #334155;
+      padding-bottom: 0.5rem;
+    }
+
+    .views-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .view-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .view-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .view-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .view-card .caption {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .view-card .caption h3 {
+      font-size: 1.05rem;
+      color: #fff;
+    }
+
+    .view-card .caption p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <span class="badge">🌱 Biofit Agro Protection Series</span>
+    <h1>Biofit Antiviral Product Showcase & Usage Guide</h1>
+    <p>Complete 360° product visual views and interactive animated usage video</p>
+  </header>
+
+  <!-- Interactive Animated Video Section -->
+  <section class="video-section">
+    <div class="video-header">
+      <h2>🎬 Animated Usage Guide: How to Apply Biofit Antiviral</h2>
+      <span style="font-size: 0.85rem; color: var(--accent);">● Interactive Video Demo</span>
+    </div>
+
+    <div class="video-player" id="videoPlayer">
+      
+      <!-- Slide 1: Introduction -->
+      <div class="slide-stage active" id="slide0">
+        <img src="media_1787027663320.png" alt="Biofit Product Bottle">
+        <div class="step-overlay">
+          <div class="step-number">Overview</div>
+          <div class="step-title">Biofit Antiviral Eco-Friendly Solution</div>
+          <div class="step-desc">Protect plant foliage and crops against viral diseases with 100% natural, eco-friendly broad-spectrum antiviral spray.</div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Step 1 Dilution -->
+      <div class="slide-stage" id="slide1">
+        <img src="usage_step1_dilution_1787032469726.jpg" alt="Step 1: Dilution">
+        <div class="step-overlay">
+          <div class="step-number">Step 1 of 3</div>
+          <div class="step-title">Measure Correct Dilution Ratio</div>
+          <div class="step-desc">Measure 2 ml to 3 ml of Biofit Antiviral concentrate liquid per 1 Liter of clean water using the measuring cup.</div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Step 2 Mixing -->
+      <div class="slide-stage" id="slide2">
+        <img src="usage_step2_mixing_1787033133582.jpg" alt="Step 2: Mixing">
+        <div class="step-overlay">
+          <div class="step-number">Step 2 of 3</div>
+          <div class="step-title">Mix Thoroughly in Sprayer Tank</div>
+          <div class="step-desc">Pour the measured Biofit liquid into your garden or agricultural knapsack sprayer and mix well with water.</div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Step 3 Spraying -->
+      <div class="slide-stage" id="slide3">
+        <img src="biofit_angled_view_1787028231500.jpg" alt="Step 3: Application">
+        <div class="step-overlay">
+          <div class="step-number">Step 3 of 3</div>
+          <div class="step-title">Foliar Spray Application</div>
+          <div class="step-desc">Spray evenly on upper and lower surfaces of crop leaves during early morning or evening for maximum antiviral protection.</div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-bar">
+        <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+        <div class="progress-bar-bg" onclick="seekVideo(event)">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="step-markers">
+          <div class="step-dot active" onclick="goToSlide(0)"></div>
+          <div class="step-dot" onclick="goToSlide(1)"></div>
+          <div class="step-dot" onclick="goToSlide(2)"></div>
+          <div class="step-dot" onclick="goToSlide(3)"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Views Gallery -->
+  <section class="views-section">
+    <h2>📸 Multi-Angle Product Views</h2>
+    <div class="views-grid">
+
+      <!-- Front View -->
+      <div class="view-card">
+        <img src="media_1787027663320.png" alt="Front View">
+        <div class="caption">
+          <h3>Front View</h3>
+          <p>Main brand label & antiviral emblem</p>
+        </div>
+      </div>
+
+      <!-- Back View -->
+      <div class="view-card">
+        <img src="biofit_back_view_1787028037979.jpg" alt="Back View">
+        <div class="caption">
+          <h3>Back View</h3>
+          <p>Composition & dosage instructions</p>
+        </div>
+      </div>
+
+      <!-- Left View -->
+      <div class="view-card">
+        <img src="biofit_left_view_1787032199270.jpg" alt="Left View">
+        <div class="caption">
+          <h3>Left Side View</h3>
+          <p>Ingredients & eco certifications</p>
+        </div>
+      </div>
+
+      <!-- Right View -->
+      <div class="view-card">
+        <img src="biofit_right_view_1787032431676.jpg" alt="Right View">
+        <div class="caption">
+          <h3>Right Side View</h3>
+          <p>Volume specs & safety symbols</p>
+        </div>
+      </div>
+
+      <!-- 3D Angled View -->
+      <div class="view-card">
+        <img src="biofit_angled_view_1787028231500.jpg" alt="3D Angled View">
+        <div class="caption">
+          <h3>3D Perspective View</h3>
+          <p>45-degree angle studio presentation</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+  let currentSlide = 0;
+  const totalSlides = 4;
+  let isPlaying = false;
+  let timer = null;
+  let progressVal = 0;
+
+  function updateSlideDisplay() {
+    for (let i = 0; i < totalSlides; i++) {
+      document.getElementById('slide' + i).classList.remove('active');
+      document.querySelectorAll('.step-dot')[i].classList.remove('active');
+    }
+    document.getElementById('slide' + currentSlide).classList.add('active');
+    document.querySelectorAll('.step-dot')[currentSlide].classList.add('active');
+  }
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    const btn = document.getElementById('playBtn');
+    if (isPlaying) {
+      btn.innerText = '❚❚';
+      startVideoLoop();
+    } else {
+      btn.innerText = '▶';
+      clearInterval(timer);
+    }
+  }
+
+  function startVideoLoop() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      progressVal += 1;
+      if (progressVal >= 100) {
+        progressVal = 0;
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlideDisplay();
+      }
+      document.getElementById('progressFill').style.width = progressVal + '%';
+    }, 50);
+  }
+
+  function goToSlide(index) {
+    currentSlide = index;
+    progressVal = (index / totalSlides) * 100;
+    document.getElementById('progressFill').style.width = progressVal + '%';
+    updateSlideDisplay();
+  }
+
+  function seekVideo(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const pct = clickX / rect.width;
+    currentSlide = Math.floor(pct * totalSlides);
+    if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+    progressVal = pct * 100;
+    document.getElementById('progressFill').style.width = progressVal + '%';
+    updateSlideDisplay();
+  }
+
+  // Auto start playback on load
+  togglePlay();
+</script>
+
+</body>
+</html>

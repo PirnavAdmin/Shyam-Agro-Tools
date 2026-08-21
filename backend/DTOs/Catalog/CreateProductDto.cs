@@ -17,6 +17,9 @@ namespace ShyamAgroSuite.Api.DTOs.Catalog
 
         public List<IFormFile> Images { get; set; } = new();
         public IFormFile? Video { get; set; }
+        public IFormFile? Poster { get; set; }
+        public IFormFile? PosterFile { get; set; }
+        public string? PosterUrl { get; set; }
 
         public string ShortDescription { get; set; } = string.Empty;
         public string ProductDetails { get; set; } = string.Empty;

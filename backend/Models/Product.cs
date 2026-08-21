@@ -61,6 +61,8 @@ namespace ShyamAgroSuite.Api.Models
         public string? EstimatedDelivery { get; set; }
         public string? DeliveryReturn { get; set; }
 
+        public string? PosterUrl { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         public List<ProductImage> Images { get; set; } = new();
