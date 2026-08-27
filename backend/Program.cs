@@ -506,11 +506,14 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-// CORS MUST come before Authentication
+// CORS MUST come first before any redirection or static files
 app.UseCors("AllowAll");
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -122,10 +122,11 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
         { headers: API_HEADERS, skipAuth: true }
       );
 
+      const responseOtp = response.data?.otp || response.data?.OTP || '';
       const nextLoginApiData = {
-        success: response.data?.success === true,
-        isNewUser: response.data?.isNewUser === true,
-        otp: response.data?.otp || '',
+        success: response.data?.success === true || response.data?.Success === true,
+        isNewUser: response.data?.isNewUser === true || response.data?.IsNewUser === true,
+        otp: responseOtp || Math.floor(1000 + Math.random() * 9000).toString(),
       };
       setLoginApiData(nextLoginApiData);
 
@@ -142,7 +143,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
         setStep('otp');
         setOtp('');
         setResendTimer(60);
-        showToast(`OTP generated: ${nextLoginApiData.otp}`, 'info', 30000);
+        showToast(`OTP generated: ${nextLoginApiData.otp}`, 'success', 30000);
       } else {
         setError(response.data?.message || "Unable to continue. Please try again.");
       }
@@ -156,7 +157,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
         setStep('otp');
         setOtp('');
         setResendTimer(60);
-        showToast(`OTP generated: ${generatedRandomOtp}`, 'info', 30000);
+        showToast(`OTP generated: ${generatedRandomOtp}`, 'success', 30000);
       }
     } finally {
       requestLock.current = false;
@@ -185,17 +186,17 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
         { headers: API_HEADERS, skipAuth: true }
       );
 
+      const responseOtp = response.data?.otp || response.data?.OTP || '';
       const nextLoginApiData = {
-        success: response.data?.success === true,
-        isNewUser: response.data?.isNewUser === true,
-        otp: response.data?.otp || '',
+        success: response.data?.success === true || response.data?.Success === true,
+        isNewUser: response.data?.isNewUser === true || response.data?.IsNewUser === true,
+        otp: responseOtp || Math.floor(1000 + Math.random() * 9000).toString(),
       };
       setLoginApiData(nextLoginApiData);
 
       if (nextLoginApiData.success) {
         setResendTimer(60);
-        showToast(`New OTP generated: ${nextLoginApiData.otp}`, 'info', 30000);
-        showToast("OTP resent successfully.", "success", 30000);
+        showToast(`OTP resent: ${nextLoginApiData.otp}`, 'success', 30000);
       } else {
         setError(response.data?.message || "Unable to resend OTP. Please try again.");
       }
@@ -204,8 +205,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
       const generatedRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
       setLoginApiData({ success: true, isNewUser: true, otp: generatedRandomOtp });
       setResendTimer(60);
-      showToast(`New OTP generated: ${generatedRandomOtp}`, 'info', 30000);
-      showToast("OTP resent successfully.", "success", 30000);
+      showToast(`OTP resent: ${generatedRandomOtp}`, 'success', 30000);
     } finally {
       requestLock.current = false;
       setIsLoading(false);
@@ -383,6 +383,23 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
             <>
               <h2>VERIFY MOBILE</h2>
               <p>Please enter the OTP to verify ownership of this number.</p>
+              {loginApiData.otp && (
+                <div
+                  style={{
+                    backgroundColor: '#eefbdf',
+                    color: '#388e3c',
+                    border: '1px solid #c8e6c9',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    margin: '10px 0',
+                    textAlign: 'center'
+                  }}
+                >
+                  Your OTP is: <span style={{ fontSize: '16px', letterSpacing: '2px', color: '#2e7d32' }}>{loginApiData.otp}</span>
+                </div>
+              )}
             </>
           )}
 

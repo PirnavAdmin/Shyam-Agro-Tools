@@ -207,14 +207,49 @@ namespace ShyamAgroSuite.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<IActionResult> GetCategories()
         {
-            var categories = await _context.Categories
-                .Include(c => c.Subcategories)
-                .OrderBy(c => c.DisplayOrder)
-                .ThenBy(c => c.Id)
-                .ToListAsync();
-            return Ok(categories);
+            try
+            {
+                var categories = await _context.Categories
+                    .AsNoTracking()
+                    .Include(c => c.Subcategories)
+                    .OrderBy(c => c.DisplayOrder)
+                    .ThenBy(c => c.Id)
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.Name,
+                        c.Description,
+                        c.ImageUrl,
+                        c.IsActive,
+                        c.DisplayOrder,
+                        c.Slug,
+                        categoryName = c.Name,
+                        category_name = c.Name,
+                        categoryDescription = c.Description,
+                        subcategories = c.Subcategories.Select(s => new
+                        {
+                            s.Id,
+                            s.CategoryId,
+                            s.Name,
+                            s.Description,
+                            s.IsActive,
+                            s.DisplayOrder,
+                            s.Slug,
+                            subcategoryName = s.Name,
+                            subcategory_name = s.Name
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CategoryController Error] {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpPost]

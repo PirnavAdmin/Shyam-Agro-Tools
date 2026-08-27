@@ -8,6 +8,7 @@ export const SUBCATEGORY_API_BASE_URL = (
   process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   getApiDomain()
 ).replace(/\/$/, '');
+
 export const DEFAULT_SUBCATEGORY_IMAGE = '/hero_banner.png';
 const SUBCATEGORY_ENDPOINT = `${SUBCATEGORY_API_BASE_URL}/api/Subcategory`;
 const requestConfig = {
@@ -22,7 +23,6 @@ export const getSubcategoryImage = (image) => {
   if (!image || typeof image !== 'string' || !image.trim()) {
     return DEFAULT_SUBCATEGORY_IMAGE;
   }
-
   return normalizeAssetUrl(image, SUBCATEGORY_API_BASE_URL, DEFAULT_SUBCATEGORY_IMAGE);
 };
 
@@ -33,16 +33,15 @@ export const getSubcategories = async () => {
     });
   }
   const response = await subcategoriesRequest;
+  const rawList = Array.isArray(response.data)
+    ? response.data
+    : (Array.isArray(response.data?.data) ? response.data.data : (Array.isArray(response.data?.value) ? response.data.value : []));
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid Subcategory API response');
-  }
-
-  const subcategories = response.data.map((subcategory) => ({
+  const subcategories = rawList.map((subcategory) => ({
     id: subcategory.id,
     categoryId: subcategory.categoryId,
-    name: subcategory.name,
-    description: subcategory.description,
+    name: subcategory.name || subcategory.subcategoryName || '',
+    description: subcategory.description || '',
     imageUrl:
       subcategory.imageUrl ||
       subcategory.image ||
@@ -53,8 +52,8 @@ export const getSubcategories = async () => {
       subcategory.filePath ||
       subcategory.imagePath ||
       '',
-    isActive: subcategory.isActive,
-    slug: subcategory.slug,
+    isActive: subcategory.isActive !== false,
+    slug: subcategory.slug || '',
   }));
 
   return Array.from(

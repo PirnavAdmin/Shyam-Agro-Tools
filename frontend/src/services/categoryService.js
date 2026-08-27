@@ -38,18 +38,17 @@ export const getCategories = async () => {
     });
   }
   const response = await categoriesRequest;
+  const rawList = Array.isArray(response.data)
+    ? response.data
+    : (Array.isArray(response.data?.data) ? response.data.data : (Array.isArray(response.data?.value) ? response.data.value : []));
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid Category API response');
-  }
-
-  const categories = response.data.map((category) => ({
+  const categories = rawList.map((category) => ({
     id: category.id,
-    name: category.name,
-    description: category.description,
-    imageUrl: category.imageUrl,
-    isActive: category.isActive,
-    slug: category.slug,
+    name: category.name || category.categoryName || '',
+    description: category.description || '',
+    imageUrl: category.imageUrl || category.image || '',
+    isActive: category.isActive !== false,
+    slug: category.slug || '',
   }));
 
   return Array.from(

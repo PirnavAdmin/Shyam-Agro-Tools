@@ -22,11 +22,33 @@ namespace ShyamAgroSuite.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Subcategory>>> GetSubcategories()
+        public async Task<IActionResult> GetSubcategories()
         {
-            return await _context.Subcategories
-                .Include(s => s.Category)
-                .ToListAsync();
+            try
+            {
+                var subcategories = await _context.Subcategories
+                    .AsNoTracking()
+                    .Select(s => new
+                    {
+                        s.Id,
+                        s.CategoryId,
+                        s.Name,
+                        s.Description,
+                        s.IsActive,
+                        s.DisplayOrder,
+                        s.Slug,
+                        subcategoryName = s.Name,
+                        subcategory_name = s.Name,
+                        categoryName = s.Category != null ? s.Category.Name : ""
+                    })
+                    .ToListAsync();
+                return Ok(subcategories);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SubcategoryController Error] {ex.Message}");
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
