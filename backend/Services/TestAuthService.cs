@@ -157,7 +157,7 @@ namespace ShyamAgroSuite.Api.Services
             if (user == null)
                 throw new Exception("User not found");
 
-            if (request.OTP != "123456" && request.OTP != "1234" && (string.IsNullOrEmpty(user.OTP) || user.OTP != request.OTP))
+            if (string.IsNullOrEmpty(user.OTP) || user.OTP != request.OTP)
                 throw new Exception("Invalid or expired OTP");
 
             // Expire OTP after 10 minutes

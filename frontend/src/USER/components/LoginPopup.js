@@ -65,7 +65,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
   const handleOtpChange = (e) => {
     const value = e.target.value
       .replace(/\D/g, '')
-      .slice(0, 6);
+      .slice(0, 4);
 
     setOtp(value);
   };
@@ -142,7 +142,7 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
         setStep('otp');
         setOtp('');
         setResendTimer(60);
-        showToast(`OTP generated: ${nextLoginApiData.otp || '123456'}`, 'info', 30000);
+        showToast(`OTP generated: ${nextLoginApiData.otp}`, 'info', 30000);
       } else {
         setError(response.data?.message || "Unable to continue. Please try again.");
       }
@@ -151,10 +151,12 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
       if (authMode === 'signin') {
         setError("This mobile number is not registered. Please sign up first.");
       } else {
-        setLoginApiData({ success: true, isNewUser: true, otp: '123456' });
+        const generatedRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        setLoginApiData({ success: true, isNewUser: true, otp: generatedRandomOtp });
         setStep('otp');
         setOtp('');
         setResendTimer(60);
+        showToast(`OTP generated: ${generatedRandomOtp}`, 'info', 30000);
       }
     } finally {
       requestLock.current = false;
@@ -192,14 +194,17 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
 
       if (nextLoginApiData.success) {
         setResendTimer(60);
-        showToast(`New OTP generated: ${nextLoginApiData.otp || '123456'}`, 'info', 30000);
+        showToast(`New OTP generated: ${nextLoginApiData.otp}`, 'info', 30000);
         showToast("OTP resent successfully.", "success", 30000);
       } else {
         setError(response.data?.message || "Unable to resend OTP. Please try again.");
       }
     } catch (err) {
       console.error("Resend OTP Error:", err.response?.data || err.message);
+      const generatedRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+      setLoginApiData({ success: true, isNewUser: true, otp: generatedRandomOtp });
       setResendTimer(60);
+      showToast(`New OTP generated: ${generatedRandomOtp}`, 'info', 30000);
       showToast("OTP resent successfully.", "success", 30000);
     } finally {
       requestLock.current = false;
@@ -242,8 +247,8 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
       }
     } catch (err) {
       console.error("OTP Verification Error:", err.response?.data || err.message);
-      const expectedOtp = String(loginApiData.otp || '123456').trim();
-      if (otp.trim() === expectedOtp || otp.trim() === '123456' || otp.trim() === '1234') {
+      const expectedOtp = String(loginApiData.otp || '').trim();
+      if (expectedOtp && otp.trim() === expectedOtp) {
         if (loginApiData.isNewUser) {
           setStep('details');
         } else {
@@ -464,8 +469,8 @@ const LoginPopup = ({ isOpen, onClose, redirectTo }) => {
                   type="text"
                   name="otp"
                   className="premium-input-field"
-                  placeholder="ENTER 6-DIGIT OTP"
-                  maxLength="6"
+                  placeholder="ENTER 4-DIGIT OTP"
+                  maxLength="4"
                   required
                   value={otp}
                   onChange={handleOtpChange}
