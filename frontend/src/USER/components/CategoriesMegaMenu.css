@@ -1,0 +1,42 @@
+.mega-menu-container {
+  width: 860px;
+  max-width: 90vw;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+  animation: megaMenuFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes megaMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mega-cat-item {
+  border-left-width: 0px;
+}
+
+.mega-cat-item:hover {
+  border-left-width: 4px;
+}
+
+.mega-sub-item {
+  border-right-width: 0px;
+}
+
+.mega-col-categories::-webkit-scrollbar,
+.mega-col-subcategories::-webkit-scrollbar,
+.mega-col-products::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mega-col-categories::-webkit-scrollbar-thumb,
+.mega-col-subcategories::-webkit-scrollbar-thumb,
+.mega-col-products::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}

@@ -1,0 +1,219 @@
+/* ═══════════════════════════════════════════════
+   PIRNAV EMS DASHBOARD DESIGN SYSTEM
+   Professional Soft Mint & Forest Cyan Palette
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --sidebar-collapsed: 72px;
+  --sidebar-expanded:  260px;
+  --sidebar-duration:  0.28s;
+  --topbar-height:     70px;
+
+  /* PIRNAV EMS Color Palette */
+  --ems-bg:             #F0F8F6;
+  --ems-card-bg:        #FFFFFF;
+  --ems-input-bg:       #F2F9F7;
+  --ems-border:         #D6EAE5;
+  --ems-primary:        #005F53;
+  --ems-primary-light:  #0D9488;
+  --ems-active-pill:   #D8EFEA;
+  --ems-text-dark:      #0A3832;
+  --ems-text-body:      #1E293B;
+  --ems-text-muted:     #527870;
+}
+
+/* ── Grid Layout ── */
+.admin-layout {
+  display: grid;
+  grid-template-rows: var(--topbar-height) 1fr;
+  grid-template-areas:
+    "topbar"
+    "main";
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--ems-bg);
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  color: var(--ems-text-body);
+}
+
+/* ── Fixed Sidebar ── */
+.admin-sidebar-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: var(--sidebar-collapsed);
+  z-index: 200;
+  transition: width var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible !important;
+}
+
+/* Expanded state */
+.admin-layout.sidebar-open .admin-sidebar-area {
+  width: var(--sidebar-expanded);
+  box-shadow: 4px 0 24px rgba(0, 95, 83, 0.04);
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.admin-layout.sidebar-closed .admin-sidebar-area {
+  overflow: visible !important;
+}
+
+/* ── Topbar – shifts with sidebar ── */
+.admin-topbar-area {
+  grid-area: topbar;
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-collapsed);
+  right: 0;
+  height: var(--topbar-height);
+  z-index: 190;
+  transition: left var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-layout.sidebar-open .admin-topbar-area {
+  left: var(--sidebar-expanded);
+}
+
+/* ── Main Content – shifts with sidebar ── */
+.admin-main-content {
+  grid-area: main;
+  position: fixed;
+  top: var(--topbar-height);
+  left: var(--sidebar-collapsed);
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.8rem 2.2rem;
+  scroll-behavior: smooth;
+  background: var(--ems-bg);
+  transition: left var(--sidebar-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.admin-main-content::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-layout.sidebar-open .admin-main-content {
+  left: var(--sidebar-expanded);
+}
+
+/* Global Card Styling for Admin Modules to match EMS */
+.admin-main-content .dashboard-card,
+.admin-main-content .catalog-container,
+.admin-main-content .customers-list-container,
+.admin-main-content .orders-list-container,
+.admin-main-content .banners-list-container,
+.admin-main-content .coupons-list-container,
+.admin-main-content .stock-updates-container,
+.admin-main-content .admin-card,
+.admin-main-content .settings-container {
+  background: var(--ems-card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--ems-border);
+  box-shadow: 0 2px 12px rgba(0, 95, 83, 0.03);
+}
+
+.admin-main-content h1,
+.admin-main-content h2,
+.admin-main-content h3 {
+  color: var(--ems-text-dark);
+  font-weight: 800;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-collapsed: 0px;
+  }
+  .admin-main-content {
+    padding: 1.2rem;
+  }
+}
+
+/* ── Manager Read-Only Warning Banner ── */
+.manager-read-only-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fef3c7;          /* slightly deeper amber tint for contrast baseline */
+  border: 1.5px solid #d97706;  /* strong amber border, visible in bright light */
+  color: #78350f;               /* darkened: was #b45309 (~3.4:1) → now ~7.6:1 ✓ WCAG AA */
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13.5px;            /* slightly larger for legibility */
+  font-weight: 600;             /* bolder than 500 for better readability */
+  box-shadow: 0 1px 4px rgba(180, 83, 9, 0.12);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Access Denied Panel ── */
+.access-denied-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: white;
+  border: 1px solid var(--ems-border);
+  border-radius: 16px;
+  padding: 48px 32px;
+  max-width: 520px;
+  margin: 40px auto 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.access-denied-view svg {
+  margin-bottom: 20px;
+}
+
+.access-denied-view h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ems-text-dark);
+  margin: 0 0 10px;
+}
+
+.access-denied-view p {
+  font-size: 14px;
+  color: var(--ems-text-muted);
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+.access-denied-view code {
+  background: #f1f5f9;
+  color: #ef4444;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.access-denied-view button {
+  background: var(--ems-primary);
+  color: white;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  box-shadow: 0 2px 4px rgba(0, 95, 83, 0.25);
+}
+
+.access-denied-view button:hover {
+  background: var(--ems-primary-light);
+}

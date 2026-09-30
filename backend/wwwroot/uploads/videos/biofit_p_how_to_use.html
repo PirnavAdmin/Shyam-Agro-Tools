@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biofit P - How To Use Video Guide</title>
+  <style>
+    :root {
+      --primary: #9333ea;
+      --primary-hover: #a855f7;
+      --bg: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.92);
+      --text: #f8fafc;
+      --accent: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); }
+    .video-container { position: relative; width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .slide-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; background: #000; }
+    .slide-stage.active { opacity: 1; pointer-events: auto; }
+    .slide-stage img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
+    .caption-overlay { position: absolute; bottom: 72px; left: 20px; right: 20px; background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 1rem 1.25rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); }
+    .step-pill { display: inline-block; background: rgba(147, 51, 234, 0.25); color: #c084fc; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 9999px; margin-bottom: 0.35rem; border: 1px solid rgba(147, 51, 234, 0.4); }
+    .step-title { font-size: 1.15rem; font-weight: 700; color: #ffffff; line-height: 1.3; }
+    .step-desc { font-size: 0.9rem; color: #cbd5e1; margin-top: 0.25rem; line-height: 1.4; }
+    .controls-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 64px; background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.4)); display: flex; align-items: center; padding: 0 1.25rem; gap: 1rem; z-index: 20; }
+    .play-btn { background: var(--primary); color: #ffffff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: background 0.2s; }
+    .progress-bar-track { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.25); border-radius: 3px; cursor: pointer; overflow: hidden; position: relative; }
+    .progress-bar-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.1s linear; }
+    .timer-display { font-size: 0.8rem; font-weight: 600; color: #94a3b8; min-width: 42px; }
+    .step-indicators { display: flex; gap: 0.4rem; }
+    .indicator-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); cursor: pointer; transition: background 0.3s; }
+    .indicator-dot.active { background: var(--primary); transform: scale(1.2); }
+  </style>
+</head>
+<body>
+<div class="video-container" id="videoContainer">
+  <div class="slide-stage active" id="slide0">
+    <img src="biofit_p_front_clean_1787287827307.jpg" alt="Biofit P Product">
+    <div class="caption-overlay">
+      <span class="step-pill">Product Overview</span>
+      <h2 class="step-title">Biofit P Phosphate Solubilising Bacteria</h2>
+      <p class="step-desc">Biological biofertilizer that converts insoluble soil phosphorus into available form for plant absorption.</p>
+    </div>
+  </div>
+  <div class="slide-stage" id="slide1">
+    <img src="biofit_p_step1_measuring_1787287987196.jpg" alt="Step 1: Dilution">
+    <div class="caption-overlay">
+      <span class="step-pill">Step 1 of 3</span>
+      <h2 class="step-title">Measure Correct Dosage</h2>
+      <p class="step-desc">Measure 1 ml to 2 ml of Biofit P concentrate liquid per 1 Liter of clean water using a measuring cup.</p>
+    </div>
+  </div>
+  <div class="slide-stage" id="slide2">
+    <img src="biofit_p_step2_mixing_1787288021204.jpg" alt="Step 2: Soil Drenching">
+    <div class="caption-overlay">
+      <span class="step-pill">Step 2 of 3</span>
+      <h2 class="step-title">Soil Application & Root Drenching</h2>
+      <p class="step-desc">Mix into sprayer or irrigation water and drench around root zones for enhanced flowering and root growth.</p>
+    </div>
+  </div>
+  <div class="controls-bar">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()">❚❚</button>
+    <div class="progress-bar-track" onclick="seekVideo(event)">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <span class="timer-display" id="timeDisplay">0:00</span>
+    <div class="step-indicators">
+      <div class="indicator-dot active" onclick="goToSlide(0)"></div>
+      <div class="indicator-dot" onclick="goToSlide(1)"></div>
+      <div class="indicator-dot" onclick="goToSlide(2)"></div>
+    </div>
+  </div>
+</div>
+<script>
+  let currentSlide = 0; const totalSlides = 3; let isPlaying = true; let timer = null; let progressVal = 0;
+  function updateSlideDisplay() {
+    for (let i = 0; i < totalSlides; i++) {
+      document.getElementById('slide' + i)?.classList.remove('active');
+      document.querySelectorAll('.indicator-dot')[i]?.classList.remove('active');
+    }
+    document.getElementById('slide' + currentSlide)?.classList.add('active');
+    document.querySelectorAll('.indicator-dot')[currentSlide]?.classList.add('active');
+  }
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    document.getElementById('playBtn').innerText = isPlaying ? '❚❚' : '▶';
+    if (isPlaying) startVideoLoop(); else clearInterval(timer);
+  }
+  function startVideoLoop() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      progressVal += 1;
+      if (progressVal >= 100) progressVal = 0;
+      currentSlide = Math.floor((progressVal / 100) * totalSlides);
+      if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+      document.getElementById('progressFill').style.width = progressVal + '%';
+      const currentSec = Math.floor((progressVal / 100) * 12);
+      document.getElementById('timeDisplay').innerText = '0:' + (currentSec < 10 ? '0' : '') + currentSec;
+      updateSlideDisplay();
+    }, 100);
+  }
+  function goToSlide(index) { currentSlide = index; progressVal = (index / totalSlides) * 100; updateSlideDisplay(); }
+  function seekVideo(e) { const rect = e.currentTarget.getBoundingClientRect(); const pct = (e.clientX - rect.left) / rect.width; progressVal = pct * 100; currentSlide = Math.min(totalSlides - 1, Math.floor(pct * totalSlides)); updateSlideDisplay(); }
+  startVideoLoop();
+</script>
+</body>
+</html>

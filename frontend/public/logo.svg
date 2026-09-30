@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Shyam Agro Tools SAT logo</title>
+  <desc id="desc">Red SAT letters with red and blue circular swooshes on a white round badge.</desc>
+  <defs>
+    <filter id="badgeShadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+    <linearGradient id="satRed" x1="106" y1="352" x2="826" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff0712"/>
+      <stop offset="1" stop-color="#e30613"/>
+    </linearGradient>
+    <linearGradient id="satBlue" x1="180" y1="266" x2="805" y2="758" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2636b6"/>
+      <stop offset="1" stop-color="#151f86"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="512" cy="512" r="498" fill="#ffffff" filter="url(#badgeShadow)"/>
+
+  <path
+    d="M447 119 C660 82 848 190 916 369 C994 573 908 778 713 858 C631 891 529 889 425 850"
+    fill="none"
+    stroke="url(#satRed)"
+    stroke-width="58"
+    stroke-linecap="round"
+  />
+
+  <path
+    d="M185 336 C270 171 449 108 615 130 C691 140 751 180 803 243"
+    fill="none"
+    stroke="url(#satBlue)"
+    stroke-width="55"
+    stroke-linecap="butt"
+  />
+
+  <path
+    d="M177 612 C263 785 446 849 622 827 C696 817 755 780 802 718"
+    fill="none"
+    stroke="url(#satBlue)"
+    stroke-width="55"
+    stroke-linecap="butt"
+  />
+
+  <text
+    x="60"
+    y="588"
+    fill="url(#satRed)"
+    font-family="Arial Black, Impact, Arial, Helvetica, sans-serif"
+    font-size="296"
+    font-weight="900"
+    letter-spacing="-12"
+    textLength="744"
+    lengthAdjust="spacingAndGlyphs"
+  >SAT</text>
+</svg>

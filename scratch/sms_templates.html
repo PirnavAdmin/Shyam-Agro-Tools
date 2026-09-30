@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shyam Agro Tools - Vendor-Ready SMS Templates</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 10mm 8mm 10mm 8mm;
+  }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1e293b;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    font-size: 11px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #166534;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+  .company-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #166534;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .doc-subtitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 2px;
+  }
+  .meta-badge {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: right;
+    line-height: 1.4;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+  }
+  th {
+    background-color: #166534;
+    color: #ffffff;
+    text-align: left;
+    font-weight: 600;
+    padding: 8px 10px;
+    font-size: 11px;
+    border: 1px solid #15803d;
+  }
+  td {
+    padding: 7px 9px;
+    border: 1px solid #cbd5e1;
+    vertical-align: middle;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  .col-id {
+    width: 3%;
+    text-align: center;
+    font-weight: 600;
+  }
+  .col-key {
+    width: 17%;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10px;
+  }
+  .col-module {
+    width: 11%;
+  }
+  .module-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .tag-auth { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+  .tag-pay { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+  .tag-order { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .tag-log { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+  .tag-cancel { background-color: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+  .tag-refund { background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+  .tag-rem { background-color: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+
+  .col-body {
+    width: 34%;
+  }
+  .col-dlt {
+    width: 35%;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9.5px;
+    background-color: #fafafa;
+    color: #334155;
+  }
+  .footer {
+    margin-top: 12px;
+    font-size: 10px;
+    color: #64748b;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1 class="company-title">SHYAM AGRO TOOLS</h1>
+    <div class="doc-subtitle">Vendor-Ready SMS Templates Submission Set (DLT Approved Syntax)</div>
+  </div>
+  <div class="meta-badge">
+    <strong>Entity:</strong> Shyam Agro Tools<br>
+    <strong>Header:</strong> SHYAMAGRO / PITSOP<br>
+    <strong>Total Templates:</strong> 15
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th class="col-id">#</th>
+      <th class="col-key">Template Key</th>
+      <th class="col-module">Module</th>
+      <th class="col-body">SMS Body Text</th>
+      <th class="col-dlt">DLT / Provider Format ({#alp#} / ${var})</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="col-id">1</td>
+      <td class="col-key">REGISTRATION_OTP</td>
+      <td class="col-module"><span class="module-tag tag-auth">Authentication</span></td>
+      <td class="col-body">Your Shyam Agro Tools registration OTP is {OtpCode}. It is valid for 5 minutes. Do not share this OTP with anyone.</td>
+      <td class="col-dlt">Your Shyam Agro Tools registration OTP is {#num#}. It is valid for 5 minutes. Do not share this OTP with anyone.</td>
+    </tr>
+    <tr>
+      <td class="col-id">2</td>
+      <td class="col-key">LOGIN_OTP</td>
+      <td class="col-module"><span class="module-tag tag-auth">Authentication</span></td>
+      <td class="col-body">Your Shyam Agro Tools login OTP is {OtpCode}. It is valid for 10 minutes. Do not share this OTP with anyone.</td>
+      <td class="col-dlt">Dear User, your OTP for login to ${var1} is ${var2} . This OTP is valid for 10 minutes. Do not share it with anyone - Shyam Agro Tools</td>
+    </tr>
+    <tr>
+      <td class="col-id">3</td>
+      <td class="col-key">PASSWORD_RESET_OTP</td>
+      <td class="col-module"><span class="module-tag tag-auth">Authentication</span></td>
+      <td class="col-body">Your Shyam Agro Tools password reset OTP is {OtpCode}. It is valid for 5 minutes. Do not share this OTP.</td>
+      <td class="col-dlt">Your Shyam Agro Tools password reset OTP is {#num#}. It is valid for 5 minutes. Do not share this OTP.</td>
+    </tr>
+    <tr>
+      <td class="col-id">4</td>
+      <td class="col-key">PAYMENT_SUCCESS</td>
+      <td class="col-module"><span class="module-tag tag-pay">Payment</span></td>
+      <td class="col-body">Shyam Agro Tools: Payment successful. Ref {PaymentRef}. Amount {Currency} {Amount}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Payment successful. Ref {#alp#}. Amount Rs. {#alp#}</td>
+    </tr>
+    <tr>
+      <td class="col-id">5</td>
+      <td class="col-key">PAYMENT_FAILED</td>
+      <td class="col-module"><span class="module-tag tag-pay">Payment</span></td>
+      <td class="col-body">Shyam Agro Tools: Payment failed for reference {PaymentRef}. Reason: {FailureReason}. Please retry or contact support.</td>
+      <td class="col-dlt">Shyam Agro Tools: Payment failed for reference {#alp#}. Reason: {#alp#}. Please retry or contact support.</td>
+    </tr>
+    <tr>
+      <td class="col-id">6</td>
+      <td class="col-key">ORDER_CONFIRMED</td>
+      <td class="col-module"><span class="module-tag tag-order">Order</span></td>
+      <td class="col-body">Shyam Agro Tools: Order confirmed. Ref {OrderRef}. Customer {CustomerName}. Expected Dispatch {DispatchDate}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Order confirmed. Ref {#alp#}. Customer {#alp#}. Expected Dispatch {#alp#}.</td>
+    </tr>
+    <tr>
+      <td class="col-id">7</td>
+      <td class="col-key">ORDER_FAILED</td>
+      <td class="col-module"><span class="module-tag tag-order">Order</span></td>
+      <td class="col-body">Shyam Agro Tools: Order could not be completed. Ref {OrderRef}. Reason: {FailureReason}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Order could not be completed. Ref {#alp#}. Reason: {#alp#}.</td>
+    </tr>
+    <tr>
+      <td class="col-id">8</td>
+      <td class="col-key">DISPATCH_CONFIRMED</td>
+      <td class="col-module"><span class="module-tag tag-log">Logistics</span></td>
+      <td class="col-body">Shyam Agro Tools: Order dispatched. Ref {OrderRef}, Tracking {TrackingNo}. Courier: {CourierPartner}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Order dispatched. Ref {#alp#}, Tracking {#alp#}. Courier: {#alp#}.</td>
+    </tr>
+    <tr>
+      <td class="col-id">9</td>
+      <td class="col-key">DISPATCH_FAILED</td>
+      <td class="col-module"><span class="module-tag tag-log">Logistics</span></td>
+      <td class="col-body">Shyam Agro Tools: Order dispatch could not be completed. Ref {OrderRef}. Reason: {FailureReason}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Order dispatch could not be completed. Ref {#alp#}. Reason: {#alp#}.</td>
+    </tr>
+    <tr>
+      <td class="col-id">10</td>
+      <td class="col-key">BOOKING_CANCELLED</td>
+      <td class="col-module"><span class="module-tag tag-cancel">Cancellation</span></td>
+      <td class="col-body">Shyam Agro Tools: Booking {BookingRef} has been cancelled. Cancellation status: {CancellationStatus}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Booking ${var1} has been cancelled. Cancellation status: ${var2}.</td>
+    </tr>
+    <tr>
+      <td class="col-id">11</td>
+      <td class="col-key">REFUND_INITIATED</td>
+      <td class="col-module"><span class="module-tag tag-refund">Refund</span></td>
+      <td class="col-body">Shyam Agro Tools: Refund initiated for booking {BookingRef}. Refund Ref {RefundId}. Amount {Currency} {Amount}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Refund {#alp#} for booking {#alp#}. Refund Ref {#alp#}. Amount Rs. {#alp#}</td>
+    </tr>
+    <tr>
+      <td class="col-id">12</td>
+      <td class="col-key">REFUND_COMPLETED</td>
+      <td class="col-module"><span class="module-tag tag-refund">Refund</span></td>
+      <td class="col-body">Shyam Agro Tools: Refund completed for booking {BookingRef}. Refund Ref {RefundId}. Amount {Currency} {Amount}.</td>
+      <td class="col-dlt">Shyam Agro Tools: Refund completed for booking {#alp#}. Refund Ref {#alp#}. Amount Rs. {#alp#}</td>
+    </tr>
+    <tr>
+      <td class="col-id">13</td>
+      <td class="col-key">REFUND_FAILED</td>
+      <td class="col-module"><span class="module-tag tag-refund">Refund</span></td>
+      <td class="col-body">Shyam Agro Tools: Refund for booking {BookingRef} could not be completed. Refund Ref {RefundId}. Please contact support.</td>
+      <td class="col-dlt">Shyam Agro Tools: Refund for booking {#alp#} could not be completed. Refund Ref {#alp#}. Please contact support.</td>
+    </tr>
+    <tr>
+      <td class="col-id">14</td>
+      <td class="col-key">JOURNEY_REMINDER</td>
+      <td class="col-module"><span class="module-tag tag-rem">Reminder</span></td>
+      <td class="col-body">Shyam Agro Tools reminder: Your order {OrderRef} is scheduled for dispatch on {DispatchDate}. Please be ready to receive.</td>
+      <td class="col-dlt">Shyam Agro Tools reminder: Your order {#alp#} is scheduled for dispatch on {#alp#}. Please be ready to receive.</td>
+    </tr>
+    <tr>
+      <td class="col-id">15</td>
+      <td class="col-key">DELIVERY_REMINDER</td>
+      <td class="col-module"><span class="module-tag tag-rem">Reminder</span></td>
+      <td class="col-body">Shyam Agro Tools reminder: Your order {OrderRef} is out for delivery today. Delivery contact: {AgentPhone}.</td>
+      <td class="col-dlt">Shyam Agro Tools reminder: Your order {#alp#} is out for delivery today. Delivery contact: {#alp#}.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  Shyam Agro Tools SMS Template Submission Set • Confidential & Vendor Proprietary Document
+</div>
+
+</body>
+</html>

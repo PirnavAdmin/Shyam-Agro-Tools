@@ -1,0 +1,531 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { ArrowLeft, Lock, Save, Upload, Trash2, Image as ImageIcon } from 'lucide-react';
+import { getApiDomain } from '../../utils/apiConfig';
+import './brands.css';
+import { Toast } from '../components/Toast';
+
+// Inline API utilities
+const API_BASE = `${getApiDomain()}/api/Brand`;
+const API_DOMAIN = getApiDomain();
+const API_ITEM = (id) => `${getApiDomain()}/api/Brand/${encodeURIComponent(id)}`;
+
+// Normalize brand object: map any possible image field name to `logo`
+const normalizeBrand = (b) => {
+  if (!b) return {};
+  return {
+    ...b,
+    id: b.id !== undefined && b.id !== null ? String(b.id) : '',
+    name: b.name || b.Name || b.brandName || b.BrandName || '',
+    description: b.description || b.Description || '',
+    logo: b.LogoImage || b.logoImage || b.logo || b.logoUrl || b.imageUrl || b.image || b.logoURL || b.ImageUrl || b.Logo || b.LogoUrl || '',
+  };
+};
+
+// Resolve logo value to a valid <img src> regardless of what format the API returns
+export const getLogoSrc = (logo) => {
+  if (!logo) return '';
+  if (logo.startsWith('data:')) return logo;
+  if (/^https?:\/\//i.test(logo)) return logo;
+  if (logo.startsWith('/') || logo.includes('.') || logo.includes('/')) {
+    const path = logo.startsWith('/') ? logo : `/${logo}`;
+    return `${API_DOMAIN}${path}`;
+  }
+  return `data:image/png;base64,${logo}`;
+};
+
+// State-managed BrandLogo component to robustly handle load errors without DOM traversal
+export const BrandLogo = ({ logo, name }) => {
+  const [error, setError] = useState(false);
+  const src = getLogoSrc(logo);
+
+  if (!logo || error || !src) {
+    return (
+      <div className="brand-card__logo-placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+        <ImageIcon size={24} />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+      onError={() => setError(true)}
+    />
+  );
+};
+
+export const fetchBrands = async () => {
+  // Try primary Brand API (/api/Brand)
+  try {
+    const res = await fetch(API_BASE, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return Array.isArray(data) ? data.map(normalizeBrand) : [];
+    }
+    console.warn(`Primary brand fetch API returned status: ${res.status}`);
+  } catch (e) {
+    console.warn('Failed to fetch from primary Brand API, trying Catalog/brands API...', e);
+  }
+
+  // Fallback to Catalog brands API (/api/Catalog/brands)
+  try {
+    const res = await fetch(`${API_DOMAIN}/api/Catalog/brands`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Fallback fetch brands failed: ${res.status} ${err}`);
+    }
+    const data = await res.json();
+    return Array.isArray(data) ? data.map(normalizeBrand) : [];
+  } catch (e) {
+    console.error('All brand fetch APIs failed:', e);
+    throw e;
+  }
+};
+
+export const validateBrandName = (rawName) => {
+  if (!rawName || !rawName.trim()) {
+    return 'Brand Name is required.';
+  }
+  const name = rawName.trim();
+  if (name.length < 2 || name.length > 50) {
+    return 'Brand Name must be between 2 and 50 characters.';
+  }
+  if (!/[a-zA-Z]/.test(name)) {
+    return 'Brand Name must contain valid letters.';
+  }
+  if (/(.)\1{3,}/.test(name)) {
+    return 'Brand Name cannot contain repeated random characters.';
+  }
+  const mashPatterns = /(asdf|qwer|zxcv|hjkl|uiop|vbnm|wert|xcvb|erty|dfgh|cvbn|tyui|ghjk|bnm|swq|qwe|asd|zxc|qaz|wsx|edc|rfv|tgb|yhn|ujm)/i;
+  if (mashPatterns.test(name)) {
+    return 'Brand Name appears to be random keyboard typing.';
+  }
+  if (/[bcdfghjklmnpqrstvwxz]{6,}/i.test(name)) {
+    return 'Brand Name contains too many consecutive consonants.';
+  }
+  const cleanWord = name.toLowerCase().replace(/[^a-z]/g, '');
+  const uniqueChars = new Set(cleanWord).size;
+  if (cleanWord.length >= 6 && uniqueChars <= cleanWord.length / 2.0) {
+    return 'Brand Name appears to contain invalid repetitive characters.';
+  }
+  const words = name.split(/\s+/);
+  for (const w of words) {
+    if (w.length > 5) {
+      const vowels = (w.match(/[aeiouy]/gi) || []).length;
+      if (vowels === 0) return 'Brand Name words must contain vowels.';
+      const consonants = (w.match(/[bcdfghjklmnpqrstvwxz]/gi) || []).length;
+      if (consonants / vowels > 3.5) return 'Brand Name contains invalid random characters.';
+    }
+  }
+  if (!/^[A-Za-z0-9][A-Za-z0-9\s&\-\'\./]{1,49}$/.test(name)) {
+    return 'Brand Name contains invalid characters. Only letters, numbers, spaces, and standard punctuation (&, -, \', ., /) are allowed.';
+  }
+  return null;
+};
+
+const parseApiError = async (res) => {
+  try {
+    const text = await res.text();
+    try {
+      const data = JSON.parse(text);
+      return data.Message || data.message || text;
+    } catch {
+      return text || `Request failed with status ${res.status}`;
+    }
+  } catch {
+    return `Request failed with status ${res.status}`;
+  }
+};
+
+export const createBrand = async (brand) => {
+  const fd = new FormData();
+  fd.append('Id', brand.id);
+  fd.append('id', brand.id);
+  fd.append('Name', brand.name);
+  fd.append('Description', brand.description || '');
+  fd.append('IsActive', 'true');
+  fd.append('isActive', 'true');
+  
+  if (brand.logoFile) {
+    fd.append('LogoFile', brand.logoFile);
+  } else if (brand.logo) {
+    fd.append('LogoImage', brand.logo);
+  }
+
+  // Try primary Brand API (/api/Brand)
+  try {
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+      body: fd,
+    });
+    if (res.ok) return await res.json();
+    if (res.status === 400 || res.status === 409) {
+      const msg = await parseApiError(res);
+      throw new Error(msg);
+    }
+  } catch (e) {
+    if (e.message && !e.message.includes('fetch')) throw e;
+    console.warn('Failed to post to primary Brand API, trying Catalog/brands API...', e);
+  }
+
+  // Fallback to Catalog brands API (/api/Catalog/brands)
+  const res = await fetch(`${API_DOMAIN}/api/Catalog/brands`, {
+    method: 'POST',
+    headers: { 'ngrok-skip-browser-warning': 'true' },
+    body: fd,
+  });
+  if (!res.ok) {
+    const err = await parseApiError(res);
+    throw new Error(err);
+  }
+  return await res.json();
+};
+
+export const updateBrand = async (brand) => {
+  const fd = new FormData();
+  fd.append('Id', brand.id);
+  fd.append('id', brand.id);
+  fd.append('Name', brand.name);
+  fd.append('Description', brand.description || '');
+  fd.append('IsActive', 'true');
+  fd.append('isActive', 'true');
+  
+  if (brand.logoFile) {
+    fd.append('LogoFile', brand.logoFile);
+  } else if (brand.logo) {
+    fd.append('LogoImage', brand.logo);
+  } else {
+    fd.append('LogoImage', '');
+  }
+
+  // Try primary Brand API (/api/Brand/{id})
+  try {
+    const res = await fetch(API_ITEM(brand.id), {
+      method: 'PUT',
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+      body: fd,
+    });
+    if (res.ok) return { success: true };
+    if (res.status === 400 || res.status === 409) {
+      const msg = await parseApiError(res);
+      throw new Error(msg);
+    }
+  } catch (e) {
+    if (e.message && !e.message.includes('fetch')) throw e;
+    console.warn('Failed to put to primary Brand API, trying Catalog/brands API...', e);
+  }
+
+  // Fallback to Catalog brands API (/api/Catalog/brands/{id})
+  const res = await fetch(`${API_DOMAIN}/api/Catalog/brands/${encodeURIComponent(brand.id)}`, {
+    method: 'PUT',
+    headers: { 'ngrok-skip-browser-warning': 'true' },
+    body: fd,
+  });
+  if (!res.ok) {
+    const err = await parseApiError(res);
+    throw new Error(err);
+  }
+  return { success: true };
+};
+
+const BrandForm = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const brandIdFromQuery = searchParams.get('id');
+  const isEditing = Boolean(brandIdFromQuery);
+
+  const [id, setId] = useState('');
+  const [name, setName] = useState('');
+  const [nameErrorInline, setNameErrorInline] = useState('');
+  const [description, setDescription] = useState('');
+  const [logo, setLogo] = useState('');
+  const [logoFile, setLogoFile] = useState(null);
+
+  // Toast Notification State
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Auto‑generate ID on mount if in create mode
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const brands = await fetchBrands();
+        if (isEditing) {
+          const existing = brands.find(b => String(b.id || '').toLowerCase() === String(brandIdFromQuery).toLowerCase());
+          if (existing) {
+            setId(existing.id);
+            setName(existing.name);
+            setDescription(existing.description || '');
+            setLogo(existing.logo || '');
+            setLogoFile(null);
+          } else {
+            setToastMessage('Brand not found.');
+            setToastType('error');
+          }
+        } else {
+          // Auto‑generate next ID based on fetched brands
+          const nextNum = brands.reduce((largest, b) => {
+            const match = String(b.id || '').match(/(\d+)/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              return num > largest ? num : largest;
+            }
+            return largest;
+          }, 0) + 1;
+
+          // Check if any existing brand is purely numeric
+          const isNumericId = brands.length > 0 && brands.every(b => /^\d+$/.test(String(b.id)));
+          if (isNumericId) {
+            setId(String(nextNum));
+          } else {
+            setId(`BRD-${String(nextNum).padStart(3, '0')}`);
+          }
+          setLogoFile(null);
+        }
+      } catch (e) {
+        setToastMessage(e.message);
+        setToastType('error');
+      }
+    };
+    load();
+  }, [isEditing, brandIdFromQuery]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
+    const allowedExts = ['.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif'];
+    const fileName = file.name.toLowerCase();
+    const isExtensionValid = allowedExts.some(ext => fileName.endsWith(ext));
+    const isMimeValid = file.type && file.type.startsWith('image/');
+
+    if (!isExtensionValid || !isMimeValid) {
+      e.target.value = '';
+      setToastMessage('Invalid file format. Only image files (PNG, JPG, JPEG, WEBP, SVG) are allowed.');
+      setToastType('error');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      e.target.value = '';
+      setToastMessage('File size exceeds 2MB limit. Please upload a smaller image.');
+      setToastType('error');
+      return;
+    }
+
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogo(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLogo('');
+    setLogoFile(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const nameError = validateBrandName(name);
+    if (nameError) {
+      setToastMessage(nameError);
+      setToastType('warning');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (isEditing) {
+        await updateBrand({ id: id.trim(), name: name.trim(), description: description.trim(), logo, logoFile });
+      } else {
+        await createBrand({ id: id.trim(), name: name.trim(), description: description.trim(), logo, logoFile });
+      }
+      setToastMessage(isEditing ? 'Brand updated successfully!' : 'Brand saved successfully!');
+      setToastType('success');
+      setTimeout(() => {
+        navigate('/admin/brands/list');
+      }, 1000);
+    } catch (err) {
+      setToastMessage(err.message || (isEditing ? 'Failed to update brand details.' : 'Failed to save brand details.'));
+      setToastType('error');
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="brands-page" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {toastMessage && (
+        <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage('')} />
+      )}
+
+      {/* Top Header Row with Actions in Top-Right */}
+      <section className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <Link className="p-2 hover:bg-slate-50 text-slate-600 rounded-lg transition-colors border border-slate-200" to="/admin/brands/list">
+            <ArrowLeft size={16} />
+          </Link>
+          <div>
+            <span className="catalog-kicker" style={{ fontSize: '10px', textTransform: 'uppercase', color: '#059669', fontWeight: 700 }}>Catalog settings</span>
+            <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', margin: 0 }}>{isEditing ? 'Edit Brand' : 'Create Brand'}</h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link to="/admin/brands/list" className="catalog-btn catalog-btn--danger" style={{ fontSize: '11px', padding: '6px 12px' }}>
+            Cancel
+          </Link>
+          <button className="catalog-btn catalog-btn--success" onClick={handleSubmit} disabled={isSaving} style={{ fontSize: '11px', padding: '6px 12px' }}>
+            <Save size={14} style={{ marginRight: '4px' }} />
+            {isSaving ? (isEditing ? 'Updating...' : 'Saving...') : (isEditing ? 'Update Brand' : 'Save Brand')}
+          </button>
+        </div>
+      </section>
+
+      <div className="brand-form-container" style={{ maxWidth: '640px', margin: '0 auto', width: '100%' }}>
+        <div className="brand-form-card" style={{ padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: '#fff' }}>
+          <form onSubmit={handleSubmit} className="brand-form" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            
+            {/* Section Title with custom color */}
+            <h3 style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', color: '#059669', letterSpacing: '0.05em', borderBottom: '2px solid #f1f5f9', paddingBottom: '6px', margin: '0 0 4px 0' }}>
+              Brand Information
+            </h3>
+
+            {/* Brand ID Field (System Generated & Readonly) */}
+            <div className="brand-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="brand-id" style={{ fontSize: '11px', fontWeight: 700, color: '#475569' }}>Brand ID</label>
+                <span style={{ fontSize: '10px', color: '#059669', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  <Lock size={10} /> Auto-generated System ID
+                </span>
+              </div>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  id="brand-id"
+                  type="text"
+                  value={id || (isEditing ? 'Loading...' : 'Auto-assigned')}
+                  readOnly={true}
+                  disabled={true}
+                  placeholder="Auto-generated System ID"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px 6px 30px',
+                    fontSize: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    backgroundColor: '#f1f5f9',
+                    color: '#334155',
+                    fontWeight: 700,
+                    cursor: 'not-allowed'
+                  }}
+                />
+                <Lock size={13} style={{ position: 'absolute', left: '10px', color: '#94a3b8', pointerEvents: 'none' }} />
+              </div>
+            </div>
+
+            {/* Brand Name Field */}
+            <div className="brand-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label htmlFor="brand-name" style={{ fontSize: '11px', fontWeight: 700, color: '#475569' }}>Brand Name</label>
+              <input
+                id="brand-name"
+                type="text"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setNameErrorInline(validateBrandName(e.target.value));
+                }}
+                onBlur={(e) => setNameErrorInline(validateBrandName(e.target.value))}
+                placeholder="e.g. Shyam Agro Tools"
+                required
+                autoFocus
+                style={{ 
+                  padding: '6px 10px', 
+                  fontSize: '12px', 
+                  borderRadius: '8px', 
+                  border: nameErrorInline ? '1px solid #ef4444' : '1px solid #cbd5e1', 
+                  outline: 'none',
+                  backgroundColor: nameErrorInline ? '#fef2f2' : 'transparent'
+                }}
+              />
+              {nameErrorInline && (
+                <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: 500, marginTop: '2px' }}>
+                  {nameErrorInline}
+                </span>
+              )}
+            </div>
+
+            {/* Brand Description Field */}
+            <div className="brand-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label htmlFor="brand-desc" style={{ fontSize: '11px', fontWeight: 700, color: '#475569' }}>Description</label>
+              <textarea
+                id="brand-desc"
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief information about manufacturer..."
+                style={{ padding: '6px 10px', fontSize: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', resize: 'none' }}
+              />
+            </div>
+
+            {/* Brand Logo Upload Field */}
+            <div className="brand-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569' }}>Brand Logo</label>
+              
+              {logo ? (
+                <div className="brand-image-preview" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '10px', border: '1px dashed #cbd5e1', borderRadius: '8px' }}>
+                  <div className="brand-image-preview__box" style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <BrandLogo logo={logo} name="Preview" />
+                  </div>
+                  <div className="brand-image-preview__actions">
+                    <button
+                      type="button"
+                      className="catalog-btn catalog-btn--danger"
+                      onClick={handleRemoveLogo}
+                      style={{ fontSize: '10px', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="brand-image-upload" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px', border: '2.5px dashed #cbd5e1', borderRadius: '10px', cursor: 'pointer', backgroundColor: '#f8fafc', transition: 'all 0.15s' }}>
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif"
+                    onChange={handleImageChange}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="brand-image-upload__content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textAlign: 'center' }}>
+                    <Upload size={18} style={{ color: '#059669' }} />
+                    <span style={{ fontSize: '11px', color: '#475569' }}><strong>Click to upload logo</strong></span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8' }}>PNG, JPG, SVG up to 2MB</span>
+                  </div>
+                </label>
+              )}
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BrandForm;

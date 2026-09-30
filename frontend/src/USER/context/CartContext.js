@@ -1,0 +1,395 @@
+import React, { createContext, useState, useContext, useEffect, useRef, useCallback } from 'react';
+import { useToast } from './ToastContext';
+import { useLanguage } from './LanguageContext';
+import {
+  addCartItem,
+  clearCartItems,
+  deleteCartItem,
+  getCart,
+  updateCartItem,
+} from '../../services/cartCheckoutService';
+import { getProducts } from '../../services/productService';
+import { useAuth } from './AuthContext';
+import { getProductImage } from '../../utils/productImage';
+
+const CartContext = createContext();
+
+export const useCart = () => useContext(CartContext);
+
+const getCartProductId = (item = {}) => (
+  item.productId ??
+  item.ProductId ??
+  item.product?.id ??
+  item.product?.productId ??
+  item.product?.ProductId ??
+  item.id
+);
+
+const getCartId = (item = {}) => (
+  item.cartId ??
+  item.cartItemId ??
+  item.CartId ??
+  item.CartItemId ??
+  item.id ??
+  item.Id
+);
+
+const mapCartItems = (items, products) => {
+  const productsById = new Map(products.map((product) => [String(product.id), product]));
+
+  return items.map((cartItem) => {
+    const productId = getCartProductId(cartItem);
+    const product = productsById.get(String(productId)) || cartItem.product || {};
+    const quantity = Math.max(1, Number(cartItem.quantity ?? cartItem.Quantity ?? 1) || 1);
+    const price = Number(cartItem.price ?? cartItem.Price ?? product.price ?? product.sellingPrice ?? 0);
+    const totalPrice = Number(cartItem.totalPrice ?? 0);
+    const totalAmount = Number(cartItem.totalAmount ?? cartItem.TotalAmount ?? price * quantity);
+    const lineTotal = totalPrice > 0 ? totalPrice : totalAmount;
+
+    return {
+      ...product,
+      cartId: getCartId(cartItem),
+      productId,
+      id: String(productId),
+      quantity,
+      price,
+      lineTotal,
+      totalAmount,
+      createdDate: cartItem.createdDate || cartItem.CreatedDate,
+      name: product.name || product.productName || cartItem.productName || `Product ${productId}`,
+      displayName: product.displayName || product.productName || product.name || cartItem.productName || `Product ${productId}`,
+      image: getProductImage({ ...cartItem, ...product }),
+      sku: product.sku || String(productId),
+      rawCartItem: cartItem,
+    };
+  });
+};
+
+const toCartPayload = (item, quantity = item.quantity) => ({
+  cartId: Number(getCartId(item) || 0),
+  productId: Number(getCartProductId(item)),
+  quantity: Math.max(1, Number(quantity) || 1),
+  price: Number(item.price || 0),
+  totalAmount: Number(item.price || 0) * Math.max(1, Number(quantity) || 1),
+  createdDate: item.createdDate || new Date().toISOString(),
+});
+
+let initialCartDataRequest;
+
+const getInitialCartData = () => {
+  if (!initialCartDataRequest) {
+    initialCartDataRequest = Promise.all([getCart(), getProducts()])
+      .finally(() => {
+        initialCartDataRequest = null;
+      });
+  }
+  return initialCartDataRequest;
+};
+
+export const CartProvider = ({ children }) => {
+  const { showToast } = useToast();
+  const { t } = useLanguage();
+  const { isLoggedIn, loading: isAuthLoading } = useAuth();
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartLoading, setIsCartLoading] = useState(true);
+  const [isCartMutating, setIsCartMutating] = useState(false);
+  const [cartError, setCartError] = useState('');
+  const productsRef = useRef([]);
+  const cartItemsRef = useRef([]);
+  const mutationQueueRef = useRef(Promise.resolve());
+  const cartReadyPromiseRef = useRef(Promise.resolve());
+  const mutationCountRef = useRef(0);
+
+  const setLiveCartItems = useCallback((itemsOrUpdater) => {
+    const nextItems = typeof itemsOrUpdater === 'function'
+      ? itemsOrUpdater(cartItemsRef.current)
+      : itemsOrUpdater;
+    cartItemsRef.current = nextItems;
+    setCartItems(nextItems);
+  }, []);
+
+  const queueCartMutation = useCallback((mutation) => {
+    const operation = mutationQueueRef.current.then(mutation, mutation);
+    mutationQueueRef.current = operation.catch(() => undefined);
+    return operation;
+  }, []);
+
+  const waitForCartSync = useCallback(() => mutationQueueRef.current, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadCart = async () => {
+      if (isAuthLoading) return;
+      setIsCartLoading(true);
+      setCartError('');
+
+      if (!isLoggedIn) {
+        if (isActive) {
+          setLiveCartItems([]);
+          setIsCartLoading(false);
+        }
+        return;
+      }
+
+      const initialRequest = getInitialCartData();
+      cartReadyPromiseRef.current = initialRequest.catch(() => undefined);
+
+      try {
+        const [items, products] = await initialRequest;
+        if (!isActive) return;
+        productsRef.current = products;
+
+        setLiveCartItems(mapCartItems(items, products));
+      } catch (error) {
+        console.error('Unable to load cart from server.', error);
+        if (isActive) {
+          setLiveCartItems([]);
+          setCartError('Unable to load cart. Please try again.');
+        }
+      } finally {
+        if (isActive) setIsCartLoading(false);
+      }
+    };
+
+    loadCart();
+    return () => {
+      isActive = false;
+    };
+  }, [isAuthLoading, isLoggedIn, setLiveCartItems]);
+
+  const refreshCart = useCallback(async () => {
+    try {
+      const items = await getCart();
+      if (mutationCountRef.current === 0) {
+        setLiveCartItems(mapCartItems(items, productsRef.current));
+      }
+      setCartError('');
+      return items;
+    } catch (error) {
+      console.error('Unable to refresh cart.', error);
+      setCartError('Unable to load cart. Please try again.');
+      throw error;
+    }
+  }, [setLiveCartItems]);
+
+  const addToCart = (product, quantityToAdd = 1) => {
+    if (!product?.id) {
+      showToast(t('unableAddProductToCart'), 'error');
+      return Promise.resolve(false);
+    }
+
+    if (!isLoggedIn) {
+      window.dispatchEvent(new CustomEvent('auth:unauthorized', {
+        detail: { returnTo: `${window.location.pathname}${window.location.search}${window.location.hash}` },
+      }));
+      return Promise.resolve(false);
+    }
+
+    if (!productsRef.current.some((item) => String(item.id) === String(product.id))) {
+      productsRef.current = [...productsRef.current, product];
+    }
+
+    const amount = Math.max(1, Number(quantityToAdd) || 1);
+
+    const previousItems = cartItemsRef.current;
+    const existingItem = previousItems.find((item) => item.id === String(product.id));
+    let optimisticItems;
+    if (existingItem) {
+      optimisticItems = previousItems.map((item) => {
+        if (item.id === String(product.id)) {
+          const nextQty = item.quantity + amount;
+          return {
+            ...item,
+            quantity: nextQty,
+            lineTotal: item.price * nextQty,
+            totalAmount: item.price * nextQty,
+          };
+        }
+        return item;
+      });
+    } else {
+      const newCartItem = {
+        ...product,
+        cartId: 0,
+        productId: Number(product.id),
+        id: String(product.id),
+        quantity: amount,
+        price: Number(product.sellingPrice || product.price || 0),
+        lineTotal: Number(product.sellingPrice || product.price || 0) * amount,
+        totalAmount: Number(product.sellingPrice || product.price || 0) * amount,
+        name: product.name || product.productName,
+        displayName: product.displayName || product.productName || product.name,
+        image: getProductImage(product),
+        sku: product.sku || String(product.id),
+      };
+      optimisticItems = [...previousItems, newCartItem];
+    }
+
+    setLiveCartItems(optimisticItems);
+    mutationCountRef.current++;
+
+    return queueCartMutation(async () => {
+      await cartReadyPromiseRef.current;
+      setIsCartMutating(true);
+      try {
+        await addCartItem({ productId: Number(product.id), quantity: amount });
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        await refreshCart();
+        setCartError('');
+        showToast(t('addedToCartStandalone'));
+        return true;
+      } catch (error) {
+        console.error('Unable to add product to cart.', error.response?.data || error);
+        setCartError('Unable to add this product. Please try again.');
+        showToast('Unable to add product to cart.', 'error');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
+        return false;
+      } finally {
+        setIsCartMutating(false);
+      }
+    });
+  };
+
+  const removeFromCart = (productId) => {
+    const previousItems = cartItemsRef.current;
+    const itemToRemove = previousItems.find((item) => item.id === String(productId));
+    if (!itemToRemove) return Promise.resolve(false);
+
+    const optimisticItems = previousItems.filter((item) => item.id !== String(productId));
+    setLiveCartItems(optimisticItems);
+    mutationCountRef.current++;
+
+    return queueCartMutation(async () => {
+      setIsCartMutating(true);
+      try {
+        await deleteCartItem(itemToRemove.cartId);
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        await refreshCart();
+        setCartError('');
+        return true;
+      } catch (error) {
+        console.error('Unable to remove cart item.', error);
+        setCartError('Unable to remove this item. Please try again.');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
+        return false;
+      } finally {
+        setIsCartMutating(false);
+      }
+    });
+  };
+
+  const updateQuantity = (productId, delta) => {
+    const amount = Number(delta) || 0;
+    const previousItems = cartItemsRef.current;
+    const itemToUpdate = previousItems.find((item) => item.id === String(productId));
+    if (!itemToUpdate) return Promise.resolve(false);
+
+    const nextQuantity = itemToUpdate.quantity + amount;
+
+    const optimisticItems = previousItems.map((item) => {
+      if (item.id === String(productId)) {
+        if (nextQuantity < 1) return null;
+        const newTotal = item.price * nextQuantity;
+        return {
+          ...item,
+          quantity: nextQuantity,
+          lineTotal: newTotal,
+          totalAmount: newTotal,
+        };
+      }
+      return item;
+    }).filter(Boolean);
+
+    setLiveCartItems(optimisticItems);
+    mutationCountRef.current++;
+
+    return queueCartMutation(async () => {
+      setIsCartMutating(true);
+      try {
+        if (nextQuantity < 1) {
+          await deleteCartItem(itemToUpdate.cartId);
+        } else {
+          await updateCartItem(itemToUpdate.cartId, toCartPayload(itemToUpdate, nextQuantity));
+        }
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        await refreshCart();
+        setCartError('');
+        return true;
+      } catch (error) {
+        console.error('Unable to update cart quantity.', error);
+        const serverMsg = error.response?.data?.message || error.response?.data?.Message || error.message;
+        setCartError(serverMsg || 'Unable to update quantity. Please try again.');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
+        return false;
+      } finally {
+        setIsCartMutating(false);
+      }
+    });
+  };
+
+  const clearCart = () => {
+    const previousItems = cartItemsRef.current;
+    setLiveCartItems([]);
+    mutationCountRef.current++;
+    setIsCartMutating(true);
+
+    queueCartMutation(async () => {
+      await clearCartItems();
+      mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+      await refreshCart();
+    })
+      .catch((error) => {
+        console.error('Unable to clear the server cart.', error);
+        setCartError('Unable to clear cart. Please try again.');
+        mutationCountRef.current = Math.max(0, mutationCountRef.current - 1);
+        if (mutationCountRef.current === 0) {
+          setLiveCartItems(previousItems);
+        }
+      })
+      .finally(() => setIsCartMutating(false));
+  };
+
+  const isInCart = useCallback((productId) => {
+    if (!productId) return false;
+    const targetId = String(productId);
+    return cartItems.some((item) => (
+      String(item.id) === targetId ||
+      String(item.productId) === targetId ||
+      String(item.rawId) === targetId
+    ));
+  }, [cartItems]);
+
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const cartSubtotal = cartItems.reduce((acc, item) => acc + item.lineTotal, 0);
+
+  return (
+    <CartContext.Provider value={{
+      cartItems,
+      isInCart,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      cartCount,
+      cartSubtotal,
+      isCartLoading,
+      isCartMutating,
+      cartError,
+      setCartError,
+      refreshCart,
+      waitForCartSync,
+    }}>
+      {children}
+    </CartContext.Provider>
+  );
+};

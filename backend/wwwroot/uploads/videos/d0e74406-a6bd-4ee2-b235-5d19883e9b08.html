@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biofit Antiviral - How To Use Video Guide</title>
+  <style>
+    :root {
+      --primary: #e11d48;
+      --primary-hover: #f43f5e;
+      --bg: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.92);
+      --text: #f8fafc;
+      --accent: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+    }
+
+    .video-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Video Slide Stages */
+    .slide-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      background: #000;
+    }
+
+    .slide-stage.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .slide-stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    /* Video Caption Overlay */
+    .caption-overlay {
+      position: absolute;
+      bottom: 72px;
+      left: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      animation: fadeInUp 0.4s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .step-pill {
+      display: inline-block;
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      margin-bottom: 0.35rem;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+
+    /* Video Controls Bar */
+    .controls-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.4));
+      display: flex;
+      align-items: center;
+      padding: 0 1.25rem;
+      gap: 1rem;
+      z-index: 20;
+    }
+
+    .play-btn {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .play-btn:hover {
+      background: var(--primary-hover);
+      transform: scale(1.06);
+    }
+
+    .progress-bar-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 3px;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.1s linear;
+    }
+
+    .timer-display {
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-mono: monospace;
+      color: #94a3b8;
+      min-width: 42px;
+    }
+
+    .step-indicators {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .indicator-dot.active {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="video-container" id="videoContainer">
+
+  <!-- Slide 0: Product Overview -->
+  <div class="slide-stage active" id="slide0">
+    <img src="media_1787027663320.png" alt="Biofit Antiviral Product">
+    <div class="caption-overlay">
+      <span class="step-pill">Product Overview</span>
+      <h2 class="step-title">Biofit Antiviral Crop Care Solution</h2>
+      <p class="step-desc">100% Eco-Friendly botanical antiviral spray for complete crop protection against plant viruses.</p>
+    </div>
+  </div>
+
+  <!-- Slide 1: Step 1 Dilution -->
+  <div class="slide-stage" id="slide1">
+    <img src="usage_step1_dilution_1787032469726.jpg" alt="Step 1: Dilution">
+    <div class="caption-overlay">
+      <span class="step-pill">Step 1 of 3</span>
+      <h2 class="step-title">Measure Correct Dilution Ratio</h2>
+      <p class="step-desc">Measure 2 ml to 3 ml of Biofit Antiviral concentrate liquid per 1 Liter of clean water using the measuring cup.</p>
+    </div>
+  </div>
+
+  <!-- Slide 2: Step 2 Mixing -->
+  <div class="slide-stage" id="slide2">
+    <img src="usage_step2_mixing_1787033133582.jpg" alt="Step 2: Mixing">
+    <div class="caption-overlay">
+      <span class="step-pill">Step 2 of 3</span>
+      <h2 class="step-title">Mix Thoroughly in Sprayer Tank</h2>
+      <p class="step-desc">Pour the measured liquid into your sprayer pump tank and mix thoroughly with clean water.</p>
+    </div>
+  </div>
+
+  <!-- Slide 3: Step 3 Spraying -->
+  <div class="slide-stage" id="slide3">
+    <img src="biofit_angled_view_1787028231500.jpg" alt="Step 3: Spraying">
+    <div class="caption-overlay">
+      <span class="step-pill">Step 3 of 3</span>
+      <h2 class="step-title">Foliar Spray Application</h2>
+      <p class="step-desc">Spray evenly on upper and lower surfaces of crop leaves in early morning or evening for best absorption.</p>
+    </div>
+  </div>
+
+  <!-- Video Controls Bar -->
+  <div class="controls-bar">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()">❚❚</button>
+    <div class="progress-bar-track" onclick="seekVideo(event)">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <span class="timer-display" id="timeDisplay">0:00</span>
+    <div class="step-indicators">
+      <div class="indicator-dot active" onclick="goToSlide(0)"></div>
+      <div class="indicator-dot" onclick="goToSlide(1)"></div>
+      <div class="indicator-dot" onclick="goToSlide(2)"></div>
+      <div class="indicator-dot" onclick="goToSlide(3)"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentSlide = 0;
+  const totalSlides = 4;
+  let isPlaying = true;
+  let timer = null;
+  let progressVal = 0;
+  const durationPerSlideSeconds = 4;
+  const totalDurationSeconds = totalSlides * durationPerSlideSeconds;
+
+  function updateSlideDisplay() {
+    for (let i = 0; i < totalSlides; i++) {
+      const slide = document.getElementById('slide' + i);
+      const dot = document.querySelectorAll('.indicator-dot')[i];
+      if (slide) slide.classList.remove('active');
+      if (dot) dot.classList.remove('active');
+    }
+    const activeSlide = document.getElementById('slide' + currentSlide);
+    const activeDot = document.querySelectorAll('.indicator-dot')[currentSlide];
+    if (activeSlide) activeSlide.classList.add('active');
+    if (activeDot) activeDot.classList.add('active');
+  }
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    const btn = document.getElementById('playBtn');
+    if (isPlaying) {
+      btn.innerText = '❚❚';
+      startVideoLoop();
+    } else {
+      btn.innerText = '▶';
+      clearInterval(timer);
+    }
+  }
+
+  function startVideoLoop() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      progressVal += 0.8;
+      if (progressVal >= 100) {
+        progressVal = 0;
+      }
+      currentSlide = Math.floor((progressVal / 100) * totalSlides);
+      if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+
+      document.getElementById('progressFill').style.width = progressVal + '%';
+
+      const currentSec = Math.floor((progressVal / 100) * totalDurationSeconds);
+      const mins = Math.floor(currentSec / 60);
+      const secs = currentSec % 60;
+      document.getElementById('timeDisplay').innerText = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+      updateSlideDisplay();
+    }, 100);
+  }
+
+  function goToSlide(index) {
+    currentSlide = index;
+    progressVal = (index / totalSlides) * 100;
+    document.getElementById('progressFill').style.width = progressVal + '%';
+    updateSlideDisplay();
+  }
+
+  function seekVideo(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const pct = clickX / rect.width;
+    progressVal = pct * 100;
+    currentSlide = Math.floor(pct * totalSlides);
+    if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+    document.getElementById('progressFill').style.width = progressVal + '%';
+    updateSlideDisplay();
+  }
+
+  // Start video playback automatically
+  startVideoLoop();
+</script>
+
+</body>
+</html>
