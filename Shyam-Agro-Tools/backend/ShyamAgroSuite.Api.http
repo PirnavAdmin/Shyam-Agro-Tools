@@ -1,0 +1,6 @@
+@ShyamAgroSuite.Api_HostAddress = http://localhost:5014
+
+GET {{ShyamAgroSuite.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,281 @@
+{
+  "blog": {
+    "latestNews": "Últimas notícias",
+    "fromOurBlog": "Do nosso blog",
+    "by": "Por",
+    "categoryAgriculture": "Agricultura",
+    "readMore": "Ler mais",
+    "closeBlogDetails": "Fechar detalhes do blog",
+    "posts": {
+      "soilPreparation": {
+        "title": "Dicas essenciais para preparar o solo",
+        "excerpt": "Aprenda segredos profissionais para preparar o solo antes da proxima safra e aumentar a produtividade...",
+        "date": "12 de maio de 2026",
+        "author": "Admin",
+        "points": [
+          "Dica: Choose the right tiller for your soil type.",
+          "Dica: Remove weeds and leftover crop residue before planting.",
+          "Dica: Maintain proper soil moisture before tilling.",
+          "Dica: Use cultivators for better aeration and root growth.",
+          "Dica: Break large soil clods before seed placement.",
+          "Dica: Level the field to avoid waterlogging in low spots.",
+          "Dica: Add compost or organic manure before final cultivation.",
+          "Dica: Avoid working soil when it is too wet or sticky.",
+          "Dica: Check soil pH and correct nutrient imbalance early.",
+          "Dica: Prepare raised beds for vegetables and delicate crops.",
+          "Dica: Keep tiller blades clean and sharp for uniform soil mixing.",
+          "Dica: Use shallow cultivation around existing roots.",
+          "Dica: Plan drainage channels before the rainy season.",
+          "Dica: Rotate crops to maintain soil health.",
+          "Dica: Do a final light pass before sowing for smooth seed beds."
+        ]
+      },
+      "powerTools": {
+        "title": "Manutencao das suas ferramentas eletricas",
+        "excerpt": "Um guia completo para limpar e manter ferramentas industriais com mais durabilidade e seguranca...",
+        "date": "10 de maio de 2026",
+        "author": "Especialista agricola",
+        "points": [
+          "Dica: Clean tools after every use.",
+          "Dica: Remove soil, dust, and crop residue from blades.",
+          "Dica: Check engine oil before starting.",
+          "Dica: Clean or replace air filters regularly.",
+          "Dica: Tighten loose nuts, bolts, and screws.",
+          "Dica: Sharpen blades when cutting performance decreases.",
+          "Dica: Check fuel lines for leakage.",
+          "Dica: Store tools in a dry and shaded place.",
+          "Dica: Lubricate moving parts regularly.",
+          "Dica: Inspect power cables and switches.",
+          "Dica: Replace damaged blades immediately.",
+          "Dica: Use only recommended fuel or power source.",
+          "Dica: Avoid overloading the machine.",
+          "Dica: Follow manufacturer safety instructions.",
+          "Dica: Service the tool at regular intervals."
+        ]
+      },
+      "irrigation": {
+        "title": "Tecnicas modernas de irrigacao",
+        "excerpt": "Conheca sistemas modernos de irrigacao que economizam agua e transformam a agricultura na India...",
+        "date": "08 de maio de 2026",
+        "author": "Editor",
+        "points": [
+          "Dica: Use drip irrigation to save water in row crops.",
+          "Dica: Maintain pumps and filters regularly.",
+          "Dica: Choose quality hoses, pipes, and connectors.",
+          "Dica: Monitor water pressure during irrigation.",
+          "Dica: Install filters before drip lines to reduce clogging.",
+          "Dica: Flush drip pipes at regular intervals.",
+          "Dica: Use sprinklers for even coverage in open fields.",
+          "Dica: Select pump capacity based on field size and head height.",
+          "Dica: Repair leaks quickly to prevent water loss.",
+          "Dica: Schedule irrigation early morning or evening.",
+          "Dica: Group crops with similar water needs together.",
+          "Dica: Use rain guns for larger field coverage.",
+          "Dica: Check nozzles for blockage before every cycle.",
+          "Dica: Protect pipes from direct damage during field operations.",
+          "Dica: Track soil moisture before increasing watering time."
+        ]
+      }
+    },
+    "relatedProducts": "Produtos relacionados",
+    "viewProduct": "Ver produto",
+    "authors": {
+      "admin": "Administrador",
+      "editor": "Editor",
+      "agriExpert": "Especialista agrícola"
+    },
+    "categories": {
+      "agriculture": "Agricultura"
+    },
+    "dates": {
+      "may12": "12 de maio de 2026",
+      "may10": "10 de maio de 2026",
+      "may08": "08 de maio de 2026"
+    },
+    "soilPreparation": {
+      "title": "Dicas essenciais para preparação do solo",
+      "description": "Aprenda métodos profissionais para preparar o solo antes da próxima safra e aumentar a produtividade...",
+      "points": [
+        "Dica de preparação do solo 1",
+        "Dica de preparação do solo 2",
+        "Dica de preparação do solo 3",
+        "Dica de preparação do solo 4",
+        "Dica de preparação do solo 5",
+        "Dica de preparação do solo 6",
+        "Dica de preparação do solo 7",
+        "Dica de preparação do solo 8",
+        "Dica de preparação do solo 9",
+        "Dica de preparação do solo 10",
+        "Dica de preparação do solo 11",
+        "Dica de preparação do solo 12",
+        "Dica de preparação do solo 13",
+        "Dica de preparação do solo 14",
+        "Dica de preparação do solo 15"
+      ]
+    },
+    "powerTools": {
+      "title": "Manutenção das suas ferramentas elétricas",
+      "description": "Um guia completo para limpar e manter ferramentas agrícolas motorizadas com mais durabilidade e segurança...",
+      "points": [
+        "Dica de manutenção de ferramentas 1",
+        "Dica de manutenção de ferramentas 2",
+        "Dica de manutenção de ferramentas 3",
+        "Dica de manutenção de ferramentas 4",
+        "Dica de manutenção de ferramentas 5",
+        "Dica de manutenção de ferramentas 6",
+        "Dica de manutenção de ferramentas 7",
+        "Dica de manutenção de ferramentas 8",
+        "Dica de manutenção de ferramentas 9",
+        "Dica de manutenção de ferramentas 10",
+        "Dica de manutenção de ferramentas 11",
+        "Dica de manutenção de ferramentas 12",
+        "Dica de manutenção de ferramentas 13",
+        "Dica de manutenção de ferramentas 14",
+        "Dica de manutenção de ferramentas 15"
+      ]
+    },
+    "irrigation": {
+      "title": "Técnicas modernas de irrigação",
+      "description": "Conheça sistemas modernos de irrigação que economizam água e transformam a agricultura na Índia...",
+      "points": [
+        "Dica de irrigação 1",
+        "Dica de irrigação 2",
+        "Dica de irrigação 3",
+        "Dica de irrigação 4",
+        "Dica de irrigação 5",
+        "Dica de irrigação 6",
+        "Dica de irrigação 7",
+        "Dica de irrigação 8",
+        "Dica de irrigação 9",
+        "Dica de irrigação 10",
+        "Dica de irrigação 11",
+        "Dica de irrigação 12",
+        "Dica de irrigação 13",
+        "Dica de irrigação 14",
+        "Dica de irrigação 15"
+      ]
+    }
+  },
+  "supportChat": {
+    "reset": "Redefinir",
+    "message": "Mensagem",
+    "title": "Suporte Shyam Agro",
+    "needHelp": "Precisa de ajuda?",
+    "subtitle": "Ajudamos com pedidos, produtos, pagamentos, entrega e problemas t?cnicos.",
+    "relatedQuestions": "Perguntas relacionadas",
+    "raiseTicket": "Abrir chamado",
+    "send": "Enviar",
+    "typeMessage": "Digite sua mensagem",
+    "ticketSuccess": "Seu ticket foi criado com sucesso.",
+    "fallback": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+    "ticketIntro": "Explique o problema e nossa equipe ajudar?.",
+    "name": "Nome",
+    "email": "E-mail",
+    "mobile": "N?mero de celular",
+    "orderIdOptional": "ID do pedido (opcional)",
+    "issueType": "Tipo de problema",
+    "subject": "Assunto",
+    "description": "Descri??o",
+    "cancel": "Cancelar",
+    "submitTicket": "Enviar ticket",
+    "welcome": "Ol?! Bem-vindo ao suporte Shyam Agro. Como posso ajudar hoje?",
+    "solved": "?timo. Fico feliz que o problema foi resolvido.",
+    "closeChat": "Fechar chat",
+    "openChat": "Precisa de ajuda? Abrir suporte",
+    "ticketSuccessWithId": "Seu chamado foi criado. ID do chamado: {{ticketId}}.",
+    "genericAnswer": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+    "nextStep": "Pr?xima etapa",
+    "ticketFormPrompt": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+    "mainMenu": "Menu principal",
+    "issueSolved": "Problema resolvido",
+    "latestTracking": "Aqui est?o os detalhes do seu pedido mais recente.",
+    "enterOrderIdPrompt": "Digite o ID do pedido para ver o rastreamento aqui.",
+    "trackingFound": "Aqui est?o os detalhes de rastreamento do pedido.",
+    "trackingFallback": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+    "tracking": {
+      "orderId": "ID do pedido",
+      "orderStatus": "Status do pedido",
+      "estimatedDelivery": "Entrega estimada",
+      "paymentMethod": "M?todo de pagamento",
+      "currentStep": "Etapa atual",
+      "timeline": "Linha do tempo",
+      "estimatedDeliveryValue": "3-7 dias ?teis",
+      "inTransit": "Em tr?nsito",
+      "notAvailable": "N?o dispon?vel",
+      "steps": {
+        "ordered": "Pedido feito",
+        "packed": "Embalado",
+        "shipped": "Enviado",
+        "outForDelivery": "Saiu para entrega",
+        "delivered": "Entregue"
+      }
+    },
+    "optionText": {
+      "Track Order": "Rastrear pedido",
+      "Payment Issue": "Problema de pagamento",
+      "Product Help": "Ajuda do produto",
+      "Delivery Issue": "Problema de entrega",
+      "Return/Refund": "Devolu??o/Reembolso",
+      "Technical Issue": "Problema t?cnico",
+      "Raise Ticket": "Abrir chamado",
+      "Issue Solved": "Problema resolvido",
+      "Main Menu": "Menu principal"
+    },
+    "answers": {
+      "greeting": "Ol?! Bem-vindo ao suporte Shyam Agro. Como posso ajudar hoje?",
+      "track-order": "Digite o ID do pedido para ver o rastreamento aqui.",
+      "product-help": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "payment-issue": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "delivery-issue": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "return-refund": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "technical-issue": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "language": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "cart": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "wishlist": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "images-videos": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "out-of-stock": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado.",
+      "ticket": "Encontrei uma etapa relacionada. Escolha uma op??o ou abra um chamado."
+    }
+  },
+  "featuredMachinery": "M?quinas agr?colas potentes",
+  "modernAgriculture": "Para produtores modernos",
+  "trendingNow": "Pulverizadores agr?colas inteligentes",
+  "mostPopular": "Proteja culturas com pulverizadores eficientes.",
+  "backToTop": "Voltar ao topo",
+  "previousProducts": "Produtos anteriores",
+  "nextProducts": "Pr?ximos produtos",
+  "previousMedia": "M?dia anterior",
+  "nextMedia": "Pr?xima m?dia",
+  "gridView": "Visualiza??o em grade",
+  "listView": "Visualiza??o em lista",
+  "off": "DE DESCONTO",
+  "hero": {
+    "sprayer": {
+      "title": "Pulverizadores agr?colas inteligentes",
+      "subtitle": "Cuidado preciso das culturas",
+      "description": "Proteja culturas com pulverizadores eficientes."
+    },
+    "tractor": {
+      "title": "M?quinas agr?colas potentes",
+      "subtitle": "Para produtores modernos",
+      "description": "Melhore o trabalho com m?quinas confi?veis."
+    }
+  },
+  "specLabels": {
+    "weight": "Peso",
+    "dimensions": "Dimens?es",
+    "powerSource": "Fonte de energia",
+    "material": "Material",
+    "tankCapacity": "Capacidade do tanque",
+    "pressure": "Press?o",
+    "usage": "Uso"
+  },
+  "productGeneric": {
+    "feature": "O recurso {{index}} de {{productName}} ajuda no trabalho agr?cola.",
+    "detail": "{{productName}} foi projetado para uso agr?cola confi?vel.",
+    "usageInstruction": "{{productName}} foi projetado para uso agr?cola confi?vel.",
+    "suitableFor": "{{productName}} foi projetado para uso agr?cola confi?vel.",
+    "specificationValue": "{{label}}: {{value}}",
+    "reviewComment": "Compradores verificados deram {{rating}} estrelas para {{productName}}."
+  }
+}

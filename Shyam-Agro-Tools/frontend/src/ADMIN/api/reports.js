@@ -1,0 +1,67 @@
+import axios from 'axios';
+import { getApiDomain } from '../../utils/apiConfig';
+
+export const BASE_URL = getApiDomain();
+
+const api = axios.create({
+  timeout: 60000,
+  headers: {
+    'ngrok-skip-browser-warning': 'true',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use((config) => {
+  config.baseURL = getApiDomain();
+  const token = localStorage.getItem('adminToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+/**
+ * Fetch report data for orders.
+ * GET /api/Reports/orders
+ */
+export const getReportsOrders = async () => {
+  const response = await api.get('/api/Reports/orders');
+  return response.data;
+};
+
+/**
+ * Fetch report data for catalog.
+ * GET /api/Reports/catalog
+ */
+export const getReportsCatalog = async () => {
+  const response = await api.get('/api/Reports/catalog');
+  return response.data;
+};
+
+/**
+ * Trigger export of report.
+ * POST /api/Reports/export
+ */
+export const exportReport = async (reportType) => {
+  const response = await api.post('/api/Reports/export', { reportType });
+  return response.data;
+};
+
+/**
+ * Update report settings.
+ * PUT /api/Reports/settings
+ */
+export const updateReportSettings = async (settings) => {
+  const response = await api.put('/api/Reports/settings', settings);
+  return response.data;
+};
+
+/**
+ * Clear analytics report cache.
+ * DELETE /api/Reports/cache
+ */
+export const clearReportCache = async () => {
+  const response = await api.delete('/api/Reports/cache');
+  return response.data;
+};

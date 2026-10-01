@@ -1,0 +1,28 @@
+# .NET build output
+bin/
+obj/
+publish/
+ 
+ 
+# Environment/secrets
+.env
+.env.*
+ 
+# Logs
+*.log
+logs/
+ 
+# Database backups
+*.sql
+*.sql.gz
+*.bak
+ 
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+ 
+# OS
+.DS_Store
+Thumbs.db

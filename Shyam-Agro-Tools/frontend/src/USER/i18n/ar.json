@@ -1,0 +1,86 @@
+{
+  "blog": {
+    "latestNews": "Akhbar Jadida",
+    "fromOurBlog": "Min Mudawanatina",
+    "by": "Biwasitat",
+    "categoryAgriculture": "Ziraa",
+    "readMore": "Iqra Akthar",
+    "closeBlogDetails": "Ighlaq tafasil blog",
+    "posts": {
+      "soilPreparation": {
+        "title": "Nasaeh Asasiya Litahdir Al-Turba",
+        "excerpt": "Taallam nasaeh ihtirafiya litahdir al-turba qabl mawsem al-ziraa wa ziadat al-intaj...",
+        "date": "12 May 2026",
+        "author": "Admin",
+        "points": [
+          "Nasiha: Choose the right tiller for your soil type.",
+          "Nasiha: Remove weeds and leftover crop residue before planting.",
+          "Nasiha: Maintain proper soil moisture before tilling.",
+          "Nasiha: Use cultivators for better aeration and root growth.",
+          "Nasiha: Break large soil clods before seed placement.",
+          "Nasiha: Level the field to avoid waterlogging in low spots.",
+          "Nasiha: Add compost or organic manure before final cultivation.",
+          "Nasiha: Avoid working soil when it is too wet or sticky.",
+          "Nasiha: Check soil pH and correct nutrient imbalance early.",
+          "Nasiha: Prepare raised beds for vegetables and delicate crops.",
+          "Nasiha: Keep tiller blades clean and sharp for uniform soil mixing.",
+          "Nasiha: Use shallow cultivation around existing roots.",
+          "Nasiha: Plan drainage channels before the rainy season.",
+          "Nasiha: Rotate crops to maintain soil health.",
+          "Nasiha: Do a final light pass before sowing for smooth seed beds."
+        ]
+      },
+      "powerTools": {
+        "title": "Siyanat Adawat Al-Taqa",
+        "excerpt": "Dalil kamil litanzif wa siyanat adawat al-taqa alsinaiya litawil alumr wal salama...",
+        "date": "10 May 2026",
+        "author": "Khabir Zirai",
+        "points": [
+          "Nasiha: Clean tools after every use.",
+          "Nasiha: Remove soil, dust, and crop residue from blades.",
+          "Nasiha: Check engine oil before starting.",
+          "Nasiha: Clean or replace air filters regularly.",
+          "Nasiha: Tighten loose nuts, bolts, and screws.",
+          "Nasiha: Sharpen blades when cutting performance decreases.",
+          "Nasiha: Check fuel lines for leakage.",
+          "Nasiha: Store tools in a dry and shaded place.",
+          "Nasiha: Lubricate moving parts regularly.",
+          "Nasiha: Inspect power cables and switches.",
+          "Nasiha: Replace damaged blades immediately.",
+          "Nasiha: Use only recommended fuel or power source.",
+          "Nasiha: Avoid overloading the machine.",
+          "Nasiha: Follow manufacturer safety instructions.",
+          "Nasiha: Service the tool at regular intervals."
+        ]
+      },
+      "irrigation": {
+        "title": "Taqniyat Al-Rayy Al-Haditha",
+        "excerpt": "Iktashif anzimat rayy tawaffir al-miyah wa tughayir al-ziraa alhaditha fi India...",
+        "date": "08 May 2026",
+        "author": "Editor",
+        "points": [
+          "Nasiha: Use drip irrigation to save water in row crops.",
+          "Nasiha: Maintain pumps and filters regularly.",
+          "Nasiha: Choose quality hoses, pipes, and connectors.",
+          "Nasiha: Monitor water pressure during irrigation.",
+          "Nasiha: Install filters before drip lines to reduce clogging.",
+          "Nasiha: Flush drip pipes at regular intervals.",
+          "Nasiha: Use sprinklers for even coverage in open fields.",
+          "Nasiha: Select pump capacity based on field size and head height.",
+          "Nasiha: Repair leaks quickly to prevent water loss.",
+          "Nasiha: Schedule irrigation early morning or evening.",
+          "Nasiha: Group crops with similar water needs together.",
+          "Nasiha: Use rain guns for larger field coverage.",
+          "Nasiha: Check nozzles for blockage before every cycle.",
+          "Nasiha: Protect pipes from direct damage during field operations.",
+          "Nasiha: Track soil moisture before increasing watering time."
+        ]
+      }
+    }
+  },
+  "supportChat": {
+    "reset": "إعادة تعيين",
+    "message": "الرسالة",
+    "title": "Shyam Agro Support"
+  }
+}

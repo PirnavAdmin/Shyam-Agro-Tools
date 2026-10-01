@@ -1,0 +1,31 @@
+{
+  "ourCollections": "Our Collections",
+  "allCategories": "All Categories",
+  "specialOffer": "Special Offer",
+  "premiumFarmingTools": "PREMIUM FARMING\nTOOLS 40% OFF & ABOVE",
+  "premiumFarmingToolsDesc": "Equip your farm with the best industrial tools at unbeatable prices this season.",
+  "shopCollection": "SHOP COLLECTION",
+  "powerTillers": "Power Tillers",
+  "powerfulPowerTillers": "POWERFUL\nPOWER TILLERS",
+  "powerfulPowerTillersDesc": "Discover our newly launched range of high-performance industrial power tillers.",
+  "trendingNow": "TRENDING NOW",
+  "mostPopular": "Most Popular Products",
+  "ourTrustedBrands": "OUR TRUSTED BRANDS",
+  "hero": {
+    "slide1": {
+      "subtitle": "Featured Machinery",
+      "title": "Explore Powerful Farming Equipment",
+      "description": "Discover industrial-grade agricultural machinery designed for maximum productivity."
+    },
+    "slide2": {
+      "subtitle": "Advanced Tractor Collection",
+      "title": "High-Performance Tractors for Modern Agriculture",
+      "description": "Heavy-duty power tillers and tractors built for tough soil conditions."
+    },
+    "slide3": {
+      "subtitle": "Precision Crop Sprayers",
+      "title": "Protect Crops with Advanced Spraying Technology",
+      "description": "High pressure thermal foggers and motorized sprayers for farm efficiency."
+    }
+  }
+}

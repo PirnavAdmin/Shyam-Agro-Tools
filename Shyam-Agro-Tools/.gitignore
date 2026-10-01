@@ -1,0 +1,11 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Build and binary folders
+bin/
+obj/
+node_modules/
+dist/
+build/

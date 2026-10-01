@@ -1,0 +1,11 @@
+.trust-rating-section {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.trust-rating-inner {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
