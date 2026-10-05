@@ -1,8 +1,0 @@
-.git
-.env
-**/bin
-**/obj
-**/node_modules
-**/build
-**/.DS_Store
-**/*.user
