@@ -1840,13 +1840,13 @@ const PaymentPage = () => {
 
   const paymentMethodLabel = (id) => {
     if (id === 'cashfree') return 'Cashfree Gateway';
-    if (id === 'qr') return t('qrPayment');
-    if (id === 'upi') return t('upi');
-    if (id === 'bankTransfer') return t('bankTransfer');
-    if (id === 'cards' || id === 'debitCard') return t('debitCard') || 'Debit Card';
+    if (id === 'qr') return t('qrPayment') || 'Scan QR Code';
+    if (id === 'upi') return t('upi') || 'UPI App';
+    if (id === 'bankTransfer') return t('bankTransfer') || 'Bank Transfer';
+    if (id === 'cards' || id === 'debitCard') return t('debitCard') || 'Debit / Credit Card';
     if (id === 'creditCard') return t('creditCard') || 'Credit Card';
     if (id === 'cod') return t('cashOnDelivery') || 'Cash on Delivery';
-    return t('qrPayment');
+    return t('qrPayment') || 'Scan QR Code';
   };
   const paymentVisualMethod = (id) => {
     if (id === 'cashfree') return 'cashfree';
@@ -1876,19 +1876,7 @@ const PaymentPage = () => {
   const creditExpiryYear = creditExpiryYearShort ? `20${creditExpiryYearShort}` : '';
   const merchantUpiId = merchantPaymentProfile.upiId;
 
-  if (loading) {
-    return (
-      <div className="payment-page-shell">
-        <Header onLoginClick={() => setIsLoginOpen(true)} />
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', gap: '16px' }}>
-          <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', color: '#333333' }}></i>
-          <span style={{ fontSize: '16px', fontWeight: '500', color: '#666666' }}>Loading Checkout Details...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
+  if (error && !checkoutSummary) {
     return (
       <div className="payment-page-shell">
         <Header onLoginClick={() => setIsLoginOpen(true)} />

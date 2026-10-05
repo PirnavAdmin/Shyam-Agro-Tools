@@ -1084,7 +1084,7 @@ button.file-input-custom-btn {
 
 .payment-option-card-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 9px;
   margin-bottom: 10px;
 }
