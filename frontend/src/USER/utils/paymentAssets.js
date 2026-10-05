@@ -4,6 +4,7 @@ const PAYMENT_ASSET_TEXT = {
     qr: ['QR', 'Scan & Pay'],
     bank: ['BANK', 'Transfer'],
     card: ['CARD', 'Secure Card'],
+    cashfree: ['CASHFREE', 'UPI, Cards & More'],
     cod: ['COD', 'Cash on Delivery'],
   },
   te: {
@@ -11,6 +12,7 @@ const PAYMENT_ASSET_TEXT = {
     qr: ['QR', 'స్కాన్ చేసి చెల్లించండి'],
     bank: ['బ్యాంక్', 'ట్రాన్స్‌ఫర్'],
     card: ['కార్డ్', 'సురక్షిత చెల్లింపు'],
+    cashfree: ['క్యాష్‌ఫ్రీ', 'UPI & కార్డులు'],
     cod: ['COD', 'డెలివరీపై నగదు'],
   },
   hi: {
@@ -18,6 +20,7 @@ const PAYMENT_ASSET_TEXT = {
     qr: ['QR', 'स्कैन करें'],
     bank: ['बैंक', 'ट्रांसफर'],
     card: ['कार्ड', 'सुरक्षित भुगतान'],
+    cashfree: ['कैशफ्री', 'UPI एवं कार्ड्स'],
     cod: ['COD', 'डिलीवरी पर नकद'],
   },
 };
@@ -27,12 +30,14 @@ const METHOD_COLORS = {
   qr: ['#eef4ff', '#2856a3'],
   bank: ['#fff4dd', '#9a6400'],
   card: ['#f1edff', '#5c3fa3'],
+  cashfree: ['#f0fdf4', '#15803d'],
   cod: ['#eaf8f4', '#11705c'],
 };
 
 const normalizeLanguage = (language) => String(language || 'en').split('-')[0].toLowerCase();
 
 const normalizeMethod = (method) => {
+  if (method === 'cashfree' || method === 'cashfree-gateway') return 'cashfree';
   if (method === 'qr-payment' || method === 'qrCode') return 'qr';
   if (method === 'bankTransfer' || method === 'net-banking') return 'bank';
   if (method === 'debitCard' || method === 'creditCard' || method === 'cards') return 'card';

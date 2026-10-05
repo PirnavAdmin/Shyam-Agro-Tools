@@ -4,22 +4,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { getApiDomain } from '../../utils/apiConfig';
-import heroMachinery from '../../asset/hero-machinery.png';
-import heroSprayers from '../../asset/hero-sprayers.png';
-import heroNetsurf from '../../asset/hero-netsurf.jpg';
+import heroNetsurf from '../../asset/hero-netsurf.png';
 
 const API_URL = `${getApiDomain()}/api`;
 
 const defaultSlides = [
   {
     id: 1,
-    image: heroMachinery,
+    image: heroNetsurf,
     alt: 'Featured Machinery - Explore Powerful Farming Equipment',
     targetPath: '/categories',
   },
   {
     id: 2,
-    image: heroSprayers,
+    image: heroNetsurf,
     alt: 'Advanced & Reliable Sprayers - Powerful Performance & Better Farming',
     targetPath: '/categories',
   },

@@ -212,7 +212,7 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(45deg, rgba(11,46,19,0.9), rgba(11,46,19,0.7)), url('../IMAGES/hero_banner.png');
+  background: linear-gradient(45deg, rgba(11,46,19,0.9), rgba(11,46,19,0.7)), url('../../asset/hero-netsurf.png');
   background-size: cover;
   background-position: center;
   z-index: 0;

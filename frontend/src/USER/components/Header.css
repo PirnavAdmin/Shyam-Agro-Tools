@@ -256,7 +256,7 @@
 }
 
 .header-brand-accent {
-  color: #42b62b;
+  color: inherit;
 }
 
 .header-nav {

@@ -823,7 +823,7 @@ const Header = ({ onLoginClick }) => {
           <Link to="/" className="header-brand-link flex items-center gap-3 group">
             <img src={headerLogo} alt="Shyam Agro" className="site-header-logo transition-transform" />
             <h1 className="header-brand-title hidden sm:block text-lg md:text-xl font-black tracking-tight text-dark whitespace-nowrap">
-              SHYAM AGRO<span className="header-brand-accent text-primary"> TOOLS</span>
+              SHYAM AGRO<span className="header-brand-accent text-dark"> TOOLS</span>
             </h1>
           </Link>
 

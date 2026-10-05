@@ -1422,20 +1422,14 @@ const CheckoutPage = ({ mode = 'checkout' }) => {
   const continueShopping = () => navigate('/products');
   const currentNetBankingStepIndex = Math.max(0, netBankingSteps.findIndex((step) => step.id === netBankingFlow.step));
 
-  if (loading || (error && !checkoutSummary)) {
+  if (error && !checkoutSummary) {
     return (
       <div className="checkout-page-shell flex flex-col min-h-screen bg-[#f8f9fa]">
         <Header onLoginClick={() => setIsLoginOpen(true)} />
         <main className="checkout-container">
-          <div className="checkout-card text-center">
-            {loading ? (
-              'Loading Checkout...'
-            ) : (
-              <>
-                <p>{error}</p>
-                <button type="button" onClick={loadCheckoutSummary}>Retry</button>
-              </>
-            )}
+          <div className="checkout-card text-center py-12">
+            <p className="mb-4 text-red-600 font-semibold">{error}</p>
+            <button type="button" onClick={loadCheckoutSummary} className="btn-primary py-2 px-6">Retry</button>
           </div>
         </main>
         <LoginPopup isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />

@@ -1849,7 +1849,7 @@ const PaymentPage = () => {
     return t('qrPayment');
   };
   const paymentVisualMethod = (id) => {
-    if (id === 'cashfree') return 'card';
+    if (id === 'cashfree') return 'cashfree';
     if (id === 'qr') return 'qr';
     if (id === 'bankTransfer') return 'bank';
     if (id === 'cards' || id === 'debitCard' || id === 'creditCard') return 'card';
