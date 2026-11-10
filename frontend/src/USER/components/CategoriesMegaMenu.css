@@ -1,6 +1,6 @@
 .mega-menu-container {
-  width: 860px;
-  max-width: 90vw;
+  width: 960px;
+  max-width: 95vw;
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
   animation: megaMenuFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
