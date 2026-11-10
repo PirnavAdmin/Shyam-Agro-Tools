@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Package, ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronRight, Package, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { getCategoryImage } from '../../services/categoryService';
 import { getSubcategoryImage } from '../../services/subcategoryService';
-import { getProducts } from '../../services/productService';
+import { getProducts, getProductsBySubcategory } from '../../services/productService';
 import { getProductImage, handleProductImageError } from '../../utils/productImage';
 import { useLanguage } from '../context/LanguageContext';
 import './CategoriesMegaMenu.css';
@@ -14,6 +14,8 @@ const CategoriesMegaMenu = ({ mappedCategories = [], onClose }) => {
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(null);
   const [activeSubcategoryIndex, setActiveSubcategoryIndex] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
+  const [subcatProductsMap, setSubcatProductsMap] = useState({});
+  const [loadingSubcatId, setLoadingSubcatId] = useState(null);
 
   const activeCategory = activeCategoryIndex !== null ? mappedCategories[activeCategoryIndex] : null;
   const subcategories = activeCategory?.subcategories || [];
@@ -42,18 +44,75 @@ const CategoriesMegaMenu = ({ mappedCategories = [], onClose }) => {
     setActiveSubcategoryIndex(null);
   }, [activeCategoryIndex]);
 
+  // When activeSubcategory changes, ensure its products are loaded (targeted fetch if not yet in memory)
+  useEffect(() => {
+    if (!activeSubcategory?.id) return;
+    const subId = String(activeSubcategory.id);
+
+    // If already in subcatProductsMap, no need to fetch
+    if (subcatProductsMap[subId] && subcatProductsMap[subId].length > 0) {
+      return;
+    }
+
+    // Check if allProducts has products for this subcategory
+    const targetSubId = String(activeSubcategory.id).toLowerCase();
+    const targetSubName = String(activeSubcategory.name || '').trim().toLowerCase();
+
+    const fromAll = allProducts.filter((p) => {
+      const pSubId = String(p.subcategoryId ?? p.subCategoryId ?? p.subcategory?.id ?? '').toLowerCase();
+      const pSubName = String(p.subcategory?.name ?? p.subcategory ?? p.subCategory ?? '').trim().toLowerCase();
+      return (pSubId && pSubId === targetSubId) || (targetSubName && pSubName === targetSubName);
+    });
+
+    if (fromAll.length > 0) {
+      setSubcatProductsMap((prev) => ({ ...prev, [subId]: fromAll }));
+      return;
+    }
+
+    // Fetch specifically for this subcategory
+    let isMounted = true;
+    setLoadingSubcatId(subId);
+
+    getProductsBySubcategory(activeSubcategory.id)
+      .then((data) => {
+        if (isMounted) {
+          const items = Array.isArray(data) ? data : (data?.products || []);
+          setSubcatProductsMap((prev) => ({ ...prev, [subId]: items }));
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to fetch products for subcategory:', err);
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoadingSubcatId((current) => (current === subId ? null : current));
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeSubcategory, allProducts, subcatProductsMap]);
+
   // Instant in-memory filtering for active subcategory
   const products = useMemo(() => {
     if (!activeSubcategory?.id) return [];
+    const subId = String(activeSubcategory.id);
+    if (subcatProductsMap[subId]) {
+      return subcatProductsMap[subId];
+    }
+
     const targetSubId = String(activeSubcategory.id).toLowerCase();
-    const targetSubName = String(activeSubcategory.name || '').toLowerCase();
+    const targetSubName = String(activeSubcategory.name || '').trim().toLowerCase();
 
     return allProducts.filter((p) => {
-      const pSubId = String(p.subcategoryId ?? p.subCategoryId ?? '').toLowerCase();
-      const pSubName = String(p.subcategory ?? p.subCategory ?? '').toLowerCase();
-      return pSubId === targetSubId || (targetSubName && pSubName === targetSubName);
+      const pSubId = String(p.subcategoryId ?? p.subCategoryId ?? p.subcategory?.id ?? '').toLowerCase();
+      const pSubName = String(p.subcategory?.name ?? p.subcategory ?? p.subCategory ?? '').trim().toLowerCase();
+      return (pSubId && pSubId === targetSubId) || (targetSubName && pSubName === targetSubName);
     });
-  }, [allProducts, activeSubcategory]);
+  }, [allProducts, activeSubcategory, subcatProductsMap]);
+
+  const isCurrentSubcatLoading = loadingSubcatId === String(activeSubcategory?.id) && products.length === 0;
 
   if (!mappedCategories || mappedCategories.length === 0) return null;
 
@@ -203,7 +262,12 @@ const CategoriesMegaMenu = ({ mappedCategories = [], onClose }) => {
                 </button>
               </div>
 
-              {products.length > 0 ? (
+              {isCurrentSubcatLoading ? (
+                <div className="py-20 text-center text-xs text-gray-500 flex flex-col items-center justify-center gap-3">
+                  <Loader2 size={30} className="text-primary animate-spin" />
+                  <span className="font-bold text-gray-700 text-xs">Loading products...</span>
+                </div>
+              ) : products.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3">
                   {products.slice(0, 4).map((product) => {
                     const pName = productText(product, 'name');

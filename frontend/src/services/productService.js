@@ -4,7 +4,6 @@ import { getProductImage } from '../utils/productImage';
 
 export const PRODUCT_API_BASE_URL = (
   process.env.REACT_APP_PRODUCT_API_BASE_URL ||
-  process.env.REACT_APP_CART_CHECKOUT_API_BASE_URL ||
   getApiDomain()
 ).replace(/\/$/, '');
 const PRODUCT_ENDPOINT = `${PRODUCT_API_BASE_URL}/api/products`;
