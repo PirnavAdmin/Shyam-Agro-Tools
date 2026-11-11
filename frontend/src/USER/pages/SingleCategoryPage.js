@@ -4,6 +4,8 @@ import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import { useCategories } from '../context/CategoryContext';
 import ProductCard from '../components/ProductCard';
+import ProductCarousel from '../components/ProductCarousel';
+import Pagination from '../components/Pagination';
 import CategoryBanner from '../components/CategoryBanner';
 import { useLanguage } from '../context/LanguageContext';
 import { scrollToElementForOneSecond } from '../utils/smoothScroll';
@@ -254,13 +256,13 @@ const SingleCategoryPage = () => {
           
           {/* TOOLSVILLA SECTION 1: SHOP BY CATEGORY (SUBCATEGORIES CARDS) */}
           {subcategoriesForCategory.length > 0 && (
-            <section className="toolsvilla-shop-by-category mb-10 bg-white border border-gray-100 rounded-xl p-5 md:p-6 shadow-2xs">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+            <section className="toolsvilla-shop-by-category mb-6 bg-white border border-gray-100 rounded-xl p-3.5 md:p-4 shadow-2xs">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-2.5 mb-3.5">
                 <div>
-                  <h2 className="text-xl md:text-2xl font-black text-dark tracking-tight uppercase">
+                  <h2 className="text-base md:text-lg font-bold text-dark tracking-tight uppercase">
                     {t('shopByCategory') || 'Shop by Subcategory'}
                   </h2>
-                  <p className="text-xs text-gray-400 font-medium mt-0.5">
+                  <p className="text-[11px] text-gray-400 font-medium">
                     Browse specialized equipment under {title}
                   </p>
                 </div>
@@ -271,26 +273,26 @@ const SingleCategoryPage = () => {
                     className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
                   >
                     <span>View All Subcategories</span>
-                    <ArrowRight size={14} />
+                    <ArrowRight size={13} />
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2">
                 {/* ALL PRODUCTS CARD */}
                 <button
                   type="button"
                   onClick={() => setSelectedSubcategory('all')}
-                  className={`subcat-card-toolsvilla border rounded-xl p-3.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[80px] ${
+                  className={`subcat-card-toolsvilla border rounded-lg py-1.5 px-2.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[48px] shadow-3xs ${
                     selectedSubcategory === 'all'
-                      ? 'border-primary bg-primary/10 shadow-sm ring-1 ring-primary/30'
-                      : 'border-gray-200 bg-white hover:border-primary/50 hover:shadow-md'
+                      ? 'border-primary bg-primary/10 shadow-xs ring-1 ring-primary/30'
+                      : 'border-gray-200 bg-white hover:border-primary/50 hover:shadow-xs'
                   }`}
                 >
-                  <span className="text-xs md:text-sm font-bold text-dark group-hover:text-primary transition-colors line-clamp-2">
+                  <span className="text-[11px] sm:text-xs font-semibold text-dark group-hover:text-primary transition-colors line-clamp-1 leading-tight">
                     {t('allProducts') || 'All Products'}
                   </span>
-                  <span className={`text-[11px] font-bold mt-1.5 px-2.5 py-0.5 rounded-full ${
+                  <span className={`text-[10px] font-semibold mt-0.5 px-2 py-0.2 rounded-full ${
                     selectedSubcategory === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
                   }`}>
                     {categoryProducts.length} {t('items')}
@@ -308,16 +310,16 @@ const SingleCategoryPage = () => {
                       type="button"
                       key={sub.id}
                       onClick={() => handleSubcategorySelect(sub.id)}
-                      className={`subcat-card-toolsvilla border rounded-xl p-3.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[80px] ${
+                      className={`subcat-card-toolsvilla border rounded-lg py-1.5 px-2.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[48px] shadow-3xs ${
                         isSelected
-                          ? 'border-primary bg-primary/10 shadow-sm ring-1 ring-primary/30'
-                          : 'border-gray-200 bg-white hover:border-primary/50 hover:shadow-md'
+                          ? 'border-primary bg-primary/10 shadow-xs ring-1 ring-primary/30'
+                          : 'border-gray-200 bg-white hover:border-primary/50 hover:shadow-xs'
                       }`}
                     >
-                      <span className="text-xs md:text-sm font-bold text-dark line-clamp-2 group-hover:text-primary transition-colors">
+                      <span className="text-[11px] sm:text-xs font-semibold text-dark line-clamp-1 group-hover:text-primary transition-colors leading-tight">
                         {subTitle}
                       </span>
-                      <span className={`text-[11px] font-bold mt-1.5 px-2.5 py-0.5 rounded-full ${
+                      <span className={`text-[10px] font-semibold mt-0.5 px-2 py-0.2 rounded-full ${
                         isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
                       }`}>
                         {subProductsCount} {t('items')}
@@ -349,25 +351,21 @@ const SingleCategoryPage = () => {
                         <h3 className="text-lg md:text-xl font-black text-dark uppercase tracking-tight">
                           {subTitle}
                         </h3>
-                        <span className="text-xs bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-gray-100 text-gray-500 font-bold px-2.5 py-0.5 rounded-full">
                           {subProds.length}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleSubcategorySelect(sub.id)}
-                        className="text-xs font-bold text-primary hover:underline flex items-center gap-1 uppercase tracking-wider"
+                        className="px-3.5 py-1.5 rounded-full border border-gray-300 text-xs font-semibold text-gray-700 hover:border-gray-900 hover:text-gray-900 hover:bg-gray-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-2xs"
                       >
                         <span>{t('viewAll') || 'View All'}</span>
-                        <ArrowRight size={14} />
+                        <ArrowRight size={13} />
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5">
-                      {subProds.slice(0, 5).map((p) => (
-                        <ProductCard key={p.id} product={p} layout="grid" />
-                      ))}
-                    </div>
+                    <ProductCarousel products={subProds} />
                   </section>
                 );
               })}
@@ -389,11 +387,7 @@ const SingleCategoryPage = () => {
                         </h3>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5">
-                      {ungroupedProds.map((p) => (
-                        <ProductCard key={p.id} product={p} layout="grid" />
-                      ))}
-                    </div>
+                    <ProductCarousel products={ungroupedProds} />
                   </section>
                 );
               })()}
@@ -477,54 +471,11 @@ const SingleCategoryPage = () => {
                       ))}
                     </div>
 
-                    {totalPages > 1 && (
-                      <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => changePage(1)}
-                          disabled={currentPage === 1}
-                          className="pagination-btn"
-                        >
-                          {t('first')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePage(currentPage - 1)}
-                          disabled={currentPage === 1}
-                          className="pagination-btn"
-                        >
-                          {t('previous')}
-                        </button>
-                        {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
-                          <button
-                            key={page}
-                            type="button"
-                            onClick={() => changePage(page)}
-                            className={`pagination-btn min-w-10 ${
-                              currentPage === page ? 'pagination-btn-active' : ''
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => changePage(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                          className="pagination-btn"
-                        >
-                          {t('next')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => changePage(totalPages)}
-                          disabled={currentPage === totalPages}
-                          className="pagination-btn"
-                        >
-                          {t('last')}
-                        </button>
-                      </div>
-                    )}
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={changePage}
+                    />
                   </>
                 ) : (
                   <div className="border border-gray-100 bg-white px-6 py-12 text-center rounded-xl">

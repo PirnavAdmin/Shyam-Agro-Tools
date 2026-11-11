@@ -28,7 +28,21 @@ export const getSubcategoryImage = (image) => {
 
 export const getSubcategories = async () => {
   if (!subcategoriesRequest) {
-    subcategoriesRequest = axios.get(SUBCATEGORY_ENDPOINT, requestConfig).finally(() => {
+    subcategoriesRequest = (async () => {
+      const endpoint = `${getApiDomain()}/api/Subcategory`;
+      try {
+        return await axios.get(endpoint, requestConfig);
+      } catch (err) {
+        const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        const fallbackBase = isLocal ? 'http://localhost:5000' : 'https://shyamagrotools.com';
+        const fallbackEndpoint = `${fallbackBase}/api/Subcategory`;
+        if (fallbackEndpoint !== endpoint) {
+          console.warn('Primary subcategory endpoint failed, retrying with fallback:', fallbackEndpoint);
+          return await axios.get(fallbackEndpoint, requestConfig);
+        }
+        throw err;
+      }
+    })().finally(() => {
       subcategoriesRequest = null;
     });
   }

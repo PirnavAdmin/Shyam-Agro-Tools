@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import ProductCard from '../components/ProductCard';
+import Pagination from '../components/Pagination';
 import { getProducts } from '../../services/productService';
 import { useLanguage } from '../context/LanguageContext';
 import { scrollToElementForOneSecond } from '../utils/smoothScroll';
@@ -35,52 +36,6 @@ const productMatchesPowerTillers = (product = {}) => {
     .toLowerCase();
 
   return /\bpower\s*-?\s*tillers?\b/.test(searchableText);
-};
-
-const Pagination = ({ currentPage, totalPages, onPageChange, t }) => {
-  const page = Number(currentPage) || 1;
-  const maxPages = Number(totalPages) || 1;
-
-  if (maxPages <= 1) return null;
-
-  const pages = Array.from({ length: maxPages }, (_, index) => index + 1);
-  const isFirstPage = page <= 1;
-  const isLastPage = page >= maxPages;
-
-  return (
-    <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-      {!isFirstPage && (
-        <>
-          <button type="button" onClick={() => onPageChange(1)} disabled={isFirstPage} className="pagination-btn">
-            {t('first')}
-          </button>
-          <button type="button" onClick={() => onPageChange(page - 1)} disabled={isFirstPage} className="pagination-btn">
-            {t('previous')}
-          </button>
-        </>
-      )}
-      {pages.map((p) => (
-        <button
-          key={p}
-          type="button"
-          onClick={() => onPageChange(p)}
-          className={`pagination-btn min-w-10 ${page === p ? 'pagination-btn-active' : ''}`}
-        >
-          {p}
-        </button>
-      ))}
-      {!isLastPage && (
-        <>
-          <button type="button" onClick={() => onPageChange(page + 1)} disabled={isLastPage} className="pagination-btn">
-            {t('next')}
-          </button>
-          <button type="button" onClick={() => onPageChange(maxPages)} disabled={isLastPage} className="pagination-btn">
-            {t('last')}
-          </button>
-        </>
-      )}
-    </div>
-  );
 };
 
 const ProductsPage = ({ mode = 'all' }) => {

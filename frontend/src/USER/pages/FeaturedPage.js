@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LoginPopup from '../components/LoginPopup';
 import ProductCard from '../components/ProductCard';
+import Pagination from '../components/Pagination';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -133,54 +134,11 @@ const FeaturedPage = () => {
               ))}
             </div>
 
-            {totalPages > 1 && (
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => changePage(1)}
-                  disabled={currentPage === 1}
-                  className="pagination-btn"
-                >
-                  {t('first') || 'First'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => changePage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="pagination-btn"
-                >
-                  {t('previous') || 'Previous'}
-                </button>
-                {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
-                  <button
-                    key={page}
-                    type="button"
-                    onClick={() => changePage(page)}
-                    className={`pagination-btn min-w-10 ${
-                      currentPage === page ? 'pagination-btn-active' : ''
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => changePage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="pagination-btn"
-                >
-                  {t('next') || 'Next'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => changePage(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="pagination-btn"
-                >
-                  {t('last') || 'Last'}
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={changePage}
+            />
           </>
         ) : (
           <div className="border border-border bg-white px-6 py-10 text-center text-sm font-semibold text-gray-500">

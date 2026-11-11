@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import ProductCard from './ProductCard';
+import ProductCarousel from './ProductCarousel';
 import { getRelatedProducts } from '../../services/productService';
 
 const EMPTY_EXCLUDE_IDS = [];
@@ -60,11 +60,7 @@ const RelatedProducts = ({ currentProduct, categoryName, excludeIds = EMPTY_EXCL
       ) : relatedError ? (
         <p className="text-sm leading-6 text-gray-600">{relatedError}</p>
       ) : relatedProducts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5">
-          {relatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductCarousel products={relatedProducts} />
       ) : null}
     </section>
   );

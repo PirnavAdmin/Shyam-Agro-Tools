@@ -33,7 +33,22 @@ export const getCategoryImage = (image, nameOrSlug) => {
 
 export const getCategories = async () => {
   if (!categoriesRequest) {
-    categoriesRequest = axios.get(CATEGORY_ENDPOINT, requestConfig).finally(() => {
+    categoriesRequest = (async () => {
+      const endpoint = `${getApiDomain()}/api/Category`;
+      try {
+        return await axios.get(endpoint, requestConfig);
+      } catch (err) {
+        // Fallback between local and production
+        const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        const fallbackBase = isLocal ? 'http://localhost:5000' : 'https://shyamagrotools.com';
+        const fallbackEndpoint = `${fallbackBase}/api/Category`;
+        if (fallbackEndpoint !== endpoint) {
+          console.warn('Primary category endpoint failed, retrying with fallback:', fallbackEndpoint);
+          return await axios.get(fallbackEndpoint, requestConfig);
+        }
+        throw err;
+      }
+    })().finally(() => {
       categoriesRequest = null;
     });
   }

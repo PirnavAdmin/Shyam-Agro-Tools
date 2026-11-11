@@ -14,7 +14,7 @@ const formatPrice = (value) => {
   return `\u20B9${Number(value).toLocaleString('en-IN')}`;
 };
 
-const ProductCard = ({ product, layout = 'grid', animateOnView = true, onInteraction }) => {
+const ProductCard = ({ product, layout = 'grid', animateOnView = true, onInteraction, className = '' }) => {
   const navigate = useNavigate();
   const { addToCart, isInCart } = useCart();
   const { t, productText } = useLanguage();
@@ -115,7 +115,7 @@ const ProductCard = ({ product, layout = 'grid', animateOnView = true, onInterac
       data-product-id={product.id}
       className={`product-card-static flex h-full cursor-pointer overflow-hidden border border-border bg-white ${
         isList ? 'flex-col md:flex-row' : 'flex-col'
-      } ${isInStock ? '' : 'out-of-stock'}`}
+      } ${isInStock ? '' : 'out-of-stock'} ${className}`}
     >
       <div
         className={`product-card-media product-image-wrapper relative bg-[#f7f8f4] ${
