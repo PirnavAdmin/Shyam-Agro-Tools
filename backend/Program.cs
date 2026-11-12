@@ -115,9 +115,28 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Prevent stale pooled HTTP sockets from throwing SocketException (10054)
+builder.Services.ConfigureHttpClientDefaults(http =>
+{
+    http.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+    {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+        PooledConnectionIdleTimeout = TimeSpan.FromSeconds(30)
+    });
+});
+
 // Database (Using hardcoded MySQL version to avoid extra startup connection quota consumption)
-var resolvedDbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? builder.Configuration["DB_CONNECTION_STRING"];
-Console.WriteLine($"[Startup DB Config] Resolved connection string: {resolvedDbConnectionString}");
+var rawDbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? builder.Configuration["DB_CONNECTION_STRING"];
+var mysqlConnBuilder = new MySqlConnector.MySqlConnectionStringBuilder(rawDbConnectionString ?? string.Empty)
+{
+    MinimumPoolSize = 0,
+    ConnectionIdleTimeout = 30,
+    ConnectionLifeTime = 120,
+    ConnectionReset = true,
+    Keepalive = 15
+};
+var resolvedDbConnectionString = mysqlConnBuilder.ConnectionString;
+Console.WriteLine($"[Startup DB Config] Resolved connection string host: {mysqlConnBuilder.Server}");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
@@ -126,8 +145,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         mysqlOptions =>
         {
             mysqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 3,
-                maxRetryDelay: TimeSpan.FromSeconds(5),
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(3),
                 errorNumbersToAdd: null);
         }));
 
@@ -605,6 +624,40 @@ using (var scope = app.Services.CreateScope())
 
 // CORS MUST come first before any redirection or static files
 app.UseCors("AllowAll");
+
+// Gracefully handle client disconnects and transient remote socket resets (SocketException 10054)
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+    {
+        // Client closed the connection before response completed
+        if (!context.Response.HasStarted)
+        {
+            context.Response.StatusCode = 499;
+        }
+    }
+    catch (Exception ex) when (
+        ex is System.Net.Sockets.SocketException ||
+        ex.InnerException is System.Net.Sockets.SocketException ||
+        ex.GetBaseException() is System.Net.Sockets.SocketException)
+    {
+        Console.WriteLine($"[SocketException Handler] Transient socket reset caught: {ex.GetBaseException().Message}");
+        MySqlConnector.MySqlConnection.ClearAllPools();
+        if (!context.Response.HasStarted)
+        {
+            context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new
+            {
+                message = "Temporary connection reset by remote host. Please retry."
+            });
+        }
+    }
+});
 
 // Enable Swagger UI
 app.UseSwagger();
