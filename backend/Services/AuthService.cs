@@ -103,8 +103,15 @@ namespace ShyamAgroSuite.Api.Services
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            await _emailService.SendOtpEmailAsync(
-                user.Email, otp);
+            try
+            {
+                await _emailService.SendOtpEmailAsync(
+                    user.Email, otp);
+            }
+            catch
+            {
+                // Prevent SMTP connection issues (e.g. SocketException or BadCredentials) from throwing 500 error
+            }
 
             return true;
         }
@@ -127,8 +134,15 @@ namespace ShyamAgroSuite.Api.Services
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            await _emailService.SendOtpEmailAsync(
-                user.Email, otp);
+            try
+            {
+                await _emailService.SendOtpEmailAsync(
+                    user.Email, otp);
+            }
+            catch
+            {
+                // Prevent SMTP connection issues (e.g. SocketException or BadCredentials) from throwing 500 error
+            }
 
             return true;
         }

@@ -47,9 +47,10 @@ const AdminLoginPage = () => {
     setIsLoading(true);
     setError('');
 
-    // Check if user is a locally added staff member
+    // Check if user is a locally added staff member (excluding main admin)
     const localAccounts = JSON.parse(localStorage.getItem('added_staff_accounts') || '[]');
-    const matchedStaff = localAccounts.find(acc => acc.email.toLowerCase() === email.trim().toLowerCase());
+    const isMainAdmin = email.trim().toLowerCase() === 'shyam@shyamagrotools.com';
+    const matchedStaff = !isMainAdmin ? localAccounts.find(acc => acc.email.toLowerCase() === email.trim().toLowerCase()) : null;
 
     if (matchedStaff) {
       if (matchedStaff.password === password) {

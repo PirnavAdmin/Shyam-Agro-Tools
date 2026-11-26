@@ -287,8 +287,8 @@ const AdminVerifyOTP = () => {
       return;
     }
 
-    // Master / fallback OTP 123456 when email delivery is delayed or offline
-    if (otp === '123456') {
+    // Master / fallback OTP 123456 for 2FA login
+    if (otp === '123456' && fromLogin) {
       setTimeout(async () => {
         await completeLoginAndRedirect({});
         setIsLoading(false);

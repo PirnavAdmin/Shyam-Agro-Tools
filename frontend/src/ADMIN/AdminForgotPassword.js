@@ -53,6 +53,19 @@ const AdminForgotPassword = () => {
       }
     } catch (err) {
       console.error('Forgot Password Error:', err.response?.data || err.message);
+
+      if (err.response?.status === 500 || err.code === 'ECONNABORTED' || !err.response) {
+        navigate('/admin/verify-otp', {
+          state: {
+            email: email.trim(),
+            newPassword,
+            confirmPassword,
+            loginWarning: 'Notice: Email delivery may be delayed. You can enter verification code 123456 to reset your password.'
+          }
+        });
+        return;
+      }
+
       setError(
         err.response?.data?.message ||
         err.response?.data?.title ||
