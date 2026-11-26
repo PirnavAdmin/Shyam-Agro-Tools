@@ -130,6 +130,39 @@
   text-transform: uppercase;
 }
 
+.admin-password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.admin-password-wrapper .admin-premium-input {
+  padding-right: 46px;
+}
+
+.admin-password-toggle-btn {
+  position: absolute;
+  top: 16px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #727a83;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.1s ease;
+  z-index: 2;
+}
+
+.admin-password-toggle-btn:hover {
+  color: #111820;
+}
+
+.admin-password-toggle-btn:active {
+  transform: scale(0.92);
+}
+
 .admin-premium-btn {
   width: 100%;
   height: 50px;

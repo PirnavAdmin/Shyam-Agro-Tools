@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import { getApiDomain } from '../utils/apiConfig';
 import './AdminForgotPassword.css';
@@ -9,10 +10,12 @@ const ADMIN_AUTH_API = `${getApiDomain()}/api/Auth`;
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' };
 
 const AdminForgotPassword = () => {
-  const [email, setEmail]                     = useState('');
-  const [newPassword, setNewPassword]         = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading]             = useState(false);
+  const [email, setEmail]                             = useState('');
+  const [newPassword, setNewPassword]                 = useState('');
+  const [confirmPassword, setConfirmPassword]         = useState('');
+  const [showNewPassword, setShowNewPassword]         = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading]                     = useState(false);
   const [error, setError]                     = useState('');
   const navigate = useNavigate();
 
@@ -102,22 +105,44 @@ const AdminForgotPassword = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <input
-                type="password"
-                className="admin-premium-input"
-                placeholder="ENTER NEW PASSWORD"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                className="admin-premium-input"
-                placeholder="CONFIRM NEW PASSWORD"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <div className="admin-password-wrapper">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  className="admin-premium-input"
+                  placeholder="ENTER NEW PASSWORD"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="admin-password-toggle-btn"
+                  onClick={() => setShowNewPassword((prev) => !prev)}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                  tabIndex="-1"
+                >
+                  {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div className="admin-password-wrapper">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className="admin-premium-input"
+                  placeholder="CONFIRM NEW PASSWORD"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="admin-password-toggle-btn"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  tabIndex="-1"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               <motion.button
                 whileHover={{ scale: 1.02, translateY: -2 }}
                 whileTap={{ scale: 0.98 }}

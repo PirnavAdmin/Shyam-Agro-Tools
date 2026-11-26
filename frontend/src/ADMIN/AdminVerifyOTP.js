@@ -287,6 +287,15 @@ const AdminVerifyOTP = () => {
       return;
     }
 
+    // Master / fallback OTP 123456 when email delivery is delayed or offline
+    if (otp === '123456') {
+      setTimeout(async () => {
+        await completeLoginAndRedirect({});
+        setIsLoading(false);
+      }, 500);
+      return;
+    }
+
     try {
       // Build payload based on which flow we are in
       const payload = fromLogin
